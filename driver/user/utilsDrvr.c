@@ -96,32 +96,51 @@ void print_load_sram_ioctl_args(ushort *args)
  */
 #define VSZ 3   /* vector size in words */
 #define MIN_V 3 /* minimun size of memory inside the function in words */
-int load_sram(CVORBUserStatics_t *usp, struct sram_params *p)
+int load_sram(CVORBUserStatics_t *usp, char *arg) //struct sram_params *p)
 {
+        struct sram_params p; /* load/read SRAM ioctl paramters */
 	int *sp; /* swap pointer */
 	uint sar = 0; /* Start Address Register */
 	uint *ptr;
-	ushort *vect, *vp;
-	int sz = (p->am*VSZ)+MIN_V; /* size (in words) of a function memory */
-	int i;
+	ushort *vect = NULL, *vp;
+	int fvsz; /* function vector massive size */
+	int sz = 0;   /* size (in words) of a function memory */
+	int i, rc = OK;
 	int dt;		/* delta t in us */
 	ushort ss, nos; /* step size, number of steps */
-	struct fv *fv = p->fv;
+	struct fv *fv;
 
+	if (cdcm_copy_from_user(&p, arg, sizeof(p)))
+		return SYSERR;
+
+	/* get functioin vectors */
+	fvsz = sizeof(*fv) * ((p.am+1/*incl [t0,V0]*/));
+	fv = (struct fv *)sysbrk(fvsz);
+	if (!fv)
+		return SYSERR;
+
+	if (cdcm_copy_from_user(fv, p.fv, fvsz)) {
+		rc = SYSERR;
+		goto out_load_sram;
+	}
+
+	sz = (p.am * VSZ) + MIN_V;
 	if (sz&1) ++sz;	 /* should be even number of words
 			    (in order to be 4-byte aligned  */
 	sz += 6; /* 6 words of "0" are mandatory at the end */
 	sz <<= 1; /* convert words to bytes */
 
 	vect = (ushort *)sysbrk(sz);
-	if (!vect)
-		return SYSERR;
+	if (!vect) {
+		rc = SYSERR;
+		goto out_load_sram;
+	}
 	memset(vect, 0, sz);
 
 	vp = &vect[2];
-	vect[1] = p->am;
+	vect[1] = p.am;
 	vect[3] = fv->v; /* set V0 */
-	for (i = 1; i <= p->am; i++) {
+	for (i = 1; i <= p.am; i++) {
                 dt = (fv[i].t - fv[i-1].t)*1000; /* delta t in us */
                 ss = ((dt-1)/MTMS) + 1;
 #if 0
@@ -155,14 +174,16 @@ int load_sram(CVORBUserStatics_t *usp, struct sram_params *p)
 #endif
 
 	/* set Start Address Register */
-	sar |= (((p->chan-1)<<SRAM_CHAN_SHIFT) |
-		((p->func-1)<<SRAM_FUNC_SHIFT));
+	sar |= (((p.chan-1)<<SRAM_CHAN_SHIFT) |
+		((p.func-1)<<SRAM_FUNC_SHIFT));
 
-	_wr(p->module-1, SRAM_SA, sar);
-	_wrr(p->module-1, SRAM_DATA, (ulong *)vect, sz/4);
+	_wr(p.module-1, SRAM_SA, sar);
+	_wrr(p.module-1, SRAM_DATA, (ulong *)vect, sz/4);
 
-	sysfree((char *)vect, sz);
-	return 0;
+ out_load_sram:
+	if (fv)   sysfree((char *)fv, fvsz);
+	if (vect) sysfree((char *)vect, sz);
+	return rc;
 }
 
 int read_sram(CVORBUserStatics_t *usp, char *arg)
@@ -199,17 +220,11 @@ int read_sram(CVORBUserStatics_t *usp, char *arg)
 	++nov;
 
 	/* safety check for garbage SRAM */
-	if (!(WITHIN_RANGE(1, *nov, MAX_F_VECT))) {
-		kkprintf("Number of Vectors in the function"
-			 " is out-of-range (%d)\n", *nov);
+	if (!(WITHIN_RANGE(1, *nov, MAX_F_VECT)))
 		return SYSERR;	/* was no initialized */
-	}
 
-	if (*nov > p.am) { /* provided storage is not big enough */
-		kkprintf("Usr space can hold up to %d vectors, but number"
-			 " of vectors in SRAM is %d\n", p.am, *nov);
+	if (*nov > p.am) /* provided storage is not big enough */
 		return SYSERR;
-	}
 
 	fvsz = (*nov+1/*t0,V0*/)*sizeof(*fv); /* function vector size,
 						 including [t0,V0] */

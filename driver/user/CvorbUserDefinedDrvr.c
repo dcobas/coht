@@ -275,8 +275,6 @@ int CvorbUserIoctl(int *proceed, register CVORBStatics_t *sptr,
 			 struct file *f, int lun, int com, char *arg)
 {
 	CVORBUserStatics_t *usp = sptr->usrst; /* user statistics table */
-	int rc;	  /* return code */
-	struct sram_params par;	/* load/read SRAM ioctl paramters */
 	ushort edp[3]; /* [select/get function] ioctl parameters
 			  [0] -- module idx
 			  [1] -- chan idx
@@ -303,31 +301,7 @@ int CvorbUserIoctl(int *proceed, register CVORBStatics_t *sptr,
 	case CVORB_CH_STAT:
 		return read_ch_stat(usp, arg);
 	case CVORB_LOAD_SRAM:
-		{
-			struct fv *fv;
-			int sz;
-
-			if (cdcm_copy_from_user(&par, arg, sizeof(par)))
-				return SYSERR;
-
-			/* get functioin vectors */
-			sz = sizeof(*fv) * ((par.am+1/*incl [t0,V0]*/));
-			fv = (struct fv *)sysbrk(sz);
-			if (!fv)
-				return SYSERR;
-
-			if (cdcm_copy_from_user(fv, par.fv, sz)) {
-				rc = SYSERR;
-				goto out_load_sram;
-			}
-
-			par.fv = fv;
-			rc = load_sram(usp, &par);
-
-		out_load_sram:
-			if (fv) sysfree((char*)fv, sz);
-			return rc;
-		}
+		return load_sram(usp, arg);
 	case CVORB_READ_SRAM:
 		return read_sram(usp, arg);
 	case CVORB_FEN: /* enable function in the function bitmask */

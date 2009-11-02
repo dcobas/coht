@@ -14,7 +14,7 @@
 #define _UTILS_DRIVER_H_INCLUDE_
 
 void print_load_sram_ioctl_args(ushort *);
-int  load_sram(CVORBUserStatics_t *, struct sram_params *);
+int  load_sram(CVORBUserStatics_t *, char *);
 int  read_sram(CVORBUserStatics_t *, char *);
 int  read_vhdl(CVORBUserStatics_t *, char *);
 int  read_pcb(CVORBUserStatics_t *, char *);
