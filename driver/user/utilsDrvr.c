@@ -255,24 +255,12 @@ int read_sram(CVORBUserStatics_t *usp, char *arg)
 #ifdef __linux__
 		*ptr = swahb32(ioread32((void *)&(usp->md[p.module-1].md->SRAM_DATA)));
 #else  /* lynx */
-	*ptr = __inl((__port_addr_t)&(usp->md[p.module-1].md->SRAM_DATA));
+		*ptr = __inl((__port_addr_t)&(usp->md[p.module-1].md->SRAM_DATA));
 #endif
 	}
 
 	/* now convert vector table to [function vectors] table
 	   and put it in the user space */
-#if 0
-	fv->t = *nov+1; /* return number of vectors (plus [t0, V0]) */
-	fv->v = vect[0]; /* V0 */
-	vp = vect;
-	vp = &vect[1]; /* set to first [Number of Steps] */
-	for ( i = 1; i <= *nov; i++, vp += 3) {
-		fv[i].t = ((vp[0] * vp[1] * 5))/1000 + dt; /* in ms */
-		dt = fv[i].t;
-		fv[i].v = vp[2];
-	}
-#endif
-#if 1
 	fv->t = *nov+1; /* return number of vectors (plus [t0, V0]) */
 	fv->v = vect[1]; /* V0 */
 	vp = &vect[0]; /* set to first Number of Steps */
@@ -288,7 +276,7 @@ int read_sram(CVORBUserStatics_t *usp, char *arg)
 		}
 		dt = fv[i].t;
 	}
-#endif
+
 	/* give results to the user */
 	if (cdcm_copy_to_user(p.fv, fv, fvsz))
 		rc = SYSERR;
