@@ -311,7 +311,7 @@ int CvorbUserIoctl(int *proceed, register CVORBStatics_t *sptr,
 				return SYSERR;
 
 			/* get functioin vectors */
-			sz = sizeof(*fv) * ((par.am+1/*incl [t0,V0]*/) * 2);
+			sz = sizeof(*fv) * ((par.am+1/*incl [t0,V0]*/));
 			fv = (struct fv *)sysbrk(sz);
 			if (!fv)
 				return SYSERR;
