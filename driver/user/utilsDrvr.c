@@ -32,14 +32,14 @@ void print_load_sram_ioctl_args(ushort *args)
 
 
 /*
-  SRAM Memory organization inside the function is the following:
+  1. SRAM Memory organization inside the function:
+  ------------------------------------------------
 
   0 2   4    6  8  a   c ... <-- address offset
   +-+---+----+--+--+---+---+----+----+--+--+---+---+----+----+--+--+---+
   |0|nov|nos1|v0|v1|ss1|ss2|nos2|nos3|v2|v3|ss3|ss4|nos4|nos5|v4|v5|ss5| ...
   +-+---+----+--+--+---+---+----+----+--+--+---+---+----+----+--+--+---+
    0  1   2   3   4  5  ... <-- word number (element idx)
-
 
   where:
   nov  -- number of vectors in the function
@@ -63,15 +63,15 @@ void print_load_sram_ioctl_args(ushort *args)
     }
   }
 
-*/
-/*
-  Memory allocation computation:
+
+  2. Memory allocation computation:
+  ---------------------------------
 
      1  |  2    |   3  |    4   |   5   |  6   |    7   |   8   |  9   |<-dwords
-  +---+-+--+----+---+--+----+---+--+----+---+--+----+---+--+----+---+--+
-  |nov|0|V0|nos1|ss1|V1|nos2|ss2|V2|nos3|ss3|V3|nos4|ss4|V4|nos5|ss5|V5|+3dwords
-  +---+-+--+----+---+--+----+---+--+----+---+--+----+---+--+----+---+--+
-    1  2|3   4  | 5  6 | 7    8 |9   10 |11  12| 13  14 |15  16 |17  18|<-words
+  +-+---+----+--+--+---+---+----+----+--+--+---+---+----+----+--+--+---+
+  |0|nov|nos1|v0|v1|ss1|ss2|nos2|nos3|v2|v3|ss3|ss4|nos4|nos5|v4|v5|ss5|+3dwords
+  +-+---+----+--+--+---+---+----+----+--+--+---+---+----+----+--+--+---+
+   1  2 | 3   4 | 5  6 | 7    8 |9   10 |11  12| 13  14 |15  16 |17  18|<-words
 
   Size of one vector -- is 3 words           <-- VSZ
   Min size possible -- is 3 words (nov,0,V0) <-- MIN_V
@@ -93,10 +93,9 @@ void print_load_sram_ioctl_args(ushort *args)
         5       |       18      |              9
   --------------+---------------+--------------------------------
       ...             ...                      ...
-
  */
-#define VSZ 3	      /* vector size in words */
-#define MIN_V 3	      /* minimun size of memory inside the function in words */
+#define VSZ 3   /* vector size in words */
+#define MIN_V 3 /* minimun size of memory inside the function in words */
 int load_sram(CVORBUserStatics_t *usp, struct sram_params *p)
 {
 	int *sp; /* swap pointer */
@@ -119,31 +118,6 @@ int load_sram(CVORBUserStatics_t *usp, struct sram_params *p)
 		return SYSERR;
 	memset(vect, 0, sz);
 
-#if 0
-	/* now put data in the memory buffer */
-	vp = &vect[3];
-	vect[0] = p->am;
-	vect[2] = fv->v; /* set V0 */
-	kkprintf("Vector amount is %d V0 is 0x%x (%d)\n", vect[0], vect[2], vect[2]);
-	for (i = 1; i <= p->am; i++) {
-                dt = (fv[i].t - fv[i-1].t)*1000; /* delta t in us */
-                ss = ((dt-1)/MTMS) + 1;
-#if 0
-		/* step size (in us) should be a factor of dt!
-		   should be already checked by the library! */
-		if (dt%ss)
-			poison;
-#endif
-                nos = dt/(ss * MIN_STEP);
-                vp[0] = nos;
-                vp[1] = ss;
-                vp[2] = fv[i].v;
-		kkprintf("nos 0x%x (%d)   ss 0x%x (%d)   fv 0x%x (%d)\n", vp[0], vp[0], vp[1], vp[1], vp[2], vp[2]);
-                vp += 3;
-        }
-#endif
-
-#if 1
 	vp = &vect[2];
 	vect[1] = p->am;
 	vect[3] = fv->v; /* set V0 */
@@ -170,7 +144,6 @@ int load_sram(CVORBUserStatics_t *usp, struct sram_params *p)
 			vp += 2;
 		}
         }
-#endif
 
 	ptr = (uint *)vect;
 
