@@ -704,8 +704,9 @@ int cvorb_wr_fem(int h, int ch, unsigned long long mask)
  * @param ch   -- channel [1-16]
  * @param func -- function to load [1-64]
  * @param fv   -- data to load \n
- *                MAX allowed vector amount in the array
- *		  is @ref MAX_F_VECT + 1 (which is [t0 == 0, V0]) \n
+ *                MAX allowed vector amount in this array -- is
+ *		  @ref MAX_F_VECT + 1 (which is [t0 == 0, V0]) \n
+ *                Element[0] -- should be @b always [t0 ==0, V0] \n
  *                Actual element amout passed by the user in @b sz parameter
  *                can be smaller.
  * @param sz   -- how many data elements were passed by the user
