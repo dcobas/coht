@@ -1,0 +1,47 @@
+current CVORB src is in ~/drvers/cvorbgfa
+
+API functions requested:
+
+A. Open module
+   1.  handle = DaEnableAccess()
+   2.  DaDisableAccess(handle)
+
+B. r/w Module Configuration Register
+   3.  cvorb_rd_mcr(handle, channel[1-16])
+   4.  cvorb_wr_mcr(handle, channel[1-16])
+
+C. r/w Channel Configuration Register
+   5.  cvorb_rd_ccr(handle, channel[1-16])
+   6.  cvorb_wr_ccr(handle, channel[1-16])
+
+D. Read Module/Channel status
+   7.  cvorb_rd_mod_stat(handle, channel[1-16])
+   8.  cvorb_rd_chan_stat(handle, channel[1-16])
+
+E. Current VHDL version
+   9.  cvorb_rd_vhdl_vers(handle (same for both modules))
+
+F. "Printed Circuit Board" serial number
+   10. cvorb_rd_psb_sn(handle (same for both modules))
+
+G. Read module temp
+   11. cvorb_rd_temp(handle, channel[1-16])
+
+H. Reset Module/FPGA
+   12. cvorb_rst_module(handle (same for both modules))
+   13. cvorb_rst_fpga(handle (same for both modules))
+
+I. r/w Function Enable Mask
+   14. cvorb_rd_fem(handle, channel[1-16])
+   15. cvorb_wr_fem(handle, channel[1-16])
+
+J. Funtion operations
+   16. cvorb_func_load(handle, channel, function[1-64], data)
+   17. no_of_functions = cvorb_func_read(handle, function[1-64], data)
+   18. cvorb_func_en(handle, function[1-64], mask)
+   19. cvorb_func_dis(handle, function[1-64], mask)
+   20. cvorb_func_sel(handle, function[1-64])
+   21. cvorb_func_get(handle, chan)
+
+Additional functions:
+

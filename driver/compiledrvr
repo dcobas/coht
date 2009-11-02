@@ -1,0 +1,31 @@
+#!/bin/bash
+################################################################################
+# @file compiledrvr
+#
+# @brief Driver compilation script.
+#
+# @author Copyright (C) 2009 CERN. Yury GEORGIEVSKIY <ygeorgie@cern.ch>
+#
+# @date Created on 13/01/2009
+################################################################################
+
+# Compile for Linux
+if [[ "$1" == "linux" ]]; then
+#make -f makefiles/drvr-linux.mk clean
+    make -f makefiles/drvr-linux.mk
+fi
+
+# Compile for Lynx
+if [[ "$1" == "lynx" ]]; then
+#make -f makefiles/drvr-lynx.mk clean
+    make -f makefiles/drvr-lynx.mk
+fi
+
+# Compile for both
+if [[ "$#" -eq "0" ]]; then
+#make -f makefiles/drvr-linux.mk clean
+    make -f makefiles/drvr-linux.mk
+
+#make -f makefiles/drvr-lynx.mk clean
+    make -f makefiles/drvr-lynx.mk
+fi

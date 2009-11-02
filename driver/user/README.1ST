@@ -1,0 +1,34 @@
+                            LOCAL FILE NAMING CONVENTION
+                            ----------------------------
+   If you will add your own driver or simulator sourse files to this directory,
+than you should keep in mind the naming convention rule:
+
+If the files are for real driver - than they should end with "Drvr.c" suffix!
+For example:
+     MyAddedSrcDrvr.c
+               |----|
+                 |
+                 V
+             Required suffix for added driver src code.
+
+If the files are for simulator - than they should end with "Sim.c" suffix!
+For example:
+     MyAddedSrcSim.c
+               |---|
+                 |
+                 V
+             Required suffix for added simulator src code.
+
+
+This convention is used in Makefiles for source code compilation.
+
+-------------------------------------------------------------------------------
+
+   Use CvorbVersion[Drvr/Sim].h file (that is located in
+'../../include/user' directory) to change current real/simulator driver
+version. Like this it's possible to track driver versions. The first version
+that driver will have is zero (0). Note, that version is automatically
+increased by one (1) when 'cpUsrPt' is used to move user-defined src code from
+one directory to another.
+
+-------------------------------------------------------------------------------

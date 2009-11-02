@@ -1,0 +1,3 @@
+#!/bin/bash
+
+../../general/ins_rm_mod/dgmoduninst.L865 CVORB -dall
