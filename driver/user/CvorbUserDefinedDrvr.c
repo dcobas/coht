@@ -366,7 +366,6 @@ int CvorbUserIoctl(int *proceed, register CVORBStatics_t *sptr,
 			     Simulate front panel pulse inputs */
 		if (cdcm_copy_from_user(&edp, arg, sizeof(edp)))
 			return SYSERR;
-		kkprintf("Will write 0x%x @moduleIDX#%d\n", edp[1], edp[0]);
 		_wr(edp[0], SOFT_PULSE, edp[1]);
 		return OK;
 	case CVORB_RC_RD:

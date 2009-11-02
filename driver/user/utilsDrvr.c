@@ -147,7 +147,6 @@ int load_sram(CVORBUserStatics_t *usp, struct sram_params *p)
 	vp = &vect[2];
 	vect[1] = p->am;
 	vect[3] = fv->v; /* set V0 */
-	//kkprintf("Vector amount is %d V0 is 0x%x (%d)\n", vect[0], vect[2], vect[2]);
 	for (i = 1; i <= p->am; i++) {
                 dt = (fv[i].t - fv[i-1].t)*1000; /* delta t in us */
                 ss = ((dt-1)/MTMS) + 1;
@@ -163,13 +162,11 @@ int load_sram(CVORBUserStatics_t *usp, struct sram_params *p)
 			vp[0] = nos;
 			vp[2] = fv[i].v;
 			vp[3] = ss;
-			//kkprintf("nos 0x%x (%d)   ss 0x%x (%d)   fv 0x%x (%d)\n", vp[0], vp[0], vp[3], vp[3], vp[2], vp[2]);
 			vp += 4;
 		} else { /* even */
 			vp[0] = ss;
 			vp[1] = nos;
 			vp[3] = fv[i].v;
-			//kkprintf("nos 0x%x (%d)   ss 0x%x (%d)   fv 0x%x (%d)\n", vp[1], vp[1], vp[0], vp[0], vp[3], vp[3]);
 			vp += 2;
 		}
         }
