@@ -33,8 +33,8 @@ static char Cvorb_compile_time[]  = __TIME__;
 static const char Cvorb_version[] = "v2.4.13";
 
 /* generation date in hex and human representation */
-static const char Cvorb_generation_time_str[] = "Wed Oct 21 11:58:12 2009";
-#define CVORB_GENERATION_TIME_HEX 0x4adedb34
+static const char Cvorb_generation_time_str[] = "Mon Nov  2 14:38:14 2009";
+#define CVORB_GENERATION_TIME_HEX 0x4aeee0c6
 /* ------------------------------------------------------------------------- */
 
 /* to suppress implisit declaration warnings */
@@ -596,54 +596,6 @@ int Cvorb_ioctl(register CVORBStatics_t *s,
 	case CVORB_SET_DAC_CNTL:
 		return set_DAC_CNTL(s, arg, c_rwb, r_rw);
 		break;
-	case CVORB_GET_CH1:
-		return get_CH1(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_SET_CH1:
-		return set_CH1(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_GET_CH2:
-		return get_CH2(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_SET_CH2:
-		return set_CH2(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_GET_CH3:
-		return get_CH3(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_SET_CH3:
-		return set_CH3(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_GET_CH4:
-		return get_CH4(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_SET_CH4:
-		return set_CH4(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_GET_CH5:
-		return get_CH5(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_SET_CH5:
-		return set_CH5(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_GET_CH6:
-		return get_CH6(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_SET_CH6:
-		return set_CH6(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_GET_CH7:
-		return get_CH7(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_SET_CH7:
-		return set_CH7(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_GET_CH8:
-		return get_CH8(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_SET_CH8:
-		return set_CH8(s, arg, c_rwb, r_rw);
-		break;
 	case CVORB_GET_CH_STAT:
 		return get_CH_STAT(s, arg, c_rwb, r_rw);
 		break;
@@ -682,12 +634,6 @@ int Cvorb_ioctl(register CVORBStatics_t *s,
 		break;
 	case CVORB_SET_CH_REC_CYC:
 		return set_CH_REC_CYC(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_GET_ALL_CH:
-		return get_ALL_CH(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_SET_ALL_CH:
-		return set_ALL_CH(s, arg, c_rwb, r_rw);
 		break;
 	default:
 		pseterr(EINVAL);
@@ -732,60 +678,6 @@ static void CvorbMemCleanup(CVORBStatics_t *statPtr)
     if (statPtr->card->block01 != NULL) {
       kkprintf("Cvorb: Block 1 deallocation - ");
       sysfree((char*)statPtr->card->block01, (long)sizeof(CVORBBlock01_t));
-      kkprintf("OK\n");
-    }
-
-    if (statPtr->card->block02 != NULL) {
-      kkprintf("Cvorb: Block 2 deallocation - ");
-      sysfree((char*)statPtr->card->block02, (long)sizeof(CVORBBlock02_t));
-      kkprintf("OK\n");
-    }
-
-    if (statPtr->card->block03 != NULL) {
-      kkprintf("Cvorb: Block 3 deallocation - ");
-      sysfree((char*)statPtr->card->block03, (long)sizeof(CVORBBlock03_t));
-      kkprintf("OK\n");
-    }
-
-    if (statPtr->card->block04 != NULL) {
-      kkprintf("Cvorb: Block 4 deallocation - ");
-      sysfree((char*)statPtr->card->block04, (long)sizeof(CVORBBlock04_t));
-      kkprintf("OK\n");
-    }
-
-    if (statPtr->card->block05 != NULL) {
-      kkprintf("Cvorb: Block 5 deallocation - ");
-      sysfree((char*)statPtr->card->block05, (long)sizeof(CVORBBlock05_t));
-      kkprintf("OK\n");
-    }
-
-    if (statPtr->card->block06 != NULL) {
-      kkprintf("Cvorb: Block 6 deallocation - ");
-      sysfree((char*)statPtr->card->block06, (long)sizeof(CVORBBlock06_t));
-      kkprintf("OK\n");
-    }
-
-    if (statPtr->card->block07 != NULL) {
-      kkprintf("Cvorb: Block 7 deallocation - ");
-      sysfree((char*)statPtr->card->block07, (long)sizeof(CVORBBlock07_t));
-      kkprintf("OK\n");
-    }
-
-    if (statPtr->card->block08 != NULL) {
-      kkprintf("Cvorb: Block 8 deallocation - ");
-      sysfree((char*)statPtr->card->block08, (long)sizeof(CVORBBlock08_t));
-      kkprintf("OK\n");
-    }
-
-    if (statPtr->card->block09 != NULL) {
-      kkprintf("Cvorb: Block 9 deallocation - ");
-      sysfree((char*)statPtr->card->block09, (long)sizeof(CVORBBlock09_t));
-      kkprintf("OK\n");
-    }
-
-    if (statPtr->card->block10 != NULL) {
-      kkprintf("Cvorb: Block 10 deallocation - ");
-      sysfree((char*)statPtr->card->block10, (long)sizeof(CVORBBlock10_t));
       kkprintf("OK\n");
     }
 
@@ -1062,114 +954,6 @@ char* Cvorb_install(void *infofile)
 	}
 
 	bzero((char*)statPtr->card->block01, sizeof(CVORBBlock01_t));
-	kkprintf("OK\n");
-
-	kkprintf("Cvorb: Block 2 allocation - ");
-	if ( !(statPtr->card->block02 = (CVORBBlock02_t *)sysbrk((long)sizeof(CVORBBlock02_t))) ) {
-		/* Horrible, impossible failure. */
-		kkprintf("FAILED\n");
-		pseterr(ENOMEM);
-		INST_FAIL();
-		return((char*)SYSERR); /* -1 */
-	}
-
-	bzero((char*)statPtr->card->block02, sizeof(CVORBBlock02_t));
-	kkprintf("OK\n");
-
-	kkprintf("Cvorb: Block 3 allocation - ");
-	if ( !(statPtr->card->block03 = (CVORBBlock03_t *)sysbrk((long)sizeof(CVORBBlock03_t))) ) {
-		/* Horrible, impossible failure. */
-		kkprintf("FAILED\n");
-		pseterr(ENOMEM);
-		INST_FAIL();
-		return((char*)SYSERR); /* -1 */
-	}
-
-	bzero((char*)statPtr->card->block03, sizeof(CVORBBlock03_t));
-	kkprintf("OK\n");
-
-	kkprintf("Cvorb: Block 4 allocation - ");
-	if ( !(statPtr->card->block04 = (CVORBBlock04_t *)sysbrk((long)sizeof(CVORBBlock04_t))) ) {
-		/* Horrible, impossible failure. */
-		kkprintf("FAILED\n");
-		pseterr(ENOMEM);
-		INST_FAIL();
-		return((char*)SYSERR); /* -1 */
-	}
-
-	bzero((char*)statPtr->card->block04, sizeof(CVORBBlock04_t));
-	kkprintf("OK\n");
-
-	kkprintf("Cvorb: Block 5 allocation - ");
-	if ( !(statPtr->card->block05 = (CVORBBlock05_t *)sysbrk((long)sizeof(CVORBBlock05_t))) ) {
-		/* Horrible, impossible failure. */
-		kkprintf("FAILED\n");
-		pseterr(ENOMEM);
-		INST_FAIL();
-		return((char*)SYSERR); /* -1 */
-	}
-
-	bzero((char*)statPtr->card->block05, sizeof(CVORBBlock05_t));
-	kkprintf("OK\n");
-
-	kkprintf("Cvorb: Block 6 allocation - ");
-	if ( !(statPtr->card->block06 = (CVORBBlock06_t *)sysbrk((long)sizeof(CVORBBlock06_t))) ) {
-		/* Horrible, impossible failure. */
-		kkprintf("FAILED\n");
-		pseterr(ENOMEM);
-		INST_FAIL();
-		return((char*)SYSERR); /* -1 */
-	}
-
-	bzero((char*)statPtr->card->block06, sizeof(CVORBBlock06_t));
-	kkprintf("OK\n");
-
-	kkprintf("Cvorb: Block 7 allocation - ");
-	if ( !(statPtr->card->block07 = (CVORBBlock07_t *)sysbrk((long)sizeof(CVORBBlock07_t))) ) {
-		/* Horrible, impossible failure. */
-		kkprintf("FAILED\n");
-		pseterr(ENOMEM);
-		INST_FAIL();
-		return((char*)SYSERR); /* -1 */
-	}
-
-	bzero((char*)statPtr->card->block07, sizeof(CVORBBlock07_t));
-	kkprintf("OK\n");
-
-	kkprintf("Cvorb: Block 8 allocation - ");
-	if ( !(statPtr->card->block08 = (CVORBBlock08_t *)sysbrk((long)sizeof(CVORBBlock08_t))) ) {
-		/* Horrible, impossible failure. */
-		kkprintf("FAILED\n");
-		pseterr(ENOMEM);
-		INST_FAIL();
-		return((char*)SYSERR); /* -1 */
-	}
-
-	bzero((char*)statPtr->card->block08, sizeof(CVORBBlock08_t));
-	kkprintf("OK\n");
-
-	kkprintf("Cvorb: Block 9 allocation - ");
-	if ( !(statPtr->card->block09 = (CVORBBlock09_t *)sysbrk((long)sizeof(CVORBBlock09_t))) ) {
-		/* Horrible, impossible failure. */
-		kkprintf("FAILED\n");
-		pseterr(ENOMEM);
-		INST_FAIL();
-		return((char*)SYSERR); /* -1 */
-	}
-
-	bzero((char*)statPtr->card->block09, sizeof(CVORBBlock09_t));
-	kkprintf("OK\n");
-
-	kkprintf("Cvorb: Block 10 allocation - ");
-	if ( !(statPtr->card->block10 = (CVORBBlock10_t *)sysbrk((long)sizeof(CVORBBlock10_t))) ) {
-		/* Horrible, impossible failure. */
-		kkprintf("FAILED\n");
-		pseterr(ENOMEM);
-		INST_FAIL();
-		return((char*)SYSERR); /* -1 */
-	}
-
-	bzero((char*)statPtr->card->block10, sizeof(CVORBBlock10_t));
 	kkprintf("OK\n");
 
 	/* 0x5 save info table pointer */

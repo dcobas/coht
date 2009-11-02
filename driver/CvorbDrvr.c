@@ -33,8 +33,8 @@ static char Cvorb_compile_time[]  = __TIME__;
 static const char Cvorb_version[] = "v2.4.13";
 
 /* generation date in hex and human representation */
-static const char Cvorb_generation_time_str[] = "Wed Oct 21 11:58:12 2009";
-#define CVORB_GENERATION_TIME_HEX 0x4adedb34
+static const char Cvorb_generation_time_str[] = "Mon Nov  2 14:38:14 2009";
+#define CVORB_GENERATION_TIME_HEX 0x4aeee0c6
 /* ------------------------------------------------------------------------- */
 
 /* to suppress implisit declaration warnings */
@@ -596,54 +596,6 @@ int Cvorb_ioctl(register CVORBStatics_t *s,
 	case CVORB_SET_DAC_CNTL:
 		return set_DAC_CNTL(s, arg, c_rwb, r_rw);
 		break;
-	case CVORB_GET_CH1:
-		return get_CH1(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_SET_CH1:
-		return set_CH1(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_GET_CH2:
-		return get_CH2(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_SET_CH2:
-		return set_CH2(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_GET_CH3:
-		return get_CH3(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_SET_CH3:
-		return set_CH3(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_GET_CH4:
-		return get_CH4(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_SET_CH4:
-		return set_CH4(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_GET_CH5:
-		return get_CH5(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_SET_CH5:
-		return set_CH5(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_GET_CH6:
-		return get_CH6(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_SET_CH6:
-		return set_CH6(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_GET_CH7:
-		return get_CH7(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_SET_CH7:
-		return set_CH7(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_GET_CH8:
-		return get_CH8(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_SET_CH8:
-		return set_CH8(s, arg, c_rwb, r_rw);
-		break;
 	case CVORB_GET_CH_STAT:
 		return get_CH_STAT(s, arg, c_rwb, r_rw);
 		break;
@@ -682,12 +634,6 @@ int Cvorb_ioctl(register CVORBStatics_t *s,
 		break;
 	case CVORB_SET_CH_REC_CYC:
 		return set_CH_REC_CYC(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_GET_ALL_CH:
-		return get_ALL_CH(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_SET_ALL_CH:
-		return set_ALL_CH(s, arg, c_rwb, r_rw);
 		break;
 	default:
 		pseterr(EINVAL);
@@ -1237,69 +1183,6 @@ char* Cvorb_install(void *infofile)
 					info->blkDesc[1].offset);
 	kkprintf("[to mapped addr 0x%x] - OK\n",
 		 (int)statPtr->card->block01);
-
-	kkprintf("Cvorb: Block 2 assignment ");
-	statPtr->card->block02 =
-	(CVORBBlock02_t*)(info->addr1.baseAddr +
-					info->blkDesc[2].offset);
-	kkprintf("[to mapped addr 0x%x] - OK\n",
-		 (int)statPtr->card->block02);
-
-	kkprintf("Cvorb: Block 3 assignment ");
-	statPtr->card->block03 =
-	(CVORBBlock03_t*)(info->addr1.baseAddr +
-					info->blkDesc[3].offset);
-	kkprintf("[to mapped addr 0x%x] - OK\n",
-		 (int)statPtr->card->block03);
-
-	kkprintf("Cvorb: Block 4 assignment ");
-	statPtr->card->block04 =
-	(CVORBBlock04_t*)(info->addr1.baseAddr +
-					info->blkDesc[4].offset);
-	kkprintf("[to mapped addr 0x%x] - OK\n",
-		 (int)statPtr->card->block04);
-
-	kkprintf("Cvorb: Block 5 assignment ");
-	statPtr->card->block05 =
-	(CVORBBlock05_t*)(info->addr1.baseAddr +
-					info->blkDesc[5].offset);
-	kkprintf("[to mapped addr 0x%x] - OK\n",
-		 (int)statPtr->card->block05);
-
-	kkprintf("Cvorb: Block 6 assignment ");
-	statPtr->card->block06 =
-	(CVORBBlock06_t*)(info->addr1.baseAddr +
-					info->blkDesc[6].offset);
-	kkprintf("[to mapped addr 0x%x] - OK\n",
-		 (int)statPtr->card->block06);
-
-	kkprintf("Cvorb: Block 7 assignment ");
-	statPtr->card->block07 =
-	(CVORBBlock07_t*)(info->addr1.baseAddr +
-					info->blkDesc[7].offset);
-	kkprintf("[to mapped addr 0x%x] - OK\n",
-		 (int)statPtr->card->block07);
-
-	kkprintf("Cvorb: Block 8 assignment ");
-	statPtr->card->block08 =
-	(CVORBBlock08_t*)(info->addr1.baseAddr +
-					info->blkDesc[8].offset);
-	kkprintf("[to mapped addr 0x%x] - OK\n",
-		 (int)statPtr->card->block08);
-
-	kkprintf("Cvorb: Block 9 assignment ");
-	statPtr->card->block09 =
-	(CVORBBlock09_t*)(info->addr1.baseAddr +
-					info->blkDesc[9].offset);
-	kkprintf("[to mapped addr 0x%x] - OK\n",
-		 (int)statPtr->card->block09);
-
-	kkprintf("Cvorb: Block 10 assignment ");
-	statPtr->card->block10 =
-	(CVORBBlock10_t*)(info->addr1.baseAddr +
-					info->blkDesc[10].offset);
-	kkprintf("[to mapped addr 0x%x] - OK\n",
-		 (int)statPtr->card->block10);
 
 	/* 0x5 save info table pointer */
 	statPtr->info = (void*)info;

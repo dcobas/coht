@@ -1351,113 +1351,50 @@ RW_REG_SCAL(REC_CYC, long, 0, block00, l, 32);
 RW_REG_SCAL(DAC_CNTL, long, 0, block00, l, 32);
 
 /**
- * @brief All registers of channel 1
- *
- * This is a Normal register.
- */
-RW_REG_ARR(CH1, long, 0, block01, l, 32);
-
-/**
- * @brief All registers of channel 2
- *
- * This is a Normal register.
- */
-RW_REG_ARR(CH2, long, 0, block02, l, 32);
-
-/**
- * @brief All registers of channel 3
- *
- * This is a Normal register.
- */
-RW_REG_ARR(CH3, long, 0, block03, l, 32);
-
-/**
- * @brief All registers of channel 4
- *
- * This is a Normal register.
- */
-RW_REG_ARR(CH4, long, 0, block04, l, 32);
-
-/**
- * @brief All registers of channel 5
- *
- * This is a Normal register.
- */
-RW_REG_ARR(CH5, long, 0, block05, l, 32);
-
-/**
- * @brief All registers of channel 6
- *
- * This is a Normal register.
- */
-RW_REG_ARR(CH6, long, 0, block06, l, 32);
-
-/**
- * @brief All registers of channel 7
- *
- * This is a Normal register.
- */
-RW_REG_ARR(CH7, long, 0, block07, l, 32);
-
-/**
- * @brief All registers of channel 8
- *
- * This is a Normal register.
- */
-RW_REG_ARR(CH8, long, 0, block08, l, 32);
-
-/**
  * @brief Channel status
  *
  * This is a Normal register.
  */
-RO_REG_SCAL(CH_STAT, long, 0, block09, l, 32);
+RO_REG_SCAL(CH_STAT, long, 0, block01, l, 32);
 
 /**
  * @brief Channel config
  *
  * This is a Normal register.
  */
-RW_REG_SCAL(CH_CFG, long, 0, block09, l, 32);
+RW_REG_SCAL(CH_CFG, long, 0, block01, l, 32);
 
 /**
  * @brief Function selection
  *
  * This is a Normal register.
  */
-RW_REG_SCAL(FUNC_SEL, long, 0, block09, l, 32);
+RW_REG_SCAL(FUNC_SEL, long, 0, block01, l, 32);
 
 /**
  * @brief Fct enable mask (63 to 32)
  *
  * This is a Normal register.
  */
-RW_REG_SCAL(FCT_EM_H, long, 0, block09, l, 32);
+RW_REG_SCAL(FCT_EM_H, long, 0, block01, l, 32);
 
 /**
  * @brief Fct enable mask (31 to 0)
  *
  * This is a Normal register.
  */
-RW_REG_SCAL(FCT_EM_L, long, 0, block09, l, 32);
+RW_REG_SCAL(FCT_EM_L, long, 0, block01, l, 32);
 
 /**
  * @brief Slope
  *
  * This is a Normal register.
  */
-RW_REG_SCAL(SLOPE, long, 0, block09, l, 32);
+RW_REG_SCAL(SLOPE, long, 0, block01, l, 32);
 
 /**
  * @brief Recurrent cycles
  *
  * This is a Normal register.
  */
-RW_REG_SCAL(CH_REC_CYC, long, 0, block09, l, 32);
-
-/**
- * @brief All channels to access in one chunk
- *
- * This is a Normal register.
- */
-RW_REG_ARR(ALL_CH, long, 0, block10, l, 32);
+RW_REG_SCAL(CH_REC_CYC, long, 0, block01, l, 32);

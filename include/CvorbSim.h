@@ -176,40 +176,22 @@ do {									\
 #define CVORB_SET_REC_CYC (_FIRST__IOCTL_ + 31)
 #define CVORB_GET_DAC_CNTL (_FIRST__IOCTL_ + 32)
 #define CVORB_SET_DAC_CNTL (_FIRST__IOCTL_ + 33)
-#define CVORB_GET_CH1 (_FIRST__IOCTL_ + 34)
-#define CVORB_SET_CH1 (_FIRST__IOCTL_ + 35)
-#define CVORB_GET_CH2 (_FIRST__IOCTL_ + 36)
-#define CVORB_SET_CH2 (_FIRST__IOCTL_ + 37)
-#define CVORB_GET_CH3 (_FIRST__IOCTL_ + 38)
-#define CVORB_SET_CH3 (_FIRST__IOCTL_ + 39)
-#define CVORB_GET_CH4 (_FIRST__IOCTL_ + 40)
-#define CVORB_SET_CH4 (_FIRST__IOCTL_ + 41)
-#define CVORB_GET_CH5 (_FIRST__IOCTL_ + 42)
-#define CVORB_SET_CH5 (_FIRST__IOCTL_ + 43)
-#define CVORB_GET_CH6 (_FIRST__IOCTL_ + 44)
-#define CVORB_SET_CH6 (_FIRST__IOCTL_ + 45)
-#define CVORB_GET_CH7 (_FIRST__IOCTL_ + 46)
-#define CVORB_SET_CH7 (_FIRST__IOCTL_ + 47)
-#define CVORB_GET_CH8 (_FIRST__IOCTL_ + 48)
-#define CVORB_SET_CH8 (_FIRST__IOCTL_ + 49)
-#define CVORB_GET_CH_STAT (_FIRST__IOCTL_ + 50)
-#define CVORB_GET_CH_CFG (_FIRST__IOCTL_ + 51)
-#define CVORB_SET_CH_CFG (_FIRST__IOCTL_ + 52)
-#define CVORB_GET_FUNC_SEL (_FIRST__IOCTL_ + 53)
-#define CVORB_SET_FUNC_SEL (_FIRST__IOCTL_ + 54)
-#define CVORB_GET_FCT_EM_H (_FIRST__IOCTL_ + 55)
-#define CVORB_SET_FCT_EM_H (_FIRST__IOCTL_ + 56)
-#define CVORB_GET_FCT_EM_L (_FIRST__IOCTL_ + 57)
-#define CVORB_SET_FCT_EM_L (_FIRST__IOCTL_ + 58)
-#define CVORB_GET_SLOPE (_FIRST__IOCTL_ + 59)
-#define CVORB_SET_SLOPE (_FIRST__IOCTL_ + 60)
-#define CVORB_GET_CH_REC_CYC (_FIRST__IOCTL_ + 61)
-#define CVORB_SET_CH_REC_CYC (_FIRST__IOCTL_ + 62)
-#define CVORB_GET_ALL_CH (_FIRST__IOCTL_ + 63)
-#define CVORB_SET_ALL_CH (_FIRST__IOCTL_ + 64)
+#define CVORB_GET_CH_STAT (_FIRST__IOCTL_ + 34)
+#define CVORB_GET_CH_CFG (_FIRST__IOCTL_ + 35)
+#define CVORB_SET_CH_CFG (_FIRST__IOCTL_ + 36)
+#define CVORB_GET_FUNC_SEL (_FIRST__IOCTL_ + 37)
+#define CVORB_SET_FUNC_SEL (_FIRST__IOCTL_ + 38)
+#define CVORB_GET_FCT_EM_H (_FIRST__IOCTL_ + 39)
+#define CVORB_SET_FCT_EM_H (_FIRST__IOCTL_ + 40)
+#define CVORB_GET_FCT_EM_L (_FIRST__IOCTL_ + 41)
+#define CVORB_SET_FCT_EM_L (_FIRST__IOCTL_ + 42)
+#define CVORB_GET_SLOPE (_FIRST__IOCTL_ + 43)
+#define CVORB_SET_SLOPE (_FIRST__IOCTL_ + 44)
+#define CVORB_GET_CH_REC_CYC (_FIRST__IOCTL_ + 45)
+#define CVORB_SET_CH_REC_CYC (_FIRST__IOCTL_ + 46)
 
 /* First allowed number for user-defined ioctl */
-#define CVORB_FIRST_USR_IOCTL (_FIRST__IOCTL_ + 65)
+#define CVORB_FIRST_USR_IOCTL (_FIRST__IOCTL_ + 47)
 
 /* keeps last written value of the 'write only' registers */
 typedef  struct {
@@ -247,47 +229,7 @@ typedef volatile struct {
   /* 0x60 */ unsigned long DAC_CNTL;
 } CVORBBlock00_t;
 
-/* Blk[#1]@addr[#1] Offs 0x80. Sz 28 bytes. 1 reg(s). 0 gap(s) */
-typedef volatile struct {
-  /* [0x0 - 0x18] */ unsigned long CH1[7];
-} CVORBBlock01_t;
-
-/* Blk[#2]@addr[#1] Offs 0xb0. Sz 28 bytes. 1 reg(s). 0 gap(s) */
-typedef volatile struct {
-  /* [0x0 - 0x18] */ unsigned long CH2[7];
-} CVORBBlock02_t;
-
-/* Blk[#3]@addr[#1] Offs 0xe0. Sz 28 bytes. 1 reg(s). 0 gap(s) */
-typedef volatile struct {
-  /* [0x0 - 0x18] */ unsigned long CH3[7];
-} CVORBBlock03_t;
-
-/* Blk[#4]@addr[#1] Offs 0x110. Sz 28 bytes. 1 reg(s). 0 gap(s) */
-typedef volatile struct {
-  /* [0x0 - 0x18] */ unsigned long CH4[7];
-} CVORBBlock04_t;
-
-/* Blk[#5]@addr[#1] Offs 0x140. Sz 28 bytes. 1 reg(s). 0 gap(s) */
-typedef volatile struct {
-  /* [0x0 - 0x18] */ unsigned long CH5[7];
-} CVORBBlock05_t;
-
-/* Blk[#6]@addr[#1] Offs 0x170. Sz 28 bytes. 1 reg(s). 0 gap(s) */
-typedef volatile struct {
-  /* [0x0 - 0x18] */ unsigned long CH6[7];
-} CVORBBlock06_t;
-
-/* Blk[#7]@addr[#1] Offs 0x1a0. Sz 28 bytes. 1 reg(s). 0 gap(s) */
-typedef volatile struct {
-  /* [0x0 - 0x18] */ unsigned long CH7[7];
-} CVORBBlock07_t;
-
-/* Blk[#8]@addr[#1] Offs 0xd0. Sz 28 bytes. 1 reg(s). 0 gap(s) */
-typedef volatile struct {
-  /* [0x0 - 0x18] */ unsigned long CH8[7];
-} CVORBBlock08_t;
-
-/* Blk[#9]@addr[#1] Offs 0x80. Sz 28 bytes. 7 reg(s). 0 gap(s) */
+/* Blk[#1]@addr[#1] Offs 0x80. Sz 28 bytes. 7 reg(s). 0 gap(s) */
 typedef volatile struct {
   /* 0x0 */ unsigned long CH_STAT;
   /* 0x4 */ unsigned long CH_CFG;
@@ -296,12 +238,7 @@ typedef volatile struct {
   /* 0x10 */ unsigned long FCT_EM_L;
   /* 0x14 */ unsigned long SLOPE;
   /* 0x18 */ unsigned long CH_REC_CYC;
-} CVORBBlock09_t;
-
-/* Blk[#10]@addr[#1] Offs 0x80. Sz 224 bytes. 1 reg(s). 0 gap(s) */
-typedef volatile struct {
-  /* [0x0 - 0xdc] */ unsigned long ALL_CH[56];
-} CVORBBlock10_t;
+} CVORBBlock01_t;
 
 /* CVORB module master topology */
 typedef struct {
@@ -309,15 +246,6 @@ typedef struct {
   CVORBExtraneous_t *ex; /* extraneous registers */
   CVORBBlock00_t *block00;
   CVORBBlock01_t *block01;
-  CVORBBlock02_t *block02;
-  CVORBBlock03_t *block03;
-  CVORBBlock04_t *block04;
-  CVORBBlock05_t *block05;
-  CVORBBlock06_t *block06;
-  CVORBBlock07_t *block07;
-  CVORBBlock08_t *block08;
-  CVORBBlock09_t *block09;
-  CVORBBlock10_t *block10;
 } CVORBTopology_t;
 
 /* compiler should know variable type. So get rid of incomplete type */

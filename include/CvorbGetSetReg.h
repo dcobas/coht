@@ -136,38 +136,6 @@ int set_REC_CYC(register CVORBStatics_t*, char*, int, int);
 int get_DAC_CNTL(register CVORBStatics_t*, char*, int, int);
 int set_DAC_CNTL(register CVORBStatics_t*, char*, int, int);
 
-/* All registers of channel 1 */
-int get_CH1(register CVORBStatics_t*, char*, int, int);
-int set_CH1(register CVORBStatics_t*, char*, int, int);
-
-/* All registers of channel 2 */
-int get_CH2(register CVORBStatics_t*, char*, int, int);
-int set_CH2(register CVORBStatics_t*, char*, int, int);
-
-/* All registers of channel 3 */
-int get_CH3(register CVORBStatics_t*, char*, int, int);
-int set_CH3(register CVORBStatics_t*, char*, int, int);
-
-/* All registers of channel 4 */
-int get_CH4(register CVORBStatics_t*, char*, int, int);
-int set_CH4(register CVORBStatics_t*, char*, int, int);
-
-/* All registers of channel 5 */
-int get_CH5(register CVORBStatics_t*, char*, int, int);
-int set_CH5(register CVORBStatics_t*, char*, int, int);
-
-/* All registers of channel 6 */
-int get_CH6(register CVORBStatics_t*, char*, int, int);
-int set_CH6(register CVORBStatics_t*, char*, int, int);
-
-/* All registers of channel 7 */
-int get_CH7(register CVORBStatics_t*, char*, int, int);
-int set_CH7(register CVORBStatics_t*, char*, int, int);
-
-/* All registers of channel 8 */
-int get_CH8(register CVORBStatics_t*, char*, int, int);
-int set_CH8(register CVORBStatics_t*, char*, int, int);
-
 /* Channel status */
 int get_CH_STAT(register CVORBStatics_t*, char*, int, int);
 
@@ -194,9 +162,5 @@ int set_SLOPE(register CVORBStatics_t*, char*, int, int);
 /* Recurrent cycles */
 int get_CH_REC_CYC(register CVORBStatics_t*, char*, int, int);
 int set_CH_REC_CYC(register CVORBStatics_t*, char*, int, int);
-
-/* All channels to access in one chunk */
-int get_ALL_CH(register CVORBStatics_t*, char*, int, int);
-int set_ALL_CH(register CVORBStatics_t*, char*, int, int);
 
 #endif /* _CVORB_GET_SET_REG_H_INCLUDE_ */

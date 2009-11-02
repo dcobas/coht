@@ -26,14 +26,6 @@ typedef enum _tag_CVORB_rid {
   WAVE_SA_ID, /* Waveform start address (RWMODE rw) */
   REC_CYC_ID, /* Recurrent cycles (RWMODE rw) */
   DAC_CNTL_ID, /* DAC control (RWMODE rw) */
-  CH1_ID, /* All registers of channel 1 (RWMODE rw) */
-  CH2_ID, /* All registers of channel 2 (RWMODE rw) */
-  CH3_ID, /* All registers of channel 3 (RWMODE rw) */
-  CH4_ID, /* All registers of channel 4 (RWMODE rw) */
-  CH5_ID, /* All registers of channel 5 (RWMODE rw) */
-  CH6_ID, /* All registers of channel 6 (RWMODE rw) */
-  CH7_ID, /* All registers of channel 7 (RWMODE rw) */
-  CH8_ID, /* All registers of channel 8 (RWMODE rw) */
   CH_STAT_ID, /* Channel status (RWMODE r) */
   CH_CFG_ID, /* Channel config (RWMODE rw) */
   FUNC_SEL_ID, /* Function selection (RWMODE rw) */
@@ -41,7 +33,6 @@ typedef enum _tag_CVORB_rid {
   FCT_EM_L_ID, /* Fct enable mask (31 to 0) (RWMODE rw) */
   SLOPE_ID, /* Slope (RWMODE rw) */
   CH_REC_CYC_ID, /* Recurrent cycles (RWMODE rw) */
-  ALL_CH_ID, /* All channels to access in one chunk (RWMODE rw) */
 } CVORB_rid_t;
 
 #endif /* _CVORB_REG_ID_H_INCLUDE_ */

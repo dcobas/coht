@@ -16,7 +16,7 @@ DRIVER_NAME := $(shell echo $(DRIVER_NAME) | awk '{ print toupper(substr ($$1,1,
 ifeq ($(CPU), ppc4)
 	KVER = 4.0.0
 else ifeq ($(CPU), L865)
-	#KVER = 2.6.24.7-rt27
-	KVER = 2.6.29.4-rt15
+	KVER = 2.6.24.7-rt27
+	#KVER = 2.6.29.4-rt15
 	#KVER = 2.6.29.1-rt7
 endif
