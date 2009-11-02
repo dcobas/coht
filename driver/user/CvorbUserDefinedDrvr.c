@@ -411,12 +411,12 @@ char* CvorbUserInst(int *proceed, register DevInfo_t *info,
 	usp->md[0].md = (mod *)sptr->card->block00;
 	for (i = 0; i < CHAM; i++)
 		usp->md[0].cd[i] = (chd *)
-			((long)usp->md[0].md + info->blkDesc[i+1].offset);
+			((long)usp->md[0].md + _ch_offset[i]);
 
 	usp->md[1].md = (mod *)((long)sptr->card->block00 + 0x200);
 	for (i = 0; i < CHAM; i++)
 		usp->md[1].cd[i] = (chd *)
-			((long)usp->md[0].md + info->blkDesc[i+1].offset);
+			((long)usp->md[0].md + _ch_offset[i]);
 
 	/* reset subModules */
 	_wr(0, SOFT_PULSE, SPR_FGR);

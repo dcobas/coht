@@ -14,9 +14,8 @@
 struct sel; /* preliminary structure declaration to supress warnings during
 	       user code compilation */
 
-typedef CVORBBlock09_t chd;
 typedef CVORBBlock00_t mod;
-
+typedef CVORBBlock01_t chd;
 /**
  * @brief Description of each module
  *
