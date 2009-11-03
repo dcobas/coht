@@ -758,6 +758,8 @@ int cvorb_func_load(int h, int ch, int func, struct fv *fv, int sz)
 	   Step size (in us) should be a factor of dt, i.e. no remainder!
 	   Otherwise -- provided vector table is considered to be invalid */
 	for (i = 1; i <= sz-1; i++) {
+		if (!fv[i].t) /* skip internal stop */
+			continue;
                 dt = (fv[i].t - fv[i-1].t)*1000; /* delta t in us */
                 ss = ( ((dt-1)/MTMS) + 1) * MIN_STEP;
 		if (dt%ss)
