@@ -69,11 +69,6 @@ extern "C" {
 	int cvorb_func_sel(int, int, int);
 	int cvorb_func_get(int, int);
 	char* cvorb_perr(int);
-/*@} end of group*/
-
-/** @defgroup cvorb_xtra_lib Library extra API functions
- *@{
- */
 	int cvorb_swp(int, int, int);
 	int cvorb_rd_rcyc(int, int, uint *);
 	int cvorb_wr_rcyc(int, int, uint);

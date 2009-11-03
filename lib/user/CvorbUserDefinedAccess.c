@@ -149,7 +149,7 @@ int cvorb_exit(int h)
  *
  * As module consists of 2 submodules -- we need to distinguish between
  * them. \n
- * If you want to read 2 configuration registers at once -- @ref cr
+ * If you want to read 2 configuration registers at once -- @b cr parameter
  * should point to the massive of 2 uint. \n
  * See module config register layout and its bits to have more details.
  *
@@ -246,7 +246,7 @@ int cvorb_wr_mconfig(int h, int ch, uint data)
 }
 
 /**
- * @brief TODO Write module Configuration Register bit settings
+ * @brief @b TODO Write module Configuration Register bit settings
  *
  * @param h  -- handle
  * @param ch -- channel [1-8]  -- submodule#1 \n
@@ -366,7 +366,7 @@ int cvorb_wr_cconfig(int h, int ch, uint data)
 }
 
 /**
- * @brief TODO Write channel Configuration Register bit settings
+ * @brief @b TODO Write channel Configuration Register bit settings
  *
  * @param h  -- handle
  * @param ch -- channel [1-16]
@@ -487,7 +487,7 @@ int cvorb_rd_cstat(int h, int ch, uint *chs)
  * @brief Read channel Status Register bit settings
  *
  * @param h      -- handle
- * @param chan   -- channel [1-16]
+ * @param ch     -- channel [1-16]
  * @param chstat -- Status Register bit settings goes here
  *
  * Each status bit, described with its own variable
@@ -662,7 +662,7 @@ int cvorb_rd_fem(int h, int ch, uint m[2])
 }
 
 /**
- * @brief TODO Read Channel Function Enable bits
+ * @brief @b TODO Read Channel Function Enable bits
  *
  * @param h   -- handle
  * @param ch  -- channel [1-64]
@@ -678,7 +678,7 @@ int cvorb_rd_fem_arr(int h, int ch, char fem[64])
 }
 
 /**
- * @brief TODO Write Channel Function Enable Mask.
+ * @brief @b TODO Write Channel Function Enable Mask.
  *
  * @param h    -- handle
  * @param ch   -- channel [1-16]
