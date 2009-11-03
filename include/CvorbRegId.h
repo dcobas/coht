@@ -22,15 +22,12 @@ typedef enum _tag_CVORB_rid {
   DAC_VAL_ID, /* DAC value (RWMODE rw) */
   SRAM_SA_ID, /* SRAM start address (RWMODE rw) */
   SRAM_DATA_ID, /* SRAM data (RWMODE rw) */
-  WAVE_L_ID, /* Waveform length (RWMODE rw) */
-  WAVE_SA_ID, /* Waveform start address (RWMODE rw) */
-  REC_CYC_ID, /* Recurrent cycles (RWMODE rw) */
   DAC_CNTL_ID, /* DAC control (RWMODE rw) */
   CH_STAT_ID, /* Channel status (RWMODE r) */
   CH_CFG_ID, /* Channel config (RWMODE rw) */
   FUNC_SEL_ID, /* Function selection (RWMODE rw) */
-  FCT_EM_H_ID, /* Fct enable mask (63 to 32) (RWMODE rw) */
-  FCT_EM_L_ID, /* Fct enable mask (31 to 0) (RWMODE rw) */
+  FCT_EM_H_ID, /* Function enable mask (63 to 32) (RWMODE rw) */
+  FCT_EM_L_ID, /* Function enable mask (31 to 0) (RWMODE rw) */
   SLOPE_ID, /* Slope (RWMODE rw) */
   CH_REC_CYC_ID, /* Recurrent cycles (RWMODE rw) */
 } CVORB_rid_t;

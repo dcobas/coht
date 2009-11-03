@@ -1323,27 +1323,6 @@ RW_REG_SCAL(SRAM_SA, long, 0, block00, l, 32);
 RW_REG_SCAL(SRAM_DATA, long, 0, block00, l, 32);
 
 /**
- * @brief Waveform length
- *
- * This is a Normal register.
- */
-RW_REG_SCAL(WAVE_L, long, 0, block00, l, 32);
-
-/**
- * @brief Waveform start address
- *
- * This is a Normal register.
- */
-RW_REG_SCAL(WAVE_SA, long, 0, block00, l, 32);
-
-/**
- * @brief Recurrent cycles
- *
- * This is a Normal register.
- */
-RW_REG_SCAL(REC_CYC, long, 0, block00, l, 32);
-
-/**
  * @brief DAC control
  *
  * This is a Normal register.
@@ -1372,14 +1351,14 @@ RW_REG_SCAL(CH_CFG, long, 0, block01, l, 32);
 RW_REG_SCAL(FUNC_SEL, long, 0, block01, l, 32);
 
 /**
- * @brief Fct enable mask (63 to 32)
+ * @brief Function enable mask (63 to 32)
  *
  * This is a Normal register.
  */
 RW_REG_SCAL(FCT_EM_H, long, 0, block01, l, 32);
 
 /**
- * @brief Fct enable mask (31 to 0)
+ * @brief Function enable mask (31 to 0)
  *
  * This is a Normal register.
  */

@@ -33,8 +33,8 @@ static char Cvorb_compile_time[]  = __TIME__;
 static const char Cvorb_version[] = "v2.4.13";
 
 /* generation date in hex and human representation */
-static const char Cvorb_generation_time_str[] = "Mon Nov  2 14:38:14 2009";
-#define CVORB_GENERATION_TIME_HEX 0x4aeee0c6
+static const char Cvorb_generation_time_str[] = "Tue Nov  3 14:16:43 2009";
+#define CVORB_GENERATION_TIME_HEX 0x4af02d3b
 /* ------------------------------------------------------------------------- */
 
 /* to suppress implisit declaration warnings */
@@ -571,24 +571,6 @@ int Cvorb_ioctl(register CVORBStatics_t *s,
 		break;
 	case CVORB_SET_SRAM_DATA:
 		return set_SRAM_DATA(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_GET_WAVE_L:
-		return get_WAVE_L(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_SET_WAVE_L:
-		return set_WAVE_L(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_GET_WAVE_SA:
-		return get_WAVE_SA(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_SET_WAVE_SA:
-		return set_WAVE_SA(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_GET_REC_CYC:
-		return get_REC_CYC(s, arg, c_rwb, r_rw);
-		break;
-	case CVORB_SET_REC_CYC:
-		return set_REC_CYC(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_GET_DAC_CNTL:
 		return get_DAC_CNTL(s, arg, c_rwb, r_rw);

@@ -120,18 +120,6 @@ int set_SRAM_SA(register CVORBStatics_t*, char*, int, int);
 int get_SRAM_DATA(register CVORBStatics_t*, char*, int, int);
 int set_SRAM_DATA(register CVORBStatics_t*, char*, int, int);
 
-/* Waveform length */
-int get_WAVE_L(register CVORBStatics_t*, char*, int, int);
-int set_WAVE_L(register CVORBStatics_t*, char*, int, int);
-
-/* Waveform start address */
-int get_WAVE_SA(register CVORBStatics_t*, char*, int, int);
-int set_WAVE_SA(register CVORBStatics_t*, char*, int, int);
-
-/* Recurrent cycles */
-int get_REC_CYC(register CVORBStatics_t*, char*, int, int);
-int set_REC_CYC(register CVORBStatics_t*, char*, int, int);
-
 /* DAC control */
 int get_DAC_CNTL(register CVORBStatics_t*, char*, int, int);
 int set_DAC_CNTL(register CVORBStatics_t*, char*, int, int);
@@ -147,11 +135,11 @@ int set_CH_CFG(register CVORBStatics_t*, char*, int, int);
 int get_FUNC_SEL(register CVORBStatics_t*, char*, int, int);
 int set_FUNC_SEL(register CVORBStatics_t*, char*, int, int);
 
-/* Fct enable mask (63 to 32) */
+/* Function enable mask (63 to 32) */
 int get_FCT_EM_H(register CVORBStatics_t*, char*, int, int);
 int set_FCT_EM_H(register CVORBStatics_t*, char*, int, int);
 
-/* Fct enable mask (31 to 0) */
+/* Function enable mask (31 to 0) */
 int get_FCT_EM_L(register CVORBStatics_t*, char*, int, int);
 int set_FCT_EM_L(register CVORBStatics_t*, char*, int, int);
 

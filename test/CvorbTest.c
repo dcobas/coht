@@ -45,9 +45,6 @@ char block00RegData[BLOCK00_NUM_REGISTERS][2][MAX_STR] = {
   { "DAC_VAL", "DAC value" },
   { "SRAM_SA", "SRAM start address" },
   { "SRAM_DATA", "SRAM data" },
-  { "WAVE_L", "Waveform length" },
-  { "WAVE_SA", "Waveform start address" },
-  { "REC_CYC", "Recurrent cycles" },
   { "DAC_CNTL", "DAC control" },
 };
 
@@ -55,8 +52,8 @@ char block01RegData[BLOCK01_NUM_REGISTERS][2][MAX_STR] = {
   { "CH_STAT", "Channel status" },
   { "CH_CFG", "Channel config" },
   { "FUNC_SEL", "Function selection" },
-  { "FCT_EM_H", "Fct enable mask (63 to 32)" },
-  { "FCT_EM_L", "Fct enable mask (31 to 0)" },
+  { "FCT_EM_H", "Function enable mask (63 to 32)" },
+  { "FCT_EM_L", "Function enable mask (31 to 0)" },
   { "SLOPE", "Slope" },
   { "CH_REC_CYC", "Recurrent cycles" },
 };
@@ -1259,14 +1256,8 @@ int Block00(HANDLE handle)
     printf("%03d - Write SRAM_SA\n", 25);
     printf("%03d - Read SRAM_DATA\n", 26);
     printf("%03d - Write SRAM_DATA\n", 27);
-    printf("%03d - Read WAVE_L\n", 28);
-    printf("%03d - Write WAVE_L\n", 29);
-    printf("%03d - Read WAVE_SA\n", 30);
-    printf("%03d - Write WAVE_SA\n", 31);
-    printf("%03d - Read REC_CYC\n", 32);
-    printf("%03d - Write REC_CYC\n", 33);
-    printf("%03d - Read DAC_CNTL\n", 34);
-    printf("%03d - Write DAC_CNTL\n", 35);
+    printf("%03d - Read DAC_CNTL\n", 28);
+    printf("%03d - Write DAC_CNTL\n", 29);
     printf("\n> ");
 
     scanf("%d", &choice);
@@ -1355,27 +1346,9 @@ int Block00(HANDLE handle)
       SetReg(handle, SRAM_DATA_ID);
       break;
     case 28:
-      GetReg(handle, WAVE_L_ID);
-      break;
-    case 29:
-      SetReg(handle, WAVE_L_ID);
-      break;
-    case 30:
-      GetReg(handle, WAVE_SA_ID);
-      break;
-    case 31:
-      SetReg(handle, WAVE_SA_ID);
-      break;
-    case 32:
-      GetReg(handle, REC_CYC_ID);
-      break;
-    case 33:
-      SetReg(handle, REC_CYC_ID);
-      break;
-    case 34:
       GetReg(handle, DAC_CNTL_ID);
       break;
-    case 35:
+    case 29:
       SetReg(handle, DAC_CNTL_ID);
       break;
     default:

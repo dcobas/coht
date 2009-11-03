@@ -20,7 +20,7 @@ extern char *tgetstr(char*, char**);
 #define WHITE_CLR	"\033[1;37m"
 #define END_CLR		"\033[m"
 
-#define BLOCK00_NUM_REGISTERS 21
+#define BLOCK00_NUM_REGISTERS 18
 #define BLOCK01_NUM_REGISTERS 7
 
 #define EXTRANEOUS_NUM_REGISTERS 0

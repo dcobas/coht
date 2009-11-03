@@ -168,30 +168,24 @@ do {									\
 #define CVORB_SET_SRAM_SA (_FIRST__IOCTL_ + 23)
 #define CVORB_GET_SRAM_DATA (_FIRST__IOCTL_ + 24)
 #define CVORB_SET_SRAM_DATA (_FIRST__IOCTL_ + 25)
-#define CVORB_GET_WAVE_L (_FIRST__IOCTL_ + 26)
-#define CVORB_SET_WAVE_L (_FIRST__IOCTL_ + 27)
-#define CVORB_GET_WAVE_SA (_FIRST__IOCTL_ + 28)
-#define CVORB_SET_WAVE_SA (_FIRST__IOCTL_ + 29)
-#define CVORB_GET_REC_CYC (_FIRST__IOCTL_ + 30)
-#define CVORB_SET_REC_CYC (_FIRST__IOCTL_ + 31)
-#define CVORB_GET_DAC_CNTL (_FIRST__IOCTL_ + 32)
-#define CVORB_SET_DAC_CNTL (_FIRST__IOCTL_ + 33)
-#define CVORB_GET_CH_STAT (_FIRST__IOCTL_ + 34)
-#define CVORB_GET_CH_CFG (_FIRST__IOCTL_ + 35)
-#define CVORB_SET_CH_CFG (_FIRST__IOCTL_ + 36)
-#define CVORB_GET_FUNC_SEL (_FIRST__IOCTL_ + 37)
-#define CVORB_SET_FUNC_SEL (_FIRST__IOCTL_ + 38)
-#define CVORB_GET_FCT_EM_H (_FIRST__IOCTL_ + 39)
-#define CVORB_SET_FCT_EM_H (_FIRST__IOCTL_ + 40)
-#define CVORB_GET_FCT_EM_L (_FIRST__IOCTL_ + 41)
-#define CVORB_SET_FCT_EM_L (_FIRST__IOCTL_ + 42)
-#define CVORB_GET_SLOPE (_FIRST__IOCTL_ + 43)
-#define CVORB_SET_SLOPE (_FIRST__IOCTL_ + 44)
-#define CVORB_GET_CH_REC_CYC (_FIRST__IOCTL_ + 45)
-#define CVORB_SET_CH_REC_CYC (_FIRST__IOCTL_ + 46)
+#define CVORB_GET_DAC_CNTL (_FIRST__IOCTL_ + 26)
+#define CVORB_SET_DAC_CNTL (_FIRST__IOCTL_ + 27)
+#define CVORB_GET_CH_STAT (_FIRST__IOCTL_ + 28)
+#define CVORB_GET_CH_CFG (_FIRST__IOCTL_ + 29)
+#define CVORB_SET_CH_CFG (_FIRST__IOCTL_ + 30)
+#define CVORB_GET_FUNC_SEL (_FIRST__IOCTL_ + 31)
+#define CVORB_SET_FUNC_SEL (_FIRST__IOCTL_ + 32)
+#define CVORB_GET_FCT_EM_H (_FIRST__IOCTL_ + 33)
+#define CVORB_SET_FCT_EM_H (_FIRST__IOCTL_ + 34)
+#define CVORB_GET_FCT_EM_L (_FIRST__IOCTL_ + 35)
+#define CVORB_SET_FCT_EM_L (_FIRST__IOCTL_ + 36)
+#define CVORB_GET_SLOPE (_FIRST__IOCTL_ + 37)
+#define CVORB_SET_SLOPE (_FIRST__IOCTL_ + 38)
+#define CVORB_GET_CH_REC_CYC (_FIRST__IOCTL_ + 39)
+#define CVORB_SET_CH_REC_CYC (_FIRST__IOCTL_ + 40)
 
 /* First allowed number for user-defined ioctl */
-#define CVORB_FIRST_USR_IOCTL (_FIRST__IOCTL_ + 47)
+#define CVORB_FIRST_USR_IOCTL (_FIRST__IOCTL_ + 41)
 
 /* keeps last written value of the 'write only' registers */
 typedef  struct {
@@ -204,7 +198,7 @@ typedef  struct {
 } CVORBExtraneous_t;
 
 
-/* Blk[#0]@addr[#1] Offs 0x0. Sz 100 bytes. 21 reg(s). 1 gap(s) */
+/* Blk[#0]@addr[#1] Offs 0x0. Sz 100 bytes. 18 reg(s). 2 gap(s) */
 typedef volatile struct {
   /* 0x0 */ unsigned long INT_SRC;
   /* 0x4 */ unsigned long INT_EN;
@@ -224,9 +218,7 @@ typedef volatile struct {
   /* 0x48 */ unsigned long DAC_VAL;
   /* 0x4c */ unsigned long SRAM_SA;
   /* 0x50 */ unsigned long SRAM_DATA;
-  /* 0x54 */ unsigned long WAVE_L;
-  /* 0x58 */ unsigned long WAVE_SA;
-  /* 0x5c */ unsigned long REC_CYC;
+  char __gap17[12]; /* [0x54 - 0x60) memory gap */
   /* 0x60 */ unsigned long DAC_CNTL;
 } __attribute__((packed)) CVORBBlock00_t;
 
