@@ -20,6 +20,9 @@ enum irqreturn {
 	IRQ_WAKE_THREAD,
 };
 #endif
+
+struct cvorb_module _m[2];
+
 /**
  * @brief Interrupt Service Routine.
  *
@@ -381,6 +384,7 @@ char* CvorbUserInst(int *proceed, register DevInfo_t *info,
 	iVec = info->iVector;		/* set up interrupt vector */
 
 	/* map submodule address pointers */
+	usp->md = _m;
 	usp->md[0].md = (mod *)sptr->card->block00;
 	for (i = 0; i < CHAM; i++)
 		usp->md[0].cd[i] = (chd *)
@@ -407,6 +411,9 @@ char* CvorbUserInst(int *proceed, register DevInfo_t *info,
 
 		_wcr(1, i, CH_CFG, 1);
 		_wcr(1, i, CH_REC_CYC, 1);
+
+		/* initialize iolock mutex */
+		cdcm_mutex_init(&usp->md[i].iol);
 	}
 
 	/* Uncomment the following code to register ISR */

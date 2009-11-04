@@ -20,18 +20,19 @@ typedef CVORBBlock01_t chd;
  * @brief Description of each module
  *
  * Each module consists of 8 channels, and has general registers.
- * md -- generic module registers
- * cd -- channel registers
- *
+ * md  -- generic module registers
+ * cd  -- channel registers
+ * iol -- r/w protection for [SRAM start address] and [SRAM data] registers
  */
 struct cvorb_module {
 	mod *md;
 	chd *cd[8];
+	struct cdcm_mutex iol;
 };
 
 /* user-defined statics data table for CVORB module */
 struct CVORBUserStatics_t {
-	struct cvorb_module md[2];
+	struct cvorb_module *md;
 };
 
 /** @defgroup Low level r/w operations

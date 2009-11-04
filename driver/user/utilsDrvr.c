@@ -182,8 +182,12 @@ int load_sram(CVORBUserStatics_t *usp, char *arg) //struct sram_params *p)
 	sar |= (((p.chan-1)<<SRAM_CHAN_SHIFT) |
 		((p.func-1)<<SRAM_FUNC_SHIFT));
 
+	/* enter critical region -- r/w ioaccess protection */
+	cdcm_mutex_lock(&usp->md[p.module-1].iol);
 	_wr(p.module-1, SRAM_SA, sar);
 	_wrr(p.module-1, SRAM_DATA, (ulong *)vect, sz/4);
+	/* leave critical region */
+	cdcm_mutex_unlock(&usp->md[p.module-1].iol);
 
  out_load_sram:
 	if (fv)   sysfree((char *)fv, fvsz);
@@ -195,13 +199,13 @@ int read_sram(CVORBUserStatics_t *usp, char *arg)
 {
 	struct sram_params p; /* ioctl paramters */
 	int i, rc = OK;
-	int sz; /* function size (in words) in SRAM */
+	int sz = 0; /* function size (in words) in SRAM */
 	uint sram = 0, *ptr;
 	ushort *nov;		/* number of vectors */
 	ushort *vect = NULL, *vp; /* vector table && its pointer */
 	uint sar = 0;
 	struct fv *fv = NULL;
-	int fvsz; /* function vector size in bytes */
+	int fvsz = 0; /* function vector size in bytes */
 	int dt = 0;  /* time in ms from the beginning of the function */
 
 	if (cdcm_copy_from_user(&p, arg, sizeof(p)))
@@ -210,6 +214,9 @@ int read_sram(CVORBUserStatics_t *usp, char *arg)
 	/* set Start Address Register */
 	sar |= (((p.chan-1)<<SRAM_CHAN_SHIFT) |
 		((p.func-1)<<SRAM_FUNC_SHIFT));
+
+	/* enter critical region -- r/w ioaccess protection */
+	cdcm_mutex_lock(&usp->md[p.module-1].iol);
 
 	_wr(p.module-1, SRAM_SA, sar);
 
@@ -225,19 +232,26 @@ int read_sram(CVORBUserStatics_t *usp, char *arg)
 	++nov;
 
 	/* safety check for garbage SRAM */
-	if (!(WITHIN_RANGE(1, *nov, MAX_F_VECT)))
-		return SYSERR;	/* was no initialized */
+	if (!(WITHIN_RANGE(1, *nov, MAX_F_VECT))) {
+		rc = SYSERR;
+		goto outcritical; /* was no initialized */
+	}
 
-	if (*nov > p.am) /* provided storage is not big enough */
-		return SYSERR;
+	if (*nov > p.am) { /* provided storage is not big enough */
+		rc = SYSERR;
+		goto outcritical;
+	}
 
 	fvsz = (*nov+1/*t0,V0*/)*sizeof(*fv); /* function vector size,
 						 including [t0,V0] */
 
 	/* allocate space to store function vector data */
 	fv = (struct fv *) sysbrk(fvsz);
-	if (!fv)
-		return SYSERR;
+	if (!fv) {
+		rc = SYSERR;
+		goto outcritical;
+	}
+
 	memset(fv, 0, fvsz);
 
 	/* how many bytes we should read from SRAM */
@@ -250,7 +264,7 @@ int read_sram(CVORBUserStatics_t *usp, char *arg)
 	vect = (ushort *)sysbrk(sz*4);
 	if (!vect) {
 		rc = SYSERR;
-		goto out;
+		goto outcritical;
 	}
 	memset(vect, 0, sz*4);
 
@@ -263,6 +277,12 @@ int read_sram(CVORBUserStatics_t *usp, char *arg)
 		*ptr = __inl((__port_addr_t)&(usp->md[p.module-1].md->SRAM_DATA));
 #endif
 	}
+
+ outcritical:
+	/* leave critical region */
+	cdcm_mutex_unlock(&usp->md[p.module-1].iol);
+	if (rc < 0)
+		goto out;
 
 	/* now convert vector table to [function vectors] table
 	   and put it in the user space */
