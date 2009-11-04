@@ -33,8 +33,8 @@ static char Cvorb_compile_time[]  = __TIME__;
 static const char Cvorb_version[] = "v2.4.13";
 
 /* generation date in hex and human representation */
-static const char Cvorb_generation_time_str[] = "Tue Nov  3 14:16:43 2009";
-#define CVORB_GENERATION_TIME_HEX 0x4af02d3b
+static const char Cvorb_generation_time_str[] = "Wed Nov  4 17:22:19 2009";
+#define CVORB_GENERATION_TIME_HEX 0x4af1aa3b
 /* ------------------------------------------------------------------------- */
 
 /* to suppress implisit declaration warnings */

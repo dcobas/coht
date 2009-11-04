@@ -47,6 +47,12 @@
 #include <cdcm/cdcm.h>
 #endif
 
+/* for kernel only */
+#if defined(__LYNXOS) || defined (__KERNEL__)
+/* to be able to use CDCM utils inside the driver */
+#include <cdcm/cdcmBoth.h>
+#endif
+
 /* Provides debug information printing. */
 #define DBG_BEG(f_nm)							\
 do {									\

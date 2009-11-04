@@ -12,6 +12,6 @@
    from one version to another - then current Driver version will be
    automatically increased by one.
 */
-#define CVORB_DRVR_CURRENT_VERSION 4
+#define CVORB_DRVR_CURRENT_VERSION 5
 
 #endif /* _CVORB_VERSION_DRVR_H_INCLUDE_ */
