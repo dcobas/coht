@@ -72,6 +72,7 @@ extern "C" {
 	int cvorb_swp(int, int, int);
 	int cvorb_rd_rcyc(int, int, uint *);
 	int cvorb_wr_rcyc(int, int, uint);
+	int cvorb_sram_ok(int, int, int);
 /*@} end of group*/
 
 #ifdef __cplusplus

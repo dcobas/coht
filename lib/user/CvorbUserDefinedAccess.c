@@ -1168,4 +1168,43 @@ int cvorb_wr_rcyc(int h, int ch, uint rc)
 	return 0;
 }
 
+/**
+ * @brief Check if SRAM memory is loaded with reasonable data.
+ *
+ * @param h    -- handle
+ * @param ch   -- channel to check [1-16]
+ * @param func -- funcion to check [1-64]
+ *
+ * Number of vectors in the function is checked. If it is within
+ * allowed range [1 - 679] -- function vector table is considered
+ * to be sane.
+ *
+ * @return number of vectors [1 - 679] -- SRAM is OK
+ * @return -CVORB_ERR                  -- SRAM is not initialized
+ * @return -CVORB_BAD_RANGE            -- bad handle
+ * @return -CVORB_OUT_OF_RANGE         -- bad channel
+ */
+int cvorb_sram_ok(int h, int ch, int func)
+{
+	struct sram_params par;
+	ushort va;
 
+	if (!WITHIN_RANGE(1, h, MAX_HNDLS))
+		return -CVORB_BAD_HANDLE;
+
+	if (!WITHIN_RANGE(1, ch, MAX_CHAN_AM))
+		return -CVORB_OUT_OF_RANGE;
+
+	par = (struct sram_params) {
+		.module = (ch > CHAM) ? 2 : 1,
+		.chan = ((ch-1)%CHAM)+1,
+		.func = func,
+		.am = (ushort)-1 /* we need only number of vectors */
+	};
+
+	/* call the driver */
+	va = ioctl(_lh[h-1].fd, CVORB_READ_SRAM, &par);
+	if (!WITHIN_RANGE(1, va, MAX_F_VECT))
+		return -CVORB_ERR;
+	return va;
+}
