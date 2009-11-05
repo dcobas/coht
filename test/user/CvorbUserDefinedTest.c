@@ -2,6 +2,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/ioctl.h>
+#include <sys/types.h>
+
+/* directory management */
+#ifdef __Lynx__
+/* it is [direct] under lynx (outdated) */
+#include <dir.h>
+#else  /* linux */
+/* it is [dirent] under linux (up-to-date) */
+#include <sys/dir.h>
+#endif
+/* we'll use outdated [direct] because of lynx */
+
 #include "CvorbTest.h"
 #include "CvorbUserDefinedTest.h"
 #include "CvorbUserDefinedDrvr.h"
@@ -13,6 +25,7 @@ static int get_channel(int *);
 static int get_function(int *);
 static int get_module(int *);
 static int get_value(uint *, uint, uint);
+static int soft_pulses();
 
 /**
  * @brief
@@ -53,27 +66,30 @@ int UserDefinedMenu(HANDLE handle, int lun)
 		       " registers\n"
 		       "      Function selection && Function Enable "
 		       "registers\n");
-		printf("04 -- Load function into SRAM\n");
-		printf("05 -- Read function from SRAM\n");
-		printf("06 -- TODO Play already loaded function\n");
-		printf("07 -- Load && play a function\n");
-		printf("08 -- Select  Function\n");
-		printf("09 -- Enable  Function\n");
-		printf("10 -- Disable Function\n");
-		printf("11 -- Set/Get Recurrent Cycles\n");
-		printf("12 -- Set Module  Configuration register\n");
-		printf("13 -- Set Channel Configuration register\n");
-		printf("14 -- Test functionality\n");
+		printf("04 -- Software Pulses\n");
+		printf("05 -- Load function into SRAM\n");
+		printf("06 -- Read function from SRAM\n");
+		printf("07 -- Play already loaded function\n");
+		printf("08 -- Load && play a function\n");
+		printf("09 -- Select  Function\n");
+		printf("10 -- Enable  Function\n");
+		printf("11 -- Disable Function\n");
+		printf("12 -- Set/Get Recurrent Cycles\n");
+		printf("13 -- Set Module  Configuration register\n");
+		printf("14 -- Set Channel Configuration register\n");
+		printf("15 -- Test functionality (for driver "
+		       "developer ONLY!)\n");
 		printf("\n> ");
 
 		scanf("%d", &choice);
 		getchar();
 
 		switch (choice) {
-		case 14:
+		case 15:
 			{
 				do_usr_wait = 1;
-				break;
+				printf("Nothing to test\n");
+			break;
 			}
 		case 1:
 			return(OK);
@@ -103,7 +119,7 @@ int UserDefinedMenu(HANDLE handle, int lun)
 				printf("PCB SN --> %s\n", str);
 				break;
 			}
-		case 3:
+		case 3: /* read module/channel config && status regs */
 			{
 				uint data;
 				uint mask[2];
@@ -161,7 +177,22 @@ int UserDefinedMenu(HANDLE handle, int lun)
 				}
 				break;
 			}
-		case 4: /* load function into SRAM */
+		case 4: /* soft pulses */
+			do_usr_wait = 1;
+
+			i = soft_pulses();
+			if (i < 1)
+				break;
+
+			if (get_module(&md))
+				break;
+
+			if (cvorb_swp(cvorbh, md, i))
+				printf("Software pulses operation FAILED!\n");
+			else
+				printf("Front panel pulse simulated\n");
+			break;
+		case 5: /* load function into SRAM */
 			{
 				struct fv *fv; /* function vector table */
 				int noe; /* number of entries */
@@ -194,7 +225,7 @@ int UserDefinedMenu(HANDLE handle, int lun)
 					break;
 				}
 			}
-		case 5:
+		case 6:
 			{
 				int i;
 				struct fv fv[2048];
@@ -223,9 +254,44 @@ int UserDefinedMenu(HANDLE handle, int lun)
 					break;
 				}
 			}
-		case 6: /* play already loaded function */
+		case 7: /* play already loaded function */
+			do_usr_wait = 1;
+			/* get channel and function from the user */
+			fn = ch = 1;
+			if (get_channel(&ch) || get_function(&fn))
+				break;
+
+			i = cvorb_sram_ok(cvorbh, ch, fn);
+			if (i < 0) {
+				printf("Crap in SRAM memory for Channel#%d"
+				       " Function#%d detected\n"
+				       "Will NOT play!", ch, fn);
+				break;
+			}
+
+			/* enable function in Functioin Enable Mask */
+			if (cvorb_func_en(cvorbh, ch, fn)) {
+				printf("Can't Enable Function#%d in"
+				       " channel#%d\n", fn, ch);
+				break;
+			}
+
+			/* select function in Function Selection reg */
+			if (cvorb_func_sel(cvorbh, ch, fn)) {
+				printf("Can't Select Function#%d in"
+				       " channel#%d\n", fn, ch);
+				break;
+			}
+
+			/* do module software start,
+			   i.e. play the function */
+			if (cvorb_swp(cvorbh, (ch>CHAM)?2:1, SPR_MSS))
+				printf("Software Start FAILED!\n");
+			else
+				printf("Function#%d @channel#%d"
+				       " has been played\n", fn, ch);
 			break;
-		case 7: /* load && play function */
+		case 8: /* load && play function */
 			{
 				struct fv *fv; /* function vector table */
 				int noe; /* number of entries */
@@ -262,7 +328,7 @@ int UserDefinedMenu(HANDLE handle, int lun)
 					break;
 				}
 
-				/* select function if Function Selection */
+				/* select function in Function Selection reg */
 				if (cvorb_func_sel(cvorbh, ch, fn)) {
 					printf("Can't Select Function#%d in"
 					       " channel#%d\n", fn, ch);
@@ -279,7 +345,7 @@ int UserDefinedMenu(HANDLE handle, int lun)
 
 				break;
 			}
-		case 8:
+		case 9:
 			do_usr_wait = 1;
 			/* get channel */
 			ch = 1;
@@ -301,7 +367,7 @@ int UserDefinedMenu(HANDLE handle, int lun)
 				printf("Can't set new function! [%s]\n",
 				       cvorb_perr(rc));
 			break;
-		case 9:	 /* enable function */
+		case 10: /* enable function */
 			{
 				uint mask[2];
 				do_usr_wait = 1;
@@ -329,7 +395,7 @@ int UserDefinedMenu(HANDLE handle, int lun)
 					printf("Function enabled\n");
 				break;
 			}
-		case 10: /* disable function */
+		case 11: /* disable function */
 			{
 				uint mask[2];
 				do_usr_wait = 1;
@@ -358,7 +424,7 @@ int UserDefinedMenu(HANDLE handle, int lun)
 
 				break;
 			}
-		case 11: /* set/get Recurrent Cycles */
+		case 12: /* set/get Recurrent Cycles */
 			{
 				uint res;
 				do_usr_wait = 1;
@@ -380,7 +446,7 @@ int UserDefinedMenu(HANDLE handle, int lun)
 					       " set\n");
 				break;
 			}
-		case 12: /* set module config register */
+		case 13: /* set module config register */
 			do_usr_wait = 1;
 			if (get_module(&md))
 				break;
@@ -400,7 +466,7 @@ int UserDefinedMenu(HANDLE handle, int lun)
 			}
 			printf("Module Configuration register written\n");
 			break;
-		case 13: /* set chan config register */
+		case 14: /* set chan config register */
 			do_usr_wait = 1;
 			ch = 1;
 			if (get_channel(&ch))
@@ -472,38 +538,68 @@ static int load_vtf(FILE *fd, struct fv **fv)
 /**
  * @brief Try to open *.vtf Vector Table file
  *
- * @param fd -- opened FILE descriptor goes here
+ * @param f -- opened FILE descriptor goes here
  *
  * Returned file descriptor should be closed afterwards
  *
  * @return < 0 -- FAILED
  * @return   0 -- SUCCESS
  */
-static int open_vtf(FILE **fd)
+#define MAX_VTF_FILES 32
+#define MAX_STR_SZ 32
+static int open_vtf(FILE **f)
 {
-	char vtfn[32]; /* vector table file namea */
-	char *fname;
-	int rc = 0;
+        DIR *dir = opendir("./vtf"); /* by default -- always
+					search in local vtf/ dir */
+        struct direct *ent;
+	char vtf[MAX_VTF_FILES][MAX_STR_SZ] = { { 0 } }; /* search results */
+	int fc = 0, i;
+	char vtfn[MAX_STR_SZ] = { 0 }; /* vector table file name */
+	char idx[MAX_STR_SZ] = { 0 }; /* vector table index */
+	char *fn; /* filename to open */
 
-	printf("Vector table file (*.vtf) -> ");
-	scanf("%s", vtfn);
-	getchar();
-
-	if (!index(vtfn, '.'))
-		/* we should build *.vtf name */
-		asprintf(&fname, "./vtf/%s.vtf", vtfn);
-	else
-		/* should search for exact name */
-		asprintf(&fname, "./vtf/%s", vtfn);
-
-	*fd = fopen(fname, "r");
-	if (!*fd) {
-		printf("ERROR! Can't open %s Vector Table File\n", fname);
-		rc = -1;
+	if (!dir) {
+		printf("Can't open ./vtf directory\n");
+		return -1;
 	}
 
-	free(fname);
-	return rc;
+	/* scan dir for .vtf files */
+        while ( (ent = readdir(dir)) && fc < MAX_VTF_FILES)
+                if (strstr(ent->d_name, ".vtf"))
+			strncpy(vtf[fc++], ent->d_name, sizeof(vtf[0]));
+	closedir(dir);
+
+	printf("Choose vector table index to load\n"
+	       "or enter your own .vtf filename to open:\n\n");
+	for (i = 0; i < fc; i++)
+		printf("[%d] -- %s\n", i, vtf[i]);
+
+	printf("--> ");
+	scanf("%[ 0-9]", idx);	   /* get index */
+	scanf("%[ a-zA-Z]", vtfn); /* get user-provided filename */
+	getchar();
+
+	/* check, what user wants */
+	if (strlen(idx)) {	/* user provide index */
+		i = atoi(idx);
+		if (!WITHIN_RANGE(0, i, fc)) {
+			printf("index choosen is out-of-range\n");
+			return -1;
+		}
+		asprintf(&fn, "./vtf/%s", vtf[i]);
+	} else /* user-provided file */
+		asprintf(&fn, "%s", vtfn);
+
+	/* open vtf file */
+	*f = fopen(fn, "r");
+	if (!*f) {
+		printf("ERROR! Can't open %s Vector Table File\n", fn);
+		free(fn);
+		return -1;
+	}
+
+	free(fn);
+	return 0;
 }
 
 /**
@@ -599,4 +695,48 @@ static int get_value(uint *val, uint min, uint max)
 		return -1;
 	}
 	return 0;
+}
+
+/**
+ * @brief To operate on Software Pulses register
+ *
+ * @return Action to take -- if OK
+ * @return < 0            -- if FAILED
+ */
+static int soft_pulses()
+{
+	int res;
+	printf("Choose action to perform:\n\n"
+	       "[1] -- Moudle software reset\n"
+	       "[2] -- FPGA reset (global reset)\n"
+	       "[3] -- Moudle Software Start\n"
+	       "[4] -- Moudle Software event Start\n"
+	       "[5] -- Moudle Software Stop \n"
+	       "[6] -- Moudle Software event Stop\n");
+	printf("--> ");
+	scanf("%d", &res);
+	getchar();
+	if (!WITHIN_RANGE(1, res, 6)) {
+		printf("ERROR! Requested operation is out-of-range\n");
+		return -1;
+	}
+
+	switch (res) {
+	case 1:
+		return SPR_MSR;
+	case 2:
+		return SPR_FGR;
+	case 3:
+		return SPR_MSS;
+	case 4:
+		return SPR_MSES;
+	case 5:
+		return SPR_MSSTP;
+	case 6:
+		return SPR_MSESTP;
+	default:
+		return -1;
+	}
+
+	return -1;
 }
