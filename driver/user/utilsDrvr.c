@@ -228,8 +228,14 @@ int read_sram(CVORBUserStatics_t *usp, char *arg)
 #else  /* lynx */
 	sram = __inl((__port_addr_t)&(usp->md[p.module-1].md->SRAM_DATA));
 #endif
-	nov = (ushort *)&sram;	/* number of vectors in the function */
-	++nov;
+	nov = (ushort *)&sram;
+	++nov;	/* move pointer to number of vectors in the function */
+
+	if (p.am == (ushort)-1) { /* just return number of vectors
+				     in the function to the user */
+		cdcm_mutex_unlock(&usp->md[p.module-1].iol);
+		return *nov;
+	}
 
 	/* safety check for garbage SRAM */
 	if (!(WITHIN_RANGE(1, *nov, MAX_F_VECT))) {

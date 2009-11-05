@@ -76,8 +76,13 @@ struct sram_params {
 	ushort am;	/**< in case of write -- number of vectors
 			   (excluding fv[0] == [t=0, V0]!), that is
 			   not a real vector. 679 max
+
 			   in case of read -- actual fv capacity,
-			   i.e. how many vectors can be stored in it */
+			   i.e. how many vectors can be stored in it.
+			   Special case (-1) is possible in case of read.
+			   Only Vector Amount will be returned to the user in
+			   fv[0].t
+			   All other fields are invalid in this case */
 };
 
 
