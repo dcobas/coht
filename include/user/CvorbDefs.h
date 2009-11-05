@@ -95,12 +95,12 @@
  * Software Pulses register is used to simulate front panel pulse inputs.
  *@{
  */
-#define SPR_MSR    (1<<0) /**< module software reset */
+#define SPR_MSR    (1<<0) /**< Module software reset */
 #define SPR_FGR    (1<<3) /**< FPGA reset (global reset) */
 #define SPR_MSS	   (1<<4) /**< Module Software Start */
 #define SPR_MSES   (1<<5) /**< Module Software event start */
-#define SPR_MSSTP  (1<<6) /**< Module software stop */
-#define SPR_MSESTP (1<<7) /**< Module software event stop */
+#define SPR_MSSTP  (1<<6) /**< Module Software stop */
+#define SPR_MSESTP (1<<7) /**< Module Software event stop */
 #define SPR_MASK   249	  /**< bit mask */
 /*@} end of group*/
 
