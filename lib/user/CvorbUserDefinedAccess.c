@@ -1123,7 +1123,7 @@ int is_pow_of_2(unsigned long n)
 int cvorb_swp(int h, int m, int bit)
 {
 	int rc;
-	ushort par[3] = { 0 }; /* ioctl params */
+	ushort par[2]; /* ioctl params */
 
 	if (!WITHIN_RANGE(1, h, MAX_HNDLS))
 		return -CVORB_BAD_HANDLE;
@@ -1138,7 +1138,6 @@ int cvorb_swp(int h, int m, int bit)
 	  init params
 	   [0] -- module idx
 	   [1] -- bit to set in Soft Pulses reg
-	   [2] -- not used
 	*/
 	par[0] = m-1;
 	par[1] = bit;
