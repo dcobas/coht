@@ -17,7 +17,6 @@
 
 void print_load_sram_ioctl_args(ushort *args)
 {
-	//int i;
 	int *sarp = (int *)&args[FSZ];
 
 	kkprintf("Start address register is 0x%x\n"
@@ -524,5 +523,27 @@ int write_recurrent_cycles_reg(CVORBUserStatics_t *usp, char *arg)
 	if (cdcm_copy_from_user(&par, arg, sizeof(par)))
 		return SYSERR;
 	_wcr(par.m, par.c, CH_REC_CYC, par.d);
+	return OK;
+}
+
+int write_fem_regs(CVORBUserStatics_t *usp, char *arg)
+{
+	struct {
+		ushort m; /* submodule idx */
+		ushort c; /* channel idx */
+		unsigned long long p;  /* new value to set */
+	} par;
+	uint32_t *ptr = (uint32_t *) &par.p;
+
+	if (cdcm_copy_from_user(&par, arg, sizeof(par)))
+		return SYSERR;
+
+#ifdef __linux__
+	par.p = __swahl64(par.p);
+#endif
+
+	_wcr(par.m, par.c, FCT_EM_H, ptr[0]);
+	_wcr(par.m, par.c, FCT_EM_L, ptr[1]);
+
 	return OK;
 }

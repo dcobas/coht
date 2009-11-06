@@ -330,6 +330,8 @@ int CvorbUserIoctl(int *proceed, register CVORBStatics_t *sptr,
 			m[1] = _rcr(par.m, par.c, FCT_EM_L);
 			return cdcm_copy_to_user(par.p, m, sizeof(m));
 		}
+	case CVORB_FEN_WR: /* write Function Enable Mask */
+		return write_fem_regs(usp, arg);
 	case CVORB_FUNC_SEL:	/* select function to be played */
 		if (cdcm_copy_from_user(&edp, arg, sizeof(edp)))
 			return SYSERR;

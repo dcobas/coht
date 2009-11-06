@@ -59,7 +59,7 @@ extern "C" {
 	int cvorb_rd_temp(int, int*);
 	int cvorb_rst_module(int, int);
 	int cvorb_rst_fpga(int, int);
-	int cvorb_rd_fem(int, int, uint[2]);
+	int cvorb_rd_fem(int, int, unsigned long long *);
 	int cvorb_rd_fem_arr(int, int, char[64]);
 	int cvorb_wr_fem(int, int, unsigned long long);
 	int cvorb_func_load(int, int, int, struct fv*, int);

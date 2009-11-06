@@ -60,21 +60,24 @@
 /**< Read enable function mask */
 #define CVORB_FEN_RD     (CVORB_FIRST_USR_IOCTL + 13)
 
+/**< Write enable function mask */
+#define CVORB_FEN_WR     (CVORB_FIRST_USR_IOCTL + 14)
+
 /**< select function */
-#define CVORB_FUNC_SEL   (CVORB_FIRST_USR_IOCTL + 14)
+#define CVORB_FUNC_SEL   (CVORB_FIRST_USR_IOCTL + 15)
 
 /**< get currently selected function */
-#define CVORB_FUNC_GET   (CVORB_FIRST_USR_IOCTL + 15)
+#define CVORB_FUNC_GET   (CVORB_FIRST_USR_IOCTL + 16)
 
 /**< write into software pulses register. \n
    Allows to simulate front panel pulse inputs */
-#define CVORB_WRSWP      (CVORB_FIRST_USR_IOCTL + 16)
+#define CVORB_WRSWP      (CVORB_FIRST_USR_IOCTL + 17)
 
 /**< read Recurrent Cycles register */
-#define CVORB_RC_RD      (CVORB_FIRST_USR_IOCTL + 17)
+#define CVORB_RC_RD      (CVORB_FIRST_USR_IOCTL + 18)
 
 /**< write Recurrent Cycles register */
-#define CVORB_RC_WR      (CVORB_FIRST_USR_IOCTL + 18)
+#define CVORB_RC_WR      (CVORB_FIRST_USR_IOCTL + 19)
 /*@} end of group*/
 
 
@@ -154,7 +157,7 @@ struct mcr {
 	ushort oop; /**< Optical Output selection \n
 		       [0 - 7] -- Vector generator[0 - 7] */
 	ushort fplss; /**< Front panel LED source selection \n
-			 [0 - 7] -- Vector generator[0 - 7] */
+			 [0 - 7] -- Channel[1 - 7] */
 	ushort eoo; /**< Enable Optical Output */
 };
 
