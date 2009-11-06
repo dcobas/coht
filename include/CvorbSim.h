@@ -45,6 +45,7 @@
 #define sel poll_table_struct	/* for select entry point */
 /* only for Linux kernel */
 #include <cdcm/cdcm.h>
+#include "dg/swab-extra-linux.h"
 #endif
 
 /* for kernel only */
