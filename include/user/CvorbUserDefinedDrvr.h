@@ -49,29 +49,21 @@ struct CVORBUserStatics_t {
  */
 #define _rcr(m, c, r)							\
 	({								\
-		/*udelay(5);*/						\
-		/*kkprintf("\n_rcr @ 0x%x\n", (uint)&(usp->md[m].cd[c]->r));*/ \
 		__inl((__port_addr_t)&(usp->md[m].cd[c]->r));	\
 	})
 
 #define _rr(m, r)							\
 	({								\
-		/*udelay(5);*/						\
-		/*kkprintf("\n_rr @ 0x%x\n", (uint)&(usp->md[m].md->r));*/ \
 		__inl((__port_addr_t)&(usp->md[m].md->r));		\
 	})
 
 #define _rcrr(m, c, r, b, t)						\
 	({								\
-		/*udelay(5);*/						\
-		/*kkprintf("\n_rcrr @ 0x%x\n", (uint)&(usp->md[m].cd[c]->r));*/	\
 		__rep_inl((__port_addr_t)&(usp->md[m].cd[c]->r), b, t); \
 	})
 
 #define _rrr(m, r, b, t)						\
 	({								\
-		/*udelay(5);*/						\
-		/*kkprintf("\n_rrr @ 0x%x\n", (uint)&(usp->md[m].md->r));*/ \
 		__rep_inl((__port_addr_t)&(usp->md[m].md->r), b, t); \
 	})
 
@@ -86,29 +78,21 @@ struct CVORBUserStatics_t {
  */
 #define _wcr(m, c, r, v)						\
 	({								\
-		/*udelay(5);*/						\
-		/*kkprintf("\n_wcr @ 0x%x\n", (uint)&(usp->md[m].cd[c]->r));*/ \
 		__outl((__port_addr_t)&(usp->md[m].cd[c]->r), v);	\
 	})
 
 #define _wr(m, r, v)							\
 	({								\
-		/*udelay(5);*/						\
-		/*kkprintf("\n_wr @ 0x%x\n", (uint)&(usp->md[m].md->r));*/ \
 		__outl((__port_addr_t)&(usp->md[m].md->r), v);	\
 	})
 
 #define _wcrr(m, c, r, b, t)						\
 	({								\
-		/*udelay(5);*/						\
-		/*kkprintf("\n_wcrr @ 0x%x\n", (uint)&(usp->md[m].cd[c]->r));*/ \
 		__rep_outl((__port_addr_t)&(usp->md[m].cd[c]->r), b, t); \
 	})
 
 #define _wrr(m, r, b, t)						\
 	({								\
-		/*udelay(5);*/						\
-		/*kkprintf("\n_wrr @ 0x%x\n", (uint)&(usp->md[m].md->r));*/ \
 		__rep_outl((__port_addr_t)&(usp->md[m].md->r), b, t); \
 	})
 /*@} end of group*/
