@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
+#include <limits.h>
 
 /* directory management */
 #ifdef __Lynx__
@@ -89,7 +90,7 @@ int UserDefinedMenu(HANDLE handle, int lun)
 			{
 				do_usr_wait = 1;
 				printf("Nothing to test\n");
-			break;
+				break;
 			}
 		case 1:
 			return(OK);
@@ -122,7 +123,7 @@ int UserDefinedMenu(HANDLE handle, int lun)
 		case 3: /* read module/channel config && status regs */
 			{
 				uint data;
-				uint mask[2];
+				unsigned long long mask;
 				int i;
 				do_usr_wait = 1;
 
@@ -167,12 +168,9 @@ int UserDefinedMenu(HANDLE handle, int lun)
 					printf("| Recurrent Cycles reg      "
 					       "--> 0x%x\n", data);
 
-					cvorb_rd_fem(cvorbh, i, mask);
-					printf("| Function Enable Mask"
-					       " registers:\n"
-					       "| [63-32] --> 0x%x\n"
-					       "| [31-0]  --> 0x%x\n",
-					       mask[0], mask[1]);
+					cvorb_rd_fem(cvorbh, i, &mask);
+					printf("| Function Enable Mask is:\n"
+					       "| 0x%llx\n", mask);
 					printf("+--------------------------\n");
 				}
 				break;
@@ -345,7 +343,7 @@ int UserDefinedMenu(HANDLE handle, int lun)
 
 				break;
 			}
-		case 9:
+		case 9: /* select function */
 			do_usr_wait = 1;
 			/* get channel */
 			ch = 1;
@@ -369,17 +367,15 @@ int UserDefinedMenu(HANDLE handle, int lun)
 			break;
 		case 10: /* enable function */
 			{
-				uint mask[2];
+				unsigned long long mask;
 				do_usr_wait = 1;
 				ch = 1;
 				if (get_channel(&ch))
 					break;
 
-				cvorb_rd_fem(cvorbh, ch, mask);
-				printf("Current Function Enable"
-				       " Mask registers are:\n"
-				       "[63-32] --> 0x%x [31-0] --> 0x%x\n\n",
-				       mask[0], mask[1]);
+				cvorb_rd_fem(cvorbh, ch, &mask);
+				printf("Current Function Enable mask is:\n"
+				       "0x%llx\n\n", mask);
 
 				printf("Select Function to Enable"
 				       " (0 -- all of them)\n");
@@ -397,17 +393,15 @@ int UserDefinedMenu(HANDLE handle, int lun)
 			}
 		case 11: /* disable function */
 			{
-				uint mask[2];
+				unsigned long long mask;
 				do_usr_wait = 1;
 				ch = 1;
 				if (get_channel(&ch))
 					break;
 
-				cvorb_rd_fem(cvorbh, ch, mask);
-				printf("Current Function Enable"
-				       " Mask registers are:\n"
-				       "[63-32] --> 0x%x [31-0] --> 0x%x\n\n",
-				       mask[0], mask[1]);
+				cvorb_rd_fem(cvorbh, ch, &mask);
+				printf("Current Function Enable mask is:\n"
+				       "0x%llx\n\n", mask);
 
 				printf("Select Function to Disable"
 				       " (0 -- all of them)\n");

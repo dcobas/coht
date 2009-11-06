@@ -246,7 +246,7 @@ int cvorb_wr_mconfig(int h, int ch, uint data)
 }
 
 /**
- * @brief @b TODO Write module Configuration Register bit settings
+ * @brief @b Write module Configuration Register bit settings
  *
  * @param h  -- handle
  * @param ch -- channel [1-8]  -- submodule#1 \n
@@ -261,7 +261,22 @@ int cvorb_wr_mconfig(int h, int ch, uint data)
  */
 int cvorb_wr_mconfig_struct(int h, int ch, struct mcr *cr)
 {
-        return -CVORB_ERR;
+	uint mcr = 0;
+
+	if (cr->ms != (ushort)-1)
+		mcr |= (cr->ms) & 15;
+	if (cr->ipp != (ushort)-1)
+		mcr |= ((cr->ipp) & 1) << 6;
+	if (cr->dss != (ushort)-1)
+		mcr |= ((cr->dss) & 7) << 7;
+	if (cr->oop != (ushort)-1)
+		mcr |= ((cr->oop) & 7) << 10;
+	if (cr->fplss != (ushort)-1)
+		mcr |= ((cr->fplss) & 7) << 13;
+	if (cr->eoo != (ushort)-1)
+		mcr |= ((cr->eoo) & 1) << 25;
+
+        return cvorb_wr_mconfig(h, ch, mcr);
 }
 
 /**
@@ -366,7 +381,7 @@ int cvorb_wr_cconfig(int h, int ch, uint data)
 }
 
 /**
- * @brief @b TODO Write channel Configuration Register bit settings
+ * @brief @b Write channel Configuration Register bit settings
  *
  * @param h  -- handle
  * @param ch -- channel [1-16]
@@ -380,7 +395,18 @@ int cvorb_wr_cconfig(int h, int ch, uint data)
  */
 int cvorb_wr_cconfig_struct(int h, int ch, struct ccr *cr)
 {
-	return -CVORB_ERR;
+	uint ccr = 0;
+
+	if (cr->chm != (ushort)-1)
+		ccr |= (cr->chm) & 3;
+	if (cr->slope_en != (ushort)-1)
+		ccr |= ((cr->slope_en) & 1) << 3;
+	if (cr->so_dis != (ushort)-1)
+		ccr |= ((cr->so_dis) & 1) << 4;
+	if (cr->cov != (ushort)-1)
+		ccr |= ((cr->cov) & ((1<<16)-1)) << 16;
+
+	return cvorb_wr_cconfig(h, ch, ccr);
 }
 
 /**
@@ -626,8 +652,6 @@ int cvorb_rst_fpga(int h, int ch)
  * @param h  -- handle
  * @param ch -- channel [1-16]
  * @param m  -- current function mask goes here \n
- *              [0] -- bits[63-32] \n
- *              [1] -- bits[31-0] \n
  *
  * Allows to burst-check function state (enabled/disabled)
  *
@@ -637,8 +661,11 @@ int cvorb_rst_fpga(int h, int ch)
  * @return   0 -- OK
  * @return < 0 -- FAILED
  */
-int cvorb_rd_fem(int h, int ch, uint m[2])
+int cvorb_rd_fem(int h, int ch, unsigned long long *m)
 {
+	uint fem[2] = { 0 }; /* function enable bits goes here
+				[0] -- bits[63-32]
+				[1] -- bits[31-0] */
 	struct {
 		ushort m; /* submodule idx */
 		ushort c; /* channel idx */
@@ -653,16 +680,22 @@ int cvorb_rd_fem(int h, int ch, uint m[2])
 
 	par.m = (ch > CHAM) ? 1 : 0;
 	par.c = ((ch-1)%CHAM);
-	par.p = m;
+	par.p = fem;
 
 	/* call the driver */
 	if (ioctl(_lh[h-1].fd, CVORB_FEN_RD, &par))
 		return -CVORB_IOCTL_FAILED;
+
+	*m = 0;
+	*m |= fem[0];
+	*m <<= 32;
+	*m |= fem[1];
+
 	return 0;
 }
 
 /**
- * @brief @b TODO Read Channel Function Enable bits
+ * @brief @b Read Channel Function Enable bits
  *
  * @param h   -- handle
  * @param ch  -- channel [1-64]
@@ -674,11 +707,21 @@ int cvorb_rd_fem(int h, int ch, uint m[2])
  */
 int cvorb_rd_fem_arr(int h, int ch, char fem[64])
 {
-	return -CVORB_ERR;
+	int i;
+	unsigned long long data = 0;
+	int rc = cvorb_rd_fem(h, ch, &data);
+
+	if (rc)
+		return rc;
+
+	for (i = 0; i < 64; i++)
+		fem[i] = (data >> i) & 1;
+
+	return 0;
 }
 
 /**
- * @brief @b TODO Write Channel Function Enable Mask.
+ * @brief @b Write Channel Function Enable Mask.
  *
  * @param h    -- handle
  * @param ch   -- channel [1-16]
@@ -694,7 +737,27 @@ int cvorb_rd_fem_arr(int h, int ch, char fem[64])
  */
 int cvorb_wr_fem(int h, int ch, unsigned long long mask)
 {
-	return -CVORB_ERR;
+	struct {
+		ushort m; /* submodule idx */
+                ushort c; /* channel idx */
+                unsigned long long p;  /* new value to set */
+        } par;
+
+	if (!WITHIN_RANGE(1, h, MAX_HNDLS))
+                return -CVORB_BAD_HANDLE;
+
+        if (!WITHIN_RANGE(1, ch, MAX_CHAN_AM))
+                return -CVORB_OUT_OF_RANGE;
+
+        par.m = (ch > CHAM) ? 1 : 0;
+        par.c = ((ch-1)%CHAM);
+        par.p = mask;
+
+        /* call the driver */
+        if (ioctl(_lh[h-1].fd, CVORB_FEN_WR, &par))
+                return -CVORB_IOCTL_FAILED;
+
+	return 0;
 }
 
 /**
