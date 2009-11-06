@@ -332,10 +332,14 @@ int CvorbUserIoctl(int *proceed, register CVORBStatics_t *sptr,
 		}
 	case CVORB_FEN_WR: /* write Function Enable Mask */
 		return write_fem_regs(usp, arg);
-	case CVORB_FUNC_SEL:	/* select function to be played */
+	case CVORB_FUNC_SEL: /* select function to be played */
 		if (cdcm_copy_from_user(&edp, arg, sizeof(edp)))
 			return SYSERR;
 		_wcr(edp[0], edp[1], FUNC_SEL, edp[2]);
+		/* Should wait on Channel Status register bit[9] -- function
+		   copy in progress, when data is copying into local SRAM. */
+		while(_rcr(edp[0], edp[1], CH_STAT) & 1<<9)
+			udelay(1);
 		return OK;
 	case CVORB_FUNC_GET:	/* get currently selected function */
 		if (cdcm_copy_from_user(&edp, arg, sizeof(edp)))
@@ -343,10 +347,7 @@ int CvorbUserIoctl(int *proceed, register CVORBStatics_t *sptr,
 		return _rcr(edp[0], edp[1], FUNC_SEL);
 	case CVORB_WRSWP: /* action register.
 			     Simulate front panel pulse inputs */
-		if (cdcm_copy_from_user(&edp, arg, sizeof(edp)))
-			return SYSERR;
-		_wr(edp[0], SOFT_PULSE, edp[1]);
-		return OK;
+		return write_swp(usp, arg);
 	case CVORB_RC_RD:
 		return read_recurrent_cycles_reg(usp, arg);
 	case CVORB_RC_WR:

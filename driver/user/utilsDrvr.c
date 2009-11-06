@@ -183,6 +183,10 @@ int load_sram(CVORBUserStatics_t *usp, char *arg) //struct sram_params *p)
 
 	/* enter critical region -- r/w ioaccess protection */
 	cdcm_mutex_lock(&usp->md[p.module-1].iol);
+	/* Should wait on Channel Status register bit[9] -- function
+	   copy in progress, when data is copying into local SRAM. */
+	while(_rcr(p.module-1, p.chan-1, CH_STAT) & 1<<9)
+		udelay(1);
 	_wr(p.module-1, SRAM_SA, sar);
 	_wrr(p.module-1, SRAM_DATA, (ulong *)vect, sz/4);
 	/* leave critical region */
@@ -545,5 +549,15 @@ int write_fem_regs(CVORBUserStatics_t *usp, char *arg)
 	_wcr(par.m, par.c, FCT_EM_H, ptr[0]);
 	_wcr(par.m, par.c, FCT_EM_L, ptr[1]);
 
+	return OK;
+}
+
+int write_swp(CVORBUserStatics_t *usp, char *arg)
+{
+	ushort par[2]; /* [0] -- submodule idx, [1] -- new val */
+
+	if (cdcm_copy_from_user(par, arg, sizeof(par)))
+		return SYSERR;
+	_wr(par[0], SOFT_PULSE, par[1]);
 	return OK;
 }
