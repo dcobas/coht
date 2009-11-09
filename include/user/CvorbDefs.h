@@ -132,7 +132,7 @@ struct fv {
 
 /** @brief Channel Configuration register data */
 struct ccr {
-	ushort chm; /**< Vector generator mode selection \n
+	ushort chm; /**< Channel mode selection \n
 		       0 -- OFF \n
 		       1 -- ON \n
 		       4 -- Test#1 (Triangle function) \n
