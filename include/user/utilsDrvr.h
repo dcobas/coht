@@ -31,5 +31,6 @@ int  read_recurrent_cycles_reg(CVORBUserStatics_t *, char *);
 int  write_recurrent_cycles_reg(CVORBUserStatics_t *, char *);
 int  write_fem_regs(CVORBUserStatics_t *, char *);
 int  write_swp(CVORBUserStatics_t *, char *);
+void enable_modules(CVORBUserStatics_t *);
 
 #endif	/* _UTILS_DRIVER_H_INCLUDE_ */

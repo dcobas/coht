@@ -339,7 +339,7 @@ int CvorbUserIoctl(int *proceed, register CVORBStatics_t *sptr,
 		/* Should wait on Channel Status register bit[9] -- function
 		   copy in progress, when data is copying into local SRAM. */
 		while(_rcr(edp[0], edp[1], CH_STAT) & 1<<9)
-			udelay(1);
+			usec_sleep(1);
 		return OK;
 	case CVORB_FUNC_GET:	/* get currently selected function */
 		if (cdcm_copy_from_user(&edp, arg, sizeof(edp)))
@@ -398,26 +398,17 @@ char* CvorbUserInst(int *proceed, register DevInfo_t *info,
 		usp->md[1].cd[i] = (chd *)
 			((long)usp->md[0].md + _ch_offset[i]);
 
-	/* reset subModules */
-	_wr(0, SOFT_PULSE, SPR_FGR);
-	_wr(1, SOFT_PULSE, SPR_FGR);
-
-	/* set normal mode operation */
-	_wr(0, MOD_CFG, 1);	/* module#1 */
-	_wr(1, MOD_CFG, 1);	/* module#2 */
-
-	/* enable all channels and
-	   set recurrent cycles to 1 (i.e. play function once) */
-	for (i = 0; i < CHAM; i++) {
-		_wcr(0, i, CH_CFG, 1);
-		_wcr(0, i, CH_REC_CYC, 1);
-
-		_wcr(1, i, CH_CFG, 1);
-		_wcr(1, i, CH_REC_CYC, 1);
+	for (i = 0; i < SMAM; i++) {
+		/* reset subModules */
+		_wr(i, SOFT_PULSE, SPR_FGR);
 
 		/* initialize iolock mutex */
 		cdcm_mutex_init(&usp->md[i].iol);
 	}
+
+	/* set normal mode operation, enable all channels and
+	   set recurrent cycles to 1 (i.e. play function once) */
+	enable_modules(usp);
 
 	/* Uncomment the following code to register ISR */
 #if 0

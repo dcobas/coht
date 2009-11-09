@@ -14,6 +14,7 @@
  */
 #include "CvorbUserDefinedDrvr.h"
 #include "CvorbDrvrDefs.h"
+#include "utilsDrvr.h"
 
 void print_load_sram_ioctl_args(ushort *args)
 {
@@ -186,7 +187,7 @@ int load_sram(CVORBUserStatics_t *usp, char *arg) //struct sram_params *p)
 	/* Should wait on Channel Status register bit[9] -- function
 	   copy in progress, when data is copying into local SRAM. */
 	while(_rcr(p.module-1, p.chan-1, CH_STAT) & 1<<9)
-		udelay(1);
+		usec_sleep(1);
 	_wr(p.module-1, SRAM_SA, sar);
 	_wrr(p.module-1, SRAM_DATA, (ulong *)vect, sz/4);
 	/* leave critical region */
@@ -559,5 +560,29 @@ int write_swp(CVORBUserStatics_t *usp, char *arg)
 	if (cdcm_copy_from_user(par, arg, sizeof(par)))
 		return SYSERR;
 	_wr(par[0], SOFT_PULSE, par[1]);
+
+	/* will re-enable modules/channels */
+	if (par[1] == SPR_MSR || par[1] == SPR_FGR)
+		enable_modules(usp);
+
 	return OK;
+}
+
+void enable_modules(CVORBUserStatics_t *usp)
+{
+	int i;
+
+	for (i = 0; i < SMAM; i++)
+		/* set normal mode operation */
+		_wr(i, MOD_CFG, 1);
+
+        /* enable all channels and
+           set recurrent cycles to 1 (i.e. play function once) */
+        for (i = 0; i < CHAM; i++) {
+                _wcr(0, i, CH_CFG, 1);
+                _wcr(0, i, CH_REC_CYC, 1);
+
+                _wcr(1, i, CH_CFG, 1);
+                _wcr(1, i, CH_REC_CYC, 1);
+        }
 }
