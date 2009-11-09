@@ -223,7 +223,7 @@ int UserDefinedMenu(HANDLE handle, int lun)
 					break;
 				}
 			}
-		case 6:
+		case 6: /* read function from SRAM */
 			{
 				int i;
 				struct fv fv[2048];
@@ -701,12 +701,12 @@ static int soft_pulses()
 {
 	int res;
 	printf("Choose action to perform:\n\n"
-	       "[1] -- Moudle software reset\n"
+	       "[1] -- Module software reset\n"
 	       "[2] -- FPGA reset (global reset)\n"
-	       "[3] -- Moudle Software Start\n"
-	       "[4] -- Moudle Software event Start\n"
-	       "[5] -- Moudle Software Stop \n"
-	       "[6] -- Moudle Software event Stop\n");
+	       "[3] -- Module Software Start\n"
+	       "[4] -- Module Software event Start\n"
+	       "[5] -- Module Software Stop \n"
+	       "[6] -- Module Software event Stop\n");
 	printf("--> ");
 	scanf("%d", &res);
 	getchar();
