@@ -1,0 +1,5 @@
+#!/bin/bash
+
+../../general/ins_rm_mod/dgmodinst.ppc4 CVORB -U0 -O0x400
+
+#../../general/ins_rm_mod/dgmodinst.ppc4 CVORB -U0 -O0x400 -, -U1 -O0x800
