@@ -143,18 +143,19 @@ int load_sram(CVORBUserStatics_t *usp, char *arg) //struct sram_params *p)
 	for (i = 1; i <= p.am; i++) {
 		if (!fv[i].t) { /* internal stop */
 			ss = (ushort) -1;
-			nos = 0;
+			nos = dt = 0;
 		} else {
-			dt = (fv[i].t - fv[i-1].t)*1000; /* delta t in us */
-			ss = ((dt-1)/MTMS) + 1;
+			dt  = (fv[i].t - fv[i-1].t)*1000; /* delta t in us */
+			ss  = ((dt-1)/MTMS) + 1;
 			nos = dt/(ss * MIN_STEP);
 		}
-#if 0
-		/* step size (in us) should be a factor of dt!
-		   should be already checked by the library! */
-		if (dt%ss)
-			poison;
-#endif
+
+		/* ensure step size (in us) is a factor of dt,
+		   i.e. no remainder */
+		if (dt%ss) {
+			++ss;
+			nos = dt/(ss * MIN_STEP);
+		}
 
 		if (i&1) { /* odd */
 			vp[0] = nos;

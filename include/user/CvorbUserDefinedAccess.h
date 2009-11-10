@@ -28,8 +28,6 @@ enum cvorble {
         CVORB_DAL_ERR,      /**< DAL Error Occurs. You Can decode it using
 			       DaGetErrCode() */
         CVORB_OUT_OF_RANGE, /**< value out-of-range */
-	CVORB_POISONED,	    /**< step size (in us) is @b not a factor
-			       of delta t. Vector table is invalid */
 	CVORB_IOCTL_FAILED  /**< ioctl call failed */
 };
 /*@} end of group*/

@@ -784,9 +784,6 @@ int cvorb_wr_fem(int h, int ch, unsigned long long mask)
  * @return  0                  -- OK
  * @return -CVORB_BAD_HANDLE   -- library handle is bad
  * @return -CVORB_OUT_OF_RANGE -- MAX vector amount exceeded
- * @return -CVORB_POISONED     -- provided vector table is invalid.
- *                                Step size (in us) is @b not a factor
- *                                of delta t detected
  * @return -CVORB_IOCTL_FAILED -- ioctl failed
  */
 int cvorb_func_load(int h, int ch, int func, struct fv *fv, int sz)
@@ -794,7 +791,6 @@ int cvorb_func_load(int h, int ch, int func, struct fv *fv, int sz)
 	struct sram_params par;
 	int i;
 	uint dt;
-	ushort ss;
 
 	if (!WITHIN_RANGE(1, h, MAX_HNDLS))
 		return -CVORB_BAD_HANDLE;
@@ -817,20 +813,20 @@ int cvorb_func_load(int h, int ch, int func, struct fv *fv, int sz)
 	par.am = sz-1;	/* set actual vector amount,
 			   exclude first element, which is t0 == 0 V0 */
 
-	/* check delta t && step size
-	   Step size (in us) should be a factor of dt, i.e. no remainder!
-	   Otherwise -- provided vector table is considered to be invalid */
+
+	/* TODO. Handle the MAX time between two vectors
+	   Vector should be split in two vectors.
+	   (see 4.2 Vector definition in CVORB Tech Guide) */
 	for (i = 1; i <= sz-1; i++) {
 		if (!fv[i].t) /* skip internal stop */
 			continue;
-                dt = (fv[i].t - fv[i-1].t)*1000; /* delta t in us */
-                ss = ( ((dt-1)/MTMS) + 1) * MIN_STEP;
-		if (dt%ss)
-			return -CVORB_POISONED;
 
-		/* TODO. Handle the MAX time between two vectors
-		   Vector should be split in two vectors.
-		   (see 4.2 Vector definition in CVORB Tech Guide) */
+		/* vector table is wrong */
+		if (fv[i].t < fv[i-1].t)
+			return -CVORB_OUT_OF_RANGE;
+
+                dt = (fv[i].t - fv[i-1].t)*1000; /* delta t in us */
+
 		if (dt > 0xffffffff/*((1<<16)-1)*((1<<15)-1)*5*/)
 			return -CVORB_OUT_OF_RANGE;
         }
@@ -1088,10 +1084,6 @@ char* cvorb_perr(int e)
 		return "DAL error";
 	case -CVORB_OUT_OF_RANGE:
 		return "Value is out-of-range";
-	case -CVORB_POISONED:
-		return "Step size (in us) is not a factor"
-			" of delta t detected."
-			" Vector table is invalid!";
 	case -CVORB_IOCTL_FAILED:
 		return "IOCTL call failed";
 	default:
