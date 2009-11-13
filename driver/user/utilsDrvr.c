@@ -30,7 +30,6 @@ void print_load_sram_ioctl_args(ushort *args)
 		 (*sarp & SRAM_FUNC_MASK)>>SRAM_FUNC_SHIFT);
 }
 
-
 /*
   1. SRAM Memory organization inside the function:
   ------------------------------------------------
@@ -101,7 +100,6 @@ int load_sram(CVORBUserStatics_t *usp, char *arg) //struct sram_params *p)
         struct sram_params p; /* load/read SRAM ioctl paramters */
 	int *sp; /* swap pointer */
 	uint sar = 0; /* Start Address Register */
-	uint *ptr;
 	ushort *vect = NULL, *vp;
 	int fvsz; /* function vector massive size */
 	int sz = 0;   /* size (in words) of a function memory */
@@ -169,8 +167,6 @@ int load_sram(CVORBUserStatics_t *usp, char *arg) //struct sram_params *p)
 			vp += 2;
 		}
         }
-
-	ptr = (uint *)vect;
 
 #ifdef __linux__
 	/* we should swap words inside the vector table,
