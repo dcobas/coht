@@ -247,7 +247,7 @@ int UserDefinedMenu(HANDLE handle, int lun)
 					printf("Channel function read "
 					       "Number of vectors is %d\n", rc);
 					for (i = 0; i < rc; i++)
-						printf("%u %hu\n",
+						printf("%.3f %hu\n",
 						       fv[i].t, fv[i].v);
 					break;
 				}
@@ -513,7 +513,7 @@ static int load_vtf(FILE *fd, struct fv **fv)
 	static struct fv data[MAX_VECT] = { { 0 } };
 
 	/* get data from *.vtf file into local structure */
-        while ( (rc = fscanf(fd, "%u %hu\n", &data[i].t, &data[i].v)) != EOF) {
+        while ( (rc = fscanf(fd, "%lf %hu\n", &data[i].t, &data[i].v)) != EOF) {
                 if (!rc) { /* skip matching failure */
                         rc = fscanf(fd, "%*[^\n]");
                         continue;

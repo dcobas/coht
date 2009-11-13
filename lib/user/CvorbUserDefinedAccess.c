@@ -61,6 +61,7 @@
  *
  */
 #include <sys/ioctl.h>
+#include <stdint.h>
 #include <CvorbUserDefinedAccess.h>
 #include <CvorbDrvrDefs.h>
 
@@ -760,6 +761,17 @@ int cvorb_wr_fem(int h, int ch, unsigned long long mask)
 	return 0;
 }
 
+/* for testing only */
+static void  __attribute__((unused)) prnt_vtf(struct sram_params *ptr)
+{
+	int i;
+
+	printf("Number of vectors is %d\n", ptr->am);
+	for (i = 0; i < ptr->am + 1; i++)
+		printf("V%d: nos --> %d ss --> %d v --> %d\n",
+		       i, ptr->fv[i].nos, ptr->fv[i].ss, ptr->fv[i].v);
+}
+
 /**
  * @brief Load Channel Function in device SRAM.
  *
@@ -777,9 +789,27 @@ int cvorb_wr_fem(int h, int ch, unsigned long long mask)
  *
  * See struct fv description for more details on the data types
  * Channel function can hold up to @ref MAX_F_VECT.
+ * Element[0] should @b ALWAYS hold start time == 0 and
+ * initial physical value. \n
  *
- * @note Element[0] should @b ALWAYS hold start time == 0 and
- *       initial physical value!
+ * @b NOTE on rounding down time between two vectors. \n
+ *
+ * MIN step possible between two vectors is 5us.
+ * Every 327.675us -- step granularity is lowered by 5us.
+ * I.e the finest time step resolution possible only if dt is less
+ * then 327.675us.
+ * For example, in 2nd dt range [327.680 - 655.350]us -- step will be 10us.
+ * It means that dt requested should be multipe of 10.
+ * I.e. if you'll request let's say dt to be 400.355 -- it will be rounded
+ * down to 400.350.
+ *
+ * In 3rd time range -- dt must be multiple of 15 and so on...
+ *
+ * If it is not the case, (i.e. dt is not a multiple of current step size)
+ * -- time between vectors will be rounded down to be
+ * divisible by step size of the current range.
+ * Step size will always be a factor of dt.
+ *
  *
  * @return  0                  -- OK
  * @return -CVORB_BAD_HANDLE   -- library handle is bad
@@ -788,9 +818,9 @@ int cvorb_wr_fem(int h, int ch, unsigned long long mask)
  */
 int cvorb_func_load(int h, int ch, int func, struct fv *fv, int sz)
 {
-	struct sram_params par;
+	struct sram_params par = { 0 };
 	int i;
-	uint dt;
+	uint64_t lldt, llt1, llt2; /* for computation */
 
 	if (!WITHIN_RANGE(1, h, MAX_HNDLS))
 		return -CVORB_BAD_HANDLE;
@@ -805,31 +835,61 @@ int cvorb_func_load(int h, int ch, int func, struct fv *fv, int sz)
 	if (sz > MAX_F_VECT+1/* t=0,V0 */)
 		return -CVORB_OUT_OF_RANGE;
 
-
  	par.module = (ch > CHAM) ? 2 : 1;
 	par.chan = ((ch-1)%CHAM)+1;
 	par.func = func;
-	par.fv = fv;
 	par.am = sz-1;	/* set actual vector amount,
-			   exclude first element, which is t0 == 0 V0 */
+			   exclude first element, which is [t0 == 0, V0] */
 
-
-	/* TODO. Handle the MAX time between two vectors
-	   Vector should be split in two vectors.
-	   (see 4.2 Vector definition in CVORB Tech Guide) */
+	/* convert [struct sv] into ioctl params  */
+	par.fv[0].v = fv[0].v;
 	for (i = 1; i <= sz-1; i++) {
-		if (!fv[i].t) /* skip internal stop */
+		par.fv[i].v = fv[i].v;
+		if (!fv[i].t) { /* internal stop */
+			par.fv[i].ss = (ushort) -1;
 			continue;
+		}
 
-		/* vector table is wrong */
-		if (fv[i].t < fv[i-1].t)
+		if (fv[i].t <= fv[i-1].t)
+			/* vector table is wrong */
 			return -CVORB_OUT_OF_RANGE;
 
-                dt = (fv[i].t - fv[i-1].t)*1000; /* delta t in us */
+		/* convert to us in order to not lose precision */
+		llt1 = fv[i-1].t * 1000;
+		llt2 = fv[i].t   * 1000;
+		lldt = llt2 - llt1; /* delta t in us */
 
-		if (dt > 0xffffffff/*((1<<16)-1)*((1<<15)-1)*5*/)
+#if 0
+		/* TODO. Should we return wit error if
+		   MIN_STEP is not a factor of delta t???
+		   Meanwhile averaging is done within the driver */
+		if (lldt%MIN_STEP)
+			printf("5us is not a factor of MIN dt!\n");
+#endif
+		/* TODO. Handle the MAX time between two vectors
+		   (2hrs 58min 56sec 926ms 725us)
+		   Vector should be split in two vectors.
+		   (see 4.2 Vector definition in CVORB Tech Guide) */
+		if (lldt > (uint64_t)((1<<16)-1)*((1<<15)-1)*5)
 			return -CVORB_OUT_OF_RANGE;
-        }
+
+		/* first -- round down (if needed) to be multiple of
+		   MIN_STEP (5us) size */
+		lldt -= lldt % MIN_STEP;
+
+		/* get minimum step size needed to hit dt range */
+		par.fv[i].ss = ((lldt-1)/MTMS) + 1;
+
+		/* Round delta t if needed.
+		   Ensure step size (in us) is a factor of dt,
+		   i.e. no remainder */
+		lldt -= lldt % (par.fv[i].ss * MIN_STEP);
+
+		/* compute && save number of steps */
+		par.fv[i].nos = lldt/(par.fv[i].ss * MIN_STEP);
+	}
+
+	//prnt_vtf(&par); /* For testing only */
 
 	/* call the driver */
 	if (ioctl(_lh[h-1].fd, CVORB_LOAD_SRAM, &par))
@@ -853,13 +913,19 @@ int cvorb_func_load(int h, int ch, int func, struct fv *fv, int sz)
  *
  * See struct fv description for more details on the data types
  *
+ * @b NOTE Time written into the function can be different from one you wil
+ * read back, because of the possible rounding of dt between two vectors.
+ *
+ * See cvorb_func_write() for more explanation on dt rounding down issue.
+ *
+ *
  * @return number of function vectors (plus [t0, V0]) -- if OK
  * @return < 0                                        -- if FAILED
  */
 int cvorb_func_read(int h, int ch, int func, struct fv *fv, int sz)
 {
-	int rc;
-	struct sram_params par;
+	int rc, i;
+	struct sram_params par = { 0 };
 
 	if (!WITHIN_RANGE(1, h, MAX_HNDLS))
 		return -CVORB_BAD_HANDLE;
@@ -870,7 +936,6 @@ int cvorb_func_read(int h, int ch, int func, struct fv *fv, int sz)
 	if (!WITHIN_RANGE(1, func, FAM))
 		return -CVORB_OUT_OF_RANGE;
 
-
 	/* how many vectors do we have */
 	if (sz < MAX_F_VECT+1/* t=0,V0 */)
 		return -CVORB_OUT_OF_RANGE;
@@ -878,15 +943,27 @@ int cvorb_func_read(int h, int ch, int func, struct fv *fv, int sz)
 	par.module = (ch > CHAM) ? 2 : 1;
 	par.chan = ((ch-1)%CHAM)+1;
 	par.func = func;
-	par.fv = fv;
 	par.am = sz; /* array capacity */
 
 	/* call the driver */
 	if (ioctl(_lh[h-1].fd, CVORB_READ_SRAM, &par))
 		return -CVORB_IOCTL_FAILED;
 
-	rc = par.fv->t;
-	par.fv->t = 0;
+	rc = par.fv[0].nos; /* number of vectors in the table */
+
+	/* convert from ioctl function vector table
+	   into user function vector table */
+	fv[0].t = 0;
+	fv[0].v = par.fv[0].v;
+	for (i = 1; i < rc; i++) {
+		if (par.fv[i].ss == (ushort) -1)
+			fv[i].t = 0;
+		else
+			fv[i].t = ((par.fv[i].nos * par.fv[i].ss * MIN_STEP)
+				   / 1000.0) + fv[i-1].t;
+
+		fv[i].v = par.fv[i].v;
+	}
 	return rc;
 }
 

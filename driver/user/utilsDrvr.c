@@ -97,32 +97,21 @@ void print_load_sram_ioctl_args(ushort *args)
 #define MIN_V 3 /* minimun size of memory inside the function in words */
 int load_sram(CVORBUserStatics_t *usp, char *arg) //struct sram_params *p)
 {
-        struct sram_params p; /* load/read SRAM ioctl paramters */
+        struct sram_params *p; /* load/read SRAM ioctl paramters */
 	int *sp; /* swap pointer */
 	uint sar = 0; /* Start Address Register */
 	ushort *vect = NULL, *vp;
-	int fvsz; /* function vector massive size */
 	int sz = 0;   /* size (in words) of a function memory */
 	int i, rc = OK;
-	int dt;		/* delta t in us */
-	ushort ss, nos; /* step size, number of steps */
-	struct fv *fv;
 
-	if (cdcm_copy_from_user(&p, arg, sizeof(p)))
+	p = (struct sram_params *)sysbrk(sizeof(*p));
+	if (!p)
 		return SYSERR;
 
-	/* get functioin vectors */
-	fvsz = sizeof(*fv) * ((p.am+1/*incl [t0,V0]*/));
-	fv = (struct fv *)sysbrk(fvsz);
-	if (!fv)
+	if (cdcm_copy_from_user(p, arg, sizeof(*p)))
 		return SYSERR;
 
-	if (cdcm_copy_from_user(fv, p.fv, fvsz)) {
-		rc = SYSERR;
-		goto out_load_sram;
-	}
-
-	sz = (p.am * VSZ) + MIN_V;
+	sz = (p->am * VSZ) + MIN_V;
 	if (sz&1) ++sz;	 /* should be even number of words
 			    (in order to be 4-byte aligned  */
 	sz += 6; /* 6 words of "0" are mandatory at the end */
@@ -136,34 +125,18 @@ int load_sram(CVORBUserStatics_t *usp, char *arg) //struct sram_params *p)
 	memset(vect, 0, sz);
 
 	vp = &vect[2];
-	vect[1] = p.am;
-	vect[3] = fv->v; /* set V0 */
-	for (i = 1; i <= p.am; i++) {
-		if (!fv[i].t) { /* internal stop */
-			ss = (ushort) -1;
-			nos = dt = 0;
-		} else {
-			dt  = (fv[i].t - fv[i-1].t)*1000; /* delta t in us */
-			ss  = ((dt-1)/MTMS) + 1;
-			nos = dt/(ss * MIN_STEP);
-		}
-
-		/* ensure step size (in us) is a factor of dt,
-		   i.e. no remainder */
-		if (dt%ss) {
-			++ss;
-			nos = dt/(ss * MIN_STEP);
-		}
-
+	vect[1] = p->am;
+	vect[3] = p->fv[0].v; /* set V0 */
+	for (i = 1; i <= p->am; i++) {
 		if (i&1) { /* odd */
-			vp[0] = nos;
-			vp[2] = fv[i].v;
-			vp[3] = ss;
+			vp[0] = p->fv[i].nos;
+			vp[2] = p->fv[i].v;
+			vp[3] = p->fv[i].ss;
 			vp += 4;
 		} else { /* even */
-			vp[0] = ss;
-			vp[1] = nos;
-			vp[3] = fv[i].v;
+			vp[0] = p->fv[i].ss;
+			vp[1] = p->fv[i].nos;
+			vp[3] = p->fv[i].v;
 			vp += 2;
 		}
         }
@@ -176,93 +149,81 @@ int load_sram(CVORBUserStatics_t *usp, char *arg) //struct sram_params *p)
 #endif
 
 	/* set Start Address Register */
-	sar |= (((p.chan-1)<<SRAM_CHAN_SHIFT) |
-		((p.func-1)<<SRAM_FUNC_SHIFT));
+	sar |= (((p->chan-1)<<SRAM_CHAN_SHIFT) |
+		((p->func-1)<<SRAM_FUNC_SHIFT));
 
 	/* enter critical region -- r/w ioaccess protection */
-	cdcm_mutex_lock(&usp->md[p.module-1].iol);
+	cdcm_mutex_lock(&usp->md[p->module-1].iol);
 	/* Should wait on Channel Status register bit[9] -- function
 	   copy in progress, when data is copying into local SRAM. */
-	while(_rcr(p.module-1, p.chan-1, CH_STAT) & 1<<9)
+	while(_rcr(p->module-1, p->chan-1, CH_STAT) & 1<<9)
 		usec_sleep(1);
-	_wr(p.module-1, SRAM_SA, sar);
-	_wrr(p.module-1, SRAM_DATA, (ulong *)vect, sz/4);
+	_wr(p->module-1, SRAM_SA, sar);
+	_wrr(p->module-1, SRAM_DATA, (ulong *)vect, sz/4);
 	/* leave critical region */
-	cdcm_mutex_unlock(&usp->md[p.module-1].iol);
+	cdcm_mutex_unlock(&usp->md[p->module-1].iol);
 
  out_load_sram:
-	if (fv)   sysfree((char *)fv, fvsz);
+	if (p)   sysfree((char *)p, sizeof(*p));
 	if (vect) sysfree((char *)vect, sz);
 	return rc;
 }
 
 int read_sram(CVORBUserStatics_t *usp, char *arg)
 {
-	struct sram_params p; /* ioctl paramters */
+	struct sram_params *p; /* ioctl paramters */
 	int i, rc = OK;
 	int sz = 0; /* function size (in words) in SRAM */
 	uint sram = 0, *ptr;
-	ushort *nov;		/* number of vectors */
+	ushort nov;		/* number of vectors */
 	ushort *vect = NULL, *vp; /* vector table && its pointer */
 	uint sar = 0;
-	struct fv *fv = NULL;
-	int fvsz = 0; /* function vector size in bytes */
-	int dt = 0;  /* time in ms from the beginning of the function */
 
-	if (cdcm_copy_from_user(&p, arg, sizeof(p)))
+	p = (struct sram_params *)sysbrk(sizeof(*p));
+        if (!p)
+                return SYSERR;
+
+	memset(p, 0, sizeof(*p));
+
+	if (cdcm_copy_from_user(p, arg, sizeof(*p)))
 		return SYSERR;
 
 	/* set Start Address Register */
-	sar |= (((p.chan-1)<<SRAM_CHAN_SHIFT) |
-		((p.func-1)<<SRAM_FUNC_SHIFT));
+	sar |= (((p->chan-1)<<SRAM_CHAN_SHIFT) |
+		((p->func-1)<<SRAM_FUNC_SHIFT));
 
 	/* enter critical region -- r/w ioaccess protection */
-	cdcm_mutex_lock(&usp->md[p.module-1].iol);
+	cdcm_mutex_lock(&usp->md[p->module-1].iol);
 
-	_wr(p.module-1, SRAM_SA, sar);
+	_wr(p->module-1, SRAM_SA, sar);
 
 	/* get number of vectors in the function
 	   and compute how many dwords we should read */
 #ifdef __linux__
 	sram = swahb32(ioread32((void *)
-				&(usp->md[p.module-1].md->SRAM_DATA)));
+				&(usp->md[p->module-1].md->SRAM_DATA)));
 #else  /* lynx */
-	sram = __inl((__port_addr_t)&(usp->md[p.module-1].md->SRAM_DATA));
+	sram = __inl((__port_addr_t)&(usp->md[p->module-1].md->SRAM_DATA));
 #endif
-	nov = (ushort *)&sram;
-	++nov;	/* move pointer to number of vectors in the function */
+	vp = (ushort *)&sram;
+	++vp; /* move pointer to number of vectors in the function */
+	nov = *vp;
 
-	if (p.am == (ushort)-1) { /* just return number of vectors
+	if (p->am == (ushort)-1) { /* just return number of vectors
 				     in the function to the user */
-		cdcm_mutex_unlock(&usp->md[p.module-1].iol);
-		return *nov;
+		cdcm_mutex_unlock(&usp->md[p->module-1].iol);
+		rc = nov;
+		goto out;
 	}
 
 	/* safety check for garbage SRAM */
-	if (!(WITHIN_RANGE(1, *nov, MAX_F_VECT))) {
+	if (!(WITHIN_RANGE(1, nov, MAX_F_VECT))) {
 		rc = SYSERR;
 		goto outcritical; /* was no initialized */
 	}
 
-	if (*nov > p.am) { /* provided storage is not big enough */
-		rc = SYSERR;
-		goto outcritical;
-	}
-
-	fvsz = (*nov+1/*t0,V0*/)*sizeof(*fv); /* function vector size,
-						 including [t0,V0] */
-
-	/* allocate space to store function vector data */
-	fv = (struct fv *) sysbrk(fvsz);
-	if (!fv) {
-		rc = SYSERR;
-		goto outcritical;
-	}
-
-	memset(fv, 0, fvsz);
-
 	/* how many bytes we should read from SRAM */
-	sz = (*nov*VSZ)+MIN_V;
+	sz = (nov * VSZ) + MIN_V;
 	if (sz&1) ++sz;
 	sz >>= 1;	/* convert to dwords */
 	--sz;		/* as we already read first dword */
@@ -279,42 +240,43 @@ int read_sram(CVORBUserStatics_t *usp, char *arg)
 	ptr = (uint *)vect;
 	for (i = 0; i < sz; i++, ptr++) {
 #ifdef __linux__
-		*ptr = swahb32(ioread32((void *)&(usp->md[p.module-1].md->SRAM_DATA)));
+		*ptr = swahb32(ioread32((void *)&(usp->md[p->module-1].md->SRAM_DATA)));
 #else  /* lynx */
-		*ptr = __inl((__port_addr_t)&(usp->md[p.module-1].md->SRAM_DATA));
+		*ptr = __inl((__port_addr_t)&(usp->md[p->module-1].md->SRAM_DATA));
 #endif
 	}
 
  outcritical:
 	/* leave critical region */
-	cdcm_mutex_unlock(&usp->md[p.module-1].iol);
+	cdcm_mutex_unlock(&usp->md[p->module-1].iol);
 	if (rc < 0)
 		goto out;
 
 	/* now convert vector table to [function vectors] table
 	   and put it in the user space */
-	fv->t = *nov+1; /* return number of vectors (plus [t0, V0]) */
-	fv->v = vect[1]; /* V0 */
+	p->fv[0].nos = nov+1; /* return number of vectors (plus [t0, V0]) */
+	p->fv[0].v = vect[1]; /* V0 */
 	vp = &vect[0]; /* set to first Number of Steps */
-	for ( i = 1; i <= *nov; i++) {
+	for ( i = 1; i <= nov; i++) {
 		if (i&1) { /* odd */
-			fv[i].t = ((vp[0] * vp[3] * 5))/1000 + dt; /* in ms */
-			fv[i].v = vp[2];
+			p->fv[i].nos = vp[0];
+                        p->fv[i].v   = vp[2];
+                        p->fv[i].ss  = vp[3];
 			vp += 4;
 		} else { /* even */
-			fv[i].t = ((vp[0] * vp[1] * 5))/1000 + dt; /* in ms */
-			fv[i].v = vp[3];
+			p->fv[i].ss  = vp[0];
+			p->fv[i].nos = vp[1];
+                        p->fv[i].v   = vp[3];
 			vp += 2;
 		}
-		dt = fv[i].t;
 	}
 
 	/* give results to the user */
-	if (cdcm_copy_to_user(p.fv, fv, fvsz))
+	if (cdcm_copy_to_user(arg, p, sizeof(*p)))
 		rc = SYSERR;
  out:
 	if (vect) sysfree((char *)vect, sz*4);
-	if (fv) sysfree((char *)fv, fvsz);
+	if (p) sysfree((char *)p, sizeof(*p));
 	return rc;
 }
 

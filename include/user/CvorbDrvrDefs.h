@@ -69,16 +69,23 @@ struct sram_params {
 	ushort module;	/**< sub module [1, 2] */
 	ushort chan;	/**< channel [1 - 8] */
 	ushort func;	/**< function [1 - 64] */
-	struct fv *fv;	/**< function vectors
-			   fv[0] == [t0 == 0, V0] -- in case of write
-			   fv[0] == [number of vectors(including this one), v0]
-			            -- in case of read */
+	struct {
+		ushort nos; /**< number of steps */
+		ushort ss;  /**< step size (-1 if internal stop) */
+		ushort v;   /**< amplitudes in corresponding physical unit */
+	} fv[MAX_F_VECT+1]; /**< function vectors
+			       fv[0] == [nos == 0, ss == 0, V0] -- in case of write
+			       fv[0] == [nos == number of
+			                        vectors(including this one),
+					 ss == 0,
+					 V0] -- in case of read */
 	ushort am;	/**< in case of write -- number of vectors
 			   (excluding fv[0] == [t=0, V0]!), that is
 			   not a real vector. 679 max
 
 			   in case of read -- actual fv capacity,
 			   i.e. how many vectors can be stored in it.
+
 			   Special case (-1) is possible in case of read.
 			   Only Vector Amount will be returned to the user in
 			   fv[0].t

@@ -30,7 +30,7 @@
 #define WITHIN_RANGE(MIN,ARG,MAX) ( ((MAX) >= (ARG)) && ((MIN) <= (ARG)) )
 
 struct {
-	ushort t;
+	double t;
 	ushort v;
 } data[2048] = { { 0 } };
 
@@ -91,7 +91,7 @@ int main(int argc, char *argv[], char *envp[])
 		++cntr;
 	}
 
-	/* store converted 16-bit values it in the *.dat file */
+	/* store converted 16-bit values it in the *.vtf file */
 	newfname = index(fname, '.');
 	i = newfname - fname;
 	asprintf(&newfname, "%.*s.vft", i, fname);

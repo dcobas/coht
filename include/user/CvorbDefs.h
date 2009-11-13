@@ -126,7 +126,7 @@
  *   elements long \n
  */
 struct fv {
-	uint   t; /**< values of time from function start in microseconds */
+	double t; /**< values of time from function start in microseconds */
 	ushort v; /**< amplitudes in corresponding physical unit */
 };
 
