@@ -87,9 +87,10 @@
 #define FAM 64 /**< function amount per one channel */
 #define FSZ 2048 /**< function size in shorts */
 #define MIN_STEP 5 /**< function minimum step size is 5 us */
-#define MTMS (((1<<16)*MIN_STEP) - 1) /**< MAX possible time between 2 vectors
-					 with min step size (327675 us)  */
-
+#define NOS ((1<<16)-1) /* MAX number of steps */
+#define MSS ((1<<15)-1)/* MAX step size */
+#define MTMS (NOS*MIN_STEP) /**< MAX possible time between 2 vectors
+			       with min step size (327675 us)  */
 
 /** @defgroup cvorb_sw_pulses Software Pulses register bits
  *
