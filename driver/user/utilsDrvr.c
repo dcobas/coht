@@ -15,6 +15,7 @@
 #include "CvorbUserDefinedDrvr.h"
 #include "CvorbDrvrDefs.h"
 #include "utilsDrvr.h"
+#include "ad9516o-drvr.h"
 
 void print_load_sram_ioctl_args(ushort *args)
 {

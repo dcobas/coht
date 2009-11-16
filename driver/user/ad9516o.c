@@ -15,7 +15,7 @@
 #include <cdcm/cdcm.h>
 #include <cdcm/cdcmBoth.h>
 #include <cdcm/cdcmIo.h>
-#include <ad9516o.h>
+#include <ad9516o-drvr.h>
 
 /*
  * define this if you want to debug the SPI interface with the AD9516
@@ -25,7 +25,13 @@
 #define AD9516_CALIB_DIVIDER	2
 #define AD9516_SPI_SLEEP_US	5
 
-static struct ad9516o ad9516o; /* device state */
+ /* device */
+static struct ad9516o {
+        void *ba;
+        struct cdcm_mutex clkgen_lock;
+        struct cdcm_mutex pll_lock;
+        struct pll        pll;
+} ad9516o;
 
 /*
  * Note regarding locking: each module has a mutex to manage the access

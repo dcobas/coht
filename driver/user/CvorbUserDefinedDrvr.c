@@ -1,6 +1,7 @@
 #include "CvorbUserDefinedDrvr.h"
 #include "CvorbDrvrDefs.h"
 #include "utilsDrvr.h"
+#include "ad9516o-drvr.h"
 
 #ifdef __powerpc__
 #include <vme.h>

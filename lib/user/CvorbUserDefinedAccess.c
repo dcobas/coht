@@ -64,6 +64,7 @@
 #include <stdint.h>
 #include <CvorbUserDefinedAccess.h>
 #include <CvorbDrvrDefs.h>
+#include "ad9516o.h"
 
 #define MAX_HNDLS 32 //!< MAX supported users
 

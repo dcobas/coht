@@ -1,181 +1,31 @@
 /**
  * @file ad9516o.h
  *
- * @brief AD9516-O clock generator definitions
+ * @brief ad9516 chip library
  *
- * The AD9516-O is controller through an SPI interface. This file
- * provides definitions for the different addresses of the module
- * to make its configuration easier to read.
+ * @author Copyright (C) 2009 CERN. Yury GEORGIEVSKIY <ygeorgie@cern.ch>
  *
- * Copyright (c) 2009 CERN
- * @author Emilio G. Cota <emilio.garcia.cota@cern.ch>
- *
- * Copyright (c) 2009 CERN
- * @author Yury Georgievskiy <yury.georgievskiy@cern.ch>
+ * @date Created on 16/11/2009
  *
  * @section license_sec License
- * Released under the GPL v2. (and only v2, not any later version)
+ *          Released under the GPL
  */
-#ifndef _AD9516O_H_
-#define _AD9516O_H_
+#ifndef _AD_9516_H_INCLUDE_
+#define _AD_9516_H_INCLUDE_
 
-#define OSCILLATOR_FREQ 40000000UL
-
-/**
- * @brief PLL configuration structure
- *
- * @a        -- [0-63]           PLL parameter
- * @b        -- 13 bits [0-8191] PLL parameter
- * @p        -- 16 or 32         PLL parameter
- * @r        --                  PLL parameter
- * @dvco     -- [1,6]  non-PLL divider
- * @d1       -- [1,32] first divider of the output.  non-PLL divider
- * @d2       -- [1,32] second divider of the output. non-PLL divider
- * @force    -- set to 1 to even apply this configuration when there's another
- *              channel currently playing a waveform. 0 to avoid the update in
- *              that case.
- * @external -- set to 0 to use the internal PLL; 1 to use EXTCLK
- */
-struct pll {
-        int a;
-        int b;
-        int p;
-        int r;
-        int dvco;
-        int d1;
-        int d2;
-        int force;
-        int external;
-};
-
-/* device */
-struct ad9516o {
-	void *ba;
-        struct cdcm_mutex clkgen_lock;
-        struct cdcm_mutex pll_lock;
-        struct pll        pll;
-};
-
-/** @defgroup clock_generator_control Clock Generator Control register layout
- *
- * SPI Interface to the AD9516-O IC
+#ifdef __cplusplus
+extern "C" {
+#endif
+/** @defgroup ad9516lib ad9516 chip Library API functions
  *@{
  */
-#define CLKCTL_DATA       (0xFF<<0) /**< AD9516 register data (D7->D0) */
-#define CLKCTL_ADDR       (0x3FF<<8) /**< AD9156 register addr (D9->D0) */
-#define CLKCTL_RW         (1<<18) /**< AD9516 read/write (1/0) */
-#define CLKCTL_SENDSPI    (1<<19) /**< Send SPI frame (1) */
-#define CLKCTL_UP2DATE    (1<<20) /**< set when data in CLKCTL are
-				     updated; cleared on SPI read */
-/* bits 21-24 not used */
-#define CLKCTL_LOCKDETCT  (1<<25) /**< Lock detect (R/only) */
-#define CLKCTL_REFMON     (1<<26) /**< Reference monitor (R/only) */
-#define CLKCTL_STATUS     (1<<27) /**< Status (R/only) */
-#define CLKCTL_POWDOWN    (1<<28) /**< Power down (on 0) */
-#define CLKCTL_RESET9516  (1<<29) /**< Reset (on 0) */
-#define CLKCTL_SYNC       (1<<30) /**< Manual synchronisation (on 0) */
-#define CLKCTL_SELECT     (1<<31) /**< Select local/ext clock (0/1) */
+	int    ad9516o_on(int, int, int);
+	int    ad9516o_off(int, int);
+	double ad9516o_get_freq(int, char **);
 /*@} end of group*/
-
-/*
- * AD9516-O default Control Operation
- * Since the user basically wants to read/write from the AD at a certain
- * address, define a set of operations so that the caller just needs
- * to OR these opcodes with the address and desired value (if any).
- * (in case of doubt, check these opcodes against the definitions below)
- */
-#define AD9516_OP_WRITE   0x70080000
-#define AD9516_OP_READ    0x700C0000
-
-/*
- * AD9516-O Adress Map
- */
-#define AD9516_SERIALPORT	0x00
-#define AD9516_READBACK	        0x04
-#define AD9516_PDF_CP		0x10
-#define AD9516_RCOUNT_LSB	0x11
-#define AD9516_RCOUNT_MSB	0x12
-#define AD9516_ACOUNT		0x13
-#define AD9516_BCOUNT_LSB	0x14
-#define AD9516_BCOUNT_MSB	0x15
-#define AD9516_PLL1		0x16
-#define AD9516_PLL2		0x17
-#define AD9516_PLL3		0x18
-#define AD9516_PLL4		0x19
-#define AD9516_PLL5		0x1A
-#define AD9516_PLL6		0x1B
-#define AD9516_PLL7		0x1C
-#define AD9516_PLL8		0x1D
-#define AD9516_PLL9		0x1E
-#define AD9516_PLLREADBACK	0x1F
-
-/* Fine Delay Adjust: OUT6 to OUT9 */
-#define AD9516_OUT6DELAY_BP	0xA0
-#define AD9516_OUT6DELAY_FS	0xA1
-#define AD9516_OUT6DELAY_FR	0xA2
-#define AD9516_OUT7DELAY_BP	0xA3
-#define AD9516_OUT7DELAY_FS	0xA4
-#define AD9516_OUT7DELAY_FR	0xA5
-#define AD9516_OUT8DELAY_BP	0xA6
-#define AD9516_OUT8DELAY_FS	0xA7
-#define AD9516_OUT8DELAY_FR	0xA8
-#define AD9516_OUT9DELAY_BP	0xA9
-#define AD9516_OUT9DELAY_FS	0xAA
-#define AD9516_OUT9DELAY_FR	0xAB
-
-/* LVPECL Outputs */
-#define AD9516_LVPECL_OUT0	0xF0
-#define AD9516_LVPECL_OUT1	0xF1
-#define AD9516_LVPECL_OUT2	0xF2
-#define AD9516_LVPECL_OUT3	0xF3
-#define AD9516_LVPECL_OUT4	0xF4
-#define AD9516_LVPECL_OUT5	0xF5
-
-/* LVDS/CMOS Outputs */
-#define AD9516_LVCMOS_OUT6	0x140
-#define AD9516_LVCMOS_OUT7	0x141
-#define AD9516_LVCMOS_OUT8	0x142
-#define AD9516_LVCMOS_OUT9	0x143
-
-/* LVPECL Channel Dividers */
-#define AD9516_PECLDIV0_1	0x190
-#define AD9516_PECLDIV0_2	0x191
-#define AD9516_PECLDIV0_3	0x192
-#define AD9516_PECLDIV1_1	0x193
-#define AD9516_PECLDIV1_2	0x194
-#define AD9516_PECLDIV1_3	0x195
-#define AD9516_PECLDIV2_1	0x196
-#define AD9516_PECLDIV2_2	0x197
-#define AD9516_PECLDIV2_3	0x198
-
-/* LVDS/CMOS Channel Dividers */
-#define AD9516_CMOSDIV3_1	0x199
-#define AD9516_CMOSDIV3_PHO	0x19A
-#define AD9516_CMOSDIV3_2	0x19B
-#define AD9516_CMOSDIV3_BYPASS	0x19C
-#define AD9516_CMOSDIV3_DCCOFF	0x19D
-#define AD9516_CMOSDIV4_1	0x19E
-#define AD9516_CMOSDIV4_PHO	0x19F
-#define AD9516_CMOSDIV4_2	0x1A0
-#define AD9516_CMOSDIV4_BYPASS	0x1A1
-#define AD9516_CMOSDIV4_DCCOFF	0x1A2
-
-/* VCO Divider and CLK Input */
-#define AD9516_VCO_DIVIDER	0x1E0
-#define AD9516_INPUT_CLKS	0x1E1
-
-/* System */
-#define AD9516_POWDOWN_SYNC	0x230
-
-/* Update All Registers */
-#define AD9516_UPDATE_ALL	0x232
-
-void init_ad9516(void *);
-void get_pll_conf(struct pll *);
-int  put_pll_conf(struct pll *);
-int  check_pll(struct pll *);
-int  clkgen_default_config(void);
+#ifdef __cplusplus
+}
+#endif
 
 
-
-#endif /* _AD9516O_H_ */
+#endif	/* _AD_9516_H_INCLUDE_ */
