@@ -1373,7 +1373,8 @@ int cvorb_dac_on(int h, int ch, double freq)
 
 	/* read current configuration */
 	cvorb_rd_mconfig_struct(h, ch, &cr);
-	cr.dss = ((ch-1)%CHAM);	/* select new channel */
+	cr.dss   = ((ch-1)%CHAM); /* select new channel */
+	cr.fplss = ((ch-1)%CHAM); /* Front panel LED's */
 	cvorb_wr_mconfig_struct(h, ch, &cr);
 	return 0;
 }
