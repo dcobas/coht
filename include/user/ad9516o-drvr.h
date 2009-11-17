@@ -79,6 +79,10 @@ struct pll {
 #define AD9516_OP_WRITE   0x70080000
 #define AD9516_OP_READ    0x700C0000
 
+/* switch DAC on/off */
+#define AD9516_ON   0x70000000
+#define AD9516_OFF  0x60000000
+
 /*
  * AD9516-O Adress Map
  */

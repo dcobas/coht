@@ -546,3 +546,24 @@ void enable_modules(CVORBUserStatics_t *usp)
                 _wcr(1, i, CH_REC_CYC, 1);
         }
 }
+
+/* enable on-board clock generator */
+int  dac_on(CVORBUserStatics_t *usp, char *arg)
+{
+	struct pll pll;
+
+	if (cdcm_copy_from_user(&pll, arg, sizeof(pll)))
+		return SYSERR;
+
+	/* for now just set a default config */
+	//return ad9516o_clkgen_default_conf();
+	return ad9516o_put_pll_conf(&pll);
+}
+
+/* get current PLL settings */
+int get_pll(CVORBUserStatics_t *usp, char *arg)
+{
+	struct pll pll;
+	ad9516o_get_pll_conf(&pll);
+	return cdcm_copy_to_user(arg, &pll, sizeof(pll));
+}

@@ -353,6 +353,14 @@ int CvorbUserIoctl(int *proceed, register CVORBStatics_t *sptr,
 		return read_recurrent_cycles_reg(usp, arg);
 	case CVORB_RC_WR:
 		return write_recurrent_cycles_reg(usp, arg);
+	case CVORB_DAC_ON:
+		return dac_on(usp, arg);
+	case CVORB_DAC_OFF:
+		/* disable on-board clock generator */
+		_wr(0, CLK_GEN_CNTL, AD9516_OFF);
+		return OK;
+	case AD9516_GET_PLL:
+		return get_pll(usp, arg);
 	default:
 		*proceed = TRUE; /* continue standard code execution */
 	}
@@ -405,6 +413,12 @@ char* CvorbUserInst(int *proceed, register DevInfo_t *info,
 			usp->md[m].cd[c] = (chd *)
 				((long)usp->md[m].md + _ch_offset[c]);
 	}
+
+	/* init on-board DAC */
+	ad9516o_init((void *)&usp->md[0].md->CLK_GEN_CNTL);
+
+	/* disable on-board clock generator */
+	_wr(0, CLK_GEN_CNTL, AD9516_OFF);
 
 	/* set normal mode operation, enable all channels and
 	   set recurrent cycles to 1 (i.e. play function once) */

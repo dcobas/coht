@@ -1,6 +1,7 @@
 #define _GNU_SOURCE /* asprintf rocks */
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <limits.h>
@@ -61,12 +62,9 @@ int UserDefinedMenu(HANDLE handle, int lun)
 
 		printf("\n\n");
 		printf("01 -- Return to Main Menu\n");
-		printf("02 -- Read VHDL version, Temperature and PCB"
-		       " serial number\n");
-		printf("03 -- Read Module/Channel Configuration && Status"
-		       " registers\n"
-		       "      Function selection && Function Enable "
-		       "registers\n");
+		printf("02 -- Read VHDL version, Temp. and PCB SN\n");
+		printf("03 -- Read Module/Channel Config && Status regs\n"
+		       "      Function selection && Function Enable regs\n");
 		printf("04 -- Software Pulses\n");
 		printf("05 -- Load function into SRAM\n");
 		printf("06 -- Read function from SRAM\n");
@@ -78,7 +76,8 @@ int UserDefinedMenu(HANDLE handle, int lun)
 		printf("12 -- Set/Get Recurrent Cycles\n");
 		printf("13 -- Set Module  Configuration register\n");
 		printf("14 -- Set Channel Configuration register\n");
-		printf("15 -- Test functionality (for driver "
+		printf("15 -- Enable/Disable on-board DAC\n");
+		printf("16 -- Test functionality (for driver "
 		       "developer ONLY!)\n");
 		printf("\n> ");
 
@@ -86,10 +85,14 @@ int UserDefinedMenu(HANDLE handle, int lun)
 		getchar();
 
 		switch (choice) {
-		case 15:
+		case 16:
 			{
 				do_usr_wait = 1;
-				printf("Nothing to test\n");
+				ch = 1;
+                                if (get_channel(&ch))
+                                        break;
+                                cvorb_dac_on(cvorbh, ch, 0);
+				//	printf("Nothing to test\n");
 				break;
 			}
 		case 1:
@@ -481,6 +484,45 @@ int UserDefinedMenu(HANDLE handle, int lun)
 			}
 			printf("Channel Configuration register written\n");
 			break;
+		case 15: { /* enable/disable onboard DAC */
+			uint32_t reg;
+			double dacfreq;
+			struct mcr mcr;
+			char c;
+			do_usr_wait = 1;
+			/* check status bit */
+			DaGetRegister(handle, CLK_GEN_CNTL_ID, &reg,
+				      sizeof(reg));
+			if (reg & (1<<28)) { /* ON */
+				cvorb_rd_mconfig_struct(cvorbh, 1, &mcr);
+				dacfreq = cvorb_get_clk_freq(cvorbh);
+				printf("Onboard Clock Generator is ON."
+				       " Freq is %g Hz Chan %d\n",
+				       dacfreq, mcr.dss);
+				printf("Switch it off? [y/n] --> ");
+				scanf("%c", &c);
+				getchar();
+				if (c == 'y') {
+					cvorb_dac_off(cvorbh);
+					printf("Done\n");
+				} else
+					printf("Abort\n");
+			} else { /* OFF */
+				printf("Onboard Clock Generator is OFF\n");
+				printf("Switch it on? [y/n] --> ");
+				scanf("%c", &c);
+				getchar();
+				if (c == 'y') {
+					ch = 1;
+					if (get_channel(&ch))
+						break;
+					cvorb_dac_on(cvorbh, ch, 0);
+					printf("Done\n");
+				} else
+					printf("Abort\n");
+			}
+			break;
+		}
 		default:
 			printf("Please enter a valid menu item.\n\n<enter>"
 			       " to continue");

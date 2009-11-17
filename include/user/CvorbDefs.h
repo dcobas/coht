@@ -78,6 +78,15 @@
 
 /**< write Recurrent Cycles register */
 #define CVORB_RC_WR      (CVORB_FIRST_USR_IOCTL + 19)
+
+/**< Enable on board DAC */
+#define CVORB_DAC_ON     (CVORB_FIRST_USR_IOCTL + 20)
+
+/**< Disable on board DAC */
+#define CVORB_DAC_OFF    (CVORB_FIRST_USR_IOCTL + 21)
+
+/**< Get current PLL values */
+#define AD9516_GET_PLL   (CVORB_FIRST_USR_IOCTL + 22)
 /*@} end of group*/
 
 

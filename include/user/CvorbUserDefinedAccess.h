@@ -71,6 +71,9 @@ extern "C" {
 	int cvorb_rd_rcyc(int, int, uint *);
 	int cvorb_wr_rcyc(int, int, uint);
 	int cvorb_sram_ok(int, int, int);
+	int cvorb_dac_on(int, int, double);
+	int cvorb_dac_off(int);
+	double cvorb_get_clk_freq(int);
 /*@} end of group*/
 
 #ifdef __cplusplus

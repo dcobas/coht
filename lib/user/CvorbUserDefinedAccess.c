@@ -1340,3 +1340,79 @@ int cvorb_sram_ok(int h, int ch, int func)
 		return -CVORB_ERR;
 	return va;
 }
+
+/**
+ * @brief Enable onboard clock generator.
+ *
+ * @param h    -- handle
+ * @param ch   -- channel [1-8]  -- submodule#1 \n
+ *                        [9-16] -- submodule#2 \n
+ * @param freq -- Clock generator frequency
+ *                0 -- use default (that is 100MHz)
+ *
+ * <long-description>
+ *
+ * @return   0 -- if OK
+ * @return < 0 -- if FAILED
+ */
+int cvorb_dac_on(int h, int ch, double freq)
+{
+	struct mcr cr;
+
+	if (!WITHIN_RANGE(1, h, MAX_HNDLS))
+		return -CVORB_BAD_HANDLE;
+
+	if (!WITHIN_RANGE(0, ch, MAX_CHAN_AM))
+		return -CVORB_OUT_OF_RANGE;
+
+	/* TODO. For now set default freq only */
+	if (ad9516o_on(_lh[h-1].fd, CVORB_DAC_ON, 0))
+		return -CVORB_IOCTL_FAILED;
+
+	/* now we can select on-board DAC source */
+
+	/* read current configuration */
+	cvorb_rd_mconfig_struct(h, ch, &cr);
+	cr.dss = ((ch-1)%CHAM);	/* select new channel */
+	cvorb_wr_mconfig_struct(h, ch, &cr);
+	return 0;
+}
+
+/**
+ * @brief Disable onboard Clock generator.
+ *
+ * @param h -- library handle
+ *
+ * @return   0 -- if OK
+ * @return < 0 -- if FAILED
+ */
+int cvorb_dac_off(int h)
+{
+	if (!WITHIN_RANGE(1, h, MAX_HNDLS))
+		return -CVORB_BAD_HANDLE;
+
+	if (ioctl(_lh[h-1].fd, CVORB_DAC_OFF, NULL))
+		return -CVORB_IOCTL_FAILED;
+
+	return 0;
+}
+
+/**
+ * @brief Get current onboard Clock generator frequency.
+ *
+ * @param h -- library handle
+ *
+ * <long-description>
+ *
+ * @return clk generator frequency -- if OK
+ * @return < 0                     -- if FAILED
+ */
+double cvorb_get_clk_freq(int h)
+{
+	char *str;
+
+	if (!WITHIN_RANGE(1, h, MAX_HNDLS))
+		return -CVORB_BAD_HANDLE;
+
+	return ad9516o_get_freq(_lh[h-1].fd, &str);
+}
