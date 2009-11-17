@@ -52,10 +52,6 @@ cdcm-$(IS_CDCM) := $(addprefix $(CDCM_D), \
 		   cdcmMem.o cdcmThread.o cdcmTime.o \
 		   $(cdcmvme-y) $(cdcmpci-y) $(dg-y))
 
-ccflags-y += \
-	-I$(ROOTDIR)/include \
-	-I$(ROOTDIR)
-
 DRIVER    := $(notdir $(DRIVER:.ko=))
 SIMULATOR := $(notdir $(SIMULATOR:.ko=))
 
