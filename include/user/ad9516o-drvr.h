@@ -162,12 +162,10 @@ struct pll {
 /* Update All Registers */
 #define AD9516_UPDATE_ALL	0x232
 
-void init_ad9516(void *);
-void get_pll_conf(struct pll *);
-int  put_pll_conf(struct pll *);
-int  check_pll(struct pll *);
-int  clkgen_default_config(void);
-
-
+void ad9516o_init(void *);
+void ad9516o_get_pll_conf(struct pll *);
+int  ad9516o_put_pll_conf(struct pll *);
+int  ad9516o_check_pll(struct pll *);
+int  ad9516o_clkgen_default_conf(void);
 
 #endif /* _AD9516O_H_ */
