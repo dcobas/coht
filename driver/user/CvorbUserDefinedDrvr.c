@@ -383,28 +383,27 @@ char* CvorbUserInst(int *proceed, register DevInfo_t *info,
 {
 	CVORBUserStatics_t *usp = sptr->usrst; /* user statistics table */
 	int iVec = 0; /* interrupt vector */
-	int i;
+	int m, c;
 
 	iVec = info->iVector;		/* set up interrupt vector */
 
 	/* map submodule address pointers */
 	usp->md = _m;
+
 	usp->md[0].md = (mod *)sptr->card->block00;
-	for (i = 0; i < CHAM; i++)
-		usp->md[0].cd[i] = (chd *)
-			((long)usp->md[0].md + _ch_offset[i]);
-
 	usp->md[1].md = (mod *)((long)sptr->card->block00 + 0x200);
-	for (i = 0; i < CHAM; i++)
-		usp->md[1].cd[i] = (chd *)
-			((long)usp->md[0].md + _ch_offset[i]);
 
-	for (i = 0; i < SMAM; i++) {
+	for (m = 0; m < SMAM; m++) {
 		/* reset subModules */
-		_wr(i, SOFT_PULSE, SPR_FGR);
+		_wr(m, SOFT_PULSE, SPR_FGR);
 
 		/* initialize iolock mutex */
-		cdcm_mutex_init(&usp->md[i].iol);
+		cdcm_mutex_init(&usp->md[m].iol);
+
+		/* set submodule channels addresses */
+		for (c = 0; c < CHAM; c++)
+			usp->md[m].cd[c] = (chd *)
+				((long)usp->md[m].md + _ch_offset[c]);
 	}
 
 	/* set normal mode operation, enable all channels and
