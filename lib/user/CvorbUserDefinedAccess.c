@@ -201,11 +201,11 @@ int cvorb_rd_mconfig_struct(int h, int ch, struct mcr *cr)
 
 	*cr = (struct mcr) {
 		.ms    = mcr & 15,
-		.ipp   = mcr & (1<<6),
-		.dss   = mcr & (7<<7),
-		.oop   = mcr & (7<<10),
-		.fplss = mcr & (7<<13),
-		.eoo   = mcr & (1<<25)
+		.ipp   = (mcr & (1<<6))>>6,
+		.dss   = (mcr & (7<<7))>>7,
+		.oop   = (mcr & (7<<10))>>10,
+		.fplss = (mcr & (7<<13))>>13,
+		.eoo   = (mcr & (1<<25))>>25
 	};
 
 	return 0;
