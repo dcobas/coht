@@ -16,6 +16,7 @@
 #include <cdcm/cdcmBoth.h>
 #include <cdcm/cdcmIo.h>
 #include <ad9516o-drvr.h>
+#include <include/general_both.h>
 
 /*
  * define this if you want to debug the SPI interface with the AD9516
