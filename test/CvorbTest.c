@@ -86,7 +86,6 @@ static void  DisplayRegSummaries(int, char(*)[2][MAX_STR]);
 static void  PrntDbgFlag(int);
 /*===================END of static function declaration======================*/
 
-
 /**
  * @brief Guess what...
  *
@@ -95,7 +94,7 @@ static void  PrntDbgFlag(int);
 static void DisplayUsage(char *progName)
 {
 	printf("Usage:  %s <module_name> -U<lun> -C<chan_num>"
-	       " -l[ioctl | ioconf]\n", progName);
+	       " -a[ioctl | iommap | iodma]\n", progName);
 	printf("where:\n");
 	printf(" <module_name> %sOptional%s\n", WHITE_CLR, END_CLR);
 	printf(" DataBase Module Name to test. Default (CVORB) will be"
@@ -110,8 +109,8 @@ static void DisplayUsage(char *progName)
 	printf("    current Logical Unit Number. If not provided - then"
 	       " will be\n    set to zero.\n\n");
 	printf("If Driver or Simulator is currently installed in the system,"
-	       " then files like\n /dev/CVORB-DrvrLXXCXX"
-	       " (for Driver)\nor\n /dev/CVORB-SimLXXCXX"
+	       " then files like\n /dev/CVORBD.lXX.cXX"
+	       " (for Driver)\nor\n /dev/CVORBS.lXX.cXX"
 	       " (for Simulator)\nshould exist. These are module"
 	       " Device/Simulator drivers. First 'XX' is a LUN.\n"
 	       "Second 'XX' is a Minor Device Number (or Channel number)."
@@ -127,16 +126,17 @@ static void DisplayUsage(char *progName)
 	printf("    -a[ioctl] %sDefault%s\n", WHITE_CLR, END_CLR);
 	printf("      Registers accessed in a standard way using standard"
 	       " 'ioctl' system call.\n");
-	printf("    -a[ioconf]\n");
+	printf("    -a[iommap]\n");
 	printf("      Registers accessed directly through the module Mapped"
 	       " Memory. Can be\n");
 	printf("      used only in case of real Driver but not in case of"
 	       " Driver simulator.\n\n");
+	printf("    -a[iodma] %sLinux only%s\n"
+	       "      Registers accessed using DMA.", WHITE_CLR, END_CLR);
 	printf("EXAMPLES: %s CIBC -U0\n", progName);
-	printf("          %s VXI_MUX_HF -U-2 -C4 -aioconf\n", progName);
+	printf("          %s VXI_MUX_HF -U-2 -C4 -aiommap\n", progName);
 	printf("          %s TG8 -U3 -aioctl\n\n", progName);
 }
-
 
 /**
  * @brief Checks if command line arguments are correct.
@@ -181,8 +181,10 @@ static char* ParseProgArgs(int argc, char *argv[], int *lun, int *chanN)
 		case 'a':	/* register access mode option */
 			if (!strcmp(optarg, "ioctl"))
 				access_mode = IOCTL;
-			else if (!strcmp(optarg, "ioconf"))
-				access_mode = IOCONF;
+			else if (!strcmp(optarg, "iommap"))
+				access_mode = IOMMAP;
+			else if (!strcmp(optarg, "iodma"))
+                                access_mode = IODMA;
 			else {
 				fprintf(stderr,
 					"Invalid argument -l%s\n.", optarg);
@@ -212,9 +214,9 @@ static char* ParseProgArgs(int argc, char *argv[], int *lun, int *chanN)
 		goto wrongOption;
 	}
 
-	if ((*lun < 0) && (access_mode == IOCONF)) { /* unacceptable mode */
-		fprintf(stderr,
-			"Driver Simulators can not be tested using DMA.\n");
+	if ((*lun < 0) && (access_mode == IOMMAP)) { /* unacceptable mode */
+		fprintf(stderr, "Driver Simulators can not be tested using"
+			" mmaped I/O access.\n");
 		goto wrongOption;
 	}
 
@@ -1042,9 +1044,9 @@ int WORegsMenu(HANDLE handle)
 
 		printf("\n\n");
 
-		if (access_mode == IOCONF) {
+		if (access_mode == IOMMAP) {
 			printf("Can't read WO register last history using"
-			       " IOCONF access method.\n\n<enter> to continue");
+			       " IOMMAP access method.\n\n<enter> to continue");
 			getchar();
 			return OK;
 		}

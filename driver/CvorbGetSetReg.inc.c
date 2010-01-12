@@ -9,8 +9,8 @@
 #define WO_WRITE(_wo_data) *wop++ = *(_wo_data)
 
 /**
- * DriverGen ioctl numbers and get their parameters
- * ------------------------------------------------
+ * ioctl numbers and their parameters
+ * ----------------------------------
 
  * All DriverGen ioctl arguments are comming in predefined format.
  *
@@ -19,9 +19,9 @@
  * arg[1] -- number of elements to r/w
  * arg[2] -- element index, starting from zero
  *
- * In case of service ioctl - arguments can vary Their amount depends on
+ * In case of service ioctl - arguments can vary. Their amount depends on
  * specific ioctl number. See service routines (those are with __SRV__ subword)
- * for more details on parameter amount.
+ * for complete details on parameter amount.
  *
  * For example, if this is a repetitive r/w request
  * (ioctl number is SRV__REP_REG_RW) then we should have 4 arguments,
@@ -81,7 +81,7 @@ do {								\
 #endif
 
 /**
- * @brief user-space boundaries checking for register writing operation
+ * @brief user-space boundaries checker for register writing operation
  *
  * @param s     -- statics table
  * @param crwb  -- if to check r/w boundaries. Valid only for Lynx
@@ -89,8 +89,8 @@ do {								\
  * @param size  -- data size in user space
  * @param back  -- backup user-space address. Valid only for Linux
  *
- * User-space Read bounds assertion. System-specific.
- * Called every time, register write operations are performed
+ * Assert read bounds.
+ * Called every time register write operations are performed.
  *
  * @return SYSERR - failed
  * @return OK     - success
@@ -124,7 +124,7 @@ static int assert_rbounds(CVORBStatics_t *s, int crwb,
 }
 
 /**
- * @brief user-space boundaries checking for register reading operation
+ * @brief user-space boundaries checker for register reading operation
  *
  * @param s     -- statics table
  * @param crwb  -- if to check r/w boundaries. Valid only for Lynx
@@ -132,8 +132,8 @@ static int assert_rbounds(CVORBStatics_t *s, int crwb,
  * @param size  -- data size (in bytes) in user space
  * @param back  -- backup user-space address. Valid only for Linux
  *
- * User-space Write bounds assertioin. System-specific.
- * Called everytime, register read operations are performed
+ * Assert write bounds.
+ * Called everytime register read operations are performed
  *
  * @return SYSERR - failed
  * @return OK     - success
@@ -319,7 +319,8 @@ int get_##_r_nm(register CVORBStatics_t *s, char *ioctlarg,	\
 	/* read from device */						\
 	if (r_rw)							\
 		/* repetitive read access */				\
-		__rep_in##_r_port_op((__port_addr_t)regp, uaddr, rcntr*rwoa); \
+		__rep_in##_r_port_op##_delay((__port_addr_t)regp, uaddr, \
+					     rcntr*rwoa, _r_tloop);	\
 	else								\
 		__rep_in##_r_port_op##_delay_shift((__port_addr_t)regp, uaddr, \
 					   rwoa, _r_tloop);		\
@@ -401,7 +402,8 @@ int get_##_r_nm(register CVORBStatics_t *s, char *ioctlarg,	\
 									\
 	if (r_rw)							\
 		/* repetitive read access */				\
-		__rep_in##_r_port_op((__port_addr_t)regp, uaddr, rcntr * rwoa);	\
+		__rep_in##_r_port_op##_delay((__port_addr_t)regp, uaddr, \
+					     rcntr * rwoa, _r_tloop);	\
 	else								\
 		/* all OK - put data in the user buffer */		\
 		__rep_in##_r_port_op##_delay_shift((__port_addr_t)regp, uaddr, \
@@ -490,7 +492,8 @@ int set_##_r_nm(register CVORBStatics_t *s, char *ioctlarg,	\
 			swap_data((char *)uaddr, rcntr, dg_swa##_r_port_op##_rsz); \
 									\
 		/* write into hw */					\
-		__rep_out##_r_port_op((__port_addr_t)regp, uaddr, rcntr * rwoa); \
+		__rep_out##_r_port_op##_delay((__port_addr_t)regp, uaddr, \
+					      rcntr * rwoa, _r_tloop);	\
 	} else { /* single write */					\
 									\
 		/* save last written values (if write-only reg) */	\
@@ -595,7 +598,8 @@ int set_##_r_nm(register CVORBStatics_t *s, char *ioctlarg,	\
 			swap_data((char *)uaddr, rcntr, dg_swa##_r_port_op##_rsz); \
 									\
 		/* write into hw */					\
-		__rep_out##_r_port_op((__port_addr_t)regp, uaddr, rcntr * rwoa); \
+		__rep_out##_r_port_op##_delay((__port_addr_t)regp, uaddr, \
+					      rcntr * rwoa, _r_tloop);	\
 	} else { /* multiple writes */					\
 									\
 		/* save last written values (if write-only reg) */	\

@@ -3,6 +3,7 @@ SUBDIRS = \
 	lib \
 	driver \
 	test \
-	include
+	include \
+	install
 
 include ./Makefile.base

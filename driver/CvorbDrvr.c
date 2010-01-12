@@ -30,11 +30,11 @@ static char Cvorb_compile_date[]  = __DATE__;
 static char Cvorb_compile_time[]  = __TIME__;
 
 /* which driverGen version was used to generate current code */
-static const char Cvorb_version[] = "v2.4.13";
+static const char Cvorb_version[] = "v2.6.11";
 
 /* generation date in hex and human representation */
-static const char Cvorb_generation_time_str[] = "Tue Nov 17 16:34:04 2009";
-#define CVORB_GENERATION_TIME_HEX 0x4b02c26c
+static const char Cvorb_generation_time_str[] = "Tue Jan 12 10:00:12 2010";
+#define CVORB_GENERATION_TIME_HEX 0x4b4c3a1c
 /* ------------------------------------------------------------------------- */
 
 /* to suppress implisit declaration warnings */

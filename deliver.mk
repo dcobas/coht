@@ -109,4 +109,22 @@ _deliver:
 	fi; \
 	echo "Copying new $(LIBRARIES) libraries to '$(INSTDIR)/$(DRVR)' directory..."; \
 	dsc_install $(addprefix $(FINAL_DEST)/, $(LIBRARIES)) $(INSTDIR)/$(DRVR)
+else ifeq ($(notdir $(shell pwd)), install)
+_deliver:
+	@ umask 0002; \
+	if [ -d $(INSTDIR)/$(DRVR) ]; then \
+		if [ -d $(INSTDIR)/$(DRVR)/previousV ]; then \
+			rm -rf $(INSTDIR)/$(DRVR)/previousV; \
+		fi; \
+		mkdir -p $(INSTDIR)/$(DRVR)/previousV; \
+		echo "$(INSTDIR)/$(DRVR) include directory already exist."; \
+		echo "Saving current shared libraries..."; \
+		$(CP) --preserve=mode,timestamps $(INSTDIR)/$(DRVR)/*.so $(INSTDIR)/$(DRVR)/previousV; \
+		rm -f $(INSTDIR)/$(DRVR)/*.so; \
+	else \
+		echo "Creating $(INSTDIR)/$(DRVR) lib directory..."; \
+		mkdir -p $(INSTDIR)/$(DRVR); \
+	fi; \
+	echo "Copying new $(LIBRARIES) libraries to '$(INSTDIR)/$(DRVR)' directory..."; \
+	dsc_install $(addprefix $(FINAL_DEST)/, $(LIBRARIES)) $(INSTDIR)/$(DRVR)
 endif
