@@ -34,5 +34,6 @@ int  write_swp(CVORBUserStatics_t *, char *);
 void enable_modules(CVORBUserStatics_t *);
 int  dac_on(CVORBUserStatics_t *, char *);
 int  get_pll(CVORBUserStatics_t *, char *);
+int  write_sar(CVORBUserStatics_t *, char *);
 
 #endif	/* _UTILS_DRIVER_H_INCLUDE_ */

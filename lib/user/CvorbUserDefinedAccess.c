@@ -1417,3 +1417,63 @@ double cvorb_get_clk_freq(int h)
 
 	return ad9516o_get_freq(_lh[h-1].fd, &str);
 }
+
+/**
+ * @brief Write SRAM Start Address register
+ *
+ * @param h    -- handle
+ * @param ch   -- channel [1-16]
+ * @param func -- function  [1-64]
+ *
+ * Set SRAM address for r/w operations
+ *
+ * @return   0 -- if OK
+ * @return < 0 -- if FAILED
+ */
+int cvorb_wr_sar(int h, int ch, int func)
+{
+	ushort par[3]; /* ioctl params */
+
+	if (!WITHIN_RANGE(1, h, MAX_HNDLS))
+		return -CVORB_BAD_HANDLE;
+
+	if (!WITHIN_RANGE(1, ch, MAX_CHAN_AM))
+		return -CVORB_OUT_OF_RANGE;
+
+	if (!WITHIN_RANGE(1, func, FAM))
+		return -CVORB_OUT_OF_RANGE;
+
+	/*
+	  init params
+	   [0] -- module idx
+	   [1] -- channel idx
+	   [2] -- function idx
+	*/
+	par[0] = (ch > CHAM) ? 1 : 0;
+	par[1] = ((ch-1)%CHAM);
+	par[2] = func-1;
+
+	/* call the driver */
+	if (ioctl(_lh[h-1].fd, CVORB_WR_SAR, &par))
+		return -CVORB_IOCTL_FAILED;
+
+	return 0;
+}
+
+/**
+ * @brief Get DAL handle
+ *
+ * @param h -- library handle
+ *
+ * Just in case if someone wants to work directly with DAL.
+ *
+ * @return -CVORB_BAD_HANDLE -- bad library handle
+ * @return DAL handle        -- if OK
+ */
+HANDLE cvorb_get_dal_h(int h)
+{
+	if (!WITHIN_RANGE(1, h, MAX_HNDLS))
+		return -CVORB_BAD_HANDLE;
+
+	return _lh[h-1].h;
+}

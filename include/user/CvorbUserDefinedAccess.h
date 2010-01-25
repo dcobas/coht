@@ -74,6 +74,8 @@ extern "C" {
 	int cvorb_dac_on(int, int, double);
 	int cvorb_dac_off(int);
 	double cvorb_get_clk_freq(int);
+	int cvorb_wr_sar(int, int, int);
+	HANDLE cvorb_get_dal_h(int);
 /*@} end of group*/
 
 #ifdef __cplusplus

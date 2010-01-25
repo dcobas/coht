@@ -567,3 +567,19 @@ int get_pll(CVORBUserStatics_t *usp, char *arg)
 	ad9516o_get_pll_conf(&pll);
 	return cdcm_copy_to_user(arg, &pll, sizeof(pll));
 }
+
+/* write SRAM Start Address register */
+int write_sar(CVORBUserStatics_t *usp, char *arg)
+{
+	uint rv = 0; /* register value */
+	ushort par[3]; /* [0] -- submodule idx
+			  [1] -- chan idx
+			  [2] -- func idx */
+
+	if (cdcm_copy_from_user(&par, arg, sizeof(par)))
+		return SYSERR;
+
+	rv |= (par[1]<<SRAM_CHAN_SHIFT) | (par[2]<<SRAM_FUNC_SHIFT);
+	_wr(par[0], SRAM_SA, rv);
+	return OK;
+}

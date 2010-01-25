@@ -87,6 +87,9 @@
 
 /**< Get current PLL values */
 #define AD9516_GET_PLL   (CVORB_FIRST_USR_IOCTL + 22)
+
+/**< Write SRAM Start Address register */
+#define CVORB_WR_SAR  (CVORB_FIRST_USR_IOCTL + 23)
 /*@} end of group*/
 
 

@@ -361,6 +361,8 @@ int CvorbUserIoctl(int *proceed, register CVORBStatics_t *sptr,
 		return OK;
 	case AD9516_GET_PLL:
 		return get_pll(usp, arg);
+	case CVORB_WR_SAR:
+		return write_sar(usp, arg);
 	default:
 		*proceed = TRUE; /* continue standard code execution */
 	}
