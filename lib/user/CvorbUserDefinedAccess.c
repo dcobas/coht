@@ -10,7 +10,7 @@
  * Extra funcions were added to exploit new features, that were not available
  * in the old HW.
  *
- * @author Copyright (C) 2009 CERN. Yury GEORGIEVSKIY <ygeorgie@cern.ch>
+ * @author Copyright (C) 2009-2010 CERN. Yury GEORGIEVSKIY <ygeorgie@cern.ch>
  *
  * @date Created on 12/10/2009
  *
@@ -45,7 +45,7 @@
  *
  * * This Library is working on top of  DAL library, so user application should
  *   be compiled\n
- *   with @b -lcvorb and @b -ldal libraries.\n
+ *   with @b -lcvorbuda and @b -ldal libraries.\n
  *   Note, that library order is relevant during compilation.
  *
  * @section install_sec Initialization.
@@ -336,10 +336,10 @@ int cvorb_rd_cconfig_struct(int h, int ch, struct ccr *cr)
 		return rc;
 
 	*cr = (struct ccr) {
-		.chm      = ccr & 3,
-		.slope_en = ccr & (1<<3),
-		.so_dis   = ccr & (1<<4),
-		.cov      = ccr & (((1<<16)-1)<<16)
+		.chm      = ccr & 7,
+		.slope_en = (ccr & (1<<3)) >> 3,
+		.so_dis   = (ccr & (1<<4)) >> 4,
+		.cov      = (ccr & (((1<<16)-1)<<16)) >> 16
 	};
 
 	return 0;
@@ -400,7 +400,7 @@ int cvorb_wr_cconfig_struct(int h, int ch, struct ccr *cr)
 	uint ccr = 0;
 
 	if (cr->chm != (ushort)-1)
-		ccr |= (cr->chm) & 3;
+		ccr |= (cr->chm) & 7;
 	if (cr->slope_en != (ushort)-1)
 		ccr |= ((cr->slope_en) & 1) << 3;
 	if (cr->so_dis != (ushort)-1)
@@ -700,7 +700,7 @@ int cvorb_rd_fem(int h, int ch, unsigned long long *m)
  * @brief @b Read Channel Function Enable bits
  *
  * @param h   -- handle
- * @param ch  -- channel [1-64]
+ * @param ch  -- channel [1-16]
  * @param fem -- Channel bitmaks goes here, one char for each bit \n
  *               Can be 0 or 1
  *
@@ -796,13 +796,13 @@ static void  __attribute__((unused)) prnt_vtf(struct sram_params *ptr)
  * @b NOTE on rounding down time between two vectors. \n
  *
  * MIN step possible between two vectors is 5us.
- * Every 327.675us -- step granularity is lowered by 5us.
+ * Every 327.675ms -- step granularity is lowered by 5us.
  * I.e the finest time step resolution possible only if dt is less
- * then 327.675us.
- * For example, in 2nd dt range [327.680 - 655.350]us -- step will be 10us.
+ * then 327.675ms.
+ * For example, in 2nd dt range [327.680 - 655.350]ms -- step will be 10us.
  * It means that dt requested should be multipe of 10.
- * I.e. if you'll request let's say dt to be 400.355 -- it will be rounded
- * down to 400.350.
+ * I.e. if you'll request let's say dt to be 400.355ms -- it will be rounded
+ * down to 400.350ms.
  *
  * In 3rd time range -- dt must be multiple of 15 and so on...
  *

@@ -7,7 +7,9 @@
 
   Second -- this program should be run on *.csv files.
 
-  Produced *.vft files are CVORB data table functions (time / 16-bit value).
+  Produced *.vft files (Vector Table File) are CVORB data table functions
+  (time / 16-bit value).
+
   They are used by the test program to load them into SRAM.
 */
 #define _GNU_SOURCE /* asprintf rocks */

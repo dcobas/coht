@@ -14,7 +14,7 @@
 #define _CVORB_USER_DEFINED_ACCESS_H_INCLUDE_
 
 #include <dg/dal.h>
-#include <CvorbDefs.h>
+#include <user/CvorbDefs.h>
 
 #define MAX_CHAN_AM 16 //!< module can have up to 16 channels
 
