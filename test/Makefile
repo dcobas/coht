@@ -1,19 +1,32 @@
+###############################################################################
+# @file test.mk
+#
+# @brief Test program compilation
+#
+# Automatically generated for driver-gen Cvorb driver test program
+#
+# @author Copyright (C) 2003-2010 CERN. Yury GEORGIEVSKIY <ygeorgie@cern.ch>
+#
+# @date Created on 22/01/2010
+#
+# @section license_sec License
+#          Released under the GPL
+###############################################################################
 include ../Makefile.base
 
 VPATH = user
 
-DRVRDIR    = object_$(DRVR)
-INSTDIR    = $(addsuffix /$(DLVRYPLS)/$(CPU), $(EXECINSTDIR))
-ADDCFLAGS  = $(STDFLAGS)
+DRVRDIR   = object_$(DRVR)
+ADDCFLAGS = $(STDFLAGS)
 
 # We will link with local DAL copy (if any)
 # Otherwise will link with general DAL copy
 define create-lib-symlink
 	if [ ! -d ../../general/dal ]; then                 \
-			echo '  SYMLINK $@ -> /acc/local/$(CPU)/lib'; \
+			echo 'SYMLINK $@ -> /acc/local/$(CPU)/lib'; \
 			ln -fs /acc/local/$(CPU)/lib/libdal.a $@;     \
 	else \
-			echo '  SYMLINK $@ -> ../../general/dal'; \
+			echo 'SYMLINK $@ -> ../../general/dal'; \
 			ln -fs ../../general/dal/libdal.$(CPU).a $@; \
 	fi
 endef
@@ -53,8 +66,8 @@ lynx:
 	$(Q)$(MAKE) _build CPU=ppc4
 
 all:
-	$(Q)$(MAKE) _build CPU=L865
-	$(Q)$(MAKE) _build CPU=ppc4
+	$(Q)$(MAKE) linux
+	$(Q)$(MAKE) lynx
 
 
 # Move compiled files to proper place

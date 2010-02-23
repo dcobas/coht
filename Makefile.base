@@ -1,3 +1,24 @@
+###############################################################################
+# @file Makefile.base
+#
+# @brief Generic rules used to compile driver-gen driver framework
+#
+# Automatically generated for driver-gen Cvorb driver
+#
+# @author Copyright (C) 2003-2010 CERN. Yury GEORGIEVSKIY <ygeorgie@cern.ch>
+#
+# @date Created on 22/01/2010
+#
+# @section license_sec License
+#          Released under the GPL
+###############################################################################
+
+# For debugging
+#SHELL += -x
+
+# Do not print "Entering directory ..."
+MAKEFLAGS += --no-print-directory
+
 # Standart CERN Make rules
 include /acc/src/dsc/co/Make.auto
 
@@ -16,6 +37,7 @@ ifeq ($(VERBOSE),1)
   LD  = $(LINK.o)
   QLD =
   QNM =
+  CCL = $(CC)
 else
    Q   = @
 
@@ -25,33 +47,38 @@ else
   _CC := $(CC)
    CC  = @echo 'CC   $@'; $(_CC)
 
+   CCL = @echo 'CC   $%'; $(_CC)
+
   QNM  = @echo 'KSYM $@'
 
   _AR := $(AR)
-   AR  = echo 'AR   $@'; $(_AR) 2>&1>&/dev/null
+   AR  = @echo 'AR   $@'; $(_AR) 2>&1>&/dev/null
 endif
 
 # General settings
 DRVR        = Cvorb
 BUS         = VME
-UTILINSTDIR = /acc/local/$(CPU)
+
+PHONY := _all
+_all:
+
+# Executable && drivers goes here
+FINAL_DEST := ../object_$(DRVR)
+$(FINAL_DEST):
+	$(Q)mkdir -p $@
+
+# Compiled files goes here
+OBJDIR = $(CPU)_$(BLDTYPE)
+$(CPU)_%:
+	$(Q)mkdir -p $@
 
 # Redefine
 %.$(CPU).o: %.c
 	$(Q)$(COMPILE.c) $< $(OUTPUT_OPTION)
 
-PHONY := _all
-_all:
-
-# For debugging
-#SHELL += -x
-
-# Do not print "Entering directory ..."
-MAKEFLAGS += --no-print-directory
-
 unexport BLDTYPE PASSTARG
 
-# some file extentions
+# generic definitions
 EXTDLL	= .dll
 EXTSO	= .so
 EXTLIB	= .a
@@ -78,7 +105,7 @@ rls.BLDTFLAGS = -O2
 drv.BLDTFLAGS =  # Drivers are build without debug and optimization
 BLDTFLAGS = $($(BLDTYPE).BLDTFLAGS)
 
-# next 3 are not used for now, but i'll keep them 'just-in-case-if...'
+# next 3 are not used for now, but are kept for 'just-in-case-if...'
 BASELDSHFLAGS = $(LDSHFLAGS) $(HOSTLDSHFLAGS) $(BLDTFLAGS) $(ADDLDSHFLAGS)
 BASELDFLAGS = $(LDFLAGS) $(HOSTLDFLAGS) $(BLDTFLAGS) $(ADDLDFLAGS)
 BASEARFLAGS = $(ARFLAGS) $(HOSTARFLAGS) $(ADDARFLAGS)
@@ -110,17 +137,6 @@ endif # ifeq ($(SUBDIRS),)
 
 # Cleaning up
 clean clear:
-
-
-# Object files directory buidup
-OBJDIR = $(ISP)_$(BLDTYPE)
-$(ISP)_%:
-	$(Q)mkdir -p $@
-
-# Executable && drivers goes here
-FINAL_DEST := ../object_$(DRVR)
-$(FINAL_DEST):
-	$(Q)mkdir -p $@
 
 # Descent into subdirectories
 %-subdirs:

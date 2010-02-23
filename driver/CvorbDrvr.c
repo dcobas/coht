@@ -33,8 +33,8 @@ static char Cvorb_compile_time[]  = __TIME__;
 static const char Cvorb_version[] = "v2.6.11";
 
 /* generation date in hex and human representation */
-static const char Cvorb_generation_time_str[] = "Tue Jan 12 10:00:12 2010";
-#define CVORB_GENERATION_TIME_HEX 0x4b4c3a1c
+static const char Cvorb_generation_time_str[] = "Tue Feb 23 22:29:06 2010";
+#define CVORB_GENERATION_TIME_HEX 0x4b8448a2
 /* ------------------------------------------------------------------------- */
 
 /* to suppress implisit declaration warnings */
@@ -455,7 +455,7 @@ int Cvorb_ioctl(register CVORBStatics_t *s,
 	int minN;     /* minor device number (LUN) */
 	int proceed;  /* if standard code execution should be proceed after
 			 call to user entry point function  */
-	int usrcoco;  /* completion code of user entry point function */
+	int rc;  /* return code */
 	int r_rw = 0; /* repetitive r/w (1 - yes, 0 - no) */
 
 	START_TIME_STAT(); /* timing measurements */
@@ -467,162 +467,164 @@ int Cvorb_ioctl(register CVORBStatics_t *s,
 #endif
 
 	/* user entry point function call */
-	usrcoco = CvorbUserIoctl(&proceed, s, f, minN, com, arg);
+	rc = CvorbUserIoctl(&proceed, s, f, minN, com, arg);
 	if (!proceed) /* all done by user */
-		return usrcoco;
+		goto out_ioctl;
 
  rep_ioctl:
 	switch (com) { /* default 'ioctl' driver operations */
 	case SRV_GET_DEBUG_FLAG:
-		return get___SRV__DEBUG_FLAG(s, arg, c_rwb, r_rw);
+		rc = get___SRV__DEBUG_FLAG(s, arg, c_rwb, r_rw);
 		break;
 	case SRV_SET_DEBUG_FLAG:
-		return set___SRV__DEBUG_FLAG(s, arg, c_rwb, r_rw);
+		rc = set___SRV__DEBUG_FLAG(s, arg, c_rwb, r_rw);
 		break;
 	case SRV_GET_DEVINFO_T:
-		return get___SRV__DEVINFO_T(s, arg, c_rwb, r_rw);
+		rc = get___SRV__DEVINFO_T(s, arg, c_rwb, r_rw);
 		break;
 	case SRV_GET_DRVR_VERS:
-		return get___SRV__DRVR_VERS(s, arg, c_rwb, r_rw);
+		rc = get___SRV__DRVR_VERS(s, arg, c_rwb, r_rw);
 		break;
 	case SRV_GET_DAL_CONSISTENT:
-		return get___SRV__DAL_CONSISTENT(s, arg, c_rwb, r_rw);
+		rc = get___SRV__DAL_CONSISTENT(s, arg, c_rwb, r_rw);
 		break;
 	case SRV__REP_REG_RW:
-		return srv_func___SRV__REP_REG_RW(s, arg, c_rwb, r_rw);
+		rc = srv_func___SRV__REP_REG_RW(s, arg, c_rwb, r_rw);
 		break;
 	case SRV__RW_BOUNDS:
-		return srv_func___SRV__RW_BOUNDS(s, arg, c_rwb, r_rw);
+		rc = srv_func___SRV__RW_BOUNDS(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_GET_INT_SRC:
-		return get_INT_SRC(s, arg, c_rwb, r_rw);
+		rc = get_INT_SRC(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_GET_INT_EN:
-		return get_INT_EN(s, arg, c_rwb, r_rw);
+		rc = get_INT_EN(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_SET_INT_EN:
-		return set_INT_EN(s, arg, c_rwb, r_rw);
+		rc = set_INT_EN(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_GET_INT_L:
-		return get_INT_L(s, arg, c_rwb, r_rw);
+		rc = get_INT_L(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_SET_INT_L:
-		return set_INT_L(s, arg, c_rwb, r_rw);
+		rc = set_INT_L(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_GET_INT_V:
-		return get_INT_V(s, arg, c_rwb, r_rw);
+		rc = get_INT_V(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_SET_INT_V:
-		return set_INT_V(s, arg, c_rwb, r_rw);
+		rc = set_INT_V(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_GET_VHDL_V:
-		return get_VHDL_V(s, arg, c_rwb, r_rw);
+		rc = get_VHDL_V(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_GET_PCB_SN_H:
-		return get_PCB_SN_H(s, arg, c_rwb, r_rw);
+		rc = get_PCB_SN_H(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_GET_PCB_SN_L:
-		return get_PCB_SN_L(s, arg, c_rwb, r_rw);
+		rc = get_PCB_SN_L(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_GET_TEMP:
-		return get_TEMP(s, arg, c_rwb, r_rw);
+		rc = get_TEMP(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_GET_ADC:
-		return get_ADC(s, arg, c_rwb, r_rw);
+		rc = get_ADC(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_GET_HISTORY_SOFT_PULSE:
-		return get_wo_SOFT_PULSE(s, arg, c_rwb, r_rw);
+		rc = get_wo_SOFT_PULSE(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_SET_SOFT_PULSE:
-		return set_SOFT_PULSE(s, arg, c_rwb, r_rw);
+		rc = set_SOFT_PULSE(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_GET_EXT_CLK_FREQ:
-		return get_EXT_CLK_FREQ(s, arg, c_rwb, r_rw);
+		rc = get_EXT_CLK_FREQ(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_GET_CLK_GEN_CNTL:
-		return get_CLK_GEN_CNTL(s, arg, c_rwb, r_rw);
+		rc = get_CLK_GEN_CNTL(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_SET_CLK_GEN_CNTL:
-		return set_CLK_GEN_CNTL(s, arg, c_rwb, r_rw);
+		rc = set_CLK_GEN_CNTL(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_GET_MOD_STAT:
-		return get_MOD_STAT(s, arg, c_rwb, r_rw);
+		rc = get_MOD_STAT(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_GET_MOD_CFG:
-		return get_MOD_CFG(s, arg, c_rwb, r_rw);
+		rc = get_MOD_CFG(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_SET_MOD_CFG:
-		return set_MOD_CFG(s, arg, c_rwb, r_rw);
+		rc = set_MOD_CFG(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_GET_DAC_VAL:
-		return get_DAC_VAL(s, arg, c_rwb, r_rw);
+		rc = get_DAC_VAL(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_SET_DAC_VAL:
-		return set_DAC_VAL(s, arg, c_rwb, r_rw);
+		rc = set_DAC_VAL(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_GET_SRAM_SA:
-		return get_SRAM_SA(s, arg, c_rwb, r_rw);
+		rc = get_SRAM_SA(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_SET_SRAM_SA:
-		return set_SRAM_SA(s, arg, c_rwb, r_rw);
+		rc = set_SRAM_SA(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_GET_SRAM_DATA:
-		return get_SRAM_DATA(s, arg, c_rwb, r_rw);
+		rc = get_SRAM_DATA(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_SET_SRAM_DATA:
-		return set_SRAM_DATA(s, arg, c_rwb, r_rw);
+		rc = set_SRAM_DATA(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_GET_DAC_CNTL:
-		return get_DAC_CNTL(s, arg, c_rwb, r_rw);
+		rc = get_DAC_CNTL(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_SET_DAC_CNTL:
-		return set_DAC_CNTL(s, arg, c_rwb, r_rw);
+		rc = set_DAC_CNTL(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_GET_CH_STAT:
-		return get_CH_STAT(s, arg, c_rwb, r_rw);
+		rc = get_CH_STAT(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_GET_CH_CFG:
-		return get_CH_CFG(s, arg, c_rwb, r_rw);
+		rc = get_CH_CFG(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_SET_CH_CFG:
-		return set_CH_CFG(s, arg, c_rwb, r_rw);
+		rc = set_CH_CFG(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_GET_FUNC_SEL:
-		return get_FUNC_SEL(s, arg, c_rwb, r_rw);
+		rc = get_FUNC_SEL(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_SET_FUNC_SEL:
-		return set_FUNC_SEL(s, arg, c_rwb, r_rw);
+		rc = set_FUNC_SEL(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_GET_FCT_EM_H:
-		return get_FCT_EM_H(s, arg, c_rwb, r_rw);
+		rc = get_FCT_EM_H(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_SET_FCT_EM_H:
-		return set_FCT_EM_H(s, arg, c_rwb, r_rw);
+		rc = set_FCT_EM_H(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_GET_FCT_EM_L:
-		return get_FCT_EM_L(s, arg, c_rwb, r_rw);
+		rc = get_FCT_EM_L(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_SET_FCT_EM_L:
-		return set_FCT_EM_L(s, arg, c_rwb, r_rw);
+		rc = set_FCT_EM_L(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_GET_SLOPE:
-		return get_SLOPE(s, arg, c_rwb, r_rw);
+		rc = get_SLOPE(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_SET_SLOPE:
-		return set_SLOPE(s, arg, c_rwb, r_rw);
+		rc = set_SLOPE(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_GET_CH_REC_CYC:
-		return get_CH_REC_CYC(s, arg, c_rwb, r_rw);
+		rc = get_CH_REC_CYC(s, arg, c_rwb, r_rw);
 		break;
 	case CVORB_SET_CH_REC_CYC:
-		return set_CH_REC_CYC(s, arg, c_rwb, r_rw);
+		rc = set_CH_REC_CYC(s, arg, c_rwb, r_rw);
 		break;
 	default:
 		pseterr(EINVAL);
-		return SYSERR; /* -1 */
+		rc = SYSERR; /* -1 */
+                break;
 	} /* end of 'ioctl' operations switch */
 
-	return OK; /* 0 */
+ out_ioctl:
+	return rc;
 }
 
 
