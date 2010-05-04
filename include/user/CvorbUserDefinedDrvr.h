@@ -14,6 +14,9 @@
 struct sel; /* preliminary structure declaration to supress warnings during
 	       user code compilation */
 
+/* enable/disable i/o access debugging printout */
+// #define __DEBUG
+
 typedef CVORBBlock00_t mod;
 typedef CVORBBlock01_t chd;
 /**
@@ -47,8 +50,39 @@ struct CVORBUserStatics_t {
    b -- buffer to put results into
    t -- times to read (counter)
  */
+#ifdef __DEBUG
+
 #define _rcr(m, c, r)							\
 	({								\
+		kkprintf("%s()@%d: Read [%s] register @module#%hd channel#%hd\n", \
+			 __FUNCTION__, __LINE__, #r, m, c);		\
+		__inl((__port_addr_t)&(usp->md[m].cd[c]->r));		\
+	})
+
+#define _rr(m, r)							\
+	({								\
+		kkprintf("%s()@%d: Read [%s] register @module#%d\n", __FUNCTION__, __LINE__, #r, m);	\
+		__inl((__port_addr_t)&(usp->md[m].md->r));		\
+	})
+
+#define _rcrr(m, c, r, b, t)						\
+	({								\
+		kkprintf("%s()@%d: Repetitive read (%d times) [%s] register @module#%d" \
+			 " channel#%d to buffer 0x%lx\n", __FUNCTION__, __LINE__, t, #r, m, c, (long)b); \
+		__rep_inl((__port_addr_t)&(usp->md[m].cd[c]->r), b, t);	\
+	})
+
+#define _rrr(m, r, b, t)						\
+	({								\
+		kkprintf("%s()@%d: Repetitive read (%d times) [%s] register @module#%d" \
+			 " to buffer 0x%lx\n", __FUNCTION__, __LINE__, t, #r, m, (long)b);	\
+		__rep_inl((__port_addr_t)&(usp->md[m].md->r), b, t);	\
+	})
+
+#else
+
+#define _rcr(m, c, r)						\
+	({							\
 		__inl((__port_addr_t)&(usp->md[m].cd[c]->r));	\
 	})
 
@@ -64,8 +98,10 @@ struct CVORBUserStatics_t {
 
 #define _rrr(m, r, b, t)						\
 	({								\
-		__rep_inl((__port_addr_t)&(usp->md[m].md->r), b, t); \
+		__rep_inl((__port_addr_t)&(usp->md[m].md->r), b, t);	\
 	})
+
+#endif
 
 /* write register (_wr),  write channel register (_wcr),
    write channel register repetitive (_wcrr), write register repetitive (_wrr)
@@ -76,13 +112,43 @@ struct CVORBUserStatics_t {
    b -- buffer to get data from
    t -- times to write (counter)
  */
+#ifdef __DEBUG
+
 #define _wcr(m, c, r, v)						\
 	({								\
+		kkprintf("%s()@%d: Write 0x%x into [%s] register @module#%d channel#%d\n", __FUNCTION__, __LINE__, v, #r, m, c); \
 		__outl((__port_addr_t)&(usp->md[m].cd[c]->r), v);	\
 	})
 
 #define _wr(m, r, v)							\
 	({								\
+		kkprintf("%s()@%d: Write 0x%x into [%s] register @module#%d\n", __FUNCTION__, __LINE__, v, #r, m); \
+		__outl((__port_addr_t)&(usp->md[m].md->r), v);		\
+	})
+
+#define _wcrr(m, c, r, b, t)						\
+	({								\
+		kkprintf("%s()@%d: Repetitive write (%d times) [%s] register @module#%d"	\
+			 " channel#%d from buffer 0x%lx\n", __FUNCTION__, __LINE__, t, #r, m, c, (long)b); \
+		__rep_outl((__port_addr_t)&(usp->md[m].cd[c]->r), b, t); \
+	})
+
+#define _wrr(m, r, b, t)						\
+	({								\
+		kkprintf("%s()@%d: Repetitive write (%d times) [%s] register @module#%d"	\
+			 " from buffer 0x%lx\n", __FUNCTION__, __LINE__, t, #r, m, (long)b); \
+		__rep_outl((__port_addr_t)&(usp->md[m].md->r), b, t);	\
+	})
+
+#else
+
+#define _wcr(m, c, r, v)						\
+	({								\
+		__outl((__port_addr_t)&(usp->md[m].cd[c]->r), v);	\
+	})
+
+#define _wr(m, r, v)						\
+	({							\
 		__outl((__port_addr_t)&(usp->md[m].md->r), v);	\
 	})
 
@@ -93,8 +159,10 @@ struct CVORBUserStatics_t {
 
 #define _wrr(m, r, b, t)						\
 	({								\
-		__rep_outl((__port_addr_t)&(usp->md[m].md->r), b, t); \
+		__rep_outl((__port_addr_t)&(usp->md[m].md->r), b, t);	\
 	})
+
+#endif
 /*@} end of group*/
 
 int CvorbUserOpen(int*, register CVORBStatics_t*, int, struct file*);
