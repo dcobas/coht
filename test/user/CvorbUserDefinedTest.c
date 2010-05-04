@@ -724,7 +724,8 @@ static int get_module(int *m)
 static int get_value(uint *val, uint min, uint max)
 {
 	printf("Enter new value[0x%x-0x%x] -> ", min, max);
-	scanf("%u", val);
+	scanf("%i", val);
+	scanf("%*[^\n]"); /* skip to the end of the line */
 	getchar();
 	if (!WITHIN_RANGE(min, *val, max)) {
 		printf("ERROR! Value provided is out-of-range\n");
