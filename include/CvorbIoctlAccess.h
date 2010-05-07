@@ -1,7 +1,7 @@
 #ifndef _CVORB_IOCTL_ACCESS_H_INCLUDE_
 #define _CVORB_IOCTL_ACCESS_H_INCLUDE_
 
-#include "./user/CvorbUserDefinedAccess.h"
+#include "CvorbUserDefinedAccess.h"
 
 /* this API is obsolete! */
 #warning WARNING! Deprecated library. Use DrvrAccess library instead.
