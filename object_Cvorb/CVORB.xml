@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DriverGen>
+  <module name="CVORB" base="0x400" addrinc="0x400" ilevel="7" ivec="200" ivecinc="4">
+    <vme_space name="0" am="0x29" dps="32" range="0x400" offset="0x0">
+      <block name="0" offset="0x0">
+        <register name="INT_SRC" offset="0x0" depth="0x1" mode="r" size="4"/>
+        <register name="INT_EN" offset="0x4" depth="0x1" mode="wr" size="4"/>
+        <register name="INT_L" offset="0x8" depth="0x1" mode="wr" size="4"/>
+        <register name="INT_V" offset="0xc" depth="0x1" mode="wr" size="4"/>
+        <register name="VHDL_V" offset="0x10" depth="0x1" mode="rc" size="4"/>
+        <register name="PCB_SN_H" offset="0x14" depth="0x1" mode="r" size="4"/>
+        <register name="PCB_SN_L" offset="0x18" depth="0x1" mode="r" size="4"/>
+        <register name="TEMP" offset="0x1c" depth="0x1" mode="r" size="4"/>
+        <register name="ADC" offset="0x20" depth="0x1" mode="r" size="4"/>
+        <register name="SOFT_PULSE" offset="0x24" depth="0x1" mode="w" size="4"/>
+        <register name="EXT_CLK_FREQ" offset="0x28" depth="0x1" mode="r" size="4"/>
+        <register name="CLK_GEN_CNTL" offset="0x2c" depth="0x1" mode="wr" size="4"/>
+        <register name="MOD_STAT" offset="0x40" depth="0x1" mode="r" size="4"/>
+        <register name="MOD_CFG" offset="0x44" depth="0x1" mode="wr" size="4"/>
+        <register name="DAC_VAL" offset="0x48" depth="0x1" mode="wr" size="4"/>
+        <register name="SRAM_SA" offset="0x4c" depth="0x1" mode="wr" size="4"/>
+        <register name="SRAM_DATA" offset="0x50" depth="0x1" mode="wr" size="4"/>
+        <register name="DAC_CNTL" offset="0x60" depth="0x1" mode="wr" size="4"/>
+      </block>
+      <block name="1" offset="0x80">
+        <register name="CH_STAT" offset="0x0" depth="0x1" mode="r" size="4"/>
+        <register name="CH_CFG" offset="0x4" depth="0x1" mode="wr" size="4"/>
+        <register name="FUNC_SEL" offset="0x8" depth="0x1" mode="wr" size="4"/>
+        <register name="FCT_EM_H" offset="0xc" depth="0x1" mode="wr" size="4"/>
+        <register name="FCT_EM_L" offset="0x10" depth="0x1" mode="wr" size="4"/>
+        <register name="SLOPE" offset="0x14" depth="0x1" mode="wr" size="4"/>
+        <register name="CH_REC_CYC" offset="0x18" depth="0x1" mode="wr" size="4"/>
+      </block>
+    </vme_space>
+  </module>
+</DriverGen>

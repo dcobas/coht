@@ -171,6 +171,5 @@ _deliver:
 		mkdir -p $(INSTDIR)/$(DRVR); \
 	fi; \
 	echo "Copying new header files to '$(INSTDIR)/$(DRVR)' directory..."; \
-	$(CP) --preserve=mode,timestamps *.h $(INSTDIR)/$(DRVR); \
-	$(CP) --preserve=mode,timestamps user/*.h $(INSTDIR)/$(DRVR)
+	$(CP) --preserve=mode,timestamps *.h $(INSTDIR)/$(DRVR);
 endif
