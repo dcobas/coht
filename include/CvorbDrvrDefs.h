@@ -54,14 +54,14 @@ enum {
 
 /* channel offsets from the Submodule Base Address */
 static int _ch_offset[] __attribute__((unused)) = {
-	0x80,
-	0xb0,
-	0xe0,
-	0x110,
-	0x140,
-	0x170,
-	0x1a0,
-	0x1d0
+	0x80,	/* ch#1 */
+	0xb0,	/* ch#2 */
+	0xe0,	/* ch#3 */
+	0x110,	/* ch#4 */
+	0x140,	/* ch#5 */
+	0x170,	/* ch#6 */
+	0x1a0,	/* ch#7 */
+	0x1d0	/* ch#8 */
 };
 
 /* CVORB_LOAD_SRAM && CVORB_GET_SRAM ioctl parameters */
