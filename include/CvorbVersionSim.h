@@ -12,6 +12,6 @@
    from one version to another - then current Simulator version will be
    automatically increased by one.
 */
-#define CVORB_SIM_CURRENT_VERSION 10
+#define CVORB_SIM_CURRENT_VERSION 11
 
 #endif /* _CVORB_VERSION_SIM_H_INCLUDE_ */

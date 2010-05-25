@@ -19,7 +19,7 @@
 extern char *optarg;
 
 /*==========================Global data=====================================*/
-static char *curModName;	 /* Module Name exactly as in the DataBase */
+char        *curModName;	 /* Module Name exactly as in the DataBase */
 METHOD      access_mode = IOCTL; /* default access method */
 char        *ClearScreen;	 /* terminal clear screen esc sequence */
 const char  *g_drvrVersInfo;     /* Module version info string */

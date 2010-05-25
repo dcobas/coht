@@ -33,6 +33,7 @@ int UserDefinedMenu(HANDLE, int);
 /* CvorbTest.c */
 extern char *ClearScreen;
 extern const char *g_drvrVersInfo;
+extern char *curModName;
 extern int g_drvrVers;
 int         screenHeight();
 int         screenWidth();

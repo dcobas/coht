@@ -13,6 +13,7 @@
 #          Released under the GPL
 ###############################################################################
 include ../Makefile.base
+include ../Makefile.specific
 
 VPATH = user
 

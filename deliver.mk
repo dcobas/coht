@@ -111,6 +111,12 @@ _deliver:
 			dsc_install $(FINAL_DEST)/$(EXEC_OBJS) $$tmp_dir; \
 			echo -e "Done"; \
 		fi; \
+		if [ -e user/deliver.mk ]; then \
+			echo -en "\nDo user-specific delivery -- "; \
+			tmp_dir="$(EXECINSTDIR)/$$a/$(CPU)/$(KVER)/$(DRIVER_NAME)"; \
+			$(MAKE) -C ./user -f deliver.mk _deliver DDIR=$$tmp_dir; \
+			echo -e "Done"; \
+		fi; \
 	done
 	@echo ""
 else ifeq ($(notdir $(shell pwd)), lib)
