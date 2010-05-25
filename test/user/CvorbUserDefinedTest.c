@@ -32,9 +32,8 @@ static int soft_pulses();
 /**
  * @brief
  *
- * @param handle - lib handle, ret. by @e DaEnableAccess() call
- * @param lun    - logical unit number.
- *
+ * @param handle -- lib handle, ret. by @e DaEnableAccess() call
+ * @param lun    -- logical unit number.
  * @return
  */
 int UserDefinedMenu(HANDLE handle, int lun)
@@ -585,18 +584,28 @@ static int load_vtf(FILE *fd, struct fv **fv)
 #define MAX_STR_SZ 32
 static int open_vtf(FILE **f)
 {
-        DIR *dir = opendir("./vtf"); /* by default -- always
-					search in local vtf/ dir */
         struct direct *ent;
 	char vtf[MAX_VTF_FILES][MAX_STR_SZ] = { { 0 } }; /* search results */
-	int fc = 0, i;
+	int fc = 0, i, rc = 0;
 	char vtfn[MAX_STR_SZ] = { 0 }; /* vector table file name */
 	char idx[MAX_STR_SZ] = { 0 }; /* vector table index */
-	char *fn; /* filename to open */
+	char *fn = NULL, *dn = NULL; /* filename && dirname to open */
+	DIR *dir;
+
+	asprintf(&dn, "./vtf");
+	dir = opendir(dn); /* first try to open local ./vtf dir */
 
 	if (!dir) {
-		printf("Can't open ./vtf directory\n");
-		return -1;
+		/* we are on FEC -- open delivered one */
+		free(dn);
+		asprintf(&dn, "/usr/local/drivers/%s/vtf", _ncf(curModName));
+		dir = opendir(dn);
+	}
+
+	if (!dir) {
+		printf("Can't locate *.vtf files\n");
+		rc = -1;
+		goto out;
 	}
 
 	/* scan dir for .vtf files */
@@ -620,9 +629,10 @@ static int open_vtf(FILE **f)
 		i = atoi(idx);
 		if (!WITHIN_RANGE(0, i, fc)) {
 			printf("index choosen is out-of-range\n");
-			return -1;
+			rc = -1;
+			goto out;
 		}
-		asprintf(&fn, "./vtf/%s", vtf[i]);
+		asprintf(&fn, "%s/%s", dn, vtf[i]);
 	} else /* user-provided file */
 		asprintf(&fn, "%s", vtfn);
 
@@ -630,12 +640,14 @@ static int open_vtf(FILE **f)
 	*f = fopen(fn, "r");
 	if (!*f) {
 		printf("ERROR! Can't open %s Vector Table File\n", fn);
-		free(fn);
-		return -1;
+		rc = -1;
+		goto out;
 	}
 
-	free(fn);
-	return 0;
+ out:
+	if (fn) free(fn);
+	if (dn) free(dn);
+	return rc;
 }
 
 /**
