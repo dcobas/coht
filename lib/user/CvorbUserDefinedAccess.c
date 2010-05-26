@@ -186,10 +186,11 @@ int cvorb_rd_mconfig(int h, int ch, uint *cr)
  * @param h  -- handle
  * @param ch -- channel [1-8]  -- submodule#1 \n
  *                      [9-16] -- submodule#2
- * @param cr -- Configuration Register bit settings goes here
+ * @param cr -- if not NULL - configuration Register bit
+ *              settings goes here
  *
- * @return   0 -- if SUCCESS
- * @return < 0 -- FAILED
+ * @return Module Config Register Value -- if SUCCESS
+ * @return -1                           -- FAILED
  */
 int cvorb_rd_mconfig_struct(int h, int ch, struct mcr *cr)
 {
@@ -197,18 +198,21 @@ int cvorb_rd_mconfig_struct(int h, int ch, struct mcr *cr)
 	int rc = cvorb_rd_mconfig(h, ch, &mcr);
 
 	if (rc)
-		return rc;
+		return -1;
+
+	if (!cr)
+		return mcr;
 
 	*cr = (struct mcr) {
-		.ms    = mcr & 15,
-		.ipp   = (mcr & (1<<6))>>6,
-		.dss   = (mcr & (7<<7))>>7,
-		.oop   = (mcr & (7<<10))>>10,
-		.fplss = (mcr & (7<<13))>>13,
-		.eoo   = (mcr & (1<<25))>>25
+		.ms    = mcr & 15, /* module selection */
+		.ipp   = (mcr & (1<<6))>>6, /* input pulses polarity */
+		.dss   = (mcr & (7<<7))>>7, /* DAC source selection */
+		.oop   = (mcr & (7<<10))>>10, /* optical output selection */
+		.fplss = (mcr & (7<<13))>>13, /* front panel LED source selection */
+		.eoo   = (mcr & (1<<25))>>25  /* enable optical output */
 	};
 
-	return 0;
+	return mcr;
 }
 
 /**
