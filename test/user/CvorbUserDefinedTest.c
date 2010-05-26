@@ -6,6 +6,8 @@
 #include <sys/types.h>
 #include <limits.h>
 
+//#define GDB_TEST /* special test cases possible */
+
 /* directory management */
 #ifdef __Lynx__
 /* it is [direct] under lynx (outdated) */
@@ -43,6 +45,7 @@ int UserDefinedMenu(HANDLE handle, int lun)
 	int do_usr_wait = 0;
 	int fd, rc;
 	static int cvorbh;
+	struct mcr mcr;
 	int ch, fn, md;
 	uint val;
 	FILE *f;
@@ -76,14 +79,17 @@ int UserDefinedMenu(HANDLE handle, int lun)
 		printf("13 -- Set Module  Configuration register\n");
 		printf("14 -- Set Channel Configuration register\n");
 		printf("15 -- Enable/Disable on-board DAC\n");
+#ifdef GDB_TEST
 		printf("16 -- Test functionality (for driver "
 		       "developer ONLY!)\n");
+#endif
 		printf("\n> ");
 
 		scanf("%d", &choice);
 		getchar();
 
 		switch (choice) {
+#ifdef GDB_TEST
 		case 16:
 			{
 				do_usr_wait = 1;
@@ -91,9 +97,10 @@ int UserDefinedMenu(HANDLE handle, int lun)
                                 if (get_channel(&ch))
                                         break;
                                 cvorb_dac_on(cvorbh, ch, 0);
-				//	printf("Nothing to test\n");
+				//printf("Nothing to test\n");
 				break;
 			}
+#endif
 		case 1:
 			return(OK);
 			break;
@@ -143,12 +150,24 @@ int UserDefinedMenu(HANDLE handle, int lun)
 					ch = MAX_CHAN_AM;
 				}
 
-				for (; i <=ch; i++) {
-					cvorb_rd_mconfig(cvorbh, i, &data);
-					printf("+---------[ ch#%d ]--------\n",
-					       i);
-					printf("| Module Configuration reg  "
-					       "--> 0x%x\n", data);
+				for (; i <= ch; i++) {
+					data = cvorb_rd_mconfig_struct(cvorbh, i, &mcr);
+					printf("+---------[ ch#%d ]--------\n"
+					       "| Module Configuration reg --> 0x%x\n"
+					       "|\tmodule selection --> 0x%hx\n"
+					       "|\tinp pulses polar --> 0x%hx\n"
+					       "|\tDAC src sel      --> 0x%hx\n"
+					       "|\topticat out sel  --> 0x%hx\n"
+					       "|\tLED src sel      --> 0x%hx\n"
+					       "|\toptical out ON   --> 0x%hx\n\n",
+					       i,
+					       data,
+					       mcr.ms,
+					       mcr.ipp,
+					       mcr.dss,
+					       mcr.oop,
+					       mcr.fplss,
+					       mcr.eoo);
 
 					cvorb_rd_mstat(cvorbh, i, &data);
 					printf("| Module Status reg         "
@@ -181,8 +200,13 @@ int UserDefinedMenu(HANDLE handle, int lun)
 			do_usr_wait = 1;
 
 			i = soft_pulses();
-			if (i < 1)
+			if (i < 0)
 				break;
+
+			if (!i) {
+				do_usr_wait = 0;
+				break;
+			}
 
 			if (get_module(&md))
 				break;
@@ -486,24 +510,34 @@ int UserDefinedMenu(HANDLE handle, int lun)
 		case 15: { /* enable/disable onboard DAC */
 			uint32_t reg;
 			double dacfreq;
-			struct mcr mcr;
 			char c;
+			int dac_src[2]; /* DAC channels from both modules */
 			do_usr_wait = 1;
 			/* check status bit */
 			DaGetRegister(handle, CLK_GEN_CNTL_ID, &reg,
 				      sizeof(reg));
 			if (reg & (1<<28)) { /* ON */
+
+				/* read #1 module config register */
 				cvorb_rd_mconfig_struct(cvorbh, 1, &mcr);
+				dac_src[0] = mcr.dss;
+
+				/* read #2 module config register */
+				cvorb_rd_mconfig_struct(cvorbh, 9, &mcr);
+				dac_src[1] = mcr.dss;
+
 				dacfreq = cvorb_get_clk_freq(cvorbh);
 				printf("Onboard Clock Generator is ON."
-				       " Freq is %g Hz Chan %d\n",
-				       dacfreq, mcr.dss);
+				       " Freq is %g Hz. Chan are %d && %d\n",
+				       dacfreq, dac_src[0]+1, dac_src[1]+1+8);
 				printf("Switch it off? [y/n] --> ");
 				scanf("%c", &c);
 				getchar();
 				if (c == 'y') {
-					cvorb_dac_off(cvorbh);
-					printf("Done\n");
+					if ((rc = cvorb_dac_off(cvorbh)))
+						printf("Failed [%s]\n", cvorb_perr(rc));
+					else
+						printf("Done\n");
 				} else
 					printf("Abort\n");
 			} else { /* OFF */
@@ -515,8 +549,10 @@ int UserDefinedMenu(HANDLE handle, int lun)
 					ch = 1;
 					if (get_channel(&ch))
 						break;
-					cvorb_dac_on(cvorbh, ch, 0);
-					printf("Done\n");
+					if ((rc = cvorb_dac_on(cvorbh, ch, 0)))
+						printf("Failed [%s]\n", cvorb_perr(rc));
+					else
+						printf("Done\n");
 				} else
 					printf("Abort\n");
 			}
@@ -751,11 +787,13 @@ static int get_value(uint *val, uint min, uint max)
  *
  * @return Action to take -- if OK
  * @return < 0            -- if FAILED
+ * @return   0            -- aborted
  */
 static int soft_pulses()
 {
 	int res;
 	printf("Choose action to perform:\n\n"
+	       "[0] -- Abort\n"
 	       "[1] -- Module software reset\n"
 	       "[2] -- FPGA reset (global reset)\n"
 	       "[3] -- Module Software Start\n"
@@ -765,7 +803,7 @@ static int soft_pulses()
 	printf("--> ");
 	scanf("%d", &res);
 	getchar();
-	if (!WITHIN_RANGE(1, res, 6)) {
+	if (!WITHIN_RANGE(0, res, 6)) {
 		printf("ERROR! Requested operation is out-of-range\n");
 		return -1;
 	}
@@ -783,8 +821,9 @@ static int soft_pulses()
 		return SPR_MSSTP;
 	case 6:
 		return SPR_MSESTP;
+	case 0:
 	default:
-		return -1;
+		return 0;
 	}
 
 	return -1;
