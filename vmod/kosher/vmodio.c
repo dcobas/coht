@@ -90,7 +90,7 @@ static int __init init(void)
 	while (device < nlun) {
 		struct vmodio *dev = &device_table[device];
 		
-		if (!device_init(dev, lun[device], base_address[device])) {
+		if (device_init(dev, lun[device], base_address[device]) != 0) {
 			printk(KERN_ERR PFX "map failed! not configuring lun %d\n", 
 				dev->lun);
 			continue;
