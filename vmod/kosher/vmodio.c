@@ -86,8 +86,8 @@ static int __init init(void)
 		goto failed_init;
 	}
 
-	device = 0;
-	while (device < nlun) {
+	devices = 0;
+	for (device = 0; device < nlun; device++) {
 		struct vmodio *dev = &device_table[device];
 		
 		if (device_init(dev, lun[device], base_address[device]) != 0) {
@@ -97,10 +97,8 @@ static int __init init(void)
 		}
 		printk(KERN_INFO PFX "mapped at virtual address 0x%08lx\n",
 			dev->vaddr);
-		device++;
+		devices++;
 	}
-
-	devices = device;
 	printk(KERN_INFO PFX "%d devices configured\n", devices);
 	return 0;
 
