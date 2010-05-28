@@ -172,13 +172,13 @@ static int get_address_space(
 		printk(KERN_ERR PFX "non-existent lun %d\n", board_number);
 		return -1;
 	}
-	if ((board_position <= 0) || (board_position > VMODIO_SLOTS)) {
+	if ((board_position < 0) || (board_position >= VMODIO_SLOTS)) {
 		printk(KERN_ERR PFX "invalid VMOD/IO board position %d\n", board_position);
 		return -1;
 	}
 
 	/* parameters ok, set up mapping information */
-	asp->address = dev->vaddr + vmodio_offsets[board_position-1];
+	asp->address = dev->vaddr + vmodio_offsets[board_position];
 	asp->size = 0x200;
 	asp->width = 16;
 	asp->is_big_endian = 1;
