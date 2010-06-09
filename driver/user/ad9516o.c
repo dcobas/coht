@@ -187,8 +187,13 @@ static int ad9516o_calib_vco_sleep(int r, int freqref)
 	/* convert to tens of ms, rounding up */
 	interval = interval / 10 + !!(interval % 10);
 
-	/* sleep for 'interval' tens of ms */
-	tswait(NULL, SEM_SIGIGNORE, interval);
+	/*
+	 * sleep for, at least, 'interval' tens of ms.
+	 * We add one to the number of ticks to ensure that in a worst
+	 * case scenario (the first tick arrives immediately after tswait
+	 * is called) we still wait for at least 'interval' tens of ms.
+	 */
+	tswait(NULL, SEM_SIGIGNORE, interval + 1);
 
 	/* check for completion */
 	if (!(ad9516o_clkgen_read(AD9516_PLLREADBACK) & 0x40))
