@@ -20,16 +20,27 @@ static unsigned long base_address[MAX_DEVICES];
 static int nbase_address;
 module_param_array(base_address, ulong, &nbase_address, S_IRUGO);
 
+static int irq[MAX_DEVICES];
+static int nirq;
+module_param_array(irq, int, &nirq, S_IRUGO);
+
+static int irq_to_lun [MAX_DEVICES];
+static int irq_to_slot [MAX_DEVICES * VMODIO_SLOTS];
+
 /* description of a vmodio module */
 struct vmodio {
 	int		lun;		/* logical unit number */
 	unsigned long	vme_addr;	/* vme base address */
 	unsigned long	vaddr;		/* virtual address of MODULBUS
 							space */
+	int 		irq;		/* IRQ */
 };
 
 static struct vmodio device_table[MAX_DEVICES];
 static int devices;
+
+/* Matrix for register the isr callback functions */
+static isrcb_t mezzanines_callback[VMODIO_SLOTS][MAX_DEVICES];
 
 /* map vmodio VME address space */
 static struct pdparam_master param = {
@@ -48,13 +59,54 @@ static unsigned long vmodio_map(unsigned long base_address)
 		VMODIO_ADDRESS_MODIFIER, 0, VMODIO_DATA_SIZE, &param);               
 }
 
-static int device_init(struct vmodio *dev, int lun, unsigned long base_address)
+static irqreturn_t vmodio_interrupt(void *irq_id);
+
+static int device_init(struct vmodio *dev, int lun, unsigned long base_address, int irq)
 {
+	int ret;
+	int tmp;
+	int index = 0;
+
 	dev->lun	= lun;
 	dev->vme_addr	= base_address;
 	dev->vaddr	= vmodio_map(base_address);
+	dev->irq	= irq;
 
-	if (dev->vaddr == -1) 
+	tmp = (dev->irq >> 4) & 0x0f;
+	irq_to_lun[tmp] = lun;	
+	index = tmp * VMODIO_SLOTS;
+
+	/* The irq corresponding to the first slot is passed as argument to the driver */
+	irq_to_slot[index] = dev->irq;
+	ret = vme_request_irq(dev->irq, vmodio_interrupt, &irq_to_slot[index], "vmodio");
+	if(ret < 0){ 
+		printk(KERN_ERR PFX "Cannot register an irq to the device %d, error %d\n", 
+			  dev->lun, ret);
+	}
+
+	/* To the rest of slots, the irq is calculated using the constants VMODIO_SLOT_POS_x */
+	irq_to_slot[index + 1] = dev->irq - VMODIO_SLOT_POS_1;
+	ret = vme_request_irq((dev->irq - 1), vmodio_interrupt, &irq_to_slot[index + 1], "vmodio");
+	if(ret < 0){ 
+		printk(KERN_ERR PFX "Cannot register an irq to the device %d, error %d\n", 
+			  dev->lun, ret);
+	}
+
+	irq_to_slot[index + 2] = dev->irq - VMODIO_SLOT_POS_2;
+	ret = vme_request_irq((dev->irq - 3), vmodio_interrupt, &irq_to_slot[index + 2], "vmodio");
+	if(ret < 0){ 
+		printk(KERN_ERR PFX "Cannot register an irq to the device %d, error %d\n", 
+			  dev->lun, ret);
+	}
+
+	irq_to_slot[index + 3] = dev->irq - VMODIO_SLOT_POS_3;
+	ret = vme_request_irq((dev->irq - 7), vmodio_interrupt, &irq_to_slot[index + 3], "vmodio");
+	if(ret < 0){ 
+		printk(KERN_ERR PFX "Cannot register an irq to the device %d, error %d\n", 
+			  dev->lun, ret);
+	}
+		
+	if (dev->vaddr == -1)
 		return -1;
 	else
 		return 0;
@@ -64,13 +116,30 @@ static int get_address_space(
 	struct carrier_as *asp,
 	int board_number, int board_position, int address_space_number);
 
+static int register_isr(
+		int (*isr_callback)(
+					 int board_number,
+                                        int board_position,
+                                        void* extra),
+                int board_number, int board_position);
+
 static int __init init(void)
 {
 	int device = 0;
+	int i;
 
 	printk(KERN_INFO PFX "initializing driver\n");
 
-	if (carrier_register(DRIVER_NAME, get_address_space, NULL) != 0) {
+	/* Initialize the needed matrix for IRQ */
+	for (i = 0; i < MAX_DEVICES; i++){
+		irq_to_lun[i] = -1;
+		irq_to_slot[i * VMODIO_SLOTS] = -1;
+		irq_to_slot[i * VMODIO_SLOTS + 1] = -1;
+		irq_to_slot[i * VMODIO_SLOTS + 2] = -1;
+		irq_to_slot[i * VMODIO_SLOTS + 3] = -1;
+	}
+
+	if (modulbus_carrier_register(DRIVER_NAME, get_address_space, register_isr) != 0) {
 		printk(KERN_ERR PFX "could not register %s module\n",
 			DRIVER_NAME);
 		goto failed_init;
@@ -88,10 +157,10 @@ static int __init init(void)
 	}
 
 	devices = 0;
-	for (device = 0; device < nlun; device++) {
+	for (device = 0; device < nlun; device++){
 		struct vmodio *dev = &device_table[device];
 		
-		if (device_init(dev, lun[device], base_address[device]) != 0) {
+		if (device_init(dev, lun[device], base_address[device], irq[device])) {
 			printk(KERN_ERR PFX "map failed! not configuring lun %d\n", 
 				dev->lun);
 			continue;
@@ -101,6 +170,18 @@ static int __init init(void)
 		devices++;
 	}
 	printk(KERN_INFO PFX "%d devices configured\n", devices);
+{
+	gas_t gas;
+	int l, s;
+	struct carrier_as as, *asp = &as;
+	gas = modulbus_carrier_as_entry("vmodio");
+	for (l = 0; l < 2; l++)
+	for(s = 0; s < 4; s++) {
+		gas(asp, l, s, 1);
+		printk(KERN_INFO PFX "address space for lun=%d, slot=%d at 0x%lx\n",
+			l, s, asp->address);
+	}
+}	
 	return 0;
 
 failed_init:
@@ -110,6 +191,12 @@ failed_init:
 
 static void __exit exit(void)
 {
+	int i;
+	
+	for(i = 0; i < MAX_DEVICES * VMODIO_SLOTS; i++){
+		if(irq_to_slot[i] >= 0)
+			vme_free_irq(irq_to_slot[i]);
+	}
 }
 
 module_init(init);
@@ -124,6 +211,12 @@ MODULE_DESCRIPTION("VMODIO driver");
 static int get_address_space(
 	struct carrier_as *asp,
 	int board_number, int board_position, int address_space_number);
+
+static int register_isr(int (*isr_callback)(
+					 int board_number,
+                                        int board_position,
+                                        void* extra),
+                int board_number, int board_position);
 
 static int vmodio_offsets[VMODIO_SLOTS] = {
 	VMODIO_SLOT0,
@@ -155,7 +248,7 @@ struct vmodio *lun_to_dev(int lun)
  * @param address_space_number
  *                      - must be 1 (only one address space available)
  * @return 0 on success
- * @retrun != 0 on failure
+ * @return != 0 on failure
  */
 static int get_address_space(
 	struct carrier_as *asp,
@@ -201,3 +294,87 @@ int  vmodio_get_address_space(
 	return	get_address_space(as, board_number, board_position, address_space_number);
 }
 EXPORT_SYMBOL_GPL(vmodio_get_address_space);
+
+
+/**
+ * @brief Save a isr_callback of each mezzanine connected.
+ *
+ * VMOD/IO saves the isr callback function of each mezzanine's driver
+ * to call it when an interrupt occurs.
+ *
+ * @param isr_callback  - IRQ callback function to be called.
+ * @param board_number - lun of the carrier where the requesting mezzanine is plugged in
+ * @param board_position - slot the requesting mezzanine is plugged in
+ * @return 0 on success
+ * @retrun != 0 on failure
+ */
+static int register_isr(int (*isr_callback)(
+					    int board_number,
+					    int board_position,
+					    void* extra),
+			    int board_number, int board_position)
+{
+
+	/* Adds the isr_callback if the carrier number and slot are correct. */
+	if(board_number >= 0 && board_number < MAX_DEVICES &&
+			board_position >= 0 && board_position < VMODIO_SLOTS){
+		mezzanines_callback[board_number][board_position] = (isrcb_t) isr_callback;
+	}
+	else{
+		printk(KERN_ERR PFX "Invalid VMOD/IO board number %d or board position %d\n",
+				board_number, board_position);
+		return -1;
+	}
+
+        return 0;
+}
+
+static irqreturn_t vmodio_interrupt(void *irq_id)
+{
+	int tmp;
+	int carrier_number = -1;
+	short board_position = -1;
+
+	int irq = *(int *)irq_id;
+
+	/* Get the interrupt vector to know the lun of the matched carrier */
+	tmp = (irq >> 4) & 0x0f;
+
+	carrier_number = irq_to_lun[tmp];
+
+	/* Get the interrupt vector to know the slot */
+	tmp = irq & 0x0f;
+
+	switch(tmp){
+	case 0xe:
+		board_position = 0;
+		break;
+	case 0xd:
+		board_position = 1;
+		break;
+	case 0xb:
+		board_position = 2;
+		break;
+	case 0x7:
+		board_position = 3;
+		break;
+	default:
+		board_position = -1;
+	}
+	
+	printk(KERN_ERR PFX "Interrupt carrier %d slot %d\n", carrier_number, board_position);
+
+	if (board_position < 0 || board_position >= VMODIO_SLOTS || carrier_number < 0
+	    || carrier_number >= MAX_DEVICES){
+		printk(KERN_ERR PFX "invalid board_number interrupt: carrier %d board_position %d\n",
+			    carrier_number, board_position);
+		return IRQ_NONE;
+	}
+
+	if ((mezzanines_callback[carrier_number][board_position] == NULL) ||
+	    (mezzanines_callback[carrier_number][board_position] (carrier_number, board_position, NULL) == -1))
+		return IRQ_NONE;
+
+	return IRQ_HANDLED;
+}
+
