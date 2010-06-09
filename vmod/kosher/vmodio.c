@@ -1,9 +1,10 @@
 #include <linux/module.h>
+#include <linux/interrupt.h>
 #include <vmebus.h>
 #include "vmodio.h"
 #include "modulbus_register.h"
 
-#define	MAX_DEVICES	64
+#define	MAX_DEVICES	16
 #define	DRIVER_NAME	"vmodio"
 #define	PFX		DRIVER_NAME ": "
 
