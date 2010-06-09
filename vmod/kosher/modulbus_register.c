@@ -45,7 +45,7 @@ static int already_present(char *name)
  *  @param gas	Its get_address_space entry point
  *  @param risr	Its register_isr entry point
  */
-int carrier_register(char *name, gas_t gas, risr_t risr) 
+int modulbus_carrier_register(char *name, gas_t gas, risr_t risr)
 {
 	int err = -1;
 	struct register_entry *this;
@@ -79,7 +79,7 @@ int carrier_register(char *name, gas_t gas, risr_t risr)
 fail:	mutex_unlock(&register_mutex);
 	return err;
 }
-EXPORT_SYMBOL(carrier_register);
+EXPORT_SYMBOL(modulbus_carrier_register);
 
 /** @brief get a carrier's entry point for getting address spaces 
  *  @param - official name of the carrier driver
@@ -87,7 +87,7 @@ EXPORT_SYMBOL(carrier_register);
  *  @return - a valid pointer to the entry point
  *  @return - NULL on failure
  */
-gas_t	carrier_as_entry(char *carrier)
+gas_t	modulbus_carrier_as_entry(char *carrier)
 {
 	int i;
 
@@ -97,7 +97,7 @@ gas_t	carrier_as_entry(char *carrier)
 	}
 	return NULL;
 }
-EXPORT_SYMBOL(carrier_as_entry);
+EXPORT_SYMBOL(modulbus_carrier_as_entry);
 
 /** @brief get a carrier's entry point for registering ISR callbacks 
  *  @param - official name of the carrier driver
@@ -105,7 +105,7 @@ EXPORT_SYMBOL(carrier_as_entry);
  *  @return - a valid pointer to the entry point
  *  @return - NULL on failure
  */
-risr_t	carrier_isr_entry(char *carrier)
+risr_t	modulbus_carrier_isr_entry(char *carrier)
 {
 	int i;
 
@@ -115,7 +115,7 @@ risr_t	carrier_isr_entry(char *carrier)
 	}
 	return NULL;
 }
-EXPORT_SYMBOL(carrier_isr_entry);
+EXPORT_SYMBOL(modulbus_carrier_isr_entry);
 
 /* usual housekeeping */
 MODULE_LICENSE("GPL");

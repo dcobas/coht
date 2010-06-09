@@ -34,7 +34,7 @@ struct carrier_as {
  *  @return 0 on success
  *  @return <0 on failure
  */
-int get_address_space_prototype(
+int modulbus_get_address_space_prototype(
 	struct carrier_as *as,
 	int board_number, 
 	int board_position, 
@@ -59,11 +59,10 @@ int get_address_space_prototype(
  *  @param board_position	Slot of mezzanine in carrier bus (1..M)
  *  @param extra		For additional info (cookies, whatever)
  */
-int register_isr_prototype(
-	int (*isr_callback)(
-		int board_number, 
-		int board_position, 
-		void* extra));
+int modulbus_register_isr_prototype(
+	int (*isr_callback)(void* extra),
+	int board_number,
+	int board_position);
 
 /* @brief type of a get_address_space entry point */
 typedef int (*gas_t)(
@@ -76,8 +75,15 @@ typedef int (*gas_t)(
 typedef int (*risr_t)(
 	int (*isr_callback)(
 		int board_number, 
-		int board_position, 
-		void* extra));
+		int board_position,
+		void* extra),
+	int board_number,
+	int board_position);
+
+typedef int (*isrcb_t)(
+	int board_number,
+	int board_position,
+	void* extra);
 
 /** @brief register a carrier's entry points in the carrier 
  *  register module
@@ -88,7 +94,7 @@ typedef int (*risr_t)(
  *  @return 0 on success
  *  @return <0 on failure
  */
-int carrier_register(
+int modulbus_carrier_register(
 	char   *carrier_type,
 	gas_t   get_address_space,
 	risr_t  register_isr);
@@ -99,7 +105,7 @@ int carrier_register(
  *  @return - a valid pointer to the entry point
  *  @return - NULL on failure
  */
-gas_t	carrier_as_entry(char *carrier);
+gas_t	modulbus_carrier_as_entry(char *carrier);
 
 /** @brief get a carrier's entry point for registering ISR callbacks 
  *  @param - official name of the carrier driver
@@ -107,6 +113,6 @@ gas_t	carrier_as_entry(char *carrier);
  *  @return - a valid pointer to the entry point
  *  @return - NULL on failure
  */
-risr_t	carrier_isr_entry(char *carrier);
+risr_t	modulbus_carrier_isr_entry(char *carrier);
 
 #endif /*_CARRIER_H_ */
