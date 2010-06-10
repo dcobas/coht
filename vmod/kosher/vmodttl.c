@@ -10,6 +10,10 @@
 #include "vmodttl.h"
 #include "cio8536.h"
 #include "modulbus_register.h"
+#include "lunargs.h"
+
+#define DRIVER_NAME	"vmodttl"
+#define PFX		DRIVER_NAME ": "
 
 struct message_list {
 	struct list_head list;
@@ -39,32 +43,11 @@ struct vmodttl_dev{
 };
 
 
-static int lun[VMODTTL_MAX_BOARDS];
-static int num_lun;
-module_param_array(lun, int, &num_lun, S_IRUGO);
-MODULE_PARM_DESC(lun, "Logical Unit Number of the VMOD-TTL board");
-
-static char *carrier[CARRIER_NAME * VMODTTL_MAX_BOARDS];
-static int num_carrier;
-module_param_array(carrier, charp, &num_carrier, S_IRUGO);
-MODULE_PARM_DESC(carrier, "Name of the carrier in which the VMOD-TTL is plugged in.");
-
-static int carrier_number[VMODTTL_MAX_BOARDS];
-static int num_carrier_number;
-module_param_array(carrier_number, int, &num_carrier_number, S_IRUGO);
-MODULE_PARM_DESC(carrier_number, "Logical Unit Number of the carrier");
-
-static int slot[VMODTTL_MAX_BOARDS];
-static int num_slot;
-module_param_array(slot, int, &num_slot, S_IRUGO);
-MODULE_PARM_DESC(slot, "Slot of the carrier in which the VMOD-TTL board is placed.");
-
 /* The One And Only Device (OAOD) */
 struct cdev                     cdev;
 
 /* module config tables */
-static struct vmodttl    modules[VMODTTL_MAX_BOARDS];
-static int                      lun_to_dev[VMODTTL_MAX_BOARDS];
+static struct vmod_devices    dt, *dev_table = &dt;
 
 /* The One And Only Device (OAOD) */
 static dev_t devno;
@@ -486,77 +469,16 @@ struct file_operations vmodttl_fops = {
         .release =	vmodttl_release
 };
 
-
-
-static int check_lun_args(void)
-{
-	int i;
-
-	if((num_lun != num_carrier) || (num_lun != num_carrier_number) || (num_lun != num_slot) ||
-		(num_lun > VMODTTL_MAX_BOARDS)) {
-		printk(KERN_ERR "VMODTTL: the number of parameters doesn't match or is invalid\n");
-		return -1;
-	}
-	
-	for(i=0; i < num_lun ; i++){
-		int lun_d 		= (int) lun[i];
-		char *cname 		= carrier[i];
-		int carrier_num 	= (int)carrier_number[i];
-		int slot_board 		= (int)slot[i];
-
-		struct vmodttl 	*module = &(modules[i]);
-		struct carrier_as 	as, *asp  = &as;
-		gas_t 			get_address_space;
-
-		if (lun_d < 0 || lun_d > VMODTTL_MAX_BOARDS){
-			printk(KERN_ERR "VMODTTL Invalid lun: %d\n", lun_d);
-			module->lun = -1;
-			continue;
-		}
-		
-		get_address_space = modulbus_carrier_as_entry(cname);
-
-		if (get_address_space == NULL) {
-			printk(KERN_ERR "No carrier %s\n", cname);
-			return -1;
-		} else
-			printk(KERN_INFO "Carrier %s a.s. entry point at %p\n",
-					cname, get_address_space);
-		if (get_address_space(asp, carrier_num, slot_board, 1) <= 0){
-			printk(KERN_ERR "VMODTTL Invalid carrier number: %d or slot: %d\n",
-				  carrier_num, slot_board);
-			module->lun = -1;
-			continue;
-		}
-
-		module->lun           = lun_d;
-		module->cname         = cname;
-		module->carrier       = carrier_num;
-		module->slot          = slot_board;
-		module->address       = asp->address;
-
-		module->is_big_endian = asp->is_big_endian;
-		lun_to_dev[lun_d]       = i;
-
-		printk(KERN_INFO "VMODTTL handle is %lx. Big Endian %d\n", module->address, module->is_big_endian);
-		printk(KERN_INFO
-				"    module<%d>: lun %d with "
-				"carrier %s carrier_number = %d slot = %d\n",
-				i, lun_d, cname, carrier_num, slot_board);
-	}
-        
-        return 0;
-}
-
 static int __init vmodttl_init(void)
 {
 	int err;
 	int i;
 	struct vmodttl_dev *pd;
 
-        printk(KERN_INFO "Initializing module with lun=%d/%d\n", num_lun, VMODTTL_MAX_BOARDS);
+        printk(KERN_INFO PFX "initializing driver for %di (max %d) cards\n",
+		dev_table->num_modules, VMODTTL_MAX_BOARDS);
 
-        err = check_lun_args();
+        err = read_params(DRIVER_NAME, dev_table);
         if (err != 0)
                 return -1;
 
@@ -564,7 +486,7 @@ static int __init vmodttl_init(void)
         if (err != 0) 
 		goto fail_chrdev;
 
-        printk(KERN_INFO "Allocated devno %0x\n",devno);
+        printk(KERN_INFO "Allocated devno %0x\n", devno);
 
         cdev_init(&cdev, &vmodttl_fops);
         cdev.owner = THIS_MODULE;
@@ -574,9 +496,8 @@ static int __init vmodttl_init(void)
 		goto fail_cdev;
 	}
 
-	for(i = 0; i < num_lun ; i++){ 
-		if(modules[i].lun == -1)
-			continue;
+	for(i = 0; i < dev_table->num_modules; i++){ 
+		struct vmod_dev	*mod = &dev_table->module[i];
 
 		pd = kzalloc(sizeof(struct vmodttl_dev), GFP_KERNEL);
 
@@ -584,16 +505,16 @@ static int __init vmodttl_init(void)
 			goto fail_cdev;
 
 		pvmodttlDv[i] = (void *)pd;
-		pd->handle = modules[i].address;
-		pd->dev = i;
+		pd->handle = mod->address;
+		pd->dev = lun_to_index(dev_table, i);
 		pd->OpenCount = 0;
 		pd->io_flag = 0;
 		pd->open_collector = 0; /* All of channels are open drain by default */
 		pd->created = 1;
-		pd->is_big_endian = modules[i].is_big_endian;
-		pd->board_number = modules[i].carrier;
-		pd->board_position = modules[i].slot;
-		pd->cname = modules[i].cname;
+		pd->cname          = mod->carrier_name;
+		pd->board_number   = mod->carrier_lun;
+		pd->board_position = mod->slot;
+		pd->is_big_endian  = mod->is_big_endian;
 
 		spin_lock_init(&pd->vmodttl_spinlock);
 		vmodttl_default(pd);
@@ -613,7 +534,7 @@ static void __exit vmodttl_exit(void)
 	cdev_del(&cdev);
         unregister_chrdev_region(devno, VMODTTL_MAX_BOARDS);
 	
-	for(i =0; i < num_lun; i++)
+	for(i =0; i < dev_table->num_modules; i++)
 	{
 		if(pvmodttlDv[i] != 0)
 		{
@@ -631,4 +552,3 @@ MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Samuel Iglesias Gonsalvez");
 MODULE_DESCRIPTION("VMOD-TTL device driver");
 MODULE_VERSION("1.0");
-
