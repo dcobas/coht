@@ -107,4 +107,3 @@ int lun_to_index(struct vmod_devices *devs, int lun)
 			return i;
 	return -1;
 }
-
