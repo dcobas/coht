@@ -1,5 +1,10 @@
+#include <linux/kernel.h>
+#include <linux/module.h>
+#include "modulbus_register.h"
+
 /** Maximum number of VMOD-XXX mezzanine boards in a crate */
 #define VMOD_MAX_BOARDS	64
+#define PFX "VMOD args: "
 
 struct vmod_dev {
 	int             lun;            /** logical unit number */
@@ -7,7 +12,7 @@ struct vmod_dev {
 	int             carrier_lun;    /** supporting carrier */
 	int             slot;           /** slot we're plugged in */
 	unsigned long	address;	/** virtual address of mz a.s.  */
-	int		is_big_endian;
+	int		is_big_endian;	/** probably useless in MODULBUS */
 };
 
 struct vmod_devices {
@@ -21,7 +26,7 @@ static int num_lun;
 module_param_array(lun, int, &num_lun, S_IRUGO);
 MODULE_PARM_DESC(lun, "Logical Unit Number of the VMOD-XXX board");
 
-static char *carrier[CARRIER_NAME * VMOD_MAX_BOARDS];
+static char *carrier[VMOD_MAX_BOARDS];
 static int num_carrier;
 module_param_array(carrier, charp, &num_carrier, S_IRUGO);
 MODULE_PARM_DESC(carrier, "Name of the carrier in which the VMOD-XXX is plugged in.");
@@ -36,79 +41,85 @@ static int num_slot;
 module_param_array(slot, int, &num_slot, S_IRUGO);
 MODULE_PARM_DESC(slot, "Slot of the carrier in which the VMOD-XXX board is placed.");
 
-/* module config table */
-static struct vmod_layout args;
-
-#define PFX "VMOD args: "
-struct vmod_dev {
-	int             lun;            /** logical unit number */
-	char            *carrier_name;  /** carrier name */
-	int             carrier_lun;    /** supporting carrier */
-	int             slot;           /** slot we're plugged in */
-	unsigned long	address;	/** virtual address of mz a.s.  */
-	int		is_big_endian;
-};
-
-
-static int check_lun_args(char *driver_name, struct vmod_devices *devs)
+static int set_module_params(struct vmod_dev *module,
+	int lun, char *cname, int carrier_lun, int slot)
 {
-	int i;
+	gas_t			get_address_space;
+	struct carrier_as	as, *asp = &as;
 
-	if ((num_lun != num_carrier) || (num_lun != num_carrier_number) || (num_lun != num_slot) ||
-		(num_lun > VMOD_MAX_BOARDS)) {
+	/* Sanity check parameters */
+	if (lun < 0) {
+		printk(KERN_ERR PFX "invalid lun: %d\n", lun);
+		return -1;
+	}
+	get_address_space = modulbus_carrier_as_entry(cname);
+	if (get_address_space == NULL) {
+		printk(KERN_ERR PFX "No carrier %s\n", cname);
+		return -1;
+	} else
+		printk(KERN_INFO PFX 
+			"Carrier %s get_address_space entry point at %p\n",
+			module->carrier_name, get_address_space);
+	if (get_address_space(asp, carrier_lun, slot, 1) <= 0){
+		printk(KERN_ERR PFX 
+			"Invalid carrier number: %d or slot: %d\n",
+			carrier_lun, slot);
+		return -1;
+	}
+
+	/* Parameters OK, go ahead */
+	module->lun           = lun;           
+	module->carrier_name  = cname;       
+	module->carrier_lun   = carrier_lun;
+	module->slot          = slot;          
+	module->is_big_endian = asp->is_big_endian;
+	return 0;
+}
+
+int read_params(char *driver_name, struct vmod_devices *devs)
+{
+	int i, device;
+
+	/* check that all insmod argument vectors are the same length */
+	if (num_lun != num_carrier || num_lun != num_carrier_number || 
+		num_lun != num_slot || num_lun >= VMOD_MAX_BOARDS) {
 		printk(KERN_ERR PFX "the number of parameters doesn't match or is invalid\n");
 		return -1;
 	}
 
 	device = 0;
-	for(i=0; i < num_lun ; i++){
-		int lun_d 		= (int) lun[i];
-		char *cname 		= carrier[i];
-		int carrier_num 	= (int)carrier_number[i];
-		int slot_board 		= (int)slot[i];
+	for (i=0; i < num_lun ; i++) {
+		int 			ret;
+		struct vmod_dev 	*module = &devs->module[i];
 
-		struct vmod_dev 	*module = &(modules[i]);
-		struct carrier_as 	as, *asp  = &as;
-		gas_t 			get_address_space;
-
-		declare_device(&devs[i], 
-		if (lun_d < 0){
-			printk(KERN_ERR PFX 
-				"%s, invalid lun: %d\n", driver_name, lun_d);
-			module->lun = -1;
-			continue;
-		}
-		
-		get_address_space = modulbus_carrier_as_entry(cname);
-		if (get_address_space == NULL) {
-			printk(KERN_ERR PFX "No carrier %s\n", cname);
+		printk(KERN_INFO PFX 
+			"configuring %s lun %d\n", driver_name, lun[i]);
+		ret = set_module_params(module, 
+			lun[i], carrier[i], carrier_number[i], slot[i]);
+		if (ret != 0)
 			return -1;
-		} else
-			printk(KERN_INFO PFX "Carrier %s a.s. entry point at %p\n",
-					cname, get_address_space);
-		if (get_address_space(asp, carrier_num, slot_board, 1) <= 0){
-			printk(KERN_ERR PFX "Invalid carrier number: %d or slot: %d\n",
-				  carrier_num, slot_board);
-			module->lun = -1;
-			continue;
-		}
 
-		module->lun           = lun_d;
-		module->cname         = cname;
-		module->carrier       = carrier_num;
-		module->slot          = slot_board;
-		module->address       = asp->address;
-
-		module->is_big_endian = asp->is_big_endian;
-		lun_to_dev[lun_d]       = i;
-
-		printk(KERN_INFO PFX "%s handle is %lx. Big Endian %d\n", 
-			module->address, module->is_big_endian);
+		device++;
+		printk(KERN_INFO PFX "%s mapped at vaddr %lx",
+			driver_name, module->address);
 		printk(KERN_INFO PFX
-				"    module<%d>: lun %d with "
-				"carrier %s carrier_number = %d slot = %d\n",
-				i, lun_d, cname, carrier_num, slot_board);
+			"    module<%02d>: lun %02d" 
+			" carrier %10s carrier_number = %02d slot = %02d\n",
+			i, module->lun, module->carrier_name, 
+			module->carrier_lun, module->slot);
 	}
+	devs->num_modules = device;
         
         return 0;
 }
+
+int lun_to_index(struct vmod_devices *devs, int lun)
+{
+	int i;
+
+	for (i = 0; i < devs->num_modules; i++) 
+		if (lun == devs->module[i].lun)
+			return i;
+	return -1;
+}
+
