@@ -1,24 +1,9 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include "modulbus_register.h"
+#include "lunargs.h"
 
-/** Maximum number of VMOD-XXX mezzanine boards in a crate */
-#define VMOD_MAX_BOARDS	64
 #define PFX "VMOD args: "
-
-struct vmod_dev {
-	int             lun;            /** logical unit number */
-	char            *carrier_name;  /** carrier name */
-	int             carrier_lun;    /** supporting carrier */
-	int             slot;           /** slot we're plugged in */
-	unsigned long	address;	/** virtual address of mz a.s.  */
-	int		is_big_endian;	/** probably useless in MODULBUS */
-};
-
-struct vmod_devices {
-	int			num_modules;
-	struct vmod_dev		module[VMOD_MAX_BOARDS];
-};
 
 /* module parameters */
 static int lun[VMOD_MAX_BOARDS];
