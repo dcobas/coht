@@ -40,6 +40,15 @@ MODULE_PARM_DESC(slot, "Slot of the carrier in which the VMOD-XXX board is place
 static struct vmod_layout args;
 
 #define PFX "VMOD args: "
+struct vmod_dev {
+	int             lun;            /** logical unit number */
+	char            *carrier_name;  /** carrier name */
+	int             carrier_lun;    /** supporting carrier */
+	int             slot;           /** slot we're plugged in */
+	unsigned long	address;	/** virtual address of mz a.s.  */
+	int		is_big_endian;
+};
+
 
 static int check_lun_args(char *driver_name, struct vmod_devices *devs)
 {
@@ -50,7 +59,8 @@ static int check_lun_args(char *driver_name, struct vmod_devices *devs)
 		printk(KERN_ERR PFX "the number of parameters doesn't match or is invalid\n");
 		return -1;
 	}
-	
+
+	device = 0;
 	for(i=0; i < num_lun ; i++){
 		int lun_d 		= (int) lun[i];
 		char *cname 		= carrier[i];
@@ -61,7 +71,8 @@ static int check_lun_args(char *driver_name, struct vmod_devices *devs)
 		struct carrier_as 	as, *asp  = &as;
 		gas_t 			get_address_space;
 
-		if (lun_d < 0 || lun_d > VMOD_MAX_BOARDS){
+		declare_device(&devs[i], 
+		if (lun_d < 0){
 			printk(KERN_ERR PFX 
 				"%s, invalid lun: %d\n", driver_name, lun_d);
 			module->lun = -1;
@@ -76,7 +87,7 @@ static int check_lun_args(char *driver_name, struct vmod_devices *devs)
 			printk(KERN_INFO PFX "Carrier %s a.s. entry point at %p\n",
 					cname, get_address_space);
 		if (get_address_space(asp, carrier_num, slot_board, 1) <= 0){
-			printk(KERN_ERR PFX "VMODTTL Invalid carrier number: %d or slot: %d\n",
+			printk(KERN_ERR PFX "Invalid carrier number: %d or slot: %d\n",
 				  carrier_num, slot_board);
 			module->lun = -1;
 			continue;
@@ -91,7 +102,8 @@ static int check_lun_args(char *driver_name, struct vmod_devices *devs)
 		module->is_big_endian = asp->is_big_endian;
 		lun_to_dev[lun_d]       = i;
 
-		printk(KERN_INFO PFX "VMODTTL handle is %lx. Big Endian %d\n", module->address, module->is_big_endian);
+		printk(KERN_INFO PFX "%s handle is %lx. Big Endian %d\n", 
+			module->address, module->is_big_endian);
 		printk(KERN_INFO PFX
 				"    module<%d>: lun %d with "
 				"carrier %s carrier_number = %d slot = %d\n",
