@@ -170,18 +170,7 @@ static int __init init(void)
 		devices++;
 	}
 	printk(KERN_INFO PFX "%d devices configured\n", devices);
-{
-	gas_t gas;
-	int l, s;
-	struct carrier_as as, *asp = &as;
-	gas = modulbus_carrier_as_entry("vmodio");
-	for (l = 0; l < 2; l++)
-	for(s = 0; s < 4; s++) {
-		gas(asp, l, s, 1);
-		printk(KERN_INFO PFX "address space for lun=%d, slot=%d at 0x%lx\n",
-			l, s, asp->address);
-	}
-}	
+
 	return 0;
 
 failed_init:
