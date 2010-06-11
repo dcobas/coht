@@ -6,7 +6,7 @@
 #define DRIVER_NAME_MAX_LENGTH	128
 #define REGISTER_SIZE		32
 #define	MODULE_NAME		"modulbus"
-#define	PFX 			MODULE_NAME ": "
+#define PFX 			MODULE_NAME ": "
 
 struct register_entry {
 	char	name[DRIVER_NAME_MAX_LENGTH];
@@ -73,7 +73,7 @@ int modulbus_carrier_register(char *name, gas_t gas, risr_t risr)
 	this->get_address_space = gas;
 	this->register_isr 	= risr;
 	err = 0;
-	printk(KERN_INFO PFX
+	printk(KERN_INFO PFX 
 		"carrier %s get_address_space entry point at %p\n"
 		"carrier %s register_isr  entry point at %p\n",
 		name, gas, name, risr);
