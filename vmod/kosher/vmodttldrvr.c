@@ -475,12 +475,13 @@ static int __init vmodttl_init(void)
 	int i;
 	struct vmodttl_dev *pd;
 
-        printk(KERN_INFO PFX "initializing driver for %d (max %d) cards\n",
-		dev_table->num_modules, VMODTTL_MAX_BOARDS);
+        printk(KERN_INFO PFX "reading parameters\n");
 
         err = read_params(DRIVER_NAME, dev_table);
         if (err != 0)
                 return -1;
+        printk(KERN_INFO PFX "initialized driver for %d (max %d) cards\n",
+		dev_table->num_modules, VMODTTL_MAX_BOARDS);
 
         err = alloc_chrdev_region(&devno, 0, VMODTTL_MAX_BOARDS, "vmodttl");
         if (err != 0) 
