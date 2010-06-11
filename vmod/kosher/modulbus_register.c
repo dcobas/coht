@@ -29,14 +29,14 @@ static void __exit exit(void)
 }
 
 /* check whether carrier driver is already registered */
-static int already_present(char *name)
+static int find_carrier_index(char *name)
 {
 	int i;
 
 	for (i = 0; i < used_entries; i++)
 		if (strcmp(cregister[i].name, name) == 0)
-			return 1;
-	return 0;
+			return i;
+	return -1;
 }
 
 /** @brief register a carrier driver's entry points 
@@ -61,7 +61,7 @@ int modulbus_carrier_register(char *name, gas_t gas, risr_t risr)
 	}
 
 	mutex_lock(&register_mutex);
-	if (already_present(name)) {
+	if (find_carrier_index(name) >= 0) {
 		printk(KERN_ERR "carrier %s already registered\n",
 			name);
 		goto fail;
@@ -80,6 +80,28 @@ fail:	mutex_unlock(&register_mutex);
 	return err;
 }
 EXPORT_SYMBOL(modulbus_carrier_register);
+
+int modulbus_carrier_unregister(char *name)
+{
+	int idx, i;
+
+	printk(KERN_INFO "unregistering carrier %s\n", name);
+
+	mutex_lock(&register_mutex);
+	idx = find_carrier_index(name);
+	if (idx < 0) {
+		printk(KERN_ERR "carrier %s not found\n", name);
+		mutex_unlock(&register_mutex);
+		return -1;
+	}
+	used_entries--;
+	for (i = idx; i < used_entries; i++)
+		cregister[i] = cregister[i+1];
+
+	mutex_unlock(&register_mutex);
+	return 0;
+}
+EXPORT_SYMBOL(modulbus_carrier_unregister);
 
 /** @brief get a carrier's entry point for getting address spaces 
  *  @param - official name of the carrier driver

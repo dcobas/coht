@@ -99,6 +99,16 @@ int modulbus_carrier_register(
 	gas_t   get_address_space,
 	risr_t  register_isr);
 
+/** @brief unregister a carrier from the entry point list
+ *
+ * @param	name	official name of the driver
+ * 
+ * @return	0 on success
+ * @return <0 on failure
+ */
+
+int modulbus_carrier_unregister(char *name);
+
 /** @brief get a carrier's entry point for getting address spaces 
  *  @param - official name of the carrier driver
  *
