@@ -5,6 +5,8 @@
 
 #define DRIVER_NAME_MAX_LENGTH	128
 #define REGISTER_SIZE		32
+#define	MODULE_NAME		"modulbus"
+#define	PFX 			MODULE_NAME ": "
 
 struct register_entry {
 	char	name[DRIVER_NAME_MAX_LENGTH];
@@ -19,13 +21,13 @@ DEFINE_MUTEX(register_mutex);
 /* module initialization and cleanup */
 static int __init init(void)
 {
-	printk(KERN_INFO "carrier register module init\n");
+	printk(KERN_INFO PFX "carrier register module init\n");
 	return 0;
 }
 
 static void __exit exit(void)
 {
-	printk(KERN_INFO "carrier register module exit\n");
+	printk(KERN_INFO PFX "carrier register module exit\n");
 }
 
 /* check whether carrier driver is already registered */
@@ -50,19 +52,19 @@ int modulbus_carrier_register(char *name, gas_t gas, risr_t risr)
 	int err = -1;
 	struct register_entry *this;
 
-	printk(KERN_INFO "registering carrier %s\n", name);
+	printk(KERN_INFO PFX "registering carrier %s\n", name);
 	if (used_entries >= REGISTER_SIZE) {
-		printk(KERN_ERR "too many carriers\n");
+		printk(KERN_ERR PFX "too many carriers\n");
 		return err;
 	}
 	if (strlen(name) > DRIVER_NAME_MAX_LENGTH) {
-		printk(KERN_ERR "carrier name too long\n");
+		printk(KERN_ERR PFX "carrier name too long\n");
 		return err;
 	}
 
 	mutex_lock(&register_mutex);
 	if (find_carrier_index(name) >= 0) {
-		printk(KERN_ERR "carrier %s already registered\n",
+		printk(KERN_ERR PFX "carrier %s already registered\n",
 			name);
 		goto fail;
 	}
@@ -71,7 +73,7 @@ int modulbus_carrier_register(char *name, gas_t gas, risr_t risr)
 	this->get_address_space = gas;
 	this->register_isr 	= risr;
 	err = 0;
-	printk(KERN_INFO 
+	printk(KERN_INFO PFX
 		"carrier %s get_address_space entry point at %p\n"
 		"carrier %s register_isr  entry point at %p\n",
 		name, gas, name, risr);
@@ -85,12 +87,12 @@ int modulbus_carrier_unregister(char *name)
 {
 	int idx, i;
 
-	printk(KERN_INFO "unregistering carrier %s\n", name);
+	printk(KERN_INFO PFX "unregistering carrier %s\n", name);
 
 	mutex_lock(&register_mutex);
 	idx = find_carrier_index(name);
 	if (idx < 0) {
-		printk(KERN_ERR "carrier %s not found\n", name);
+		printk(KERN_ERR PFX "carrier %s not found\n", name);
 		mutex_unlock(&register_mutex);
 		return -1;
 	}
