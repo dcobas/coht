@@ -192,11 +192,13 @@ failed_init:
 static void __exit exit(void)
 {
 	int i;
-	
+
+	printk(KERN_INFO PFX "uninstalling driver\n");
 	for(i = 0; i < MAX_DEVICES * VMODIO_SLOTS; i++){
 		if(irq_to_slot[i] >= 0)
 			vme_free_irq(irq_to_slot[i]);
 	}
+	modulbus_carrier_unregister(DRIVER_NAME);
 }
 
 module_init(init);
