@@ -59,7 +59,7 @@ static unsigned long vmodio_map(unsigned long base_address)
 		VMODIO_ADDRESS_MODIFIER, 0, VMODIO_DATA_SIZE, &param);               
 }
 
-static irqreturn_t vmodio_interrupt(void *irq_id);
+static int  vmodio_interrupt(void *irq_id);
 
 static int device_init(struct vmodio *dev, int lun, unsigned long base_address, int irq)
 {
@@ -329,7 +329,7 @@ static int register_isr(int (*isr_callback)(
         return 0;
 }
 
-static irqreturn_t vmodio_interrupt(void *irq_id)
+static int vmodio_interrupt(void *irq_id)
 {
 	int tmp;
 	int carrier_number = -1;
