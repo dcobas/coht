@@ -475,7 +475,7 @@ static int __init vmodttl_init(void)
 	int i;
 	struct vmodttl_dev *pd;
 
-        printk(KERN_INFO PFX "initializing driver for %di (max %d) cards\n",
+        printk(KERN_INFO PFX "initializing driver for %d (max %d) cards\n",
 		dev_table->num_modules, VMODTTL_MAX_BOARDS);
 
         err = read_params(DRIVER_NAME, dev_table);
