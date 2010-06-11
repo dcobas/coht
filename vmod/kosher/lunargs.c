@@ -44,7 +44,7 @@ static int set_module_params(struct vmod_dev *module,
 	} else
 		printk(KERN_INFO PFX 
 			"Carrier %s get_address_space entry point at %p\n",
-			module->carrier_name, get_address_space);
+			cname, get_address_space);
 	if (get_address_space(asp, carrier_lun, slot, 1) <= 0){
 		printk(KERN_ERR PFX 
 			"Invalid carrier number: %d or slot: %d\n",
