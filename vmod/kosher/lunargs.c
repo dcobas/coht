@@ -45,7 +45,7 @@ static int set_module_params(struct vmod_dev *module,
 		printk(KERN_INFO PFX 
 			"Carrier %s get_address_space entry point at %p\n",
 			cname, get_address_space);
-	if (get_address_space(asp, carrier_lun, slot, 1) <= 0){
+	if (get_address_space(asp, carrier_lun, slot, 1) < 0){
 		printk(KERN_ERR PFX 
 			"Invalid carrier number: %d or slot: %d\n",
 			carrier_lun, slot);
@@ -57,6 +57,7 @@ static int set_module_params(struct vmod_dev *module,
 	module->carrier_name  = cname;       
 	module->carrier_lun   = carrier_lun;
 	module->slot          = slot;          
+	module->address	      = asp->address;
 	module->is_big_endian = asp->is_big_endian;
 	return 0;
 }
