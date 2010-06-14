@@ -250,7 +250,9 @@ static void __exit vmod12a2_exit(void)
 }
 
 
-MODULE_LICENSE("GPL");
 module_init(vmod12a2_init);
 module_exit(vmod12a2_exit);
+
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("Juan David Gonzalez Cobas <dcobas@cern.ch>");
 
