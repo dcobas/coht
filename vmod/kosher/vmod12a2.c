@@ -5,25 +5,21 @@
 #include <linux/cdev.h>
 #include <linux/fs.h>
 #include <asm/uaccess.h>	/* copy_*_user */
-#include "carrier.h"
+#include "modulbus_carrier.h"
+#include "lunargs.h"
 #include "vmod12a2.h"
 
 
-#define	PARAMS_PER_LUN	4
-static char *luns[PARAMS_PER_LUN*VMOD12A2_MAX_MODULES];
-static int num;
-module_param_array(luns, charp, &num, S_IRUGO);
+#define	DRIVER_NAME	"vmod12a2"
+#define	PFX		DRIVER_NAME ": "
 
 /* The One And Only Device (OAOD) */
-struct cdev			cdev;
+struct cdev	cdev;
+static dev_t	devno;
 
 /* module config tables */
-static int 			used_modules = 0;
-static struct vmod12a2_dev 	modules[VMOD12A2_MAX_MODULES];
-static int			lun_to_dev[VMOD12A2_MAX_MODULES];
+static struct vmod_dev 	modules[VMOD12A2_MAX_MODULES];
 
-/* The One And Only Device (OAOD) */
-static dev_t devno;
 
 static int vmod12a2_offsets[VMOD_12A2_CHANNELS] = {
 	VMOD_12A2_CHANNEL0,
@@ -215,29 +211,31 @@ static int __init vmod12a2_init(void)
 {
 	int err;
 
-	printk(KERN_INFO "Initializing module with luns=%d/%d\n", num, PARAMS_PER_LUN);
+	printk(KERN_INFO PFX "reading parameters\n");
 
-	err = check_luns_args(luns, num);
+	err = read_params(DRIVER_NAME, modules);
 	if (err != 0)
 		return -1;
+	printk(KERN_INFO PFX "initialized driver for %d (max %d) cards\n");
 
-	err = alloc_chrdev_region(&devno, 0, VMOD12A2_MAX_MODULES, "vmod12a2");
-	if (err != 0) goto fail_chrdev;
-	printk("Allocated devno %0x\n",devno); 
+	err = alloc_chrdev_region(&devno, 0, VMOD12A2_MAX_MODULES, DRIVER_NAME);
+	if (err != 0) 
+		goto fail_chrdev;
+	printk(KERN_INFO PFX "allocated device %d\n", MAJOR(devno)); 
 
 	cdev_init(&cdev, &vmod12a2_fops);
 	cdev.owner = THIS_MODULE;
-	err = cdev_add(&cdev, devno, 1);
-	if (err) goto fail_cdev;
-	printk(KERN_INFO "Added cdev with err = %d\n", err);
+	err = cdev_add(&cdev, devno, VMOD12A2_MAX_MODULES);
+	if (err) {
+		printk(KERN_ERR PFX 
+		"failed to create chardev %d with err %d\n",
+			MAJOR(devno), err);
+		goto fail_cdev;
+	}
+	printk(KERN_INFO PFX "created chardev %d with err = %d\n",
+			MAJOR(devno), err);
 
-	/* roll back if something went wrong */
-	if (used_modules == 0) {
-		cdev_del(&cdev);
-		unregister_chrdev_region(devno, VMOD12A2_MAX_MODULES);
-		return -ENODEV;
-	} else
-		return 0;
+	return 0;
 
 fail_cdev:	unregister_chrdev_region(devno, VMOD12A2_MAX_MODULES);
 fail_chrdev:	return -1;
