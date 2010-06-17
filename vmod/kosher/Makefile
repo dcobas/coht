@@ -16,7 +16,7 @@ LIBS=libvmod.a libvmod.so _pyvmod.so
 SWIG=/user/dcobas/swig/bin/swig
 SKELDRVR=../skel/driver/skeldrvr.c
 
-all: driver lib
+all: driver lib tstlib12a2
 driver: modules
 
 modules: 
