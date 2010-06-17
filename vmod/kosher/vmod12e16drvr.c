@@ -22,6 +22,8 @@
 #include "carrier.h"
 #include "vmod12e16.h"
 
+#define	DRIVER_NAME	"vmod12e16"
+#define PFX		DRIVER_NAME ": "
 
 /* The One And Only Device (OAOD) */
 struct cdev	cdev;
