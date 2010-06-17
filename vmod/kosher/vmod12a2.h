@@ -67,4 +67,8 @@ struct vmod12a2_select {
 	int	channel;
 };
 
+struct vmod12a2_output {
+	int	channel;
+	int	value;
+};
 #endif /* _VMOD12A2_H_ */

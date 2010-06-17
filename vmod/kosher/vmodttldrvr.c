@@ -483,11 +483,11 @@ static int __init vmodttl_init(void)
         printk(KERN_INFO PFX "initialized driver for %d (max %d) cards\n",
 		dev_table->num_modules, VMODTTL_MAX_BOARDS);
 
-        err = alloc_chrdev_region(&devno, 0, VMODTTL_MAX_BOARDS, "vmodttl");
+        err = alloc_chrdev_region(&devno, 0, VMODTTL_MAX_BOARDS, DRIVER_NAME);
         if (err != 0) 
 		goto fail_chrdev;
 
-        printk(KERN_INFO "Allocated devno %0x\n", devno);
+        printk(KERN_INFO PFX "allocated device %d\n", MAJOR(devno));
 
         cdev_init(&cdev, &vmodttl_fops);
         cdev.owner = THIS_MODULE;
