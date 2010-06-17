@@ -21,7 +21,7 @@ int vmod12a2_get_handle(unsigned int lun)
 	int fd;
 
 	/* open the device file */
-	snprintf(devname, filename_sz, "/dev/%s.%3d", driver_name, lun);
+	snprintf(devname, filename_sz, "/dev/%s.%d", driver_name, lun);
 	fd = open(devname, O_RDONLY);
 	return fd;
 }
