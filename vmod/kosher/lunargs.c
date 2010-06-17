@@ -86,13 +86,13 @@ int read_params(char *driver_name, struct vmod_devices *devs)
 			return -1;
 
 		device++;
-		printk(KERN_INFO PFX "%s mapped at vaddr %lx",
-			driver_name, module->address);
 		printk(KERN_INFO PFX
-			"    module<%02d>: lun %02d" 
-			" carrier %10s carrier_number = %02d slot = %02d\n",
+			"module<%02d>:\n\tlun %d"
+			"\n\tcarrier %s\n\tcarrier_number = %d\n\tslot = %d"
+			"\n\taddress 0x%08lx\n\tendian = %d\n",
 			i, module->lun, module->carrier_name, 
-			module->carrier_lun, module->slot);
+			module->carrier_lun, module->slot,
+			module->address, module->is_big_endian);
 	}
 	devs->num_modules = device;
         
