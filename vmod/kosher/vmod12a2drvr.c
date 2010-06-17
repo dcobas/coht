@@ -19,7 +19,6 @@ static dev_t	devno;
 
 /* module config tables */
 static struct vmod_devices	config;
-static struct vmod12a2_dev	devices[VMOD12A2_MAX_MODULES];
 
 static int vmod12a2_offsets[VMOD_12A2_CHANNELS] = {
 	VMOD_12A2_CHANNEL0,
@@ -39,7 +38,7 @@ int vmod12a2_open(struct inode *ino, struct file *filp)
 		printk(KERN_ERR PFX "could not open, bad lun %d\n", lun);
 		return -ENODEV;
 	}
-	filp->private_data = &devices[idx];
+	filp->private_data = &config.module[idx];
 	return 0;
 }
 
