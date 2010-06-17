@@ -19,9 +19,9 @@ int volts2digital(float volts)
                 return digital;
 }
 
-void usage(void)
+void usage(char *progname)
 {
-	fprintf(stderr, "usage: pp lun channel volts\n");
+	fprintf(stderr, "usage: %s lun channel volts\n", progname);
 }
 
 int main(int argc, char *argv[])
@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
 	int fd, err;
 
 	if (argc != 4) {
-		usage();
+		usage(argv[0]);
 		return 1;
 	}
 	lun     = atoi(argv[1]);
@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
         volts   = atof(argv[3]);
 	digital = volts2digital(volts);
 	if (digital < 0) {
-		usage();
+		usage(argv[0]);
 		return 1;
 	}
 
