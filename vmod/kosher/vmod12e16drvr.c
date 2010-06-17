@@ -344,7 +344,8 @@ static void __exit exit(void)
 }
 
 
-MODULE_LICENSE("GPL");
 module_init(init);
 module_exit(exit);
 
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("Juan David Gonzalez Cobas <dcobas@cern.ch>");
