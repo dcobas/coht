@@ -19,20 +19,16 @@
 #define _LIBVMOD12A2_H_
 
 /**
- * @brief Get a handle for a vmod12a2 device and channel
+ * @brief Get a handle for a vmod12a2 device
  *
- * A channel is selected by giving the LUN for the board
- * and the channel number. The handle returned allows
- * further reference to the same channel
- *
- * @param carrier_lun - carrier LUN for vmod card
- * @param channel     - selected channel for reading
+ * A board is selected by lun, and a handle is returned for further
+ * refrence to it.
+
+ * @param lun - LUN of vmod card
  *
  * @return >0 - on success, device file descriptor number
- * @return <0 - if failure
- *
  */
-int vmod12a2_get_handle(unsigned int carrier_lun);
+int vmod12a2_get_handle(unsigned int lun);
 
 /**
  * @brief perform a digital-to-analog conversion
