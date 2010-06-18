@@ -3,7 +3,7 @@
  *
  * @brief Driver for VMOD12E16 ADC mezzanine on VMOD/MOD-PCI MODULBUS
  * carrier
- *  
+ *
  * Copyright (c) 2009 CERN
  * @author Juan David Gonzalez Cobas <dcobas@cern.ch>
  *
@@ -18,156 +18,51 @@
 #include <linux/cdev.h>
 #include <linux/delay.h>
 #include <linux/fs.h>
-#include <asm/uaccess.h>	/* copy_*_user */
-#include "carrier.h"
+#include <linux/uaccess.h>
+#include <linux/semaphore.h>
+#include "modulbus_register.h"
+#include "lunargs.h"
 #include "vmod12e16.h"
 
-#define	DRIVER_NAME	"vmod12e16"
-#define PFX		DRIVER_NAME ": "
+#define	DRIVER_NAME		"vmod12e16"
+#define PFX			DRIVER_NAME ": "
+#define	VMOD12E16_MAX_MODULES	VMOD_MAX_BOARDS
 
 /* The One And Only Device (OAOD) */
-struct cdev	cdev;
 dev_t		devno;
+struct cdev	cdev;
 
-/** @brief entry in MODULBUS config table */
-struct modulbus_dev {
-	int		lun;		/** logical unit number */
-	char		*cname;		/** carrier name */
-	int		carrier;	/** supporting carrier */
-	int		slot;		/** slot we're plugged in */
-	unsigned long	address;	/** address space */
-	int		is_big_endian;	/** endianness */
+struct vmod12e16_dev {
+	struct vmod_dev		*config;
+	struct semaphore	sem;
 };
 
-/** @brief stores a selected lun, channel per open file */
-struct mobulbus_state {
-	int	lun;		/** logical unit number */
-	int	channel;	/** channel */
-	int	selected;	/** already selected flag */
-};
+/** configuration parameters from module params */
+struct vmod_devices	config;
+struct vmod12e16_dev	device_list[VMOD12E16_MAX_MODULES];
 
-/** IOCSELECT ioctl arg 
-struct vmod12a2_select {
-	int	lun;		
-	int	channel;
-};
- */
-
-/* module name */
-static char	*devname = "vmod12e16";
-
-/* module config tables */
-#define		MODULBUS_MAX_MODULES	64
-#define		INVALID_LUN		(-1)
-
-static int 			used_modules = 0;
-static struct modulbus_dev 	modules[MODULBUS_MAX_MODULES];
-
-/* insmod parameters */
-#define	PARAMS_PER_LUN	4
-static char *luns[PARAMS_PER_LUN*MODULBUS_MAX_MODULES];
-static int num;
-module_param_array(luns, charp, &num, S_IRUGO);
-
-static int init_module_table(char *luns[], int num) 
+static int vmod12e16_open(struct inode *ino, struct file  *filp)
 {
-	int i, idx;
-	const int ppl = PARAMS_PER_LUN;	/* for readability */
+	unsigned int lun = iminor(ino);
+	unsigned int idx = lun_to_index(&config, lun);
 
-	for (i = 0; i < MODULBUS_MAX_MODULES; i++) 
-		modules[i].lun = INVALID_LUN;
-
-	if (num % ppl != 0) {
-		printk(KERN_ERR "bad number of luns=... arguments\n");
-		return -1;
+	if (idx < 0) {
+		printk(KERN_ERR PFX "could not open, bad lun %d\n", lun);
+		return -ENODEV;
 	}
-	for (i = 0, idx = 0; idx < num; i++, idx += ppl) {
-		int   lun	= simple_strtol(luns[idx], NULL, 10);
-		char *cname	= luns[idx+1];
-		int   carrier	= simple_strtol(luns[idx+2], NULL, 10);
-		int   slot	= simple_strtol(luns[idx+3], NULL, 10);
-
-		struct modulbus_dev	*dev;
-		gas_t			get_address_space;
-		struct carrier_as	as;
-
-		/* sanity-check mezzanine LUN */
-		if (! ((lun > 0) && (lun <= MODULBUS_MAX_MODULES))) {
-			printk(KERN_ERR "lun %d out of range\n", lun);
-			return -1;
-		}
-		dev = &(modules[lun]);
-		if (dev->lun != INVALID_LUN) {
-			printk(KERN_ERR "duplicated lun %d\n", lun);
-			return -1;
-		}
-
-		/* check carrier name and get address spaces */
-		get_address_space = carrier_as_entry(cname);
-		if (get_address_space == NULL) {
-			printk(KERN_ERR "No carrier %s present\n", cname);
-			return -1;
-		}
-
-		/* MODULBUS needs a single a.s. */
-		if (get_address_space(&as, carrier, slot, 1) != 0) {
-			printk(KERN_ERR "No valid address space for "
-				"carrier %s, lun = %d, slot = %d\n",
-				cname, carrier, slot);
-			return -1;
-		}
-
-		/* Fill modules table entry */
-		dev->lun		= lun;
-		dev->cname		= cname;
-		dev->carrier		= carrier;
-		dev->slot		= slot;
-		dev->address		= as.address;
-		dev->is_big_endian	= as.is_big_endian;
-
-		printk(KERN_INFO 
-			"configured %s device:\n"
-			"   lun = %d, carrier = %s, lun = %d, slot = %d\n"
-			"       at addr = 0x%lx, %s endian\n",
-			devname,
-			lun, cname, carrier, slot,
-			dev->address, 
-			(dev->is_big_endian ? "big" : "little"));
-	}
-
-	printk(KERN_INFO "Configured %d %s modules\n", i, devname);
-	used_modules = i;
-
+	filp->private_data = &device_list[idx];
 	return 0;
 }
 
-static int do_open(struct inode *ino,
-		   struct file  *filp)
+static int vmod12e16_release(struct inode *ino, struct file  *filp)
 {
-	struct vmod12e16_state *statep = kmalloc(sizeof(*statep), GFP_KERNEL);
-	if (statep == NULL) {
-		printk(KERN_ERR "%s open(): bad kmalloc\n", devname);
-		return -1;
-	}
-	statep->selected = 0;
-	filp->private_data = statep;
-	return 0;
-}
-
-static int do_release(struct inode *ino,
-		   struct file  *filp)
-{
-	struct vmod12e16_state *statep = filp->private_data;
-	kfree(statep);
 	return 0;
 }
 
 static u16 ioread(void *addr, int be)
 {
 	u16 val = ioread16(addr);
-#ifdef DEBUG
-	printk(KERN_INFO "Reading from address %p\n", addr);
-#endif
+	printk(KERN_INFO PFX "Reading from address %p\n", addr);
 	if (be)
 		return be16_to_cpu(val);
 	else
@@ -182,38 +77,36 @@ static void iowrite(u16 val, void *addr, int be)
 		tmp = cpu_to_be16(val);
 	else
 		tmp = val;
-#ifdef DEBUG
-	printk(KERN_INFO "Writing 0x%x to address %p\n", tmp, addr);
-#endif
+	printk(KERN_INFO PFX "Writing 0x%x to address %p\n", tmp, addr);
 	iowrite16(tmp, addr);
 }
 
-static int do_conversion(struct file *filp, 
+static int do_conversion(struct file *filp,
 			struct vmod12e16_conversion *conversion)
 {
-	struct vmod12e16_state	*statep = filp->private_data;
-	int 			lun     = statep->lun;
-	int			channel = conversion->channel;
-	int			ampli	= conversion->amplification;
-	struct vmod12e16_registers 
-				*regs   = (void*)modules[lun].address;
-	int 			us_elapsed;
-	int			be = modules[lun].is_big_endian;
+	struct vmod12e16_dev *dev = filp->private_data;
+	struct vmod12e16_registers *regs = (void*)dev->config->address;
+	int be = dev->config->is_big_endian;
 
-	/* 
-	 * explicitly disable interrupt mode 
-	 * 
-	 * WARNING: omitting this step leads to random 
+	int channel = conversion->channel;
+	int ampli   = conversion->amplification;
+	int us_elapsed;
+
+	down_interruptible(&dev->sem);
+	/*
+	 * explicitly disable interrupt mode
+	 *
+	 * WARNING: omitting this step leads to random
 	 * bus errors when doing ADC conversion in polling mode
 	 */
 	iowrite(VMOD_12E16_ADC_INTERRUPT_MASK, &regs->interrupt, be);
 
 	/* specify channel and amplification */
-	if ((ampli & ~((1<<2)-1)) || channel & ~((1<<4)-1)) 
+	if ((ampli & ~((1<<2)-1)) || channel & ~((1<<4)-1))
 		return -EINVAL;
 	iowrite((ampli<<4) | channel, &regs->control, be);
 
-	/* wait at most the manufacturer-supplied max time */ 
+	/* wait at most the manufacturer-supplied max time */
 	us_elapsed = 0;
 	while (us_elapsed < VMOD_12E16_MAX_CONVERSION_TIME) {
 		udelay(VMOD_12E16_CONVERSION_TIME);
@@ -229,63 +122,22 @@ static int do_conversion(struct file *filp,
 	return -ETIME;
 }
 
-static int do_ioctl(struct inode *ino, 
-		    struct file *filp, 
-		    unsigned int cmd, 
+static int vmod12e16_ioctl(struct inode *ino,
+		    struct file *filp,
+		    unsigned int cmd,
 		    unsigned long arg)
 {
-	struct vmod12e16_state   
-			state, 
-			*statep = &state, 
-			*mystate = filp->private_data;
-	struct vmod12e16_conversion
-			conversion, 
-			*conversionp = &conversion;
-	int lun, channel, err;
+	struct vmod12e16_conversion cnv, *cnvp = &cnv;
+	int err;
 
 	switch (cmd) {
-	case VMOD12E16_IOCSELECT:
-		if (!access_ok(VERIFY_READ, (void*)arg, sizeof(state))
-		  || copy_from_user(statep, (void*)arg, sizeof(state)))
-			return -EINVAL;
-
-		lun = statep->lun;
-		if (!((lun > 0)  && (lun <= MODULBUS_MAX_MODULES))
-			    || modules[lun].lun == INVALID_LUN) {
-			printk(KERN_ERR "invalid LUN %d\n", lun);
-			return -EINVAL;
-		}
-
-		channel = statep->channel;
-		if (!((channel >= 0) && (channel < VMOD_12E16_CHANNELS))) {
-			printk(KERN_ERR "invalid channel %d\n", channel);
-			return -EINVAL;
-		}
-
-		mystate->lun		= statep->lun;
-		mystate->channel	= statep->channel;
-		mystate->selected	= 1;
-
-		return 0;
-		break;
-
 
 	case VMOD12E16_IOCCONVERT:
-		if (!access_ok(VERIFY_READ,  (void*)arg, sizeof(conversion))
-		  ||!access_ok(VERIFY_WRITE, (void*)arg, sizeof(conversion))
-		  ||copy_from_user(conversionp, (void*)arg, sizeof(conversion)))
+		if (copy_from_user(cnvp, (void*)arg, sizeof(cnv)))
 			return -EINVAL;
-
-		if (!mystate->selected) {
-			printk(KERN_ERR "Invalid ioctl: CONVERT before SELECT\n");
-			return -ENOTTY;
-		}
-
-		err = do_conversion(filp, conversionp);
-		if (err != 0)
-			return -EINVAL;
-
-		if (copy_to_user((void*)arg, conversionp, sizeof(conversion)))
+		if ((err = do_conversion(filp, cnvp)) != 0)
+			return err;
+		if (copy_to_user((void*)arg, cnvp, sizeof(cnv)))
 			return -EINVAL;
 
 		return 0;
@@ -300,41 +152,44 @@ static int do_ioctl(struct inode *ino,
 
 struct file_operations fops = {
 	.owner =    THIS_MODULE,
-	.ioctl =    do_ioctl,
-	.open =     do_open,
-	.release =  do_release,
+	.ioctl =    vmod12e16_ioctl,
+	.open =     vmod12e16_open,
+	.release =  vmod12e16_release,
 };
 
 /* module initialization and cleanup */
 static int __init init(void)
 {
-	printk(KERN_INFO "Initializing module  with %d/%d = %d luns\n", 
-				num, PARAMS_PER_LUN, num/PARAMS_PER_LUN);
+	int i, err;
 
-	/* scan and check command-line parameters */
-	if (init_module_table(luns, num) != 0)
-		goto fail_chrdev;
-	if (used_modules == 0) {
-		printk(KERN_ERR "no devices configured, exiting\n");
-		goto fail_chrdev;
-	}
-	printk(KERN_INFO "Configuration for %d modules ok\n", used_modules);
+	printk(KERN_INFO PFX "reading parameters\n");
+	err = read_params(DRIVER_NAME, &config);
+	if (err != 0)
+		return -1;
+	printk(KERN_INFO PFX
+		"initializing driver for %d (max %d) cards\n",
+		config.num_modules, VMOD_MAX_BOARDS);
 
-	if (alloc_chrdev_region(&devno, 0, MODULBUS_MAX_MODULES, devname) != 0)
-		goto fail_chrdev;
-	printk(KERN_INFO "Allocated devno 0x%x for device %s\n",devno, devname); 
+	for (i = 0; i < config.num_modules; i++)
+		init_MUTEX(&device_list[i].sem);
 
-	/* create character device */
+	err = alloc_chrdev_region(&devno, 0, VMOD12E16_MAX_MODULES, DRIVER_NAME);
+	if (err != 0)
+		goto fail_chrdev;
+	printk(KERN_INFO PFX "allocated device %d\n", MAJOR(devno));
+
 	cdev_init(&cdev, &fops);
 	cdev.owner = THIS_MODULE;
-	if (cdev_add(&cdev, devno, 1) != 0)
+	if (cdev_add(&cdev, devno, VMOD12E16_MAX_MODULES) != 0) {
+		printk(KERN_ERR PFX
+			"failed to create chardev %d with err %d\n",
+				MAJOR(devno), err);
 		goto fail_cdev;
-	printk(KERN_INFO "Added cdev %s with devno 0x%x\n", devname, devno);
-
+	}
 	return 0;
 
 fail_cdev:	
-	unregister_chrdev_region(devno, MODULBUS_MAX_MODULES);
+	unregister_chrdev_region(devno, VMOD12E16_MAX_MODULES);
 fail_chrdev:	
 	return -1;
 }
@@ -342,7 +197,7 @@ fail_chrdev:
 static void __exit exit(void)
 {
 	cdev_del(&cdev);
-	unregister_chrdev_region(devno, MODULBUS_MAX_MODULES);
+	unregister_chrdev_region(devno, VMOD12E16_MAX_MODULES);
 }
 
 
