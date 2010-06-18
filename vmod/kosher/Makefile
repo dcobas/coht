@@ -13,6 +13,7 @@ OUTPUTDIR=$(PWD)/$(CPU)/$(KVER)
 CFLAGS=-g -Wall -I /usr/include/python2.4
 OBJS=libvmod12a2.o libvmod16a2.o libvmod12e16.o
 LIBS=libvmod.a libvmod.so _pyvmod.so
+TESTS=tstlib12a2  tstlib16a2 test12e16
 SWIG=/user/dcobas/swig/bin/swig
 SKELDRVR=../skel/driver/skeldrvr.c
 
@@ -37,8 +38,7 @@ libvmod.a: $(OBJS)
 	ar r $@ $^
 
 # test programs
-# tests:  tstlib12a2  tstlib16a2 test12e16
-tests:  tstlib12a2  test12e16
+tests:  $(TESTS)
 tstlib12a2: libvmod12a2.a libvmod12a2.h
 tstlib16a2: libvmod16a2.a libvmod16a2.h
 test12e16: libvmod12e16.a libvmod12e16.h
