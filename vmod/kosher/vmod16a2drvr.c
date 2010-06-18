@@ -23,12 +23,12 @@ static struct vmod_devices 	config;
 static int open(struct inode *ino, struct file *filp)
 {
 	unsigned int lun = iminor(ino);
-	unsigned int idx = lun_to_dev(lun);
+	unsigned int idx = lun_to_index(&config, lun);
 
 	if (idx < 0) {
 		printk(KERN_ERR PFX 
 			"cannot open, invalid lun %d\n", lun);
-		retunr -EINVAL;
+		return -EINVAL;
 	}
 	filp->private_data = &config.module[idx];
 	return 0;
@@ -39,13 +39,15 @@ static int release(struct inode *ino, struct file *filp)
 	return 0;
 }
 
-static int do_output(vmod16a2_dev *dev, vmod16a2_convert *cvrt)
+static int do_output(struct vmod_dev *dev,
+		struct vmod16a2_convert *cvrt)
 {
 	int value = cvrt->value;
 	int channel = cvrt->channel;
+	struct vmod16a2_registers *regp = (void*)dev->address;
 
 	/* fix value endianness */
-	if (cvrt->is_big_endian)
+	if (dev->is_big_endian)
 		value = cpu_to_be16(value);
 
 	if (channel == 0) {
@@ -70,8 +72,7 @@ static int ioctl(struct inode *inode,
 		unsigned op,
 		unsigned long arg)
 {
-	struct vmod16a2_dev *devp = fp->private_data;
-	struct vmod16a2_registers *regp = (void*)dev->address;
+	struct vmod_dev *devp = fp->private_data;
 	struct vmod16a2_convert cvrt, *cvrtp = &cvrt;
 
 	switch (op) {
@@ -102,7 +103,7 @@ static int __init init(void)
 	int err;
 
 	printk(KERN_INFO PFX "initializing driver");
-	err = read_params(&config, DRIVER_NAME);
+	err = read_params(DRIVER_NAME, &config);
 	if (err != 0)
 		return -1;
 
