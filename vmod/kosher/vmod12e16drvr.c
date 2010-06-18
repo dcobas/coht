@@ -92,7 +92,8 @@ static int do_conversion(struct file *filp,
 	int ampli   = conversion->amplification;
 	int us_elapsed;
 
-	down_interruptible(&dev->sem);
+	if (down_interruptible(&dev->sem))
+		return -ERESTARTSYS;
 	/*
 	 * explicitly disable interrupt mode
 	 *
@@ -119,6 +120,7 @@ static int do_conversion(struct file *filp,
 	}
 
 	/* timeout */
+	up(&dev->sem);
 	return -ETIME;
 }
 
