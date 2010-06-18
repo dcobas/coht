@@ -13,7 +13,7 @@ OUTPUTDIR=$(PWD)/$(CPU)/$(KVER)
 CFLAGS=-g -Wall
 OBJS=libvmod12a2.o libvmod16a2.o libvmod12e16.o
 LIBS=libvmod.a libvmod.so
-TESTS=tstlib12a2  tstlib16a2 test12e16
+TESTS=tstlib12a2  tstlib16a2 tstlib12e16
 
 all: driver lib tests
 driver: modules
@@ -39,7 +39,7 @@ libvmod.a: $(OBJS)
 tests:  $(TESTS)
 tstlib12a2: libvmod12a2.a libvmod12a2.h
 tstlib16a2: libvmod16a2.a libvmod16a2.h
-test12e16: libvmod12e16.a libvmod12e16.h
+tstlib12e16: libvmod12e16.a libvmod12e16.h
 
 libvmod12a2.o:  libvmod12a2.h  vmod12a2.h
 libvmod16a2.o:  libvmod16a2.h  vmod16a2.h
