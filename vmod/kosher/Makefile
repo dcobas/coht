@@ -16,7 +16,7 @@ LIBS=libvmod.a libvmod.so _pyvmod.so
 SWIG=/user/dcobas/swig/bin/swig
 SKELDRVR=../skel/driver/skeldrvr.c
 
-all: driver lib tstlib12a2
+all: driver lib tests
 driver: modules
 
 modules: 
@@ -31,14 +31,15 @@ clean:
 	make -C $(KERNELSRC) M=`pwd` clean
 
 # lib: $(LIBS)
-lib: libvmod12a2.a
+lib: libvmod12a2.a libvmod12e16.a
 libvmod.so: $(OBJS)
 	gcc -shared -o $@ $^
 libvmod.a: $(OBJS)
 	ar r $@ $^
 
 # test programs
-tests:  tstlib12a2  tstlib16a2 test12e16
+# tests:  tstlib12a2  tstlib16a2 test12e16
+tests:  tstlib12a2  test12e16
 tstlib12a2: libvmod12a2.a libvmod12a2.h
 tstlib16a2: libvmod16a2.a libvmod16a2.h
 test12e16: libvmod12e16.a libvmod12e16.h

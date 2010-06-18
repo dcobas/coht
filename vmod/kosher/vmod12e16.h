@@ -20,6 +20,7 @@
 
 #include <linux/types.h>
 #include <linux/ioctl.h>
+#include "vmod12e16drvr.h"
 
 /* VMOD 12E16 registers */
 #define VMOD_12E16_CONTROL	0x00	/* write: set amp and channel, start conversion */
@@ -37,26 +38,7 @@
 
 
 /**
- * @brief identify a unique channel of a unique VMOD12E16 
- */
-struct vmod12e16_state {
-	int   lun;		/**< Logical unit number of carrier */
-	int   channel;		/**< Input channel number (0-15) */
-	int   selected;		/**< true if filep had a SELECT ioctl */
-};
-
-/**
- * @brief  user argument  for ioctl VMOD12E16_IOCCONVERT	
- * defining channel, amplification factor, and the data to get in return
- */
-struct vmod12e16_conversion {
-	int amplification;	/**< amplification factor (0..3 for 1, 10, 100 or 1000 amplification) */
-	int channel;		/**< analog channel to convert from (0..15) */
-	int data;               /**< digital value after conversion	*/
-};                             
-
-/**
- * @brief map of mezzanine register addresses 
+ * @brief map of vmod12e16 register layout
  */
 struct vmod12e16_registers {
 	union {
@@ -72,9 +54,14 @@ struct vmod12e16_registers {
 					     mode is in force/desired) */ 
 };
 
-/* IOCTLS for this driver */
-#define VMOD12E16_IOCMAGIC	'm'
-#define	VMOD12E16_IOCSELECT	_IOW (VMOD12E16_IOCMAGIC, 1, struct vmod12e16_state)
-#define	VMOD12E16_IOCCONVERT	_IOWR(VMOD12E16_IOCMAGIC, 2, struct vmod12e16_conversion)
+/**
+ * @brief vmod12e16 device information consists of ordinary vmod
+ * geographical info plus a semaphore for mutexing during conversion
+ * cycle
+ */
+struct vmod12e16_dev {
+	struct vmod_dev		*config;	/**< vmod lunargs */
+	struct semaphore	sem;		/**< locks conversion */
+};
 
 #endif /* _VMOD12E16_H_ */
