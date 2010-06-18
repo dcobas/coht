@@ -77,7 +77,6 @@ static void iowrite(u16 val, void *addr, int be)
 		tmp = cpu_to_be16(val);
 	else
 		tmp = val;
-	printk(KERN_INFO PFX "Writing 0x%x to address %p\n", tmp, addr);
 	iowrite16(tmp, addr);
 }
 
@@ -94,12 +93,8 @@ static int do_conversion(struct file *filp,
 
 	if (down_interruptible(&dev->sem))
 		return -ERESTARTSYS;
-	/*
-	 * explicitly disable interrupt mode
-	 *
-	 * WARNING: omitting this step leads to random
-	 * bus errors when doing ADC conversion in polling mode
-	 */
+
+	/* explicitly disable interrupt mode for safely polling */
 	iowrite(VMOD_12E16_ADC_INTERRUPT_MASK, &regs->interrupt, be);
 
 	/* specify channel and amplification */
