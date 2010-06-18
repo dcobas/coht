@@ -252,7 +252,8 @@ static void __exit exit(void)
 	unregister_chrdev_region(devno, VMOD16A2_MAX_MODULES);
 }
 
-MODULE_LICENSE("GPL");
 module_init(init);
 module_exit(exit);
 
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("Juan David Gonzalez Cobas <dcobas@cern.ch>");
