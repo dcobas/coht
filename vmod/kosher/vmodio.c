@@ -216,7 +216,7 @@ static int vmodio_offsets[VMODIO_SLOTS] = {
 	VMODIO_SLOT3,
 };
 
-struct vmodio *lun_to_dev(int lun)
+static struct vmodio *lun_to_dev(int lun)
 {
 	int i = 0;
 
@@ -276,7 +276,7 @@ static int get_address_space(
  *  Same parameters and semantics, only intended for export (via
  *  linux EXPORT_SYMBOL or some LynxOS kludge)
  */
-int  vmodio_get_address_space(
+static int  vmodio_get_address_space(
 	struct carrier_as *as,
 	int board_number, 
 	int board_position, 

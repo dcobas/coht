@@ -29,7 +29,7 @@ static int vmod12a2_offsets[VMOD_12A2_CHANNELS] = {
  * @brief allocate a struct vmod12a2_state on a
  * per-open-file basis, which stores the last lun,channel pair selected
  */
-int vmod12a2_open(struct inode *ino, struct file *filp)
+static int vmod12a2_open(struct inode *ino, struct file *filp)
 {
 	unsigned int lun = iminor(ino);
 	unsigned int idx = lun_to_index(&config, lun);
@@ -44,7 +44,7 @@ int vmod12a2_open(struct inode *ino, struct file *filp)
 
 /**
  *  @brief release the struct vmod12a2_select struct */
-int vmod12a2_release(struct inode *ino, struct file *filp)
+static int vmod12a2_release(struct inode *ino, struct file *filp)
 {
 	return 0;
 }
@@ -55,7 +55,7 @@ static int do_iocput(struct file *fp, struct vmod12a2_output *argp)
 	struct vmod12a2_dev	*dev = fp->private_data;
 	unsigned int		channel = argp->channel;
 	u16			value = argp->value;
-	unsigned long		addr;
+	void __iomem		*addr;
 
 	if (channel != 0 && channel != 1) {
 		printk(KERN_ERR PFX "invalid channel %d in ioctl\n", channel);
@@ -64,13 +64,13 @@ static int do_iocput(struct file *fp, struct vmod12a2_output *argp)
 	}
 
 	/* determine channel register address and write */
-	addr = dev->address + vmod12a2_offsets[channel];
-	printk(KERN_INFO PFX "writing %x = %d to addr 0x%lx, %s endian\n",
+	addr = (void __iomem *)(dev->address + vmod12a2_offsets[channel]);
+	printk(KERN_INFO PFX "writing %x = %d to addr %p, %s endian\n",
 			value, value, addr,
 			dev->is_big_endian ? "big" : "little" );
 	if (dev->is_big_endian)
 		value = cpu_to_be16(value);
-	iowrite16(value, (void*)addr);
+	iowrite16(value, addr);
 	return 0;
 }
 
@@ -85,7 +85,7 @@ static int vmod12a2_ioctl(struct inode *inode,
 	switch (op) {
 
 	case VMOD12A2_IOCPUT:
-		if (copy_from_user(myargp, (void*)arg, sizeof(myarg)) != 0)
+		if (copy_from_user(myargp, (const void __user *)arg, sizeof(myarg)) != 0)
 			return -EINVAL;
 		return do_iocput(fp, myargp);
 		break;
@@ -96,7 +96,7 @@ static int vmod12a2_ioctl(struct inode *inode,
 	return -ENOTTY;
 }
 
-struct file_operations vmod12a2_fops = {
+static struct file_operations vmod12a2_fops = {
 	.owner =    THIS_MODULE,
 	.ioctl =    vmod12a2_ioctl,
 	.open =     vmod12a2_open,
