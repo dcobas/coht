@@ -131,7 +131,6 @@ static int __init vmod12a2_init(void)
 			MAJOR(devno), err);
 		goto fail_cdev;
 	}
-	printk(KERN_INFO PFX "created chardev %d\n", MAJOR(devno));
 
 	return 0;
 
