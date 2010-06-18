@@ -30,8 +30,7 @@ clean:
 	rm -rf L865 L864 ppc 
 	make -C $(KERNELSRC) M=`pwd` clean
 
-# lib: $(LIBS)
-lib: libvmod12a2.a libvmod12e16.a
+lib: $(LIBS)
 libvmod.so: $(OBJS)
 	gcc -shared -o $@ $^
 libvmod.a: $(OBJS)
