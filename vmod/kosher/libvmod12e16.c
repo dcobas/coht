@@ -12,10 +12,6 @@
 #include "vmod12e16.h"
 #include "libvmod12e16.h"
 
-/*
-#include <skeluser_ioctl.h>
- */
-
 /**
  * @brief Get a handle for a vmod12e16 device
  *
