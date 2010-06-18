@@ -4,9 +4,9 @@
  * @brief VMOD12E16 ADC definitions
  *
  * The VMOD12E16 mezzanine is a 12-bit resolution, 16 channel ADC for
- * which this driver provides support if installed in a MOD-PCI carrier
+ * which this driver provides support if installed in a modulbus carrier
  * board. So this file provides definitions for easy access to hardware
- * register on both MOD-PCI carrier and VMOD12E16
+ * register on both VMODIO/MOD-PCI carrier and VMOD12E16
  * 
  * Copyright (c) 2009 CERN
  * @author Juan David Gonzalez Cobas <dcobas@cern.ch>
