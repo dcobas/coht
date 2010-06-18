@@ -80,13 +80,12 @@ static int vmod12a2_ioctl(struct inode *inode,
 			unsigned op, 
 			unsigned long arg)
 {
-	struct vmod12a2_output	*argp = (struct vmod12a2_output *)arg;
 	struct vmod12a2_output	myarg, *myargp = &myarg;
 
 	switch (op) {
 
 	case VMOD12A2_IOCPUT:
-		if (copy_from_user(myargp, argp, sizeof(myarg)) != 0)
+		if (copy_from_user(myargp, (void*)arg, sizeof(myarg)) != 0)
 			return -EINVAL;
 		return do_iocput(fp, myargp);
 		break;
