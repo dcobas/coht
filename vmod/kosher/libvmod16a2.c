@@ -16,7 +16,7 @@ int vmod16a2_get_handle(unsigned int lun)
 {
 	const int filename_sz = 256;
 	char devname[filename_sz];
-	const char *driver_name = DRIVER_NAME;
+	const char *driver_name = "vmod16a2";
 
 	int fd, err;
 
