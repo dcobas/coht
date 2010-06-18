@@ -14,8 +14,8 @@
 #define	PFX		DRIVER_NAME ": "
 
 /* The One And Only Device (OAOD) */
-struct cdev	cdev;
-static dev_t	devno;
+static struct cdev	cdev;
+static dev_t		devno;
 
 /* module config tables */
 static struct vmod_devices	config;
