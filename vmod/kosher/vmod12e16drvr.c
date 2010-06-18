@@ -114,6 +114,7 @@ static int do_conversion(struct file *filp,
 		if ((ioread(&regs->ready, be) & VMOD_12E16_RDY_BIT) == 0) {
 			conversion->data = ioread(&regs->data, be) & VMOD_12E16_ADC_DATA_MASK;
 			udelay(VMOD_12E16_CONVERSION_TIME);
+			up(&dev->sem);
 			return 0;
 		}
 		us_elapsed += VMOD_12E16_CONVERSION_TIME;
