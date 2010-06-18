@@ -29,12 +29,12 @@
 #define	VMOD12E16_MAX_MODULES	VMOD_MAX_BOARDS
 
 /* The One And Only Device (OAOD) */
-dev_t		devno;
-struct cdev	cdev;
+static dev_t		devno;
+static struct cdev	cdev;
 
 /** configuration parameters from module params */
-struct vmod_devices	config;
-struct vmod12e16_dev	device_list[VMOD12E16_MAX_MODULES];
+static struct vmod_devices	config;
+static struct vmod12e16_dev	device_list[VMOD12E16_MAX_MODULES];
 
 static int vmod12e16_open(struct inode *ino, struct file  *filp)
 {
@@ -54,7 +54,7 @@ static int vmod12e16_release(struct inode *ino, struct file  *filp)
 	return 0;
 }
 
-static u16 ioread(void __iomem *addr, int be)
+static int ioread(void __iomem *addr, int be)
 {
 	unsigned int val = ioread16(addr);
 	printk(KERN_INFO PFX "Reading from address %p\n", addr);
@@ -64,7 +64,7 @@ static u16 ioread(void __iomem *addr, int be)
 		return val;
 }
 
-static void iowrite(u16 val, void *addr, int be)
+static void iowrite(u16 val, void __iomem *addr, int be)
 {
 	u16 tmp;
 
