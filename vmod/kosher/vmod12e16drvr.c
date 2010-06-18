@@ -32,11 +32,6 @@
 dev_t		devno;
 struct cdev	cdev;
 
-struct vmod12e16_dev {
-	struct vmod_dev		*config;
-	struct semaphore	sem;
-};
-
 /** configuration parameters from module params */
 struct vmod_devices	config;
 struct vmod12e16_dev	device_list[VMOD12E16_MAX_MODULES];
