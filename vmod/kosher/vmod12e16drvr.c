@@ -79,7 +79,8 @@ static int do_conversion(struct file *filp,
 			struct vmod12e16_conversion *conversion)
 {
 	struct vmod12e16_dev *dev = filp->private_data;
-	struct vmod12e16_registers *regs = (void*)dev->config->address;
+	struct vmod12e16_registers __iomem *regs = 
+		(struct vmod12e16_registers __iomem *)dev->config->address;
 	int be = dev->config->is_big_endian;
 
 	int channel = conversion->channel;
@@ -126,11 +127,11 @@ static int vmod12e16_ioctl(struct inode *ino,
 	switch (cmd) {
 
 	case VMOD12E16_IOCCONVERT:
-		if (copy_from_user(cnvp, (void*)arg, sizeof(cnv)))
+		if (copy_from_user(cnvp, (const void __user*)arg, sizeof(cnv)))
 			return -EINVAL;
 		if ((err = do_conversion(filp, cnvp)) != 0)
 			return err;
-		if (copy_to_user((void*)arg, cnvp, sizeof(cnv)))
+		if (copy_to_user((void __user *)arg, cnvp, sizeof(cnv)))
 			return -EINVAL;
 
 		return 0;
@@ -143,7 +144,7 @@ static int vmod12e16_ioctl(struct inode *ino,
 	return 0;
 }
 
-struct file_operations fops = {
+static struct file_operations fops = {
 	.owner =    THIS_MODULE,
 	.ioctl =    vmod12e16_ioctl,
 	.open =     vmod12e16_open,

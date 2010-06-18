@@ -44,7 +44,8 @@ static int do_output(struct vmod_dev *dev,
 {
 	int value = cvrt->value;
 	int channel = cvrt->channel;
-	struct vmod16a2_registers *regp = (void*)dev->address;
+	struct vmod16a2_registers __iomem *regp = 
+		(struct vmod16a2_registers __iomem *)dev->address;
 
 	/* fix value endianness */
 	if (dev->is_big_endian)
@@ -78,7 +79,7 @@ static int ioctl(struct inode *inode,
 	switch (op) {
 
 	case VMOD16A2_IOCPUT:
-		if (copy_from_user(cvrtp, (void*)arg, sizeof(cvrt)) != 0)
+		if (copy_from_user(cvrtp, (const void __user*)arg, sizeof(cvrt)) != 0)
 			return -EINVAL;
 		return do_output(devp, cvrtp);
 		break;
@@ -90,7 +91,7 @@ static int ioctl(struct inode *inode,
 }
 
 /* @brief file operations for this driver */
-struct file_operations vmod16a2_fops = {
+static struct file_operations vmod16a2_fops = {
 	.owner =    THIS_MODULE,
 	.ioctl =    ioctl,
 	.open =     open,
