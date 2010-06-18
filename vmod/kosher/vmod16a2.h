@@ -25,29 +25,6 @@ struct vmod16a2_registers {
 	unsigned short	wdclr;		/** watchdog clear */
 };
 
-/** @brief entry in vmod16a2 config table */
-struct vmod16a2_dev {
-	int		lun;		/** logical unit number */
-	char		*cname;		/** carrier driver name */
-	int		carrier;	/** supporting carrier */
-	int		slot;		/** slot we're plugged in */
-	unsigned long	address;	/** address space */
-	int		is_big_endian;	/** MODULBUS endianness */
-};
-
-/** @brief stores a selected lun, channel per open file */
-struct vmod16a2_state {
-	int	lun;		/** logical unit number */
-	int	channel;	/** channel */
-	int	selected;	/** already selected flag */
-};
-
-/** IOCSELECT ioctl arg */
-struct vmod16a2_select {
-	int	lun;		
-	int	channel;
-};
-
 /* driver internals, device table size and ioctl commands */
 
 #define	VMOD16A2_MAX_MODULES	64
