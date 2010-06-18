@@ -1,7 +1,8 @@
 EXTRA_CFLAGS=-I $(src)/../../include
 obj-m += modulbus_register.o 
 obj-m += mod-pci.o vmodio.o 
-obj-m += vmodttl.o vmoddor.o vmod12a2.o vmod12e16.o
+obj-m += vmodttl.o vmoddor.o vmod12a2.o
+obj-m += vmod12e16.o
 
 vmodttl-objs := lunargs.o vmodttldrvr.o
 vmod12a2-objs := lunargs.o vmod12a2drvr.o
