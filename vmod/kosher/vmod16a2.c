@@ -9,6 +9,8 @@
 #include "vmod16a2.h"
 #include "carrier.h"
 
+#define DRIVER_NAME	"vmod16a2"
+#define PFX		DRIVER_NAME ": "
 
 #define	VMOD16A2_PARAMS_PER_LUN  4
 
