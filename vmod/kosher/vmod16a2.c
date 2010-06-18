@@ -7,68 +7,18 @@
 #include <asm/uaccess.h>	/* copy_*_user */
 
 #include "vmod16a2.h"
-#include "carrier.h"
+#include "lunargs.h"
+#include "modulbus_register.h"
 
 #define DRIVER_NAME	"vmod16a2"
 #define PFX		DRIVER_NAME ": "
 
-#define	VMOD16A2_PARAMS_PER_LUN  4
-
-static char		*luns[VMOD16A2_PARAMS_PER_LUN*VMOD16A2_MAX_MODULES];
-static int 		num;
-module_param_array(luns, charp, &num, S_IRUGO);
-
 /* The One And Only Device (OAOD) */
-struct cdev		cdev;
+static dev_t devno;
+static struct cdev cdev;
 
 /* module config tables */
-static int 			configured_modules = 0;
-static struct vmod16a2_dev 	modules[VMOD16A2_MAX_MODULES];
-static int 			lun_to_dev[VMOD16A2_MAX_MODULES];
-
-static dev_t devno;
-
-/* carrier entry points for address space and interrupt hook */
-static gas_t			get_address_space;
-/* not needed
-static risr_t			register_isr;
- */
-
-/** @brief sanity check (lun, channel) pair */
-static int good(int lun, int channel)
-{
-	return 	(0 < lun) && 
-		(lun <= configured_modules) && 
-		(channel == 1 || channel == 0);
-}
-
-/** 
- * @brief allocate a struct vmod16a2_state  on a
- * per-open-file basis, which stores the last lun,channel pair selected
- */
-static int open(struct inode *ino, struct file *filp)
-{
-	struct vmod16a2_state *vsp;
-
-	vsp = kmalloc(sizeof(*vsp), GFP_KERNEL);
-	if (vsp == NULL) {
-		printk(KERN_INFO "could not open, bad kmalloc\n");
-		return -ENOMEM;
-	} else {
-		vsp->selected = 0; /* invalid until IOCSELECT */
-		filp->private_data = vsp;
-		return 0;
-	}
-}
-
-/**
- *  @brief release the struct vmod16a2_select struct */
-static int release(struct inode *ino, struct file *filp)
-{
-	kfree(filp->private_data);
-	return 0;
-}
-
+static struct vmod_devices 	config;
 
 static int ioctl(struct inode *inode, 
 			struct file *fp, 
@@ -82,27 +32,6 @@ static int ioctl(struct inode *inode,
 	u16				value, tmp;
 
 	switch (op) {
-
-	case VMOD16A2_IOCSELECT:
-
-		/* sanity check user params */
-		selp = (void*)arg;
-		if (!access_ok(VERIFY_READ, selp, sizeof(sel)))
-			return -EINVAL;
-		if (copy_from_user(&sel, selp, sizeof(sel)) != 0)
-			return -EINVAL;
-
-		/* ioctl arg ok, extract lun+channel and check sanity */
-		statep->lun	= (sel.lun != VMOD16A2_NO_LUN_CHANGE) ? 
-						sel.lun : 
-						statep->lun;
-		statep->channel = sel.channel;
-		if (!good(statep->lun, statep->channel))
-			return -EINVAL;
-		statep->selected = 1;
-
-		return 0;
-		break;
 
 	case VMOD16A2_IOCPUT:
 
