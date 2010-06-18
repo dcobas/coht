@@ -25,13 +25,15 @@ struct vmod16a2_registers {
 	unsigned short	wdclr;		/** watchdog clear */
 };
 
+/** @brief ioctl arg for IOCPUT */
+struct vmod16a2_convert {
+	unsigned int	channel;	/**< output channel (0 or 1) */
+	unsigned int	value;		/**< 16-bit value to output */
+};
+
 /* driver internals, device table size and ioctl commands */
 
 #define	VMOD16A2_MAX_MODULES	64
 
 #define	VMOD16A2_IOC_MAGIC	'J'
-#define VMOD16A2_IOCSELECT 	_IOW(VMOD16A2_IOC_MAGIC, 1, struct vmod16a2_select)
-#define	VMOD16A2_IOCPUT		_IOW(VMOD16A2_IOC_MAGIC, 2, int)
-
-#define VMOD16A2_NO_LUN_CHANGE	(-1)
-
+#define	VMOD16A2_IOCPUT		_IOW(VMOD16A2_IOC_MAGIC, 2, struct vmod16a2_convert)
