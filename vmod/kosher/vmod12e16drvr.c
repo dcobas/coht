@@ -173,8 +173,11 @@ static int __init init(void)
 		"initializing driver for %d (max %d) cards\n",
 		config.num_modules, VMOD_MAX_BOARDS);
 
-	for (i = 0; i < config.num_modules; i++)
+	/* fill in config data and semaphore */
+	for (i = 0; i < config.num_modules; i++) {
+		device_list[i].config = &config.module[i];
 		init_MUTEX(&device_list[i].sem);
+	}
 
 	err = alloc_chrdev_region(&devno, 0, VMOD12E16_MAX_MODULES, DRIVER_NAME);
 	if (err != 0)
