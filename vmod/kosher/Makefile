@@ -14,7 +14,6 @@ CFLAGS=-g -Wall
 OBJS=libvmod12a2.o libvmod16a2.o libvmod12e16.o
 LIBS=libvmod.a libvmod.so
 TESTS=tstlib12a2  tstlib16a2 test12e16
-SKELDRVR=../skel/driver/skeldrvr.c
 
 all: driver lib tests
 driver: modules
@@ -25,7 +24,7 @@ modules:
 	mkdir -p $(OUTPUTDIR)
 	mv *.o *.ko $(OUTPUTDIR)
 clean:
-	rm -f *.o *.a *.pyc *.so
+	rm -f *.o *.a *.pyc *.so $(TESTS)
 	rm -f vmodio-skel.c mod-pci-skel.c
 	rm -rf L865 L864 ppc 
 	make -C $(KERNELSRC) M=`pwd` clean
