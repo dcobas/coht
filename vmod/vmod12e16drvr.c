@@ -57,7 +57,6 @@ static int vmod12e16_release(struct inode *ino, struct file  *filp)
 static int ioread(void __iomem *addr, int be)
 {
 	unsigned int val = ioread16(addr);
-	printk(KERN_INFO PFX "Reading from address %p\n", addr);
 	if (be)
 		return be16_to_cpu(val);
 	else
