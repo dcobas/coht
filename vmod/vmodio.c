@@ -63,12 +63,11 @@ static unsigned long vmodio_map(unsigned long base_address)
 
 static int  vmodio_interrupt(void *irq_id);
 
-static int vmodio_slot_positions[] = {
-	VMODIO_SLOT_POS_0, 
-	VMODIO_SLOT_POS_1, 
-	VMODIO_SLOT_POS_2, 
-	VMODIO_SLOT_POS_3, 
-};
+/* obtain the irq of slot from a base_irq in slot 0 */
+static inline int vmodio_irq_shift(int base_irq, int slot)
+{
+	return base_irq - (0xe - (~(1<<slot) & 0xf));
+}
 
 static int device_init(struct vmodio *dev, int lun, unsigned long base_address, int irq)
 {
@@ -91,7 +90,7 @@ static int device_init(struct vmodio *dev, int lun, unsigned long base_address, 
 	 * To the rest of slots, the irq is calculated by substracting constants 0, 1, 3, 7.
 	 */
 	for (i = 0; i < VMODIO_SLOTS; i++) {
-		int irq = dev->irq - vmodio_slot_positions[i];
+		int irq = vmodio_irq_shift(dev->irq, i);
 		slot_irq[lun][i] = irq;
 		ret = vme_request_irq(irq, vmodio_interrupt, &irq, "vmodio");
 		if(ret < 0){ 
