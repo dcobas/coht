@@ -72,7 +72,6 @@ static inline int vmodio_irq_shift(int base_irq, int slot)
 static int device_init(struct vmodio *dev, int lun, unsigned long base_address, int irq)
 {
 	int ret;
-	int tmp;
 	int i;
 
 	dev->lun	= lun;
@@ -82,8 +81,9 @@ static int device_init(struct vmodio *dev, int lun, unsigned long base_address, 
 
 	if (dev->vaddr == -1)
 		return -1;
-	tmp = (dev->irq >> 4) & 0x0f;
-	irq_to_lun[tmp] = lun;	
+
+	/* Upper nibble of irq corresponds to a single VMODIO module */
+	irq_to_lun[(dev->irq >> 4) & 0x0f] = lun;
 
 	/* 
 	 * The irq corresponding to the first slot is passed as argument to the driver 
