@@ -311,6 +311,18 @@ static int register_isr(int (*isr_callback)(
         return 0;
 }
 
+static int interrupt_to_slot[] = {
+	-1, -1, -1, -1,
+	-1, -1, -1,  3,
+	-1, -1, -1,  2,
+	-1,  1,  0, -1,
+};
+
+static inline int irq_to_slot(int tmp)
+{
+	return interrupt_to_slot[tmp&0xf];
+}
+
 static int vmodio_interrupt(void *irq_id)
 {
 	int tmp;
@@ -325,25 +337,7 @@ static int vmodio_interrupt(void *irq_id)
 	carrier_number = irq_to_lun[tmp];
 
 	/* Get the interrupt vector to know the slot */
-	tmp = irq & 0x0f;
-
-	switch(tmp){
-	case 0xe:
-		board_position = 0;
-		break;
-	case 0xd:
-		board_position = 1;
-		break;
-	case 0xb:
-		board_position = 2;
-		break;
-	case 0x7:
-		board_position = 3;
-		break;
-	default:
-		board_position = -1;
-	}
-	
+	board_position = irq_to_slot(irq);
 	printk(KERN_ERR PFX "Interrupt carrier %d slot %d\n", carrier_number, board_position);
 
 	if (board_position < 0 || board_position >= VMODIO_SLOTS || carrier_number < 0
