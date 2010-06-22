@@ -27,7 +27,7 @@ static int nirq;
 module_param_array(irq, int, &nirq, S_IRUGO);
 
 static int irq_to_lun [MAX_DEVICES];
-static int irq_to_slot [MAX_DEVICES * VMODIO_SLOTS];
+static int slot_irq[MAX_DEVICES][VMODIO_SLOTS];
 
 /* description of a vmodio module */
 struct vmodio {
@@ -74,7 +74,6 @@ static int device_init(struct vmodio *dev, int lun, unsigned long base_address, 
 {
 	int ret;
 	int tmp;
-	int index = 0;
 	int i;
 
 	dev->lun	= lun;
@@ -84,16 +83,15 @@ static int device_init(struct vmodio *dev, int lun, unsigned long base_address, 
 
 	tmp = (dev->irq >> 4) & 0x0f;
 	irq_to_lun[tmp] = lun;	
-	index = tmp * VMODIO_SLOTS;
 
 	/* 
 	 * The irq corresponding to the first slot is passed as argument to the driver 
 	 * To the rest of slots, the irq is calculated by substracting constants 0, 1, 3, 7.
 	 */
 	for (i = 0; i < VMODIO_SLOTS; i++) {
-		int slot_irq = dev->irq - vmodio_slot_positions[i];
-		irq_to_slot[index+i] = slot_irq;
-		ret = vme_request_irq(slot_irq, vmodio_interrupt, &irq_to_slot[index+i], "vmodio");
+		int irq = dev->irq - vmodio_slot_positions[i];
+		slot_irq[lun][i] = irq;
+		ret = vme_request_irq(irq, vmodio_interrupt, &irq, "vmodio");
 		if(ret < 0){ 
 			printk(KERN_ERR PFX "Cannot register an irq to the device %d, error %d\n", 
 				  dev->lun, ret);
@@ -127,10 +125,10 @@ static int __init init(void)
 	/* Initialize the needed matrix for IRQ */
 	for (i = 0; i < MAX_DEVICES; i++){
 		irq_to_lun[i] = -1;
-		irq_to_slot[i * VMODIO_SLOTS] = -1;
-		irq_to_slot[i * VMODIO_SLOTS + 1] = -1;
-		irq_to_slot[i * VMODIO_SLOTS + 2] = -1;
-		irq_to_slot[i * VMODIO_SLOTS + 3] = -1;
+		slot_irq[i][0] = -1;
+		slot_irq[i][1] = -1;
+		slot_irq[i][2] = -1;
+		slot_irq[i][3] = -1;
 	}
 
 	if (modulbus_carrier_register(DRIVER_NAME, get_address_space, register_isr) != 0) {
@@ -174,13 +172,13 @@ failed_init:
 
 static void __exit exit(void)
 {
-	int i;
+	int i, j;
 
 	printk(KERN_INFO PFX "uninstalling driver\n");
-	for(i = 0; i < MAX_DEVICES * VMODIO_SLOTS; i++){
-		if(irq_to_slot[i] >= 0)
-			vme_free_irq(irq_to_slot[i]);
-	}
+	for(i = 0; i < MAX_DEVICES; i++)
+	for(j = 0; j < MAX_DEVICES; j++)
+		if(slot_irq[i][j] >= 0)
+			vme_free_irq(slot_irq[i][j]);
 	modulbus_carrier_unregister(DRIVER_NAME);
 }
 
