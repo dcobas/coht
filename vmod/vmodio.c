@@ -114,12 +114,12 @@ static int device_init(struct vmodio *dev, int lun, unsigned long base_address, 
 		return 0;
 }
 
+/* forward */
 static int get_address_space(
 	struct carrier_as *asp,
 	int board_number, int board_position, int address_space_number);
 
-static int register_isr(
-		int (*isr_callback)(
+static int register_isr(int (*isr_callback)(
 					 int board_number,
                                         int board_position,
                                         void* extra),
@@ -199,17 +199,6 @@ MODULE_AUTHOR("Juan David Gonzalez Cobas");
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("VMODIO driver");
 
-
-/* forward */
-static int get_address_space(
-	struct carrier_as *asp,
-	int board_number, int board_position, int address_space_number);
-
-static int register_isr(int (*isr_callback)(
-					 int board_number,
-                                        int board_position,
-                                        void* extra),
-                int board_number, int board_position);
 
 static int vmodio_offsets[VMODIO_SLOTS] = {
 	VMODIO_SLOT0,
