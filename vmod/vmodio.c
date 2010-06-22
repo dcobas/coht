@@ -27,7 +27,7 @@ static int nirq;
 module_param_array(irq, int, &nirq, S_IRUGO);
 
 static int irq_to_lun [MAX_DEVICES];
-static int slot_irq[MAX_DEVICES][VMODIO_SLOTS];
+static int lun_slot_to_irq[MAX_DEVICES][VMODIO_SLOTS];
 
 /* description of a vmodio module */
 struct vmodio {
@@ -248,7 +248,7 @@ static int device_init(struct vmodio *dev, int lun, unsigned long base_address, 
 	 */
 	for (i = 0; i < VMODIO_SLOTS; i++) {
 		int irq = vmodio_irq_shift(dev->irq, i);
-		slot_irq[lun][i] = irq;
+		lun_slot_to_irq[lun][i] = irq;
 		ret = vme_request_irq(irq, vmodio_interrupt, &irq, "vmodio");
 		if(ret < 0){ 
 			printk(KERN_ERR PFX "Cannot register an irq to the device %d, error %d\n", 
@@ -270,10 +270,10 @@ static int __init init(void)
 	/* Initialize the needed matrix for IRQ */
 	for (i = 0; i < MAX_DEVICES; i++){
 		irq_to_lun[i] = -1;
-		slot_irq[i][0] = -1;
-		slot_irq[i][1] = -1;
-		slot_irq[i][2] = -1;
-		slot_irq[i][3] = -1;
+		lun_slot_to_irq[i][0] = -1;
+		lun_slot_to_irq[i][1] = -1;
+		lun_slot_to_irq[i][2] = -1;
+		lun_slot_to_irq[i][3] = -1;
 	}
 
 	if (nlun >= MAX_DEVICES) {
@@ -325,8 +325,8 @@ static void __exit exit(void)
 	printk(KERN_INFO PFX "uninstalling driver\n");
 	for(i = 0; i < MAX_DEVICES; i++)
 	for(j = 0; j < MAX_DEVICES; j++)
-		if(slot_irq[i][j] >= 0)
-			vme_free_irq(slot_irq[i][j]);
+		if(lun_slot_to_irq[i][j] >= 0)
+			vme_free_irq(lun_slot_to_irq[i][j]);
 	modulbus_carrier_unregister(DRIVER_NAME);
 }
 
