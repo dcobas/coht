@@ -81,6 +81,8 @@ static int device_init(struct vmodio *dev, int lun, unsigned long base_address, 
 	dev->vaddr	= vmodio_map(base_address);
 	dev->irq	= irq;
 
+	if (dev->vaddr == -1)
+		return -1;
 	tmp = (dev->irq >> 4) & 0x0f;
 	irq_to_lun[tmp] = lun;	
 
@@ -98,10 +100,7 @@ static int device_init(struct vmodio *dev, int lun, unsigned long base_address, 
 		}
 	}
 
-	if (dev->vaddr == -1)
-		return -1;
-	else
-		return 0;
+	return 0;
 }
 
 /* forward */
