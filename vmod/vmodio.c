@@ -69,6 +69,11 @@ static inline int vmodio_irq_shift(int base_irq, int slot)
 	return base_irq - (0xe - (~(1<<slot) & 0xf));
 }
 
+static inline int upper_nibble_of(int byte)
+{
+	return 0xf & (byte >> 4);
+}
+
 static int device_init(struct vmodio *dev, int lun, unsigned long base_address, int irq)
 {
 	int ret;
@@ -83,7 +88,7 @@ static int device_init(struct vmodio *dev, int lun, unsigned long base_address, 
 		return -1;
 
 	/* Upper nibble of irq corresponds to a single VMODIO module */
-	irq_to_lun[(dev->irq >> 4) & 0x0f] = lun;
+	irq_to_lun[upper_nibble_of(dev->irq)] = lun;
 
 	/* 
 	 * The irq corresponding to the first slot is passed as argument to the driver 
@@ -317,16 +322,13 @@ static inline int irq_slot(int tmp)
 
 static int vmodio_interrupt(void *irq_id)
 {
-	int tmp;
 	int carrier_number = -1;
 	short board_position = -1;
 
 	int irq = *(int *)irq_id;
 
 	/* Get the interrupt vector to know the lun of the matched carrier */
-	tmp = (irq >> 4) & 0x0f;
-
-	carrier_number = irq_to_lun[tmp];
+	carrier_number = irq_to_lun[upper_nibble_of(irq)];
 
 	/* Get the interrupt vector to know the slot */
 	board_position = irq_slot(irq);
