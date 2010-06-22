@@ -10,7 +10,7 @@
 
 /*
  * this module is invoked as
- *     $ insmod vmodio lun=0,1,4 
+ *     $ insmod vmodio lun=0,1,4
  *			base_address=0x1200,0xA800,0x6000
  *		     	irq=126,130,142
  */
@@ -110,7 +110,7 @@ static int vmodio_offsets[VMODIO_SLOTS] = {
  * @brief Get virtual address of a mezzanine board AS
  *
  * VMOD/IO assigns a memory-mapped IO area to each slot of slot0..3
- * by the rule slot_address = base_address + slot#*0x200. 
+ * by the rule slot_address = base_address + slot#*0x200.
  *
  * @param board_number  - logical module number of VMOD/IO card
  * @param board_positio - slot the requesting mz is plugged in
@@ -150,14 +150,14 @@ static int get_address_space(
 
 /**
  *  @brief Wrapper around get_address_space
- *  
+ *
  *  Same parameters and semantics, only intended for export (via
  *  linux EXPORT_SYMBOL or some LynxOS kludge)
  */
 static int  vmodio_get_address_space(
 	struct carrier_as *as,
-	int board_number, 
-	int board_position, 
+	int board_number,
+	int board_position,
 	int address_space_number)
 {
 	return	get_address_space(as, board_number, board_position, address_space_number);
@@ -183,18 +183,18 @@ static int register_isr(int (*isr_callback)(
 					    void* extra),
 			    int board_number, int board_position)
 {
-
 	/* Adds the isr_callback if the carrier number and slot are correct. */
 	if(board_number >= 0 && board_number < MAX_DEVICES &&
-			board_position >= 0 && board_position < VMODIO_SLOTS){
-		mezzanines_callback[board_number][board_position] = (isrcb_t) isr_callback;
+			board_position >= 0 && board_position < VMODIO_SLOTS) {
+		mezzanines_callback[board_number][board_position] =
+					(isrcb_t) isr_callback;
 	}
-	else{
-		printk(KERN_ERR PFX "Invalid VMOD/IO board number %d or board position %d\n",
+	else {
+		printk(KERN_ERR PFX
+			"Invalid VMOD/IO board number %d or board position %d\n",
 				board_number, board_position);
 		return -1;
 	}
-
         return 0;
 }
 
@@ -202,8 +202,8 @@ static int vmodio_interrupt(void *irq_id)
 {
 	int carrier_number = -1;
 	short board_position = -1;
-
 	int irq = *(int *)irq_id;
+	isrcb_t callback;
 
 	/* Get the interrupt vector to know the lun of the matched carrier */
 	carrier_number = irq_to_lun[upper_nibble_of(irq)];
@@ -212,15 +212,18 @@ static int vmodio_interrupt(void *irq_id)
 	board_position = irq_to_slot(irq);
 	printk(KERN_ERR PFX "Interrupt carrier %d slot %d\n", carrier_number, board_position);
 
-	if (board_position < 0 || board_position >= VMODIO_SLOTS || carrier_number < 0
-	    || carrier_number >= MAX_DEVICES){
-		printk(KERN_ERR PFX "invalid board_number interrupt: carrier %d board_position %d\n",
+	if (board_position < 0 || board_position >= VMODIO_SLOTS ||
+		carrier_number < 0 || carrier_number >= MAX_DEVICES) {
+		printk(KERN_ERR PFX
+			"invalid board_number interrupt:"
+			"carrier %d board_position %d\n",
 			    carrier_number, board_position);
 		return IRQ_NONE;
 	}
 
-	if ((mezzanines_callback[carrier_number][board_position] == NULL) ||
-	    (mezzanines_callback[carrier_number][board_position] (carrier_number, board_position, NULL) == -1))
+	callback = mezzanines_callback[carrier_number][board_position];
+	if ( callback == NULL ||
+		callback(carrier_number, board_position, NULL) == -1)
 		return IRQ_NONE;
 
 	return IRQ_HANDLED;
@@ -242,16 +245,19 @@ static int device_init(struct vmodio *dev, int lun, unsigned long base_address, 
 	/* Upper nibble of irq corresponds to a single VMODIO module */
 	irq_to_lun[upper_nibble_of(dev->irq)] = lun;
 
-	/* 
-	 * The irq corresponding to the first slot is passed as argument to the driver 
-	 * To the rest of slots, the irq is calculated by substracting constants 0, 1, 3, 7.
+	/*
+	 * The irq corresponding to the first slot is passed as argument
+	 * to the driver To the rest of slots, the irq is calculated by
+	 * substracting constants 0, 1, 3, 7.
 	 */
 	for (i = 0; i < VMODIO_SLOTS; i++) {
 		int irq = vmodio_irq_shift(dev->irq, i);
 		lun_slot_to_irq[lun][i] = irq;
 		ret = vme_request_irq(irq, vmodio_interrupt, &irq, "vmodio");
-		if(ret < 0){ 
-			printk(KERN_ERR PFX "Cannot register an irq to the device %d, error %d\n", 
+		if (ret < 0) {
+			printk(KERN_ERR PFX
+				"Cannot register an irq "
+				"to the device %d, error %d\n",
 				  dev->lun, ret);
 			return -1;
 		}
@@ -295,11 +301,11 @@ static int __init init(void)
 	printk(KERN_INFO PFX "registered as %s carrier\n", DRIVER_NAME);
 
 	devices = 0;
-	for (device = 0; device < nlun; device++){
+	for (device = 0; device < nlun; device++) {
 		struct vmodio *dev = &device_table[device];
 		
 		if (device_init(dev, lun[device], base_address[device], irq[device])) {
-			printk(KERN_ERR PFX "map failed! not configuring lun %d\n", 
+			printk(KERN_ERR PFX "map failed! not configuring lun %d\n",
 				dev->lun);
 			goto failed_register;
 		}
