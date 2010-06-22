@@ -315,7 +315,7 @@ static int interrupt_to_slot[] = {
 	-1,  1,  0, -1,
 };
 
-static inline int irq_slot(int tmp)
+static inline int irq_to_slot(int tmp)
 {
 	return interrupt_to_slot[tmp&0xf];
 }
@@ -331,7 +331,7 @@ static int vmodio_interrupt(void *irq_id)
 	carrier_number = irq_to_lun[upper_nibble_of(irq)];
 
 	/* Get the interrupt vector to know the slot */
-	board_position = irq_slot(irq);
+	board_position = irq_to_slot(irq);
 	printk(KERN_ERR PFX "Interrupt carrier %d slot %d\n", carrier_number, board_position);
 
 	if (board_position < 0 || board_position >= VMODIO_SLOTS || carrier_number < 0
