@@ -330,7 +330,7 @@ static void __exit exit(void)
 
 	printk(KERN_INFO PFX "uninstalling driver\n");
 	for(i = 0; i < MAX_DEVICES; i++)
-	for(j = 0; j < MAX_DEVICES; j++)
+	for(j = 0; j < VMODIO_SLOTS; j++)
 		if(lun_slot_to_irq[i][j] >= 0)
 			vme_free_irq(lun_slot_to_irq[i][j]);
 	modulbus_carrier_unregister(DRIVER_NAME);
