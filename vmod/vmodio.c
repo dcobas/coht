@@ -130,22 +130,23 @@ static int __init init(void)
 		slot_irq[i][3] = -1;
 	}
 
+	if (nlun >= MAX_DEVICES) {
+		printk(KERN_ERR PFX "too many devices (%d)\n", nlun);
+		goto failed_init;
+	}
+	if (nlun != nbase_address || nlun != nirq) {
+		printk(KERN_ERR PFX
+			"Given %d luns but %d addresses and %d irqs\n",
+				nlun, nbase_address, nirq);
+		goto failed_init;
+	}
+
 	if (modulbus_carrier_register(DRIVER_NAME, get_address_space, register_isr) != 0) {
 		printk(KERN_ERR PFX "could not register %s module\n",
 			DRIVER_NAME);
 		goto failed_init;
 	}
 	printk(KERN_INFO PFX "registered as %s carrier\n", DRIVER_NAME);
-
-	if (nlun >= MAX_DEVICES) {
-		printk(KERN_ERR PFX "too many devices (%d)\n", nlun);
-		goto failed_init;
-	}
-	if (nlun != nbase_address) {
-		printk(KERN_ERR PFX "Given %d luns but %d addresses\n", 
-				nlun, nbase_address);
-		goto failed_init;
-	}
 
 	devices = 0;
 	for (device = 0; device < nlun; device++){
@@ -154,7 +155,7 @@ static int __init init(void)
 		if (device_init(dev, lun[device], base_address[device], irq[device])) {
 			printk(KERN_ERR PFX "map failed! not configuring lun %d\n", 
 				dev->lun);
-			continue;
+			goto failed_register;
 		}
 		printk(KERN_INFO PFX "mapped at virtual address 0x%08lx\n",
 			dev->vaddr);
@@ -164,6 +165,8 @@ static int __init init(void)
 
 	return 0;
 
+failed_register:
+	modulbus_carrier_unregister(DRIVER_NAME);
 failed_init:
 	printk(KERN_ERR PFX "failed to init, exit\n");
 	return -1;
