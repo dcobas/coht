@@ -97,6 +97,7 @@ static int device_init(struct vmodio *dev, int lun, unsigned long base_address, 
 		if(ret < 0){ 
 			printk(KERN_ERR PFX "Cannot register an irq to the device %d, error %d\n", 
 				  dev->lun, ret);
+			return -1;
 		}
 	}
 
