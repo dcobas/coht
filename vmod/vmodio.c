@@ -10,7 +10,9 @@
 
 /*
  * this module is invoked as
- *     $ insmod vmodio lun=0,1,2,4 lun=0,1,2,4 base_address=0x1200,0xA800,0x6000
+ *     $ insmod vmodio lun=0,1,4 
+ *		base_address=0x1200,0xA800,0x6000
+ *		     irq=126,130,142
  */
 static int lun[MAX_DEVICES];
 static int nlun;
