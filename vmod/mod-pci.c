@@ -4,6 +4,7 @@
 
 #define	MAX_DEVICES	16
 #define	DRIVER_NAME	"mod-pci"
+#define PFX		DRIVER_NAME ": "
 
 /*
  * this module is invoked as
@@ -65,7 +66,7 @@ static int probe(struct pci_dev *dev, const struct pci_device_id *id)
 		return -1;
 
 	/* found match, configure */
-	printk(KERN_INFO "%s: "
+	printk(KERN_INFO PFX
 		"configuring device at bus = %d, slot %d\n",
 		DRIVER_NAME, bus, slot);
 	if (pci_read_config_dword(dev, MOD_PCI_MODULBUS_MEMSPACE_BIG_BAR_OFFSET, (u32*)&vaddr) != 0) {
@@ -76,8 +77,10 @@ static int probe(struct pci_dev *dev, const struct pci_device_id *id)
 	printk(KERN_INFO "%s: "
 		"configured device number %d\n"
 		"lun = %d, bus = %d, slot = %d, vaddr = %p\n",
-		DRIVER_NAME, i, device_table[i].lun, bus, slot, 
-		(void*)vaddr);
+		cfg_entry->lun, 
+		cfg_entry->bus_number, cfg_entry->slot_number, 
+		cfg_entry->vaddr);
+
 	return 0;
 }
 
@@ -86,7 +89,7 @@ static void remove(struct pci_dev *dev)
 }
 
 static struct pci_driver pci_driver = {
-	.name     = "mod-pci",
+	.name     = DRIVER_NAME,
 	.id_table = mod_pci_ids,
 	.probe    = probe,
 	.remove   = remove,
@@ -96,17 +99,16 @@ static int __init init(void)
 {
 	int device = 0;
 
-	printk(KERN_INFO "%s: initializing driver\n", DRIVER_NAME);
+	printk(KERN_INFO PFX "initializing driver\n");
 	if (nlun < 0 || nlun >= MAX_DEVICES) {
-		printk(KERN_ERR "%s: "
-		"invalid number of configured devices (%d)\n",
-			DRIVER_NAME, nlun);
+		printk(KERN_ERR PFX
+		"invalid number of configured devices (%d)\n", nlun);
 		goto failed_init;
 	}
 	if (nbus_number != nlun || nslot_number != nlun) {
-		printk(KERN_ERR "%s: parameter mismatch.\n"
+		printk(KERN_ERR PFX "parameter mismatch.\n"
 			"Given %d luns, %d bus numbers, %d slot numbers\n",
-			DRIVER_NAME, nlun, nbus_number, nslot_number);
+			nlun, nbus_number, nslot_number);
 		goto failed_init;
 	}
 
@@ -116,16 +118,16 @@ static int __init init(void)
 		dev->lun	= lun[device];
 		dev->bus_number	= bus_number[device];
 		dev->slot_number= slot_number[device];
-		printk(KERN_INFO "should have (%d, %d, %d)\n",
+		printk(KERN_INFO PFX "shall config lun %d," "bus %d, slot %d)\n",
 			dev->lun, dev->bus_number, dev->slot_number);
 	}
 	devices = device;
 
-	printk(KERN_INFO "%s: registering driver\n", DRIVER_NAME);
+	printk(KERN_INFO PFX "registering driver\n");
 	return pci_register_driver(&pci_driver);
 
 failed_init:
-	printk(KERN_ERR "%s: module exiting\n", DRIVER_NAME);
+	printk(KERN_ERR PFX "module exiting\n");
 	return -1;
 }
 
