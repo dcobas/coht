@@ -53,7 +53,7 @@
 #define MOD_PCI_MODULBUS_SLOT0_OFFSET	0x000
 #define MOD_PCI_MODULBUS_SLOT1_OFFSET	0x200
 #define MOD_PCI_MODULBUS_WIDTH		16
-#define MOD_PCI_MODULBUS_WINDOW_SIZE	4096
+#define MOD_PCI_MODULBUS_WINDOW_SIZE	2048
 
 /* On-board registers offsets */
 /* WARNING: all byte-only accesses */
