@@ -1,5 +1,6 @@
 #include <linux/module.h>
 #include <linux/pci.h>
+#include "modulbus_register.h"
 #include "mod-pci.h"
 
 #define	MAX_DEVICES	16
@@ -48,6 +49,39 @@ static struct pci_device_id mod_pci_ids[] = {
 	{ PCI_VENDOR_ID_JANZ, PCI_DEVICE_ID_JANZ_MOD_PCI_1,
 	  PCI_SUBSYSTEM_VENDOR_ID_JANZ, PCI_SUBSYSTEM_ID_MOD_PCI_3_0, },
 };
+
+static struct mod_pci *find_device_by_lun(int lun)
+{
+	int i;
+
+	for (i = 0; i < devices; i++)
+		if (device_table[i].lun == lun)
+			return &device_table[i];
+	return NULL;
+}
+
+static unsigned int modpci_offsets[] = {
+	MOD_PCI_MODULBUS_SLOT0_OFFSET,
+	MOD_PCI_MODULBUS_SLOT1_OFFSET,
+};
+
+static int get_address_space(
+	struct carrier_as *as,
+	int board_number,
+	int board_position,
+	int address_space_number)
+{
+	struct mod_pci *dev = find_device_by_lun(board_number);
+
+	if (dev == NULL || (board_position & (~0x1)) != 0)
+		return -1;
+	as->address = (unsigned long)dev->vaddr + modpci_offsets[board_position];
+	as->width   = MOD_PCI_MODULBUS_WIDTH;
+	as->size    = MOD_PCI_MODULBUS_WINDOW_SIZE/4;
+	as->is_big_endian = 1;
+
+	return 0;
+}
 
 static struct mod_pci *find_device_config(struct pci_dev *dev)
 {
@@ -144,6 +178,10 @@ static int __init init(void)
 	int device = 0;
 
 	printk(KERN_INFO PFX "initializing driver\n");
+	if (modulbus_carrier_register(DRIVER_NAME, get_address_space, NULL)) {
+		printk(KERN_ERR PFX "could not register with modulbus\n");
+		goto failed_init;
+	}
 	if (nlun < 0 || nlun >= MAX_DEVICES) {
 		printk(KERN_ERR PFX
 		"invalid number of configured devices (%d)\n", nlun);
