@@ -91,7 +91,7 @@ static int probe(struct pci_dev *dev, const struct pci_device_id *id)
 		goto failed_request;
 	}
 	if (pci_resource_len(dev,
-		MOD_PCI_MODULBUS_MEMSPACE_BIG_BAR_OFFSET) < MOD_PCI_MODULBUS_WINDOW_SIZE) {
+		MOD_PCI_MODULBUS_MEMSPACE_BIG_BAR) < MOD_PCI_MODULBUS_WINDOW_SIZE) {
 		printk(KERN_ERR PFX "wrong BAR# size\n");
 		goto failed_request;
 	}
