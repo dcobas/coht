@@ -30,7 +30,7 @@ struct mod_pci {
 	int		lun;		/* logical unit number */
 	int		bus_number;	/* pci bus number */
 	int		slot_number;	/* pci slot number */
-	unsigned long	vaddr;		/* virtual address of MODULBUS
+	void		*vaddr;		/* virtual address of MODULBUS
 							space */
 };
 
@@ -49,43 +49,87 @@ static struct pci_device_id mod_pci_ids[] = {
 	  PCI_SUBSYSTEM_VENDOR_ID_JANZ, PCI_SUBSYSTEM_ID_MOD_PCI_3_0, },
 };
 
-static int probe(struct pci_dev *dev, const struct pci_device_id *id)
+static struct mod_pci *find_device_config(struct pci_dev *dev)
 {
-	int i;
 	int bus  = dev->bus->number;
 	int slot = PCI_SLOT(dev->devfn);
-	unsigned long vaddr;
+	int i;
 
 	/* find the device in config table */
 	for (i = 0; i < devices; i++) {
-		if (device_table[i].bus_number  == bus &&
-		    device_table[i].slot_number == slot)
-		    break;
+		struct mod_pci *entry = &device_table[i];
+		if (entry->bus_number  == bus &&
+		    entry->slot_number == slot)
+		    return entry;
 	}
-	if (i >= devices) 
-		return -1;
+	return NULL;
+}
+
+static int probe(struct pci_dev *dev, const struct pci_device_id *id)
+{
+	struct mod_pci *cfg_entry;
+
+	/* check static config is present */
+	cfg_entry = find_device_config(dev);
+	if (!cfg_entry) {
+		printk(KERN_INFO PFX
+			"no config data for bus = %d, slot %d\n",
+			dev->bus->number, PCI_SLOT(dev->devfn));
+		goto failed_enable;
+	}
 
 	/* found match, configure */
 	printk(KERN_INFO PFX
 		"configuring device at bus = %d, slot %d\n",
-		DRIVER_NAME, bus, slot);
-	if (pci_read_config_dword(dev, MOD_PCI_MODULBUS_MEMSPACE_BIG_BAR_OFFSET, (u32*)&vaddr) != 0) {
-		printk(KERN_ERR "%s: could not read BAR#%d\n",
-			DRIVER_NAME, MOD_PCI_MODULBUS_MEMSPACE_BIG_BAR);
-		return -1;
+		cfg_entry->bus_number, cfg_entry->slot_number);
+	if (pci_enable_device(dev) < 0) {
+		printk(KERN_ERR PFX "could not enable device\n");
+		goto failed_enable;
 	}
-	printk(KERN_INFO "%s: "
-		"configured device number %d\n"
+	if (!(pci_resource_flags(dev, MOD_PCI_MODULBUS_MEMSPACE_BIG_BAR) & IORESOURCE_MEM)) {
+		printk(KERN_ERR PFX "BAR#2 not a MMIO, device not present?\n");
+		goto failed_request;
+	}
+	if (pci_resource_len(dev,
+		MOD_PCI_MODULBUS_MEMSPACE_BIG_BAR_OFFSET) < MOD_PCI_MODULBUS_WINDOW_SIZE) {
+		printk(KERN_ERR PFX "wrong BAR# size\n");
+		goto failed_request;
+	}
+	if (pci_request_region(dev,
+		MOD_PCI_MODULBUS_MEMSPACE_BIG_BAR, DRIVER_NAME) != 0) {
+		printk(KERN_ERR PFX "could not request BAR#2\n");
+		goto failed_request;
+	}
+	cfg_entry->vaddr = ioremap(
+		pci_resource_start(dev, MOD_PCI_MODULBUS_MEMSPACE_BIG_BAR),
+		MOD_PCI_MODULBUS_WINDOW_SIZE);
+	if (cfg_entry->vaddr == NULL) {
+		printk(KERN_ERR PFX "could not map BAR#2\n");
+		goto failed_map;
+	}
+	printk(KERN_INFO PFX "configured device "
 		"lun = %d, bus = %d, slot = %d, vaddr = %p\n",
 		cfg_entry->lun, 
 		cfg_entry->bus_number, cfg_entry->slot_number, 
 		cfg_entry->vaddr);
 
 	return 0;
+
+failed_map:
+	pci_release_regions(dev);
+failed_request:
+	pci_disable_device(dev);
+failed_enable:
+	return -ENODEV;
 }
 
 static void remove(struct pci_dev *dev)
 {
+	struct mod_pci *cfg = find_device_config(dev);
+
+	iounmap(cfg->vaddr);
+	pci_release_regions(dev);
+	pci_disable_device(dev);
 }
 
 static struct pci_driver pci_driver = {
