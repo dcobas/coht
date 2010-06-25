@@ -2,7 +2,7 @@
 #include <linux/pci.h>
 #include "mod-pci.h"
 
-#define	MAX_DEVICES	64
+#define	MAX_DEVICES	16
 #define	DRIVER_NAME	"mod-pci"
 
 /*
