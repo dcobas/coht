@@ -66,13 +66,4 @@
 #define MOD_PCI_EEP		0x9	/* r/w access */
 #define MOD_PCI_ENID		0xb	/* write/access */
 
-/**
- * @brief abstraction of a MODULBUS address space
- */
-struct mod_pci_memory_space {
-	int	slot;		/**< MODULBUS slot (0-1) */
-	char	*address;	/**< memory address of slot */
-	int	width;		/**< data width (always 16) */
-};
-
 #endif /* _MOD_PCI_H_ */
