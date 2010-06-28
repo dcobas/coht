@@ -61,8 +61,8 @@ static struct mod_pci *find_device_by_lun(int lun)
 }
 
 static unsigned int modpci_offsets[] = {
-	MOD_PCI_MODULBUS_SLOT0_OFFSET,
-	MOD_PCI_MODULBUS_SLOT1_OFFSET,
+	MOD_PCI_SLOT0_OFFSET,
+	MOD_PCI_SLOT1_OFFSET,
 };
 
 static int get_address_space(
@@ -76,8 +76,8 @@ static int get_address_space(
 	if (dev == NULL || (board_position & (~0x1)) != 0)
 		return -1;
 	as->address = (unsigned long)dev->vaddr + modpci_offsets[board_position];
-	as->width   = MOD_PCI_MODULBUS_WIDTH;
-	as->size    = MOD_PCI_MODULBUS_WINDOW_SIZE/4;
+	as->width   = MOD_PCI_WIDTH;
+	as->size    = MOD_PCI_WINDOW_SIZE/4;
 	as->is_big_endian = 1;
 
 	return 0;
@@ -112,7 +112,7 @@ static int probe(struct pci_dev *dev, const struct pci_device_id *id)
 		goto failed_enable;
 	}
 
-	/* found match, configure */
+	/* found match, map BAR#2 (big endian) */
 	printk(KERN_INFO PFX
 		"configuring device at bus = %d, slot %d\n",
 		cfg_entry->bus_number, cfg_entry->slot_number);
@@ -120,31 +120,29 @@ static int probe(struct pci_dev *dev, const struct pci_device_id *id)
 		printk(KERN_ERR PFX "could not enable device\n");
 		goto failed_enable;
 	}
-	if (!(pci_resource_flags(dev, MOD_PCI_MODULBUS_MEMSPACE_BIG_BAR) & IORESOURCE_MEM)) {
+	if (!(pci_resource_flags(dev, MOD_PCI_BIG_BAR) & IORESOURCE_MEM)) {
 		printk(KERN_ERR PFX "BAR#2 not a MMIO, device not present?\n");
 		goto failed_request;
 	}
-	if (pci_resource_len(dev,
-		MOD_PCI_MODULBUS_MEMSPACE_BIG_BAR) < MOD_PCI_MODULBUS_WINDOW_SIZE) {
-		printk(KERN_ERR PFX "wrong BAR# size\n");
+	if (pci_resource_len(dev, MOD_PCI_BIG_BAR) < MOD_PCI_BIG_BAR_SIZE) {
+		printk(KERN_ERR PFX "wrong BAR#2 size\n");
 		goto failed_request;
 	}
-	if (pci_request_region(dev,
-		MOD_PCI_MODULBUS_MEMSPACE_BIG_BAR, DRIVER_NAME) != 0) {
+	if (pci_request_region(dev, MOD_PCI_BIG_BAR, DRIVER_NAME) != 0) {
 		printk(KERN_ERR PFX "could not request BAR#2\n");
 		goto failed_request;
 	}
-	cfg_entry->vaddr = ioremap(
-		pci_resource_start(dev, MOD_PCI_MODULBUS_MEMSPACE_BIG_BAR),
-		MOD_PCI_MODULBUS_WINDOW_SIZE);
+	cfg_entry->vaddr =
+		ioremap(pci_resource_start(dev, MOD_PCI_BIG_BAR),
+			MOD_PCI_BIG_BAR_SIZE);
 	if (cfg_entry->vaddr == NULL) {
 		printk(KERN_ERR PFX "could not map BAR#2\n");
 		goto failed_map;
 	}
 	printk(KERN_INFO PFX "configured device "
 		"lun = %d, bus = %d, slot = %d, vaddr = %p\n",
-		cfg_entry->lun, 
-		cfg_entry->bus_number, cfg_entry->slot_number, 
+		cfg_entry->lun,
+		cfg_entry->bus_number, cfg_entry->slot_number,
 		cfg_entry->vaddr);
 
 	return 0;
