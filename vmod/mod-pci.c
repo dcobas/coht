@@ -124,7 +124,7 @@ static struct mod_pci *find_device_config(struct pci_dev *dev)
 	return NULL;
 }
 
-static void *map_bar(struct pci_dev *dev,
+static void *map_bar(struct pci_dev *dev, 
 	unsigned int bar, unsigned int bar_size)
 {
 	void *ret;
@@ -301,6 +301,7 @@ failed_init:
 static void __exit exit(void)
 {
 	pci_unregister_driver(&pci_driver);
+	modulbus_carrier_unregister(DRIVER_NAME);
 }
 
 module_init(init);
