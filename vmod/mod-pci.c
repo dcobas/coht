@@ -160,6 +160,13 @@ static void modpci_enable_irq(struct mod_pci *dev)
 	iowrite16be(0x3, int_enable);
 }
 
+static void modpci_disable_irq(struct mod_pci *dev)
+{
+	void *int_disable = &dev->onboard->int_disable;
+	iowrite16be(0x3, int_disable);
+}
+
+
 static irqreturn_t modpci_interrupt(int irq, void *device_id)
 {
 	struct mod_pci *dev = device_id;
@@ -254,7 +261,9 @@ static void remove(struct pci_dev *dev)
 {
 	struct mod_pci *cfg = find_device_config(dev);
 
-	free_irq(dev->irq, dev);
+	printk(KERN_INFO PFX "removing device %d\n", cfg->lun);
+	modpci_disable_irq(cfg);
+	free_irq(dev->irq, cfg);
 	iounmap(cfg->onboard);
 	iounmap(cfg->vaddr);
 	pci_release_region(dev, MOD_PCI_ONBOARD_REGS_BAR);
