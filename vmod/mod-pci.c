@@ -163,12 +163,18 @@ static void modpci_enable_irq(struct mod_pci *dev)
 static irqreturn_t modpci_interrupt(int irq, void *device_id)
 {
 	struct mod_pci *dev = device_id;
+	int index = dev-device_table;
+	int lun, int_stat, slot0, slot1;
+
+	/* forget if not mine */
+	if (!(0 <= index && index < devices))
+		return IRQ_NONE;
 
 	/* determine source */
-	int lun = dev->lun;
-	int int_stat = ioread16be(&dev->onboard->int_stat);
-	int slot0 = int_stat & (~1);
-	int slot1 = int_stat & (~2);
+	lun = dev->lun;
+	int_stat = ioread16be(&dev->onboard->int_stat);
+	slot0 = int_stat & (~1);
+	slot1 = int_stat & (~2);
 
 	printk(KERN_INFO PFX
 		"interrupt status: lun = %d, slot 0 = %d, slot1 = %d\n",
@@ -180,6 +186,7 @@ static int probe(struct pci_dev *dev, const struct pci_device_id *id)
 {
 	struct mod_pci *cfg_entry;
 	u8 irq;
+	int errno;
 
 	/* check static config is present */
 	cfg_entry = find_device_config(dev);
@@ -209,22 +216,26 @@ static int probe(struct pci_dev *dev, const struct pci_device_id *id)
 		goto failed_map;
 	}
 
-	/* get interrupt line, enable ints and install handler */
-	irq = dev->irq;
-	modpci_enable_irq(cfg_entry);
-	if (request_irq(irq, modpci_interrupt,
-			IRQF_DISABLED, DRIVER_NAME, cfg_entry)) {
-		printk(KERN_ERR PFX "could not request irq %d\n", irq);
-		goto failed_irq;
-	}
-	printk(KERN_INFO PFX "got irq %d\n", irq);
-
 	/* success! */
-	printk(KERN_INFO PFX "configured device "
-		"lun = %d, bus = %d, slot = %d, vaddr = %p\n",
+	printk(KERN_INFO PFX "configured device maps, "
+		"lun = %d, bus = %d, slot = %d, "
+		"vaddr = %p onboard = %p\n",
 		cfg_entry->lun,
 		cfg_entry->bus_number, cfg_entry->slot_number,
-		cfg_entry->vaddr);
+		cfg_entry->vaddr, cfg_entry->onboard);
+
+	/* get interrupt line, enable ints and install handler */
+	irq = dev->irq;
+	errno = request_irq(irq, modpci_interrupt,
+			IRQF_SHARED, DRIVER_NAME, cfg_entry);
+	if (errno != 0) {
+		printk(KERN_ERR PFX
+			"could not request irq %d, err = %d\n",
+				irq, errno);
+		goto failed_irq;
+	}
+	modpci_enable_irq(cfg_entry);
+	printk(KERN_INFO PFX "got irq %d\n", irq);
 
 	return 0;
 
