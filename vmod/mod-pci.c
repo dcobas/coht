@@ -1,5 +1,6 @@
 #include <linux/module.h>
 #include <linux/pci.h>
+#include <linux/interrupt.h>
 #include "modulbus_register.h"
 #include "mod-pci.h"
 
@@ -26,6 +27,29 @@ static int slot_number[MAX_DEVICES];
 static int nslot_number;
 module_param_array(slot_number, int, &nslot_number, S_IRUGO);
 
+/* map of the onboard registers at BAR#4 */
+struct onboard {
+	unsigned char	unused1;
+	union {
+	unsigned char	int_stat;
+	unsigned char	int_disable;
+	};
+	unsigned char	unused2;
+	union {
+	unsigned char	mbus_num;
+	unsigned char	int_enable;
+	};
+	unsigned char	unused3;
+	unsigned char	reset_assert;
+	unsigned char	unused4;
+	unsigned char	reset_deassert;
+	unsigned char	unused5;
+	unsigned char	eep;
+	unsigned char	unused6;
+	unsigned char	unused7;
+	unsigned char	enid;
+};
+
 /* description of a mod-pci module */
 struct mod_pci {
 	int		lun;		/* logical unit number */
@@ -33,6 +57,7 @@ struct mod_pci {
 	int		slot_number;	/* pci slot number */
 	void		*vaddr;		/* virtual address of MODULBUS
 							space */
+	struct onboard	*onboard;	/* on-board registers */
 };
 
 static struct mod_pci device_table[MAX_DEVICES];
@@ -99,9 +124,62 @@ static struct mod_pci *find_device_config(struct pci_dev *dev)
 	return NULL;
 }
 
+static void *map_bar(struct pci_dev *dev,
+	unsigned int bar, unsigned int bar_size)
+{
+	void *ret;
+
+	if (!(pci_resource_flags(dev, bar) & IORESOURCE_MEM)) {
+		printk(KERN_ERR PFX "BAR#%d not a MMIO, device not present?\n", bar);
+		goto failed_request;
+	}
+	if (pci_resource_len(dev, bar) < bar_size) {
+		printk(KERN_ERR PFX "wrong BAR#%d size\n", bar);
+		goto failed_request;
+	}
+	if (pci_request_region(dev, bar, DRIVER_NAME) != 0) {
+		printk(KERN_ERR PFX "could not request BAR#%d\n", bar);
+		goto failed_request;
+	}
+	ret = ioremap(pci_resource_start(dev, bar), bar_size);
+	if (ret == NULL) {
+		printk(KERN_ERR PFX "could not map BAR#%d\n", bar);
+		goto failed_map;
+	}
+	return ret;
+
+failed_map:
+	pci_release_regions(dev);
+failed_request:
+	return NULL;
+}
+
+static void modpci_enable_irq(struct mod_pci *dev)
+{
+	void *int_enable = &dev->onboard->int_enable;
+	iowrite16be(0x3, int_enable);
+}
+
+static irqreturn_t modpci_interrupt(int irq, void *device_id)
+{
+	struct mod_pci *dev = device_id;
+
+	/* determine source */
+	int lun = dev->lun;
+	int int_stat = ioread16be(&dev->onboard->int_stat);
+	int slot0 = int_stat & (~1);
+	int slot1 = int_stat & (~2);
+
+	printk(KERN_INFO PFX
+		"interrupt status: lun = %d, slot 0 = %d, slot1 = %d\n",
+		lun, slot0, slot1);
+	return IRQ_HANDLED;
+}
+
 static int probe(struct pci_dev *dev, const struct pci_device_id *id)
 {
 	struct mod_pci *cfg_entry;
+	u8 irq;
 
 	/* check static config is present */
 	cfg_entry = find_device_config(dev);
@@ -120,25 +198,28 @@ static int probe(struct pci_dev *dev, const struct pci_device_id *id)
 		printk(KERN_ERR PFX "could not enable device\n");
 		goto failed_enable;
 	}
-	if (!(pci_resource_flags(dev, MOD_PCI_BIG_BAR) & IORESOURCE_MEM)) {
-		printk(KERN_ERR PFX "BAR#2 not a MMIO, device not present?\n");
-		goto failed_request;
-	}
-	if (pci_resource_len(dev, MOD_PCI_BIG_BAR) < MOD_PCI_BIG_BAR_SIZE) {
-		printk(KERN_ERR PFX "wrong BAR#2 size\n");
-		goto failed_request;
-	}
-	if (pci_request_region(dev, MOD_PCI_BIG_BAR, DRIVER_NAME) != 0) {
-		printk(KERN_ERR PFX "could not request BAR#2\n");
-		goto failed_request;
-	}
-	cfg_entry->vaddr =
-		ioremap(pci_resource_start(dev, MOD_PCI_BIG_BAR),
-			MOD_PCI_BIG_BAR_SIZE);
-	if (cfg_entry->vaddr == NULL) {
-		printk(KERN_ERR PFX "could not map BAR#2\n");
+
+	/* map MMIO slot addresses and onboard registers */
+	cfg_entry->vaddr   = map_bar(dev, MOD_PCI_BIG_BAR, MOD_PCI_BIG_BAR_SIZE);
+	cfg_entry->onboard = map_bar(dev, MOD_PCI_ONBOARD_REGS_BAR, MOD_PCI_ONBOARD_REGS_BAR_SIZE);
+	if (cfg_entry->vaddr == NULL || cfg_entry->onboard == NULL) {
+		printk(KERN_ERR PFX "could not map registers, "
+		"mmio = %p, onboard = %p\n",
+		cfg_entry->vaddr, cfg_entry->onboard);
 		goto failed_map;
 	}
+
+	/* get interrupt line, enable ints and install handler */
+	irq = dev->irq;
+	modpci_enable_irq(cfg_entry);
+	if (request_irq(irq, modpci_interrupt,
+			IRQF_DISABLED, DRIVER_NAME, cfg_entry)) {
+		printk(KERN_ERR PFX "could not request irq %d\n", irq);
+		goto failed_irq;
+	}
+	printk(KERN_INFO PFX "got irq %d\n", irq);
+
+	/* success! */
 	printk(KERN_INFO PFX "configured device "
 		"lun = %d, bus = %d, slot = %d, vaddr = %p\n",
 		cfg_entry->lun,
@@ -147,9 +228,12 @@ static int probe(struct pci_dev *dev, const struct pci_device_id *id)
 
 	return 0;
 
+failed_irq:
+	iounmap(cfg_entry->onboard);
+	iounmap(cfg_entry->vaddr);
+	pci_release_region(dev, MOD_PCI_ONBOARD_REGS_BAR);
+	pci_release_region(dev, MOD_PCI_BIG_BAR);
 failed_map:
-	pci_release_regions(dev);
-failed_request:
 	pci_disable_device(dev);
 failed_enable:
 	return -ENODEV;
@@ -159,8 +243,11 @@ static void remove(struct pci_dev *dev)
 {
 	struct mod_pci *cfg = find_device_config(dev);
 
+	free_irq(dev->irq, dev);
+	iounmap(cfg->onboard);
 	iounmap(cfg->vaddr);
-	pci_release_regions(dev);
+	pci_release_region(dev, MOD_PCI_ONBOARD_REGS_BAR);
+	pci_release_region(dev, MOD_PCI_BIG_BAR);
 	pci_disable_device(dev);
 }
 
