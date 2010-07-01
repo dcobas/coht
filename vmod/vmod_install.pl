@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Install vmodttl modules from a transfer.ref file. 
+# Install vmodttl modules from a transfer.ref file.
 # Based on install script of sis33 modules created by Emilio G. Cota
 #
 # first the transfer.ref file is parsed and then, after some sanity checks,
@@ -61,13 +61,8 @@ LINE: while (<INPUT>) {
 	$href->{$_} = shift @values;
     }
 
-# don't add modules with index values that we have already picked up
-    if ($base_addrs{"$href->{'lu'}"}) {
-	print "warning: $href->{'module-type'}.$href->{'lu'} has an already taken index number and won't be installed\n";
-    } else {
-	push @AoH, $href;
-	$base_addrs{$href->{'lu'}} = $href->{'basaddr1'};
-    }
+    push @AoH, $href;
+    $base_addrs{$href->{'ln'}} = $href->{'basaddr1'};
 }
 close(INPUT);
 
@@ -75,7 +70,7 @@ close(INPUT);
 # But if the vmodttl module is already there, we won't install it again
 if (@AoH) {
     if (!module_is_loaded($driver)) {
-	vmod_install(\@AoH);	
+	vmod_install(\@AoH);
     }
 } else {
     die "No $driver modules found in $path.\n";
@@ -83,7 +78,7 @@ if (@AoH) {
 
 sub module_is_loaded {
     my $module = shift;
-    
+
     open(LSMOD, '/proc/modules') or die('Cannot open /proc/modules.\n');
     while (<LSMOD>) {
 	chomp;
@@ -106,20 +101,21 @@ sub vmod_install {
     my $slot;
     my $carrier_name;
     my $carrier;
-    
+
+    my $hrefProc;
 
   ENTRY: foreach my $href (@{$AoHref}) {
       next ENTRY if $href->{'module-type'} !~ m/$device/;
 
-# We search the carrier of the installed VMOD-like board. 
+# We search the carrier of the installed VMOD-like board.
 # To know it, we use the slot and subslot fields.
     CARRIER_ENTRY: foreach my $href_carrier (@{$AoHref}) {
 	next CARRIER_ENTRY if $href_carrier->{'module-type'} =~ m/$device/;
-	
-	if(($href_carrier->{'sl'} == $href->{'sl'}) && 
+
+	if(($href_carrier->{'sl'} == $href->{'sl'}) &&
 	   ($href_carrier->{'ss'} == -1)){
-	    $carrier_name = lc $href_carrier->{'module-type'}; 
-	    $carrier_lun = $href_carrier->{'lu'}; 
+	    $carrier_name = lc $href_carrier->{'module-type'};
+	    $carrier_lun = $href_carrier->{'lu'};
 	    last if (1);
 	}
       }
@@ -135,12 +131,35 @@ sub vmod_install {
 	  $slot = $href->{'ss'};
       }
       $carrier_name = "";
+      $carrier_lun = "-1";
+
   }
     if (defined $index_parm) {
 	my $driver_name = $driver.".ko";
 	my $insmod = "insmod $driver_name lun=$index_parm carrier=$carrier carrier_number=$carrier_number slot=$slot";
-	#system($insmod) == 0 or die("$insmod failed");
-        print $insmod, "\n";
+	print $insmod, "\n";
+	system($insmod) == 0 or die("$insmod failed");
+
+	# Create the nodes in /dev for each lun.
+	my $mayor = -1;
+	system("grep $driver /proc/devices > /tmp/tmp_$driver") == 0 or die("grep $driver in /proc/devices failed");
+
+	open(INPUT, "</tmp/tmp_$driver") or die ("/tmp/tmp_$driver not found");
+	LINE: while (<INPUT>) {
+	    chomp;
+   	    my @values = split(/\s+/, $_);
+	    $mayor = $values[0];
+	}
+	close(INPUT);
+	system("rm -f /tmp/tmp_$driver");
+
+  	ENTRY: foreach my $hrefMknod (@{$AoHref}) {
+      		next ENTRY if $hrefMknod->{'module-type'} !~ m/$device/;
+
+	 	my $mknod = "mknod /dev/$driver.$hrefMknod->{'lu'} c $mayor $hrefMknod->{'lu'}";
+	 	system($mknod) == 0 or die("$mknod failed");
+		#print $mknod, "\n";
+	}
     }
 }
 
@@ -181,8 +200,8 @@ Filename of a transfer.ref alternative to the default '/etc/transfer.ref'.
 =head1 DESCRIPTION
 
 B<vmod_install.pl> parses a B<transfer.ref> file (taken by default from '/etc/transfer.ref')
-and install it using the information gets from this file. 
-Interrupt vectors, which are available in the transfer.ref file in the install instructions, 
+and install it using the information gets from this file.
+Interrupt vectors, which are available in the transfer.ref file in the install instructions,
 are passed as arguments to the B<VMOD-like> kernel module.
 
 By default all of B<VMOD-like> devices in the transfer.ref are processed.
