@@ -154,7 +154,7 @@ static int check_module_args(void)
                                 cname, get_address_space);
 		}
 
-                if (get_address_space(asp, carrier_num, slot_board, 1) <= 0){
+                if (get_address_space(asp, carrier_num, slot_board, 1) < 0){
 				 printk(KERN_ERR "VMODDOR: Invalid carrier number: %d or slot: %d\n",
 					   carrier_num, slot_board);
                      continue;
