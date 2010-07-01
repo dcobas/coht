@@ -5,7 +5,7 @@
 #include "modulbus_register.h"
 
 #define	MAX_DEVICES	16
-#define	DRIVER_NAME	"vmodio"
+#define	DRIVER_NAME	"nulldata"
 #define	PFX		DRIVER_NAME ": "
 
 /*
