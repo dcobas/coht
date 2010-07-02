@@ -12,7 +12,12 @@ struct carrier_as {
 	int		is_big_endian;
 };
 
+struct modulbus_device_id;
 
+/* @brief type of a mezzanine isr */
+typedef int (*isrcb_t)(
+	struct modulbus_device_id *dev,
+	void* extra);
 
 /* @brief type of a get_address_space entry point */
 typedef int (*gas_t)(
@@ -23,17 +28,12 @@ typedef int (*gas_t)(
 
 /* @brief type of a register_isr entry point */
 typedef int (*risr_t)(
-	int (*isr_callback)(
-		int board_number, 
-		int board_position,
-		void* extra),
+	isrcb_t callback,
+	struct modulbus_device_id *dev,
 	int board_number,
 	int board_position);
 
-typedef int (*isrcb_t)(
-	int board_number,
-	int board_position,
-	void* extra);
+
 
 /** @brief register a carrier's entry points in the carrier 
  *  register module
