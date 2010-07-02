@@ -42,7 +42,13 @@ static struct vmodio device_table[MAX_DEVICES];
 static int devices;
 
 /* Matrix for register the isr callback functions */
-static isrcb_t mezzanines_callback[MAX_DEVICES][VMODIO_SLOTS];
+struct mz_callback {
+	isrcb_t	callback;
+	struct modulbus_device_id *dev;
+};
+
+static struct mz_callback
+mezzanines_callback[MAX_DEVICES][VMODIO_SLOTS];
 
 /* obtain the irq of slot from a base_irq in slot 0 */
 static inline int vmodio_irq_shift(int base_irq, int slot)
@@ -164,6 +170,11 @@ static int  vmodio_get_address_space(
 }
 EXPORT_SYMBOL_GPL(vmodio_get_address_space);
 
+static inline int within_bounds(int board, int position)
+{
+	return 	board >= 0 && board < MAX_DEVICES &&
+		position >= 0 && position < VMODIO_SLOTS;
+}
 
 /**
  * @brief Save a isr_callback of each mezzanine connected.
@@ -177,24 +188,23 @@ EXPORT_SYMBOL_GPL(vmodio_get_address_space);
  * @return 0 on success
  * @retrun != 0 on failure
  */
-static int register_isr(int (*isr_callback)(
-					    int board_number,
-					    int board_position,
-					    void* extra),
+static int register_isr(isrcb_t callback,
+			    struct modulbus_device_id *dev,
 			    int board_number, int board_position)
 {
+	struct mz_callback *entry;
+
 	/* Adds the isr_callback if the carrier number and slot are correct. */
-	if(board_number >= 0 && board_number < MAX_DEVICES &&
-			board_position >= 0 && board_position < VMODIO_SLOTS) {
-		mezzanines_callback[board_number][board_position] =
-					(isrcb_t) isr_callback;
-	}
-	else {
+	if (!within_bounds(board_number, board_position)) {
 		printk(KERN_ERR PFX
 			"Invalid VMOD/IO board number %d or board position %d\n",
 				board_number, board_position);
 		return -1;
 	}
+
+	entry = &mezzanines_callback[board_number][board_position];
+	entry->callback = callback;
+	entry->dev      = dev;
         return 0;
 }
 
@@ -204,6 +214,7 @@ static int vmodio_interrupt(void *irq_id)
 	short board_position = -1;
 	int irq = *(int *)irq_id;
 	isrcb_t callback;
+	struct mz_callback *entry;
 
 	/* Get the interrupt vector to know the lun of the matched carrier */
 	carrier_number = irq_to_lun[upper_nibble_of(irq)];
@@ -212,8 +223,7 @@ static int vmodio_interrupt(void *irq_id)
 	board_position = irq_to_slot(irq);
 	printk(KERN_ERR PFX "Interrupt carrier %d slot %d\n", carrier_number, board_position);
 
-	if (board_position < 0 || board_position >= VMODIO_SLOTS ||
-		carrier_number < 0 || carrier_number >= MAX_DEVICES) {
+	if (!within_bounds(carrier_number, board_position)) {
 		printk(KERN_ERR PFX
 			"invalid board_number interrupt:"
 			"carrier %d board_position %d\n",
@@ -221,9 +231,10 @@ static int vmodio_interrupt(void *irq_id)
 		return IRQ_NONE;
 	}
 
-	callback = mezzanines_callback[carrier_number][board_position];
-	if ( callback == NULL ||
-		callback(carrier_number, board_position, NULL) == -1)
+	entry = &mezzanines_callback[carrier_number][board_position];
+	callback = entry->callback;
+	callback = mezzanines_callback[carrier_number][board_position].callback;
+	if (entry->callback == NULL || callback(entry->dev, NULL) == -1)
 		return IRQ_NONE;
 
 	return IRQ_HANDLED;
