@@ -284,17 +284,18 @@ static int probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cfg_entry->lun,
 		cfg_entry->bus_number, cfg_entry->slot_number,
 		cfg_entry->vaddr, cfg_entry->onboard);
-	modpci_reset(cfg_entry);
+
 	/* get interrupt line, enable ints and install handler */
 	irq = dev->irq;
 	errno = request_irq(irq, modpci_interrupt,
 			IRQF_SHARED, DRIVER_NAME, cfg_entry);
 	if (errno != 0) {
-		printk(KERN_ERR PFX
-			"could not request irq %d, err = %d\n",
-				irq, errno);
+		printk(KERN_ERR PFX "could not request irq"
+			"%d for device %p, err = %d\n",
+				irq, cfg_entry, errno);
 		goto failed_irq;
 	}
+	modpci_reset(cfg_entry);
 	modpci_enable_irq(cfg_entry);
 	printk(KERN_INFO PFX "got irq %d for dev %p\n", irq, cfg_entry);
 	return 0;
