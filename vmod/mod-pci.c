@@ -320,7 +320,6 @@ static void remove(struct pci_dev *dev)
 	modpci_disable_irq(cfg);
 	printk(KERN_INFO PFX "freeing irq %d for dev %p\n", dev->irq, cfg);
 	free_irq(dev->irq, cfg);
-	printk(KERN_INFO PFX "freed   irq %d for lun %d\n", dev->irq, cfg->lun);
 	iounmap(cfg->onboard);
 	iounmap(cfg->vaddr);
 	pci_release_region(dev, MOD_PCI_ONBOARD_REGS_BAR);
@@ -363,7 +362,7 @@ static int __init init(void)
 		dev->lun	= lun[device];
 		dev->bus_number	= bus_number[device];
 		dev->slot_number= slot_number[device];
-		printk(KERN_INFO PFX "shall config lun %d," "bus %d, slot %d)\n",
+		printk(KERN_INFO PFX "shall config lun %d," "bus %d, slot %d\n",
 			dev->lun, dev->bus_number, dev->slot_number);
 	}
 	devices = device;
