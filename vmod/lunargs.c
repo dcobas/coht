@@ -87,9 +87,9 @@ int read_params(char *driver_name, struct vmod_devices *devs)
 
 		device++;
 		printk(KERN_INFO PFX
-			"module<%02d>:\n\tlun %d"
-			"\n\tcarrier %s\n\tcarrier_number = %d\n\tslot = %d"
-			"\n\taddress 0x%08lx\n\tendian = %d\n",
+			"module<%02d>: lun %d"
+			" carrier %s carrier_number = %d slot = %d"
+			" address 0x%08lx endian = %d\n",
 			i, module->lun, module->carrier_name, 
 			module->carrier_lun, module->slot,
 			module->address, module->is_big_endian);
