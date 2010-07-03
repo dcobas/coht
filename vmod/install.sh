@@ -1,5 +1,5 @@
 #!	/bin/sh
-for f in 12e16 mod-pci  modulbus_register ; do
+for f in 12e16 mod_pci  modulbus_register ; do
     if grep $f /proc/modules ; then
         rmmod $f
     fi
