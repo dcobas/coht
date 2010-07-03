@@ -157,13 +157,13 @@ failed_request:
 static void modpci_enable_irq(struct mod_pci *dev)
 {
 	void *int_enable = &dev->onboard->int_enable;
-	iowrite16be(0x3, int_enable);
+	iowrite8(0x3, int_enable);
 }
 
 static void modpci_disable_irq(struct mod_pci *dev)
 {
 	void *int_disable = &dev->onboard->int_disable;
-	iowrite16be(0x3, int_disable);
+	iowrite8(0x3, int_disable);
 }
 
 
