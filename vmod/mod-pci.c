@@ -124,7 +124,7 @@ static struct mod_pci *find_device_config(struct pci_dev *dev)
 	return NULL;
 }
 
-static void *map_bar(struct pci_dev *dev, 
+static void *map_bar(struct pci_dev *dev,
 	unsigned int bar, unsigned int bar_size)
 {
 	void *ret;
@@ -189,7 +189,6 @@ static void modpci_reset(struct mod_pci *dev)
 
 static irqreturn_t modpci_interrupt(int irq, void *device_id)
 {
-
 	struct mod_pci *dev = device_id;
 	int i;
 	u8 int_stat;
@@ -360,7 +359,7 @@ static int __init init(void)
 
 	for (device = 0; device < nlun; device++) {
 		struct mod_pci *dev = &device_table[device];
-		
+
 		dev->lun	= lun[device];
 		dev->bus_number	= bus_number[device];
 		dev->slot_number= slot_number[device];
