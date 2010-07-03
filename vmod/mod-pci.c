@@ -154,6 +154,18 @@ failed_request:
 	return NULL;
 }
 
+static struct mz_callback {
+	isrcb_t				callback;
+	struct modulbus_device_id 	*dev;
+} modpci_callbacks[MAX_DEVICES][MOD_PCI_SLOTS];
+
+static inline int
+within_range(int board, int slot)
+{
+	return board >= 0 && board < MAX_DEVICES &&
+	       slot >= 0  && slot  < MOD_PCI_SLOTS;
+}
+
 static void modpci_enable_irq(struct mod_pci *dev)
 {
 	void *int_enable = &dev->onboard->int_enable;
@@ -166,27 +178,71 @@ static void modpci_disable_irq(struct mod_pci *dev)
 	iowrite8(0x3, int_disable);
 }
 
+static void modpci_reset(struct mod_pci *dev)
+{
+	void *reset_assert   = &dev->onboard->reset_assert;
+	void *reset_deassert = &dev->onboard->reset_deassert;
+	iowrite8(0x3, reset_assert);
+	iowrite8(0x3, reset_deassert);
+}
+
 
 static irqreturn_t modpci_interrupt(int irq, void *device_id)
 {
-	struct mod_pci *dev = device_id;
-	int index = dev-device_table;
-	int lun, int_stat, slot0, slot1;
 
-	/* forget if not mine */
-	if (!(0 <= index && index < devices))
-		return IRQ_NONE;
+	struct mod_pci *dev = device_id;
+	int i;
+	u8 int_stat;
+	u8 slot[] = { 0, 0 };
 
 	/* determine source */
-	lun = dev->lun;
-	int_stat = ioread16be(&dev->onboard->int_stat);
-	slot0 = int_stat & (~1);
-	slot1 = int_stat & (~2);
+	int_stat = ioread8(&dev->onboard->int_stat);
+	slot[0] = !(int_stat & 1);
+	slot[1] = !(int_stat & 2);
+	if (!slot[0] && !slot[1])
+		return IRQ_NONE;	/* not mine */
 
-	printk(KERN_INFO PFX
-		"interrupt status: lun = %d, slot 0 = %d, slot1 = %d\n",
-		lun, slot0, slot1);
+	for (i = 0; i < MOD_PCI_SLOTS; i++) {
+		isrcb_t callback;
+		struct modulbus_device_id *source;
+
+		if (slot[i]) {
+			struct mz_callback *cb = &modpci_callbacks[dev->lun][i];
+			callback = cb->callback;
+			source   = cb->dev;
+		} else
+			continue;
+	        if (callback == NULL) {
+			printk(KERN_ERR PFX "unhandled interrupt! "
+			" irq = %d lun = %d, slot = %d\n",
+			irq, dev->lun, i);
+			return IRQ_NONE;
+		} else {
+			callback(source, NULL);
+			return IRQ_HANDLED;
+		}
+	}
 	return IRQ_HANDLED;
+}
+
+static int
+modpci_register_isr(isrcb_t callback,
+	struct modulbus_device_id *source,
+	int board_number,
+	int board_position)
+{
+	struct mz_callback *cb;
+
+	if (!within_range(board_number, board_position)) {
+		printk(KERN_ERR PFX "invalid %s board number %d"
+			" and position %d\n", DRIVER_NAME,
+			board_number, board_position);
+		return -1;
+	}
+	cb = &modpci_callbacks[board_number][board_position];
+	cb->callback = callback;
+	cb->dev = source;
+	return 0;
 }
 
 static int probe(struct pci_dev *dev, const struct pci_device_id *id)
@@ -230,7 +286,7 @@ static int probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cfg_entry->lun,
 		cfg_entry->bus_number, cfg_entry->slot_number,
 		cfg_entry->vaddr, cfg_entry->onboard);
-
+	modpci_reset(cfg_entry);
 	/* get interrupt line, enable ints and install handler */
 	irq = dev->irq;
 	errno = request_irq(irq, modpci_interrupt,
@@ -242,11 +298,11 @@ static int probe(struct pci_dev *dev, const struct pci_device_id *id)
 		goto failed_irq;
 	}
 	modpci_enable_irq(cfg_entry);
-	printk(KERN_INFO PFX "got irq %d\n", irq);
-
+	printk(KERN_INFO PFX "got irq %d for dev %p\n", irq, cfg_entry);
 	return 0;
 
 failed_irq:
+	modpci_disable_irq(cfg_entry);
 	iounmap(cfg_entry->onboard);
 	iounmap(cfg_entry->vaddr);
 	pci_release_region(dev, MOD_PCI_ONBOARD_REGS_BAR);
@@ -263,7 +319,9 @@ static void remove(struct pci_dev *dev)
 
 	printk(KERN_INFO PFX "removing device %d\n", cfg->lun);
 	modpci_disable_irq(cfg);
+	printk(KERN_INFO PFX "freeing irq %d for dev %p\n", dev->irq, cfg);
 	free_irq(dev->irq, cfg);
+	printk(KERN_INFO PFX "freed   irq %d for lun %d\n", dev->irq, cfg->lun);
 	iounmap(cfg->onboard);
 	iounmap(cfg->vaddr);
 	pci_release_region(dev, MOD_PCI_ONBOARD_REGS_BAR);
@@ -283,7 +341,8 @@ static int __init init(void)
 	int device = 0;
 
 	printk(KERN_INFO PFX "initializing driver\n");
-	if (modulbus_carrier_register(DRIVER_NAME, get_address_space, NULL)) {
+	if (modulbus_carrier_register(
+		DRIVER_NAME, get_address_space, modpci_register_isr)) {
 		printk(KERN_ERR PFX "could not register with modulbus\n");
 		goto failed_init;
 	}
