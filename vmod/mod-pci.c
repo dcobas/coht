@@ -258,11 +258,10 @@ static int probe(struct pci_dev *dev, const struct pci_device_id *id)
 			dev->bus->number, PCI_SLOT(dev->devfn));
 		goto failed_enable;
 	}
-
-	/* found match, map BAR#2 (big endian) */
 	printk(KERN_INFO PFX
 		"configuring device at bus = %d, slot %d\n",
 		cfg_entry->bus_number, cfg_entry->slot_number);
+
 	if (pci_enable_device(dev) < 0) {
 		printk(KERN_ERR PFX "could not enable device\n");
 		goto failed_enable;
