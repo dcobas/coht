@@ -66,4 +66,37 @@
 #define MOD_PCI_EEP		0x9	/* r/w access */
 #define MOD_PCI_ENID		0xb	/* write/access */
 
+/** map of the onboard registers at BAR#4 */
+struct onboard {
+	unsigned char	unused1;
+	union {
+	unsigned char	int_stat;
+	unsigned char	int_disable;
+	};
+	unsigned char	unused2;
+	union {
+	unsigned char	mbus_num;
+	unsigned char	int_enable;
+	};
+	unsigned char	unused3;
+	unsigned char	reset_assert;
+	unsigned char	unused4;
+	unsigned char	reset_deassert;
+	unsigned char	unused5;
+	unsigned char	eep;
+	unsigned char	unused6;
+	unsigned char	unused7;
+	unsigned char	enid;
+};
+
+/** description of a mod-pci module */
+struct mod_pci {
+	int		lun;		/* logical unit number */
+	int		bus_number;	/* pci bus number */
+	int		slot_number;	/* pci slot number */
+	void		*vaddr;		/* virtual address of MODULBUS
+							space */
+	struct onboard	*onboard;	/* on-board registers */
+};
+
 #endif /* _MOD_PCI_H_ */
