@@ -54,33 +54,12 @@ static int vmod12e16_release(struct inode *ino, struct file  *filp)
 	return 0;
 }
 
-static int ioread(void __iomem *addr, int be)
-{
-	unsigned int val = ioread16(addr);
-	if (be)
-		return be16_to_cpu(val);
-	else
-		return val;
-}
-
-static void iowrite(u16 val, void __iomem *addr, int be)
-{
-	u16 tmp;
-
-	if (be)
-		tmp = cpu_to_be16(val);
-	else
-		tmp = val;
-	iowrite16(tmp, addr);
-}
-
 static int do_conversion(struct file *filp,
 			struct vmod12e16_conversion *conversion)
 {
 	struct vmod12e16_dev *dev = filp->private_data;
 	struct vmod12e16_registers __iomem *regs = 
 		(struct vmod12e16_registers __iomem *)dev->config->address;
-	int be = dev->config->is_big_endian;
 
 	int channel = conversion->channel;
 	int ampli   = conversion->amplification;
@@ -90,19 +69,19 @@ static int do_conversion(struct file *filp,
 		return -ERESTARTSYS;
 
 	/* explicitly disable interrupt mode for safely polling */
-	iowrite(VMOD_12E16_ADC_INTERRUPT_MASK, &regs->interrupt, be);
+	iowrite16be(VMOD_12E16_ADC_INTERRUPT_MASK, &regs->interrupt);
 
 	/* specify channel and amplification */
 	if ((ampli & ~((1<<2)-1)) || channel & ~((1<<4)-1))
 		return -EINVAL;
-	iowrite((ampli<<4) | channel, &regs->control, be);
+	iowrite16be((ampli<<4) | channel, &regs->control);
 
 	/* wait at most the manufacturer-supplied max time */
 	us_elapsed = 0;
 	while (us_elapsed < VMOD_12E16_MAX_CONVERSION_TIME) {
 		udelay(VMOD_12E16_CONVERSION_TIME);
-		if ((ioread(&regs->ready, be) & VMOD_12E16_RDY_BIT) == 0) {
-			conversion->data = ioread(&regs->data, be) & VMOD_12E16_ADC_DATA_MASK;
+		if ((ioread16be(&regs->ready) & VMOD_12E16_RDY_BIT) == 0) {
+			conversion->data = ioread16be(&regs->data) & VMOD_12E16_ADC_DATA_MASK;
 			udelay(VMOD_12E16_CONVERSION_TIME);
 			up(&dev->sem);
 			return 0;
