@@ -65,9 +65,6 @@ static int do_iocput(struct file *fp, struct vmod12a2_output *argp)
 
 	/* determine channel register address and write */
 	addr = (void __iomem *)(dev->address + vmod12a2_offsets[channel]);
-	printk(KERN_INFO PFX "writing %x = %d to addr %p, %s endian\n",
-			value, value, addr,
-			dev->is_big_endian ? "big" : "little" );
 	if (dev->is_big_endian)
 		value = cpu_to_be16(value);
 	iowrite16(value, addr);
