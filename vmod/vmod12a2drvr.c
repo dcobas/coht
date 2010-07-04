@@ -52,7 +52,7 @@ static int vmod12a2_release(struct inode *ino, struct file *filp)
 static int do_iocput(struct file *fp, struct vmod12a2_output *argp)
 {
 	/* get lun, channel and value to output */
-	struct vmod12a2_dev	*dev = fp->private_data;
+	struct vmod_dev	*dev = fp->private_data;
 	unsigned int		channel = argp->channel;
 	u16			value = argp->value;
 	void __iomem		*addr;
