@@ -122,8 +122,8 @@ failed_request:
 }
 
 static struct mz_callback {
-	isrcb_t				callback;
-	struct modulbus_device_id 	*dev;
+	isrcb_t	callback;
+	void	*dev;
 } modpci_callbacks[MAX_DEVICES][MOD_PCI_SLOTS];
 
 static inline int
@@ -170,7 +170,7 @@ static irqreturn_t modpci_interrupt(int irq, void *device_id)
 
 	for (i = 0; i < MOD_PCI_SLOTS; i++) {
 		isrcb_t callback;
-		struct modulbus_device_id *source;
+		void *source;
 
 		if (slot[i]) {
 			struct mz_callback *cb = &modpci_callbacks[dev->lun][i];
@@ -193,7 +193,7 @@ static irqreturn_t modpci_interrupt(int irq, void *device_id)
 
 static int
 modpci_register_isr(isrcb_t callback,
-	struct modulbus_device_id *source,
+	void *source,
 	int board_number,
 	int board_position)
 {

@@ -79,7 +79,7 @@ static void iowrite(u16 val, void __iomem *addr, int be)
 
 static int ready = 0;
 static u16 adc_data_register;
-static int int_handler(struct modulbus_device_id *source, void *extra)
+static int int_handler(void *source, void *extra)
 {
 	struct vmod12e16_dev *dev = (struct vmod12e16_dev *)source;
 	struct vmod12e16_registers __iomem *regs = 
