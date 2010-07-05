@@ -44,7 +44,7 @@ static int devices;
 /* Matrix for register the isr callback functions */
 struct mz_callback {
 	isrcb_t	callback;
-	struct modulbus_device_id *dev;
+	void *dev;
 };
 
 static struct mz_callback
@@ -189,7 +189,7 @@ static inline int within_bounds(int board, int position)
  * @retrun != 0 on failure
  */
 static int register_isr(isrcb_t callback,
-			    struct modulbus_device_id *dev,
+			    void *dev,
 			    int board_number, int board_position)
 {
 	struct mz_callback *entry;
