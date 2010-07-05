@@ -214,6 +214,21 @@ static int __init init(void)
 		"initializing driver for %d (max %d) cards\n",
 		config.num_modules, VMOD_MAX_BOARDS);
 
+	cdev_init(&cdev, &fops);
+	cdev.owner = THIS_MODULE;
+	if (cdev_add(&cdev, devno, VMOD12E16_MAX_MODULES) != 0) {
+		printk(KERN_ERR PFX
+			"failed to create chardev %d with err %d\n",
+				MAJOR(devno), err);
+		goto fail_chrdev;
+	}
+
+	err = alloc_chrdev_region(&devno, 0, VMOD12E16_MAX_MODULES, DRIVER_NAME);
+	if (err != 0)
+		goto fail_cdev;
+	printk(KERN_INFO PFX "allocated device %d\n", MAJOR(devno));
+
+
 	/* fill in config data */
 	for (i = 0; i < config.num_modules; i++) {
 		struct vmod12e16_dev *dev = &device_list[i];
@@ -223,26 +238,15 @@ static int __init init(void)
 		init_waitqueue_head(&dev->wq);
 	
 		if (register_module_isr(dev, int_handler) < 0)
-			goto fail_chrdev;
+			goto fail_isr;
 	}
 
-	err = alloc_chrdev_region(&devno, 0, VMOD12E16_MAX_MODULES, DRIVER_NAME);
-	if (err != 0)
-		goto fail_chrdev;
-	printk(KERN_INFO PFX "allocated device %d\n", MAJOR(devno));
-
-	cdev_init(&cdev, &fops);
-	cdev.owner = THIS_MODULE;
-	if (cdev_add(&cdev, devno, VMOD12E16_MAX_MODULES) != 0) {
-		printk(KERN_ERR PFX
-			"failed to create chardev %d with err %d\n",
-				MAJOR(devno), err);
-		goto fail_cdev;
-	}
 	return 0;
 
-fail_cdev:	
+fail_isr:
 	unregister_chrdev_region(devno, VMOD12E16_MAX_MODULES);
+fail_cdev:
+	cdev_del(&cdev);
 fail_chrdev:	
 	return -1;
 }
@@ -260,8 +264,8 @@ static void __exit exit(void)
 			"could not unregister isr for lun %d\n",
 			dev->config->lun);
 	}
-	cdev_del(&cdev);
 	unregister_chrdev_region(devno, VMOD12E16_MAX_MODULES);
+	cdev_del(&cdev);
 }
 
 
