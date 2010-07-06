@@ -18,6 +18,10 @@
 #ifndef _LIBVMOD16A2_H_
 #define _LIBVMOD16A2_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Get a handle for a vmod16a2 device
  *
@@ -52,6 +56,7 @@ int vmod16a2_convert(int fd, int channel, int datum);
  */
 int vmod16a2_close(int fd);
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* _LIBVMOD16A2_H_ */
-
-
