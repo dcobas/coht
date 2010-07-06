@@ -18,6 +18,10 @@
 #ifndef _LIBVMOD12E16_H_
 #define _LIBVMOD12E16_H_
 
+#ifdef  __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Symbolic constants for amplification factors
  * 
@@ -78,5 +82,9 @@ int vmod12e16_convert(int fd, int channel,
  * @param fd Handle to close
  */
 int vmod12e16_close(int fd);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _LIBVMOD12E16_H_ */

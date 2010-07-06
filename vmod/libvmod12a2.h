@@ -18,6 +18,10 @@
 #ifndef _LIBVMOD12A2_H_
 #define _LIBVMOD12A2_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Get a handle for a vmod12a2 device
  *
@@ -50,6 +54,10 @@ int vmod12a2_convert(int fd, int channel, int datum);
  * @param fd - Handle to close
  */
 int vmod12a2_close(int fd);
+
+#ifdef __cplusplus
+}
+#endif
 #endif /* _LIBVMOD12A2_H_ */
 
 
