@@ -1,16 +1,12 @@
 #!	/bin/sh
-for f in 12e16 mod_pci  modulbus_register ; do
-    if grep $f /proc/modules ; then
-        rmmod $f
-    fi
-done
 
-( cd L*/*/
+sh remove.sh
+
+lun=0
+
 insmod modulbus_register.ko
-insmod mod-pci.ko  lun=1,0 bus_number=1,2 slot_number=14,13
-#insmod mod-pci.ko  lun=0 bus_number=1 slot_number=14
-insmod 12e16.ko lun=0 carrier=mod-pci carrier_number=1 slot=1  )
+insmod mod-pci.ko lun=0 bus_number=1 slot_number=14
+insmod vmod12e16.ko lun=$lun carrier=mod-pci carrier_number=0 slot=0
 
-DEVNO=`grep 12e16 /proc/devices | awk '{print $1}' `
-mknod /dev/vmod12e16.0 c $DEVNO 0
-
+devno=`grep vmod12e16 /proc/devices | awk '{print $1}'`
+mknod /dev/vmod12e16.$lun c $devno $lun
