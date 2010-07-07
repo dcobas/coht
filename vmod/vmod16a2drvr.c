@@ -52,13 +52,9 @@ static int do_output(struct vmod_dev *dev,
 		value = cpu_to_be16(value);
 
 	if (channel == 0) {
-		printk(KERN_INFO "writing %x = %d to addr 0x%p\n",
-			value, value, &(regp->dac0in));
 		iowrite16(value, &(regp->dac0in));
 		iowrite16(value, &(regp->ldac0));
 	} else if (channel == 1) {
-		printk(KERN_INFO "writing %x = %d to addr 0x%p\n",
-			value, value, &(regp->dac1in));
 		iowrite16(value, &(regp->dac1in));
 		iowrite16(value, &(regp->ldac1));
 	} else {
