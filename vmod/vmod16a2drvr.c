@@ -47,16 +47,12 @@ static int do_output(struct vmod_dev *dev,
 	struct vmod16a2_registers __iomem *regp = 
 		(struct vmod16a2_registers __iomem *)dev->address;
 
-	/* fix value endianness */
-	if (dev->is_big_endian)
-		value = cpu_to_be16(value);
-
 	if (channel == 0) {
-		iowrite16(value, &(regp->dac0in));
-		iowrite16(value, &(regp->ldac0));
+		iowrite16be(value, &(regp->dac0in));
+		iowrite16be(value, &(regp->ldac0));
 	} else if (channel == 1) {
-		iowrite16(value, &(regp->dac1in));
-		iowrite16(value, &(regp->ldac1));
+		iowrite16be(value, &(regp->dac1in));
+		iowrite16be(value, &(regp->ldac1));
 	} else {
 		printk(KERN_ERR PFX "invalid channel %d\n", channel);
 		return -EINVAL;
