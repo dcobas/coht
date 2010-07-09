@@ -26,6 +26,9 @@ my @keys = ('ln', 'mln', 'bus', 'mtno', 'module-type', 'lu', 'W1', 'AM1',
 
 my %base_addrs;
 
+my $carrier_register = "modulbus_register";
+my $insmod_register = "insmod $carrier_register.ko";
+
 GetOptions(
 	   "help|?|h"=> \$help,
 	   "device=s"=> \$device,
@@ -69,6 +72,9 @@ close(INPUT);
 # If we found at least a module, then vmodttl.ko should be installed
 # But if the vmodttl module is already there, we won't install it again
 if (@AoH) {
+    if (!module_is_loaded($carrier_register)) {
+	system($insmod_register) == 0 or die("$insmod_register failed");
+    }
     if (!module_is_loaded($driver)) {
 	vmod_install(\@AoH);
     }

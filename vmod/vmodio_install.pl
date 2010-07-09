@@ -23,6 +23,8 @@ my @keys = ('ln', 'mln', 'bus', 'mtno', 'module-type', 'lu', 'W1', 'AM1',
 
 my %base_addrs;
 
+my $carrier_register = "modulbus_register";
+my $insmod_register = "insmod $carrier_register.ko";
 
 # allow single-character options
 Getopt::Long::Configure("bundling_override");
@@ -74,6 +76,9 @@ for($i = 0; $i < @cmd_line_luns; $i++) {
 # If we found at least a module, then vmodttl.ko should be installed
 # But if the vmodttl module is already there, we won't install it again
 if (@AoH) {
+    if (!module_is_loaded($carrier_register)) {
+	system($insmod_register) == 0 or die("$insmod_register failed");
+    }
     if (!module_is_loaded('vmodio')) {
 	vmodio_install(\@AoH);	
     }
@@ -105,7 +110,7 @@ sub vmodio_install {
     my $base_parm;
 
   ENTRY: foreach my $href (@{$AoHref}) {
-      next ENTRY if $href->{'module-type'} !~ m/NULLDATA/;
+      next ENTRY if $href->{'module-type'} !~ m/VMODIO/;
 
      if (defined $index_parm) {
 	  $index_parm = $index_parm.','.$href->{'lu'};
