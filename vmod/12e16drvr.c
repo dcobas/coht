@@ -14,6 +14,7 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#include <linux/pci.h>
 #include <linux/cdev.h>
 #include <linux/uaccess.h>
 #include <linux/sched.h>
@@ -86,13 +87,13 @@ static int int_handler(void *source, void *extra)
 	int be = dev->config->is_big_endian;
 
 	/* acknowledge the interrupt */
+	printk(KERN_INFO PFX "entering int callback!\n");
 	adc_data_register = ioread(&regs->data, be);
 	iowrite(VMOD_12E16_ADC_INTERRUPT_MASK, &regs->interrupt, be);
+	printk(KERN_INFO PFX "interrupt acknowledged\n");
 	ready = 1;
-#if 0
 	printk(KERN_ERR PFX "handled interrupt at lun%d\n", 
 		dev->config->lun);
-#endif
 	wake_up_interruptible(&dev->wq);
 	return 0;
 }
@@ -112,6 +113,7 @@ static int do_conversion(struct file *filp,
 		return -ERESTARTSYS;
 
 	/* explicitly enable interrupt mode */
+	printk(KERN_INFO PFX "enabling interrupt\n");
 	iowrite((u16)~VMOD_12E16_ADC_INTERRUPT_MASK, &regs->interrupt, be);
 
 	/* specify channel and amplification */
@@ -120,10 +122,12 @@ static int do_conversion(struct file *filp,
 	iowrite((ampli<<4) | channel, &regs->control, be);
 
 	/* wait at most the manufacturer-supplied max time */
+	printk(KERN_INFO PFX "waiting for interrupt\n");
 	wait_event_interruptible(dev->wq, ready == 1);
 	if (!ready) {
 		printk("missing interrupt in 12e16 read cycle\n");
 	}
+	printk(KERN_INFO PFX "got ready interrupt\n");
 	ready = 0;
 	if ((ioread(&regs->ready, be) & VMOD_12E16_RDY_BIT) == 0) {
 		conversion->data = ioread(&regs->data, be) & VMOD_12E16_ADC_DATA_MASK;
