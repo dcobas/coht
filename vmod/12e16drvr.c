@@ -117,8 +117,10 @@ static int do_conversion(struct file *filp,
 	iowrite((u16)~VMOD_12E16_ADC_INTERRUPT_MASK, &regs->interrupt, be);
 
 	/* specify channel and amplification */
-	if ((ampli & ~((1<<2)-1)) || channel & ~((1<<4)-1))
+	if ((ampli & ~((1<<2)-1)) || channel & ~((1<<4)-1)) {
+		up(&dev->sem);
 		return -EINVAL;
+	}
 	iowrite((ampli<<4) | channel, &regs->control, be);
 
 	/* wait at most the manufacturer-supplied max time */
