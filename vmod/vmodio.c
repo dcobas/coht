@@ -5,7 +5,7 @@
 #include "modulbus_register.h"
 
 #define	MAX_DEVICES	16
-#define	DRIVER_NAME	"nulldata"
+#define	DRIVER_NAME	"vmodio"
 #define	PFX		DRIVER_NAME ": "
 
 /*
@@ -35,7 +35,7 @@ struct vmodio {
 	unsigned long	vme_addr;	/* vme base address */
 	unsigned long	vaddr;		/* virtual address of MODULBUS
 							space */
-	int 		irq;		/* IRQ */
+	int 		irq[4];		/* IRQ */
 };
 
 static struct vmodio device_table[MAX_DEVICES];
@@ -239,7 +239,7 @@ static int vmodio_interrupt(void *irq_id)
 	return IRQ_HANDLED;
 }
 
-static int device_init(struct vmodio *dev, int lun, unsigned long base_address, int irq)
+static int device_init(struct vmodio *dev, int lun, unsigned long base_address, int base_irq)
 {
 	int ret;
 	int i;
@@ -247,13 +247,12 @@ static int device_init(struct vmodio *dev, int lun, unsigned long base_address, 
 	dev->lun	= lun;
 	dev->vme_addr	= base_address;
 	dev->vaddr	= vmodio_map(base_address);
-	dev->irq	= irq;
 
 	if (dev->vaddr == -1)
 		return -1;
 
 	/* Upper nibble of irq corresponds to a single VMODIO module */
-	irq_to_lun[upper_nibble_of(dev->irq)] = lun;
+	irq_to_lun[upper_nibble_of(base_irq)] = lun;
 
 	/*
 	 * The irq corresponding to the first slot is passed as argument
@@ -261,9 +260,10 @@ static int device_init(struct vmodio *dev, int lun, unsigned long base_address, 
 	 * substracting constants 0, 1, 3, 7.
 	 */
 	for (i = 0; i < VMODIO_SLOTS; i++) {
-		int irq = vmodio_irq_shift(dev->irq, i);
+		int irq = vmodio_irq_shift(base_irq, i);
+		dev->irq[i] = irq;
 		lun_slot_to_irq[lun][i] = irq;
-		ret = vme_request_irq(irq, vmodio_interrupt, &irq, "vmodio");
+		ret = vme_request_irq(irq, vmodio_interrupt, &dev->irq[i], "vmodio");
 		if (ret < 0) {
 			printk(KERN_ERR PFX
 				"Cannot register an irq "
@@ -271,8 +271,9 @@ static int device_init(struct vmodio *dev, int lun, unsigned long base_address, 
 				  dev->lun, ret);
 			return -1;
 		}
+		printk(KERN_INFO PFX "registered IRQ %d for %s device,"
+			"lun = %d, slot %d\n", irq, DRIVER_NAME, lun, i);
 	}
-
 	return 0;
 }
 
