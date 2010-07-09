@@ -219,20 +219,19 @@ static int __init init(void)
 		"initializing driver for %d (max %d) cards\n",
 		config.num_modules, VMOD_MAX_BOARDS);
 
+	err = alloc_chrdev_region(&devno, 0, VMOD12E16_MAX_MODULES, DRIVER_NAME);
+	if (err != 0)
+		goto fail_chrdev;
+	printk(KERN_INFO PFX "allocated device %d\n", MAJOR(devno));
+
 	cdev_init(&cdev, &fops);
 	cdev.owner = THIS_MODULE;
 	if (cdev_add(&cdev, devno, VMOD12E16_MAX_MODULES) != 0) {
 		printk(KERN_ERR PFX
 			"failed to create chardev %d with err %d\n",
 				MAJOR(devno), err);
-		goto fail_chrdev;
-	}
-
-	err = alloc_chrdev_region(&devno, 0, VMOD12E16_MAX_MODULES, DRIVER_NAME);
-	if (err != 0)
 		goto fail_cdev;
-	printk(KERN_INFO PFX "allocated device %d\n", MAJOR(devno));
-
+	}
 
 	/* fill in config data */
 	for (i = 0; i < config.num_modules; i++) {
