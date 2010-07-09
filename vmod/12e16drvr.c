@@ -13,12 +13,11 @@
 
 #include <linux/kernel.h>
 #include <linux/module.h>
-#include <linux/pci.h>
 #include <linux/init.h>
 #include <linux/cdev.h>
-#include <linux/delay.h>
-#include <linux/fs.h>
 #include <linux/uaccess.h>
+#include <linux/sched.h>
+#include <linux/fs.h>
 #include <linux/semaphore.h>
 #include <linux/wait.h>
 #include "modulbus_register.h"
@@ -234,11 +233,16 @@ static int __init init(void)
 		struct vmod12e16_dev *dev = &device_list[i];
 
 		dev->config = &config.module[i];
+		printk(KERN_INFO PFX "configuring lun = %d\n",
+			dev->config->lun);
 		init_MUTEX(&dev->sem);
 		init_waitqueue_head(&dev->wq);
 	
-		if (register_module_isr(dev, int_handler) < 0)
+		if (register_module_isr(dev, int_handler) < 0) {
+			printk(KERN_ERR PFX "could not register handler"
+				"for lun = %d\n", dev->config->lun);
 			goto fail_isr;
+		}
 	}
 
 	return 0;
