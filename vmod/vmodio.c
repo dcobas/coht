@@ -172,7 +172,7 @@ EXPORT_SYMBOL_GPL(vmodio_get_address_space);
 
 static inline int within_bounds(int board, int position)
 {
-	return 	board >= 0 && board < MAX_DEVICES &&
+	return 	board >= 0 && board < devices &&
 		position >= 0 && position < VMODIO_SLOTS;
 }
 
