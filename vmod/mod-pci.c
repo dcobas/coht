@@ -91,10 +91,10 @@ static struct mod_pci *find_device_config(struct pci_dev *dev)
 	return NULL;
 }
 
-static void *map_bar(struct pci_dev *dev,
-	unsigned int bar, unsigned int bar_size)
+static void __iomem
+*map_bar(struct pci_dev *dev, unsigned int bar, unsigned int bar_size)
 {
-	void *ret;
+	void __iomem *ret;
 
 	if (!(pci_resource_flags(dev, bar) & IORESOURCE_MEM)) {
 		printk(KERN_ERR PFX "BAR#%d not a MMIO, device not present?\n", bar);
@@ -135,20 +135,20 @@ within_range(int board, int slot)
 
 static void modpci_enable_irq(struct mod_pci *dev)
 {
-	void *int_enable = &dev->onboard->int_enable;
+	void __iomem *int_enable = &dev->onboard->int_enable;
 	iowrite8(0x3, int_enable);
 }
 
 static void modpci_disable_irq(struct mod_pci *dev)
 {
-	void *int_disable = &dev->onboard->int_disable;
+	void __iomem *int_disable = &dev->onboard->int_disable;
 	iowrite8(0x3, int_disable);
 }
 
 static void modpci_reset(struct mod_pci *dev)
 {
-	void *reset_assert   = &dev->onboard->reset_assert;
-	void *reset_deassert = &dev->onboard->reset_deassert;
+	void __iomem *reset_assert   = &dev->onboard->reset_assert;
+	void __iomem *reset_deassert = &dev->onboard->reset_deassert;
 	iowrite8(0x3, reset_assert);
 	iowrite8(0x3, reset_deassert);
 }

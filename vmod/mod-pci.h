@@ -94,9 +94,10 @@ struct mod_pci {
 	int		lun;		/* logical unit number */
 	int		bus_number;	/* pci bus number */
 	int		slot_number;	/* pci slot number */
-	void		*vaddr;		/* virtual address of MODULBUS
-							space */
-	struct onboard	*onboard;	/* on-board registers */
+	void __iomem	*vaddr;		/* virtual address of MODULBUS
+						space */
+	struct onboard
+		__iomem	*onboard;	/* on-board registers */
 };
 
 #endif /* _MOD_PCI_H_ */
