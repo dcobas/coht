@@ -212,15 +212,15 @@ static int vmodio_interrupt(void *irq_id)
 {
 	int carrier_number = -1;
 	short board_position = -1;
-	int irq = *(int *)irq_id;
+	int irqno = *(int *)irq_id;
 	isrcb_t callback;
 	struct mz_callback *entry;
 
 	/* Get the interrupt vector to know the lun of the matched carrier */
-	carrier_number = irq_to_lun[upper_nibble_of(irq)];
+	carrier_number = irq_to_lun[upper_nibble_of(irqno)];
 
 	/* Get the interrupt vector to know the slot */
-	board_position = irq_to_slot(irq);
+	board_position = irq_to_slot(irqno);
 	printk(KERN_ERR PFX "Interrupt carrier %d slot %d\n", carrier_number, board_position);
 
 	if (!within_bounds(carrier_number, board_position)) {
@@ -260,10 +260,10 @@ static int device_init(struct vmodio *dev, int lun, unsigned long base_address, 
 	 * substracting constants 0, 1, 3, 7.
 	 */
 	for (i = 0; i < VMODIO_SLOTS; i++) {
-		int irq = vmodio_irq_shift(base_irq, i);
-		dev->irq[i] = irq;
-		lun_slot_to_irq[lun][i] = irq;
-		ret = vme_request_irq(irq, vmodio_interrupt, &dev->irq[i], "vmodio");
+		int slot_irq = vmodio_irq_shift(base_irq, i);
+		dev->irq[i] = slot_irq;
+		lun_slot_to_irq[lun][i] = slot_irq;
+		ret = vme_request_irq(slot_irq, vmodio_interrupt, &dev->irq[i], "vmodio");
 		if (ret < 0) {
 			printk(KERN_ERR PFX
 				"Cannot register an irq "
@@ -272,7 +272,7 @@ static int device_init(struct vmodio *dev, int lun, unsigned long base_address, 
 			return -1;
 		}
 		printk(KERN_INFO PFX "registered IRQ %d for %s device,"
-			"lun = %d, slot %d\n", irq, DRIVER_NAME, lun, i);
+			"lun = %d, slot %d\n", slot_irq, DRIVER_NAME, lun, i);
 	}
 	return 0;
 }

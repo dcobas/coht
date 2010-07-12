@@ -16,7 +16,7 @@ struct register_entry {
 
 static struct register_entry	cregister[REGISTER_SIZE];
 static int			used_entries = 0;
-DEFINE_MUTEX(register_mutex);
+static DEFINE_MUTEX(register_mutex);
 
 /* module initialization and cleanup */
 static int __init init(void)
