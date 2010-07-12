@@ -16,15 +16,15 @@
  */
 
 static int lun[MAX_DEVICES];
-static int nlun;
+static unsigned int nlun;
 module_param_array(lun, int, &nlun, S_IRUGO);
 
 static int bus_number[MAX_DEVICES];
-static int nbus_number;
+static unsigned int nbus_number;
 module_param_array(bus_number, int, &nbus_number, S_IRUGO);
 
 static int slot_number[MAX_DEVICES];
-static int nslot_number;
+static unsigned int nslot_number;
 module_param_array(slot_number, int, &nslot_number, S_IRUGO);
 
 /** static device table */

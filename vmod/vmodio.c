@@ -15,15 +15,15 @@
  *		     	irq=126,130,142
  */
 static int lun[MAX_DEVICES];
-static int nlun;
+static unsigned int nlun;
 module_param_array(lun, int, &nlun, S_IRUGO);
 
 static unsigned long base_address[MAX_DEVICES];
-static int nbase_address;
+static unsigned int nbase_address;
 module_param_array(base_address, ulong, &nbase_address, S_IRUGO);
 
 static int irq[MAX_DEVICES];
-static int nirq;
+static unsigned int nirq;
 module_param_array(irq, int, &nirq, S_IRUGO);
 
 static int irq_to_lun [MAX_DEVICES];

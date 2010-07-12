@@ -7,22 +7,22 @@
 
 /* module parameters */
 static int lun[VMOD_MAX_BOARDS];
-static int num_lun;
+static unsigned int num_lun;
 module_param_array(lun, int, &num_lun, S_IRUGO);
 MODULE_PARM_DESC(lun, "Logical Unit Number of the VMOD-XXX board");
 
 static char *carrier[VMOD_MAX_BOARDS];
-static int num_carrier;
+static unsigned int num_carrier;
 module_param_array(carrier, charp, &num_carrier, S_IRUGO);
 MODULE_PARM_DESC(carrier, "Name of the carrier in which the VMOD-XXX is plugged in.");
 
 static int carrier_number[VMOD_MAX_BOARDS];
-static int num_carrier_number;
+static unsigned int num_carrier_number;
 module_param_array(carrier_number, int, &num_carrier_number, S_IRUGO);
 MODULE_PARM_DESC(carrier_number, "Logical Unit Number of the carrier");
 
 static int slot[VMOD_MAX_BOARDS];
-static int num_slot;
+static unsigned int num_slot;
 module_param_array(slot, int, &num_slot, S_IRUGO);
 MODULE_PARM_DESC(slot, "Slot of the carrier in which the VMOD-XXX board is placed.");
 
