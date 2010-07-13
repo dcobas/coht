@@ -233,7 +233,7 @@ static int vmodio_interrupt(void *irq_id)
 
 	entry = &mezzanines_callback[carrier_number][board_position];
 	callback = entry->callback;
-	if (entry->callback == NULL || callback(entry->dev, NULL) == -1)
+	if (entry->callback == NULL || callback(entry->dev, NULL) < 0)
 		return IRQ_NONE;
 
 	return IRQ_HANDLED;
