@@ -221,7 +221,6 @@ static int vmodio_interrupt(void *irq_id)
 
 	/* Get the interrupt vector to know the slot */
 	board_position = irq_to_slot(irqno);
-	printk(KERN_ERR PFX "Interrupt carrier %d slot %d\n", carrier_number, board_position);
 
 	if (!within_bounds(carrier_number, board_position)) {
 		printk(KERN_ERR PFX
