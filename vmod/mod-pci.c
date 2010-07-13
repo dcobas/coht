@@ -178,14 +178,10 @@ static irqreturn_t modpci_interrupt(int irq, void *device_id)
 			source   = cb->dev;
 		} else
 			continue;
-	        if (callback == NULL) {
+	        if (callback == NULL || callback(source, NULL) < 0) {
 			printk(KERN_ERR PFX "unhandled interrupt! "
-			" irq = %d lun = %d, slot = %d\n",
-			irq, dev->lun, i);
+			" irq = %d lun = %d, slot = %d\n", irq, dev->lun, i);
 			return IRQ_NONE;
-		} else {
-			callback(source, NULL);
-			return IRQ_HANDLED;
 		}
 	}
 	return IRQ_HANDLED;
