@@ -1,0 +1,8 @@
+EXTRA_CFLAGS= \
+	-I$(src)/../utils/driver \
+	-I$(src)/../../vmebridge/driver \
+	-I$(src)/../../include \
+	-I$(src)/../include 
+
+obj-m 	     := tvme200.o
+tvme200-objs := carrier_tvme200.o 
