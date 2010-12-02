@@ -1,0 +1,10 @@
+ccflags-y += \
+	-I $(src)/../include \
+	-I $(src)/../utils/driver \
+
+
+obj-m 	     := tvme200.o
+tvme200-objs := carrierApiVme.o carrierDrvr.o carrierTVME200.o carrierVIPC61x.o \
+		drvr_load_file.o libinstkernel.o sysbrk.o
+
+obj-y := carrierTst.o carrierTstDrvr.o

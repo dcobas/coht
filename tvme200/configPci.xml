@@ -1,0 +1,7 @@
+<install host="pcgw23" comment="PCI carrier XML installer">
+	<driver name="CARRIERPCI" comment="Carrier PCI driver">
+		<module bus_type="PCI" logical_module_number="1" comment="TPCI200">
+			<pci bus_number="0x1" slot_number="0xe" vendor_id="0x1498" device_id="0x30C8" subvendor_id="0x1498" subdevice_id="0x300A"/>
+		</module>
+	</driver>
+</install>

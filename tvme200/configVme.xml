@@ -1,0 +1,9 @@
+<install host="cfv-864-cdv28" comment="VME carrier XML installer">
+	<driver name="CARRIERVME" comment="Carrier VME driver">
+		<module bus_type="VME" logical_module_number="1" comment="TVME200">
+			<vme />
+				<vme_space modifier="0x29" data_width="16" window_size="0x0400" address="0xD000" comment="IOID"/>
+				<vme_space modifier="0x39" data_width="16" window_size="0x20000" address="0xD00000" comment="MEM"/>
+		</module>
+	</driver>
+</install>

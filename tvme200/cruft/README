@@ -1,0 +1,28 @@
+To make either the PCI or the VME version
+
+rm Makefile
+ln -s Makefile.pci Makefile
+
+or
+
+rm Makefile
+ln -s Makefile.vme Makefile
+
+Then you just do the usual
+
+make CPU=L865 Kver=2.6.29.4-rt15
+
+or what ever version you want
+
+===============
+
+The Module.symvers file must be read/write
+In order to define the symbols used in Sebastiens
+VME-Bridge driver the file should be present.
+A make clean deletes it, so for VME you need to
+check it out read/write.
+
+
+================
+
+Julian

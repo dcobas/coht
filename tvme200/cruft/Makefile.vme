@@ -1,0 +1,15 @@
+CPU=L865
+KVER=2.6.29.4-rt15
+KERNELPATH=/acc/sys/$(CPU)/usr/src/kernels/$(KVER)/
+
+EXTRA_CFLAGS = -I/acc/src/dsc/drivers/coht/carrier/driver \
+	       -I/acc/src/dsc/drivers/coht/include \
+	       -I/acc/src/dsc/drivers/coht/utils/driver
+
+obj-m += carrier-vme.o
+carrier-vme-objs := carrierApiVme.o carrierDrvr.o carrierTVME200.o carrierVIPC61x.o libinstkernel.o drvr_load_file.o sysbrk.o
+
+modules:
+	make -C $(KERNELPATH) M=$(PWD) modules
+clean:
+	make -C $(KERNELPATH) M=$(PWD) clean
