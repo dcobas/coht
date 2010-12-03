@@ -4,7 +4,7 @@ ccflags-y += \
 
 
 obj-m 	     := tvme200.o
-tvme200-objs := carrierApiVme.o carrierDrvr.o carrierTVME200.o carrierVIPC61x.o \
-		drvr_load_file.o libinstkernel.o sysbrk.o
+tvme200-objs := carrierTVME200.o 
+	
 
 obj-y := carrierTst.o carrierTstDrvr.o
