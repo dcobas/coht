@@ -1298,17 +1298,6 @@ int ipSlotWriteVector(unsigned char vector, slotId_t *pSlotId, slotSpace_e space
 }
 EXPORT_SYMBOL(ipSlotWriteVector);
 
-
-
-
-
-
-
-
-
-
-
-
 /***********************************************************
  * 			XXX SIG
  ***********************************************************
