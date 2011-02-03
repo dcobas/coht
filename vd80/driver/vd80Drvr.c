@@ -909,6 +909,14 @@ UserData *u;
 	       cprintf("OK - Supported by this driver\n");
 	    else if (strcmp("C2Ab",revis_id) == 0)
 	       cprintf("OK - Supported by this driver\n");
+	    else if (strcmp("C2Ac",revis_id) == 0)
+	       cprintf("OK - Supported by this driver\n");
+	    else if (strcmp("C2Ad",revis_id) == 0)
+	       cprintf("OK - Supported by this driver\n");
+	    else if (strcmp("C2Ae",revis_id) == 0)
+	       cprintf("OK - Supported by this driver\n");
+	    else if (strcmp("C2Af",revis_id) == 0)
+	       cprintf("OK - Supported by this driver\n");
 	    else {
 	       cprintf("ERROR - %s NOT SUPPORTED BY THIS DRIVER\n",revis_id);
 	       return SkelUserReturnFAILED;
