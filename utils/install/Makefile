@@ -1,71 +1,26 @@
-###############################################################################
-# @file Makefile
-#
-# @brief Build generic installation program.
-#
-# @author Copyright (C) 2009 CERN. Yury GEORGIEVSKIY <ygeorgie@cern.ch>
-#
-# @date Created on 09/06/2009
-###############################################################################
+include /acc/src/dsc/co/Make.auto
 
-# Makefile from current directory supress one from upper level
-include $(shell if [ -e ./Makefile.specific ]; then \
-		echo ./Makefile.specific; \
-	else \
-		echo ../Makefile.specific; \
-	fi)
-
-include ../Makefile
-
-
-# libraries (and their pathes) to link executable file with
-XTRALIBDIRS = ../$(ROOTDIR)/utils/user/object
-LOADLIBES  := $(addprefix -L,$(XTRALIBDIRS)) $(LOADLIBES) -lutils.$(CPU)
-
-XTRALIBS    = -lxml2 -lz -g
-LDLIBS      = $(XTRALIBS)
-
-SRCFILES = instprog.c inst-utils.c
-
-ifeq ($(CPU), ppc4)
-# nothing to include for Lynx
+CFLAGS += -I. -I/acc/local/$(CPU)/include -I/usr/include/libxml2 -I /acc/src/dsc/drivers/coht/include -I ../include
+LDLIBS=-lxml2 -lz
+ifeq ($(CPU),ppc4)
+	LDLIBS += -liberty
+	LDFLAGS += -L /acc/local/ppc4/lib
+	LDFLAGS += -L /acc/sys/623/cdk/linux-elf-ppc/lib/
+	CPU_OBJECTS = extra_for_lynx.$(CPU).o
 else
-SRCFILES += inst-linux.c
+	CPU_OBJECTS = inst-linux.$(CPU).o
 endif
 
-EXEC_OBJS = instprog.$(CPU)
+all: lib inst
 
+lib: libutils.$(CPU).a
+inst: instprog.$(CPU)
 
-$(EXEC_OBJS): $(OBJFILES)
+instprog.$(CPU): instprog.$(CPU).o libutils.$(CPU).a
+	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
-.PHONY: _build linux lynx all test move_objs clean clear
+libutils.$(CPU).a: $(CPU_OBJECTS) libinst.$(CPU).o inst-utils.$(CPU).o
+	ar r $@ $^
 
-_build: $(EXEC_OBJS) $(OBJDIR) move_objs
-
-
-linux:
-	@echo -e "\nCompiling for Linux:"
-	$(Q)$(MAKE) _build CPU=L865
-
-lynx:
-	@echo -e "\nCompiling for Lynx:"
-	$(Q)$(MAKE) _build CPU=ppc4
-
-all:
-	$(Q)$(MAKE) linux
-	$(Q)$(MAKE) lynx
-
-test:
-	$(Q)$(MAKE) -C test
-
-# Move compiled files to proper place
-move_objs: $(FINAL_DEST)
-	$(Q)mv $(OBJFILES) $(OBJDIR)
-	$(Q)mv $(EXEC_OBJS) ../$(FINAL_DEST)
-
-
-INCDIRS = ./ ../$(ROOTDIR) ../$(ROOTDIR)/include
-ADDCFLAGS += $(addprefix -I,$(INCDIRS)) -g
-
-clean clear:
-	rm -rf object/ instprog.$(CPU)
+clean:
+	rm -f *.L865.o *.L865 *.ppc4.o *.ppc4 *.L865.a *.ppc4.a

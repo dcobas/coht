@@ -15,7 +15,7 @@
  * described in the .xml config file will be installed.
  */
 #include "install.h"
-#include <utils/user/libinst.h>
+#include "libinst.h"
 #include <general_both.h>
 #include <err.h>
 

@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <include/general_usr.h>
+#include <general_usr.h>
 #include <list.h>
 
 #if defined(__Lynx__)
