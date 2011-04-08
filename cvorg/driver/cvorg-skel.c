@@ -1879,7 +1879,7 @@ cvorg_dac_offset_ioctl(struct cvorg_channel *channel, void *arg, int set)
 	if (set) {
 		/* the offset is represented by 15 bits in 2's complement */
 		if (!WITHIN_RANGE(-(1 << 14), *offset, (1 << 14) - 1)) {
-			SK_INFO("Gain correction out of range");
+			SK_INFO("Offset correction out of range");
 			pseterr(EINVAL);
 			return SkelUserReturnFAILED;
 		}
