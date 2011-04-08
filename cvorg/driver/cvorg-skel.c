@@ -273,8 +273,23 @@ static int cvorg_freqlimit_check(uint32_t length, uint32_t hz)
 	uint32_t y1, y2, x1, x2;
 	uint32_t minimum;
 	uint32_t m;
-	uint32_t mhz = hz / 1000000 + !!(hz % 1000000);
+	uint32_t mhz;
 	int i;
+
+	/* At 100 MHz, the board measures 100.002 MHz, we have 2 kHz of error.
+	 * In other cases, we don't care because we round up to safer values.
+	 */
+	if (hz > 100002000) {
+		SK_INFO("Maximum frequency is 100 MHz. The actual frequency is %d Hz",
+			hz);
+		return -1;
+	}
+
+	mhz = hz / 1000000 + !!(hz % 1000000);
+
+	/* If we have mhz = 101, it means that we round up when we shouldn't */
+	if (mhz > 100)
+		mhz = 100;
 
 	i = cvorg_freqlimit_range(mhz);
 
@@ -1245,7 +1260,7 @@ cvorg_invalid_seq(struct cvorg_channel *channel, struct cvorg_seq *seq)
 		}
 
 		if (cvorg_invalid_freqlimit(channel, seq, wv)) {
-			SK_INFO("wave %d: not enough points", i);
+			SK_INFO("wave %d: not enough points or frequency > 100 MHz", i);
 			pseterr(EINVAL);
 			return SkelUserReturnFAILED;
 		}
