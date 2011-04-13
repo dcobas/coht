@@ -102,12 +102,18 @@ static inline int __cvorg_channel_busy(struct cvorg_channel *channel)
 static inline int __cvorg_channel_ready(struct cvorg_channel *channel)
 {
 	uint32_t status = cvorg_rchan(channel, CVORG_STATUS);
+	int ret;
 
 	/* ready to run? */
-	return    status & CVORG_STATUS_READY &&
+	ret = status & CVORG_STATUS_READY &&
 		!(status & CVORG_STATUS_BUSY) &&
 		!(status & CVORG_STATUS_ERR) &&
 		  status & CVORG_STATUS_CLKOK;
+
+	if(!ret)
+		SK_WARN("Channel not ready. Status: 0x%x", status);
+
+	return ret;
 }
 
 static inline int __cvorg_busy(struct cvorg *cvorg)
@@ -1203,8 +1209,8 @@ static void play_wv(struct cvorg_channel *channel)
 {
 	uint32_t cmd;
 
-	if (!__cvorg_channel_ready(channel))
-		SK_WARN("Channel not ready");
+	/* Check the status. If it is not ready, we still continue */
+	__cvorg_channel_ready(channel);
 
 	/* Mark the sequence in SRAM as valid and set to normal mode */
 	cmd = CVORG_CONFIG_MODE_NORMAL | CVORG_CONFIG_SEQREADY;
