@@ -4,7 +4,7 @@
 
 include /acc/dsc/src/co/Make.auto
 
-CFLAGS= -g -Wall -I. -I/acc/local/$(CPU)/include -I/acc/dsc/src/drivers/cohtdrep/lewis/coht/ctr/driver
+CFLAGS= -g -Wall -I. -I/acc/local/$(CPU)/include
 
 SRCS=TimLib.c TimLib.h ctr/CtrLib.c tg8cps/Tg8CpsLib.c tg8sps/Tg8SpsLib.c netwrk/NetWrkLib.c
 
