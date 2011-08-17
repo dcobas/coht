@@ -1,4 +1,4 @@
-#NO_APP
+	.file	"tg8.c"
 gcc2_compiled.:
 ___gnu_compiled_c:
 #APP
@@ -1097,11 +1097,11 @@ ___gnu_compiled_c:
       .globl __main
       __main: bra Main 
 #NO_APP
-.text
-	.even
-.globl _main_prog
+	.text
+	.balign 2
+	.globl _main_prog
 _main_prog:
-	link a6,#0
+	link %a6,#0
 #APP
 	
  .text
@@ -1110,250 +1110,246 @@ Main:
 #NO_APP
 	jbsr _Init
 	jbsr _MbxProcess
-L1:
-	unlk a6
+.L1:
+	unlk %a6
 	rts
-	.even
+	.balign 2
 _Init:
-	link a6,#-8
-	moveml #0x3030,sp@-
+	link %a6,#-8
+	movel %a3,%sp@-
+	movel %a2,%sp@-
+	movel %d4,%sp@-
 #APP
 	 movew #Tg8DISABLE_INTERRUPTS,SR 
 #NO_APP
-	moveq #4,d3
-	movel d3,a6@(-8)
-	movew #255,a2
-L3:
-	tstl a2
-	jge L6
-	jra L4
-	.even
-L6:
-	movel a6@(-8),a0
-	movel #_Default_Isr,a0@
-	addql #4,a6@(-8)
-L5:
-	subql #1,a2
-	jra L3
-	.even
-L4:
-	movel #256,a6@(-8)
-	movel #_Tpu0_Isr,a6@(-4)
-	movel a6@(-8),a0
-	movel a6@(-4),a0@
-	addql #4,a6@(-8)
-	movel #_Tpu1_Isr,a6@(-4)
-	movel a6@(-8),a0
-	movel a6@(-4),a0@
-	addql #4,a6@(-8)
-	movel #_Tpu2_Isr,a6@(-4)
-	movel a6@(-8),a0
-	movel a6@(-4),a0@
-	addql #4,a6@(-8)
-	movel #_Tpu3_Isr,a6@(-4)
-	movel a6@(-8),a0
-	movel a6@(-4),a0@
-	addql #4,a6@(-8)
-	movel #_Tpu4_Isr,a6@(-4)
-	movel a6@(-8),a0
-	movel a6@(-4),a0@
-	addql #4,a6@(-8)
-	movel #_Tpu5_Isr,a6@(-4)
-	movel a6@(-8),a0
-	movel a6@(-4),a0@
-	addql #4,a6@(-8)
-	movel #_Tpu6_Isr,a6@(-4)
-	movel a6@(-8),a0
-	movel a6@(-4),a0@
-	addql #4,a6@(-8)
-	movel #_Tpu7_Isr,a6@(-4)
-	movel a6@(-8),a0
-	movel a6@(-4),a0@
-	addql #4,a6@(-8)
-	movel #_Tpu8_Isr,a6@(-4)
-	movel a6@(-8),a0
-	movel a6@(-4),a0@
-	moveq #124,d3
-	movel d3,a6@(-8)
-	movel #_Abort_Isr,a6@(-4)
-	movel a6@(-8),a0
-	movel a6@(-4),a0@
-	moveq #120,d3
-	movel d3,a6@(-8)
-	movel #_Xr_Isr,a6@(-4)
-	movel a6@(-8),a0
-	movel a6@(-4),a0@
-	moveq #112,d3
-	movel d3,a6@(-8)
-	movel #_Dsc_Isr,a6@(-4)
-	movel a6@(-8),a0
-	movel a6@(-4),a0@
-	moveq #8,d3
-	movel d3,a6@(-8)
-	movel #_BusError_Isr,a6@(-4)
-	movel a6@(-8),a0
-	movel a6@(-4),a0@
-	moveq #12,d3
-	movel d3,a6@(-8)
-	movel #_AddressError_Isr,a6@(-4)
-	movel a6@(-8),a0
-	movel a6@(-4),a0@
-	moveq #32,d3
-	movel d3,a6@(-8)
-	movel #_PrivViolation_Isr,a6@(-4)
-	movel a6@(-8),a0
-	movel a6@(-4),a0@
-	moveq #96,d3
-	movel d3,a6@(-8)
-	movel #_Spurious_Isr,a6@(-4)
-	movel a6@(-8),a0
-	movel a6@(-4),a0@
-	movel #128,a6@(-8)
-	movel #_AtCompletion,a6@(-4)
-	movel a6@(-8),a0
-	movel a6@(-4),a0@
-	movel #132,a6@(-8)
-	movel #_InsertToCam,a6@(-4)
-	movel a6@(-8),a0
-	movel a6@(-4),a0@
-	movel #136,a6@(-8)
-	movel #_ClearCam,a6@(-4)
-	movel a6@(-8),a0
-	movel a6@(-4),a0@
-	movel #140,a6@(-8)
-	movel #_SetIntSourceMask,a6@(-4)
-	movel a6@(-8),a0
-	movel a6@(-4),a0@
-	movel #144,a6@(-8)
-	movel #_AtStartProcess,a6@(-4)
-	movel a6@(-8),a0
-	movel a6@(-4),a0@
-	movel #148,a6@(-8)
-	movel #_ImmCompletion,a6@(-4)
-	movel a6@(-8),a0
-	movel a6@(-4),a0@
+	moveq #4,%d2
+	movel %d2,%a6@(-8)
+	movew #255,%a2
+.L3:
+	tstl %a2
+	jge .L6
+	jra .L4
+.L6:
+	movel %a6@(-8),%a0
+	movel #_Default_Isr,%a0@
+	addql #4,%a6@(-8)
+.L5:
+	subqw #1,%a2
+	jra .L3
+.L4:
+	movel #256,%a6@(-8)
+	movel #_Tpu0_Isr,%a6@(-4)
+	movel %a6@(-8),%a0
+	movel %a6@(-4),%a0@
+	addql #4,%a6@(-8)
+	movel #_Tpu1_Isr,%a6@(-4)
+	movel %a6@(-8),%a0
+	movel %a6@(-4),%a0@
+	addql #4,%a6@(-8)
+	movel #_Tpu2_Isr,%a6@(-4)
+	movel %a6@(-8),%a0
+	movel %a6@(-4),%a0@
+	addql #4,%a6@(-8)
+	movel #_Tpu3_Isr,%a6@(-4)
+	movel %a6@(-8),%a0
+	movel %a6@(-4),%a0@
+	addql #4,%a6@(-8)
+	movel #_Tpu4_Isr,%a6@(-4)
+	movel %a6@(-8),%a0
+	movel %a6@(-4),%a0@
+	addql #4,%a6@(-8)
+	movel #_Tpu5_Isr,%a6@(-4)
+	movel %a6@(-8),%a0
+	movel %a6@(-4),%a0@
+	addql #4,%a6@(-8)
+	movel #_Tpu6_Isr,%a6@(-4)
+	movel %a6@(-8),%a0
+	movel %a6@(-4),%a0@
+	addql #4,%a6@(-8)
+	movel #_Tpu7_Isr,%a6@(-4)
+	movel %a6@(-8),%a0
+	movel %a6@(-4),%a0@
+	addql #4,%a6@(-8)
+	movel #_Tpu8_Isr,%a6@(-4)
+	movel %a6@(-8),%a0
+	movel %a6@(-4),%a0@
+	moveq #124,%d2
+	movel %d2,%a6@(-8)
+	movel #_Abort_Isr,%a6@(-4)
+	movel %a6@(-8),%a0
+	movel %a6@(-4),%a0@
+	moveq #120,%d2
+	movel %d2,%a6@(-8)
+	movel #_Xr_Isr,%a6@(-4)
+	movel %a6@(-8),%a0
+	movel %a6@(-4),%a0@
+	moveq #112,%d2
+	movel %d2,%a6@(-8)
+	movel #_Dsc_Isr,%a6@(-4)
+	movel %a6@(-8),%a0
+	movel %a6@(-4),%a0@
+	moveq #8,%d2
+	movel %d2,%a6@(-8)
+	movel #_BusError_Isr,%a6@(-4)
+	movel %a6@(-8),%a0
+	movel %a6@(-4),%a0@
+	moveq #12,%d2
+	movel %d2,%a6@(-8)
+	movel #_AddressError_Isr,%a6@(-4)
+	movel %a6@(-8),%a0
+	movel %a6@(-4),%a0@
+	moveq #32,%d2
+	movel %d2,%a6@(-8)
+	movel #_PrivViolation_Isr,%a6@(-4)
+	movel %a6@(-8),%a0
+	movel %a6@(-4),%a0@
+	moveq #96,%d2
+	movel %d2,%a6@(-8)
+	movel #_Spurious_Isr,%a6@(-4)
+	movel %a6@(-8),%a0
+	movel %a6@(-4),%a0@
+	movel #128,%a6@(-8)
+	movel #_AtCompletion,%a6@(-4)
+	movel %a6@(-8),%a0
+	movel %a6@(-4),%a0@
+	movel #132,%a6@(-8)
+	movel #_InsertToCam,%a6@(-4)
+	movel %a6@(-8),%a0
+	movel %a6@(-4),%a0@
+	movel #136,%a6@(-8)
+	movel #_ClearCam,%a6@(-4)
+	movel %a6@(-8),%a0
+	movel %a6@(-4),%a0@
+	movel #140,%a6@(-8)
+	movel #_SetIntSourceMask,%a6@(-4)
+	movel %a6@(-8),%a0
+	movel %a6@(-4),%a0@
+	movel #144,%a6@(-8)
+	movel #_AtStartProcess,%a6@(-4)
+	movel %a6@(-8),%a0
+	movel %a6@(-4),%a0@
+	movel #148,%a6@(-8)
+	movel #_ImmCompletion,%a6@(-4)
+	movel %a6@(-8),%a0
+	movel %a6@(-4),%a0@
 	movel #-1536,_sim
 	movel #-512,_tpu
 	movel #73728,_xlx
 	movel #69632,_cam
 	movel #65536,_dpm
-	movel _sim,a0
-	movel #18906160,a0@(88)
-	movel _sim,a0
-	movel #-497649,a0@(92)
-	movel _sim,a0
-	movel #-497651,a0@(96)
-	movel _sim,a0
-	movel #17855536,a0@(100)
-	movel _sim,a0
-	movel #17852464,a0@(104)
-	movel _sim,a0
-	movel #16808944,a0@(108)
-	movel _tpu,a0
-	movew #7,a0@
-	movel _tpu,a0
-	movew #1856,a0@(8)
-	movel _tpu,a0
-	movew #10,a0@(14)
-	movel _tpu,a0
-	movew #-21846,a0@(16)
-	movel _tpu,a0
-	movew #-21846,a0@(18)
-	movel _tpu,a0
-	movew #1,a0@(20)
-	movel _tpu,a0
-	movew #21845,a0@(22)
-	movel _tpu,a0
-	clrw a0@(10)
+	movel _sim,%a0
+	movel #18906160,%a0@(88)
+	movel _sim,%a0
+	movel #-497649,%a0@(92)
+	movel _sim,%a0
+	movel #-497651,%a0@(96)
+	movel _sim,%a0
+	movel #17855536,%a0@(100)
+	movel _sim,%a0
+	movel #17852464,%a0@(104)
+	movel _sim,%a0
+	movel #16808944,%a0@(108)
+	movel _tpu,%a0
+	movew #7,%a0@
+	movel _tpu,%a0
+	movew #1856,%a0@(8)
+	movel _tpu,%a0
+	movew #10,%a0@(14)
+	movel _tpu,%a0
+	movew #-21846,%a0@(16)
+	movel _tpu,%a0
+	movew #-21846,%a0@(18)
+	movel _tpu,%a0
+	movew #1,%a0@(20)
+	movel _tpu,%a0
+	movew #21845,%a0@(22)
+	movel _tpu,%a0
+	clrw %a0@(10)
 #APP
 	 movew #0,TpuIs
 #NO_APP
-	movew #-256,a2
-	clrl d2
-L7:
-	moveq #15,d3
-	cmpl d2,d3
-	jge L10
-	jra L8
-	.even
-L10:
-	movel d2,d0
-	movel d0,d1
-	lsll #2,d1
-	lea _var,a0
-	movel a2,a0@(2,d1:l)
-	addql #8,a2
-	addql #8,a2
-L9:
-	addql #1,d2
-	jra L7
-	.even
-L8:
+	movew #-256,%a2
+	clrl %d4
+.L7:
+	moveq #15,%d2
+	cmpl %d4,%d2
+	jge .L10
+	jra .L8
+.L10:
+	movel %d4,%d0
+	movel %d0,%d1
+	asll #2,%d1
+	lea _var+2,%a0
+	movel %a2,%a0@(%d1:l)
+	addqw #8,%a2
+	addqw #8,%a2
+.L9:
+	addql #1,%d4
+	jra .L7
+.L8:
 	nop
-	clrl d2
-L11:
-	moveq #8,d3
-	cmpl d2,d3
-	jge L14
-	jra L12
-	.even
-L14:
-	movel d2,d0
-	movel d0,d1
-	lsll #2,d1
-	lea _var,a0
-	movel a0@(2,d1:l),a3
-	movew #7,a3@
-	addql #2,a3
-	movew #14,a3@
-	addql #2,a3
-	movew #1,a3@
-	addql #2,a3
-	clrw a3@
-	addql #2,a3
-L13:
-	addql #1,d2
-	jra L11
-	.even
-L12:
-	movel _tpu,a0
-	movew #1,a0@(24)
-	movel _tpu,a0
-	movew #21845,a0@(26)
-	movel _tpu,a0
-	movew #2,a0@(28)
-	movel _tpu,a0
-	movew #-21845,a0@(30)
-	movel _tpu,a0
-	movew #510,a0@(10)
-	movel _sim,a0
-	movew #-15,a0@(30)
-	movel _sim,a0
-	movew #14,a0@(28)
-	movel _sim,a0
-	movel _sim,a1
-	movew a1@(26),d0
-	movew d0,d1
-	orw #12,d1
-	movew d1,a0@(26)
-	movel _sim,a0
-	clrw a0@(26)
-	movel _sim,a0
-	movel _sim,a1
-	movew a1@(26),d0
-	movew d0,d1
-	orw #12,d1
-	movew d1,a0@(26)
-	movel _xlx,a0
-	movew #32,a0@(32)
+	clrl %d4
+.L11:
+	moveq #8,%d2
+	cmpl %d4,%d2
+	jge .L14
+	jra .L12
+.L14:
+	movel %d4,%d0
+	movel %d0,%d1
+	asll #2,%d1
+	lea _var+2,%a0
+	movel %a0@(%d1:l),%a3
+	movew #7,%a3@
+	addqw #2,%a3
+	movew #14,%a3@
+	addqw #2,%a3
+	movew #1,%a3@
+	addqw #2,%a3
+	clrw %a3@
+	addqw #2,%a3
+.L13:
+	addql #1,%d4
+	jra .L11
+.L12:
+	movel _tpu,%a0
+	movew #1,%a0@(24)
+	movel _tpu,%a0
+	movew #21845,%a0@(26)
+	movel _tpu,%a0
+	movew #2,%a0@(28)
+	movel _tpu,%a0
+	movew #-21845,%a0@(30)
+	movel _tpu,%a0
+	movew #510,%a0@(10)
+	movel _sim,%a0
+	movew #-15,%a0@(30)
+	movel _sim,%a0
+	movew #14,%a0@(28)
+	movel _sim,%a0
+	movel _sim,%a1
+	movew %a1@(26),%d0
+	movew %d0,%d1
+	orw #12,%d1
+	movew %d1,%a0@(26)
+	movel _sim,%a0
+	clrw %a0@(26)
+	movel _sim,%a0
+	movel _sim,%a1
+	movew %a1@(26),%d0
+	movew %d0,%d1
+	orw #12,%d1
+	movew %d1,%a0@(26)
+	movel _xlx,%a0
+	movew #32,%a0@(32)
 	jbsr _SoftInit
-L2:
-	moveml a6@(-24),#0xc0c
-	unlk a6
+.L2:
+	moveml %a6@(-20),#0xc10
+	unlk %a6
 	rts
-	.even
+	.balign 2
 _CamInitialize:
-	link a6,#0
+	link %a6,#0
 #APP
 	 andiw #CamCOMMAND_MODE,SimDataF1 
 	 movel _cam,a0
@@ -1371,122 +1367,121 @@ _CamInitialize:
 	 dbf    d1,0b
 	 movew  #0,a0@ 
 #NO_APP
-L15:
-	unlk a6
+.L15:
+	unlk %a6
 	rts
-LC0:
-	.ascii "Apr  4 2006\0"
-	.even
+.LC0:
+	.ascii "Aug 17 2011\0"
+	.balign 2
 _SoftInit:
-	link a6,#-16
-	movel d2,sp@-
+	link %a6,#-16
 #APP
 	 movew #Tg8DISABLE_INTERRUPTS,SR 
 #NO_APP
-	movel _sim,a0
-	clrw a0@(32)
+	movel _sim,%a0
+	clrw %a0@(32)
 	jbsr _CamInitialize
 	pea 348:w
-	clrl sp@-
+	clrl %sp@-
 	pea _info
 	jbsr _memset
-	addql #8,sp
-	addql #4,sp
-	movel _dpm,a0
-	clrw a0@
-	movel _dpm,a0
-	clrl a0@(4)
+	addqw #8,%sp
+	addqw #4,%sp
+	movel _dpm,%a0
+	clrw %a0@
+	movel _dpm,%a0
+	clrl %a0@(4)
 	pea 320:w
-	clrl sp@-
-	movel _dpm,d0
-	addql #8,d0
-	movel d0,sp@-
+	clrl %sp@-
+	movel _dpm,%d0
+	addql #8,%d0
+	movel %d0,%sp@-
 	jbsr _memset
-	addql #8,sp
-	addql #4,sp
+	addqw #8,%sp
+	addqw #4,%sp
 	pea 368:w
-	clrl sp@-
-	movel _dpm,d0
-	addl #328,d0
-	movel d0,sp@-
+	clrl %sp@-
+	movel _dpm,%d0
+	addl #328,%d0
+	movel %d0,%sp@-
 	jbsr _memset
-	addql #8,sp
-	addql #4,sp
+	addqw #8,%sp
+	addqw #4,%sp
 	pea 1338:w
-	clrl sp@-
-	movel _dpm,d0
-	addl #696,d0
-	movel d0,sp@-
+	clrl %sp@-
+	movel _dpm,%d0
+	addl #696,%d0
+	movel %d0,%sp@-
 	jbsr _memset
-	addql #8,sp
-	addql #4,sp
+	addqw #8,%sp
+	addqw #4,%sp
 	clrw _camBusy
 	pea 246:w
-	clrl sp@-
+	clrl %sp@-
 	pea _eprog
 	jbsr _memset
-	addql #8,sp
-	addql #4,sp
+	addqw #8,%sp
+	addqw #4,%sp
 	pea 9216:w
-	clrl sp@-
+	clrl %sp@-
 	pea _act
 	jbsr _memset
-	addql #8,sp
-	addql #4,sp
+	addqw #8,%sp
+	addqw #4,%sp
 	pea 328:w
-	clrl sp@-
+	clrl %sp@-
 	pea _clk
 	jbsr _memset
-	addql #8,sp
-	addql #4,sp
+	addqw #8,%sp
+	addqw #4,%sp
 	pea 16008:w
-	clrl sp@-
+	clrl %sp@-
 	pea _hist
 	jbsr _memset
-	addql #8,sp
-	addql #4,sp
+	addqw #8,%sp
+	addqw #4,%sp
 	pea 520:w
-	clrl sp@-
+	clrl %sp@-
 	pea _match
 	jbsr _memset
-	addql #8,sp
-	addql #4,sp
+	addqw #8,%sp
+	addqw #4,%sp
 	pea 264:w
-	clrl sp@-
+	clrl %sp@-
 	pea _tel
 	jbsr _memset
-	addql #8,sp
-	addql #4,sp
+	addqw #8,%sp
+	addqw #4,%sp
 	pea 144:w
-	clrl sp@-
+	clrl %sp@-
 	pea _atQueue
 	jbsr _memset
-	addql #8,sp
-	addql #4,sp
+	addqw #8,%sp
+	addqw #4,%sp
 	pea 144:w
-	clrl sp@-
+	clrl %sp@-
 	pea _immQueue
 	jbsr _memset
-	addql #8,sp
-	addql #4,sp
+	addqw #8,%sp
+	addqw #4,%sp
 	pea 8:w
-	clrl sp@-
+	clrl %sp@-
 	pea _ins
 	jbsr _memset
-	addql #8,sp
-	addql #4,sp
+	addqw #8,%sp
+	addqw #4,%sp
 	pea 66:w
-	clrl sp@-
+	clrl %sp@-
 	pea _var
 	jbsr _memset
-	addql #8,sp
-	addql #4,sp
+	addqw #8,%sp
+	addqw #4,%sp
 	pea 1808:w
-	clrl sp@-
+	clrl %sp@-
 	pea _in_use
 	jbsr _memset
-	addql #8,sp
-	addql #4,sp
+	addqw #8,%sp
+	addqw #4,%sp
 	clrl _wild_c
 	movel #255,_wild_c+4
 	movel #65280,_wild_c+8
@@ -1496,11 +1491,11 @@ _SoftInit:
 	movel #16776960,_wild_c+24
 	movel #16777215,_wild_c+28
 	pea 16:w
-	clrl sp@-
+	clrl %sp@-
 	pea _time_event_index
 	jbsr _memset
-	addql #8,sp
-	addql #4,sp
+	addqw #8,%sp
+	addqw #4,%sp
 	moveb #1,_time_event_index+1
 	moveb #2,_time_event_index+4
 	moveb #2,_time_event_index+3
@@ -1510,79 +1505,77 @@ _SoftInit:
 	moveb #3,_time_event_index+6
 	moveb #3,_time_event_index+5
 	moveb #3,_time_event_index+9
-	movel _dpm,d2
-	addl #456,d2
-	movel d2,_tel+4
-	movel _dpm,d2
-	addl #504,d2
-	movel d2,_tel+8
-	movel _dpm,d2
-	addl #552,d2
-	movel d2,_tel+12
-	movel _dpm,d2
-	addl #600,d2
-	movel d2,_tel+16
-	movel _dpm,d2
-	addl #648,d2
-	movel d2,_tel+20
-	clrl a6@(-8)
-	movel #_act+1024,a6@(-4)
-L17:
-	cmpl #255,a6@(-8)
-	jle L20
-	jra L18
-	.even
-L20:
-	movel a6@(-8),d0
-	movel d0,d1
-	movel d1,d0
-	lsll #2,d0
-	lea _act,a0
-	movel a6@(-4),a0@(d0:l)
-L19:
-	addql #1,a6@(-8)
-	moveq #32,d2
-	addl d2,a6@(-4)
-	jra L17
-	.even
-L18:
+	movel _dpm,%d2
+	addl #456,%d2
+	movel %d2,_tel+4
+	movel _dpm,%d2
+	addl #504,%d2
+	movel %d2,_tel+8
+	movel _dpm,%d2
+	addl #552,%d2
+	movel %d2,_tel+12
+	movel _dpm,%d2
+	addl #600,%d2
+	movel %d2,_tel+16
+	movel _dpm,%d2
+	addl #648,%d2
+	movel %d2,_tel+20
+	clrl %a6@(-8)
+	movel #_act+1024,%a6@(-4)
+.L17:
+	cmpl #255,%a6@(-8)
+	jle .L20
+	jra .L18
+.L20:
+	movel %a6@(-8),%d0
+	movel %d0,%d1
+	movel %d1,%d0
+	asll #2,%d0
+	lea _act,%a0
+	movel %a6@(-4),%a0@(%d0:l)
+.L19:
+	addql #1,%a6@(-8)
+	moveq #32,%d2
+	addl %d2,%a6@(-4)
+	jra .L17
+.L18:
 	movel #_clk+8,_clk+4
 	movel #_hist+8,_hist+4
-	movel #_atQueue+16,d0
-	movel d0,_atQueue
-	movel d0,_atQueue+4
+	movel #_atQueue+16,%d0
+	movel %d0,_atQueue
+	movel %d0,_atQueue+4
 	movel #_atQueue+144,_atQueue+8
-	movel #_immQueue+16,d0
-	movel d0,_immQueue
-	movel d0,_immQueue+4
+	movel #_immQueue+16,%d0
+	movel %d0,_immQueue
+	movel %d0,_immQueue+4
 	movel #_immQueue+144,_immQueue+8
 	pea 12:w
-	pea LC0
-	movel _dpm,d0
-	addl #388,d0
-	movel d0,sp@-
+	pea .LC0
+	movel _dpm,%d0
+	addl #388,%d0
+	movel %d0,%sp@-
 	jbsr _memcpy16
-	addql #8,sp
-	addql #4,sp
-	movel _xlx,a0
-	movew a0@(36),a6@(-10)
-	movel _xlx,a0
-	clrw a0@(36)
-	moveb a6@(-9),_rcv_error
+	addqw #8,%sp
+	addqw #4,%sp
+	movel _xlx,%a0
+	movew %a0@(36),%a6@(-10)
+	movel _xlx,%a0
+	clrw %a0@(36)
+	moveb %a6@(-9),_rcv_error
 	clrb _rcv_error+1
-	movel _dpm,a0
-	lea a0@(380),a0
-	movew _rcv_error,a0@
-	movel _dpm,a0
-	clrw a0@(360)
-	movel _dpm,a0
-	clrw a0@(362)
-	movel _dpm,a0
-	movew #32,a0@(366)
-	movel _dpm,a0
-	movew #1,a0@(364)
-	movel _sim,a0
-	movew #160,a0@(32)
+	movel _dpm,%a0
+	addw #380,%a0
+	movew _rcv_error,%a0@
+	movel _dpm,%a0
+	clrw %a0@(360)
+	movel _dpm,%a0
+	clrw %a0@(362)
+	movel _dpm,%a0
+	movew #32,%a0@(366)
+	movel _dpm,%a0
+	movew #1,%a0@(364)
+	movel _sim,%a0
+	movew #160,%a0@(32)
 	moveb #31,_dm+11
 	moveb #31,_dm+9
 	moveb #31,_dm+7
@@ -1598,1222 +1591,1109 @@ L18:
 #APP
 	 movew #Tg8ENABLE_INTERRUPTS,SR 
 #NO_APP
-L16:
-	movel a6@(-20),d2
-	unlk a6
+.L16:
+	unlk %a6
 	rts
-	.even
+	.balign 2
 _InsertAction:
-	link a6,#-40
-	moveml #0x3030,sp@-
-	clrl d0
-	movew _ins,d0
-	movel d0,d1
-	lsll #2,d1
-	lea _act,a0
-	movel a0@(d1:l),a6@(-8)
+	link %a6,#-40
+	movel %a3,%sp@-
+	movel %a2,%sp@-
+	clrl %d0
+	movew _ins,%d0
+	movel %d0,%d1
+	asll #2,%d1
+	lea _act,%a0
+	movel %a0@(%d1:l),%a6@(-8)
 	pea 32:w
-	clrl sp@-
-	movel a6@(-8),sp@-
+	clrl %sp@-
+	movel %a6@(-8),%sp@-
 	jbsr _memset
-	addql #8,sp
-	addql #4,sp
-	tstl a6@(12)
-	jeq L22
-	movel a6@(8),a6@(-4)
-	movel a6@(-4),a0
-	clrw d0
-	moveb a0@(7),d0
-	movew d0,a6@(-36)
-	clrl d0
-	movew _ins,d0
-	movew a6@(-36),a0
-	lea a0@(0,d0:l),a1
-	cmpl #256,a1
-	jle L23
-	moveq #-4,d0
-	jra L21
-	.even
-L23:
-	movel a6@(-8),a0
-	movel a6@(-4),a1
-	movel a1@,a0@
-	movel a6@(-8),a0
-	movel a6@(-4),a1
-	movew a1@(56),a0@(4)
-	movel a6@(-8),a0
-	movel a6@(-4),a1
-	movew a1@(104),a0@(6)
-	movel a6@(-8),a0
-	movel a6@(-4),a1
-	moveb a1@(4),d1
-	moveb d1,d0
-	lslb #4,d0
-	movel a6@(-4),a1
-	moveb d0,d2
-	orb a1@(6),d2
-	moveb d2,a0@(8)
-	movel a6@(-8),a0
-	movel a6@(-4),a1
-	moveb a1@(5),a0@(9)
-	movel a6@(-8),a0
-	movel a6@(-4),a1
-	movew a1@(8),a0@(10)
-	jra L24
-	.even
-L22:
-	movel a6@(-8),a0
-	movel a6@(8),a1
-	movel a1@,d2
-	movel a1@(4),d3
-	movel d2,a0@
-	movel d3,a0@(4)
-	movew #1,a6@(-36)
-L24:
-	movel a6@(-8),a0
-	moveb a6@(-35),d0
-	moveb d0,d1
-	lslb #1,d1
-	moveb d1,a0@(15)
-	movel a6@(-8),a0
-	movel a0@,a6@(-16)
-	movel a6@(-8),a0
-	movew a0@(4),a6@(-32)
-	movew a6@(-32),d1
-	movew d1,d0
-	asrw #8,d0
-	movew d0,d3
-	andw #7,d3
-	movew d3,a6@(-24)
-	tstw a6@(-24)
-	jeq L25
-	movew a6@(-24),d0
-	subqw #1,d0
-	jra L26
-	.even
-L25:
-	moveq #7,d0
-L26:
-	movew d0,a6@(-24)
-	movel a6@(-8),a0
-	moveb a6@(-23),a0@(14)
-	movew a6@(-32),a0
-	movel a0,sp@-
+	addqw #8,%sp
+	addqw #4,%sp
+	tstl %a6@(12)
+	jeq .L22
+	movel %a6@(8),%a6@(-4)
+	movel %a6@(-4),%a0
+	clrw %d0
+	moveb %a0@(7),%d0
+	movew %d0,%a6@(-36)
+	clrl %d0
+	movew _ins,%d0
+	movew %a6@(-36),%a0
+	lea %a0@(0,%d0:l),%a1
+	cmpl #256,%a1
+	jle .L23
+	moveq #-4,%d0
+	jra .L21
+.L23:
+	movel %a6@(-8),%a0
+	movel %a6@(-4),%a1
+	movel %a1@,%a0@
+	movel %a6@(-8),%a0
+	movel %a6@(-4),%a1
+	movew %a1@(56),%a0@(4)
+	movel %a6@(-8),%a0
+	movel %a6@(-4),%a1
+	movew %a1@(104),%a0@(6)
+	movel %a6@(-8),%a0
+	movel %a6@(-4),%a1
+	moveb %a1@(4),%d1
+	moveb %d1,%d0
+	aslb #4,%d0
+	movel %a6@(-4),%a1
+	moveb %d0,%d2
+	orb %a1@(6),%d2
+	moveb %d2,%a0@(8)
+	movel %a6@(-8),%a0
+	movel %a6@(-4),%a1
+	moveb %a1@(5),%a0@(9)
+	movel %a6@(-8),%a0
+	movel %a6@(-4),%a1
+	movew %a1@(8),%a0@(10)
+	jra .L24
+.L22:
+	movel %a6@(-8),%a0
+	movel %a6@(8),%a1
+	movel %a1@,%d2
+	movel %a1@(4),%d3
+	movel %d2,%a0@
+	movel %d3,%a0@(4)
+	movew #1,%a6@(-36)
+.L24:
+	movel %a6@(-8),%a0
+	moveb %a6@(-35),%d0
+	moveb %d0,%d1
+	aslb #1,%d1
+	moveb %d1,%a0@(15)
+	movel %a6@(-8),%a0
+	movel %a0@,%a6@(-16)
+	movel %a6@(-8),%a0
+	movew %a0@(4),%a6@(-32)
+	movew %a6@(-32),%d1
+	movew %d1,%d0
+	asrw #8,%d0
+	movew %d0,%d3
+	andw #7,%d3
+	movew %d3,%a6@(-24)
+	tstw %a6@(-24)
+	jeq .L25
+	movew %a6@(-24),%d0
+	subqw #1,%d0
+	jra .L26
+.L25:
+	moveq #7,%d0
+.L26:
+	movew %d0,%a6@(-24)
+	movel %a6@(-8),%a0
+	moveb %a6@(-23),%a0@(14)
+	movew %a6@(-32),%a0
+	movel %a0,%sp@-
 	jbsr _GetXConfiguration
-	addql #4,sp
-	movew d0,a6@(-30)
-	tstw a6@(-30)
-	jge L27
-	movew a6@(-30),a0
-	movel a0,d0
-	jra L21
-	.even
-L27:
-	movel a6@(-8),a0
-	movew a6@(-30),a0@(12)
-	movew a6@(-30),d0
-	andw #1,d0
-	tstw d0
-	jeq L28
-	movel a6@(-8),a0
-	cmpw #65535,a0@(6)
-	jne L29
-	moveq #-5,d0
-	jra L21
-	.even
-L29:
-	movel a6@(-8),a0
-	addqw #1,a0@(6)
-	movew #1,a6@(-38)
-	jra L30
-	.even
-L28:
-	movel a6@(-8),a0
-	clrw a0@(6)
-	clrw a6@(-38)
-L30:
-	movew a6@(-32),d1
-	movew d1,d0
-	moveq #14,d2
-	asrw d2,d0
-	movew d0,d1
-	andw #3,d1
-	tstw d1
-	jne L31
-	orw #4,a6@(-32)
-	movel a6@(-8),a0
-	movew a6@(-32),a0@(4)
-L31:
-	movew a6@(-32),d1
-	movew d1,d0
-	asrw #3,d0
-	movew d0,d1
-	andw #3,d1
-	cmpw #3,d1
-	jeq L32
-	clrw a6@(-22)
-	cmpb #255,a6@(-15)
-	jne L33
-	orw #4,a6@(-22)
-L33:
-	cmpb #255,a6@(-14)
-	jne L34
-	orw #2,a6@(-22)
-L34:
-	cmpb #255,a6@(-13)
-	jne L35
-	orw #1,a6@(-22)
-L35:
-	movew a6@(-22),d0
-	extl d0
-	moveq #1,d1
-	movel d1,d3
-	lsll d0,d3
-	movel d3,d0
-	movew d0,a6@(-28)
-	cmpb #1,a6@(-16)
-	jeq L36
-	clrl d0
-	moveb a6@(-16),d0
-	movel #_in_use,d1
-	movel d1,a0
-	addl d0,a0
-	clrl d0
-	moveb a6@(-16),d0
-	movel #_in_use,d1
-	movel d1,a1
-	addl d0,a1
-	moveb a1@(256),d2
-	orb a6@(-27),d2
-	moveb d2,a0@(256)
-	moveb a6@(-16),d1
-	moveb d1,d0
-	lsrb #4,d0
-	clrw d1
-	moveb d0,d1
-	movew d1,a6@(-26)
-	movew a6@(-26),d0
-	extl d0
-	moveq #1,d1
-	movel d1,d3
-	lsll d0,d3
-	movel d3,d0
-	movew d0,a6@(-26)
-	movew a6@(-22),d0
-	andw #4,d0
-	tstw d0
-	jne L37
-	clrl d0
-	moveb a6@(-15),d0
-	lea _in_use,a0
-	clrl d1
-	moveb a6@(-15),d1
-	lea _in_use,a1
-	moveb a1@(d1:l),d2
-	orb a6@(-25),d2
-	moveb d2,a0@(d0:l)
-	movew a6@(-30),d0
-	andw #1,d0
-	tstw d0
-	jeq L38
-	clrl d0
-	moveb a6@(-15),d0
-	movel #_in_use,d1
-	movel d1,a0
-	addl d0,a0
-	clrl d0
-	moveb a6@(-15),d0
-	movel #_in_use,d1
-	movel d1,a1
-	addl d0,a1
-	moveb a1@(512),d3
-	orb a6@(-27),d3
-	moveb d3,a0@(512)
-	jra L39
-	.even
-L38:
-	clrl d0
-	moveb a6@(-15),d0
-	movel #_in_use,d1
-	movel d1,a0
-	addl d0,a0
-	clrl d0
-	moveb a6@(-15),d0
-	movel #_in_use,d1
-	movel d1,a1
-	addl d0,a1
-	moveb a1@(768),d2
-	orb a6@(-27),d2
-	moveb d2,a0@(768)
-L39:
-	jra L40
-	.even
-L37:
+	addqw #4,%sp
+	movew %d0,%a6@(-30)
+	tstw %a6@(-30)
+	jge .L27
+	movew %a6@(-30),%a0
+	movel %a0,%d0
+	jra .L21
+.L27:
+	movel %a6@(-8),%a0
+	movew %a6@(-30),%a0@(12)
+	movew %a6@(-30),%d0
+	andw #1,%d0
+	tstw %d0
+	jeq .L28
+	movel %a6@(-8),%a0
+	cmpw #65535,%a0@(6)
+	jne .L29
+	moveq #-5,%d0
+	jra .L21
+.L29:
+	movel %a6@(-8),%a0
+	addqw #1,%a0@(6)
+	movew #1,%a6@(-38)
+	jra .L30
+.L28:
+	movel %a6@(-8),%a0
+	clrw %a0@(6)
+	clrw %a6@(-38)
+.L30:
+	movew %a6@(-32),%d1
+	movew %d1,%d0
+	moveq #14,%d2
+	asrw %d2,%d0
+	movew %d0,%d1
+	andw #3,%d1
+	tstw %d1
+	jne .L31
+	orw #4,%a6@(-32)
+	movel %a6@(-8),%a0
+	movew %a6@(-32),%a0@(4)
+.L31:
+	movew %a6@(-32),%d1
+	movew %d1,%d0
+	asrw #3,%d0
+	movew %d0,%d1
+	andw #3,%d1
+	cmpw #3,%d1
+	jeq .L32
+	clrw %a6@(-22)
+	cmpb #255,%a6@(-15)
+	jne .L33
+	orw #4,%a6@(-22)
+.L33:
+	cmpb #255,%a6@(-14)
+	jne .L34
+	orw #2,%a6@(-22)
+.L34:
+	cmpb #255,%a6@(-13)
+	jne .L35
+	orw #1,%a6@(-22)
+.L35:
+	movew %a6@(-22),%d0
+	extl %d0
+	moveq #1,%d1
+	movel %d1,%d3
+	asll %d0,%d3
+	movel %d3,%d0
+	movew %d0,%a6@(-28)
+	cmpb #1,%a6@(-16)
+	jeq .L36
+	clrl %d0
+	moveb %a6@(-16),%d0
+	lea _in_use+256,%a0
+	clrl %d1
+	moveb %a6@(-16),%d1
+	lea _in_use+256,%a1
+	moveb %a1@(%d1:l),%d2
+	orb %a6@(-27),%d2
+	moveb %d2,%a0@(%d0:l)
+	moveb %a6@(-16),%d1
+	moveb %d1,%d0
+	lsrb #4,%d0
+	clrw %d1
+	moveb %d0,%d1
+	movew %d1,%a6@(-26)
+	movew %a6@(-26),%d0
+	extl %d0
+	moveq #1,%d1
+	movel %d1,%d3
+	asll %d0,%d3
+	movel %d3,%d0
+	movew %d0,%a6@(-26)
+	movew %a6@(-22),%d0
+	andw #4,%d0
+	tstw %d0
+	jne .L37
+	clrl %d0
+	moveb %a6@(-15),%d0
+	lea _in_use,%a0
+	clrl %d1
+	moveb %a6@(-15),%d1
+	lea _in_use,%a1
+	moveb %a1@(%d1:l),%d2
+	orb %a6@(-25),%d2
+	moveb %d2,%a0@(%d0:l)
+	movew %a6@(-30),%d0
+	andw #1,%d0
+	tstw %d0
+	jeq .L38
+	clrl %d0
+	moveb %a6@(-15),%d0
+	lea _in_use+512,%a0
+	clrl %d1
+	moveb %a6@(-15),%d1
+	lea _in_use+512,%a1
+	moveb %a1@(%d1:l),%d3
+	orb %a6@(-27),%d3
+	moveb %d3,%a0@(%d0:l)
+	jra .L39
+.L38:
+	clrl %d0
+	moveb %a6@(-15),%d0
+	lea _in_use+768,%a0
+	clrl %d1
+	moveb %a6@(-15),%d1
+	lea _in_use+768,%a1
+	moveb %a1@(%d1:l),%d2
+	orb %a6@(-27),%d2
+	moveb %d2,%a0@(%d0:l)
+.L39:
+	jra .L40
+.L37:
 	nop
-	movew #255,a6@(-24)
-L41:
-	tstw a6@(-24)
-	jge L44
-	jra L40
-	.even
-L44:
-	movew a6@(-24),a0
-	lea _in_use,a1
-	movew a6@(-24),a2
-	lea _in_use,a3
-	moveb a2@(a3:l),d3
-	orb a6@(-25),d3
-	moveb d3,a0@(a1:l)
-	movew a6@(-30),d0
-	andw #1,d0
-	tstw d0
-	jeq L45
-	movew a6@(-24),a0
-	movel #_in_use,d0
-	lea a0@(0,d0:l),a0
-	movew a6@(-24),a1
-	movel #_in_use,d0
-	lea a1@(0,d0:l),a1
-	moveb a1@(512),d2
-	orb a6@(-27),d2
-	moveb d2,a0@(512)
-	jra L43
-	.even
-L45:
-	movew a6@(-24),a0
-	movel #_in_use,d0
-	lea a0@(0,d0:l),a0
-	movew a6@(-24),a1
-	movel #_in_use,d0
-	lea a1@(0,d0:l),a1
-	moveb a1@(768),d3
-	orb a6@(-27),d3
-	moveb d3,a0@(768)
-L46:
-L43:
-	subqw #1,a6@(-24)
-	jra L41
-	.even
-L42:
-L40:
-	jra L47
-	.even
-L36:
-	clrl d0
-	moveb a6@(-16),d0
-	movel #_in_use,d1
-	movel d1,a0
-	addl d0,a0
-	clrl d0
-	moveb a6@(-16),d0
-	movel #_in_use,d1
-	movel d1,a1
-	addl d0,a1
-	moveb a1@(1280),d2
-	orb a6@(-27),d2
-	moveb d2,a0@(1280)
-	clrl d0
-	moveb a6@(-16),d0
-	lea _time_event_index,a0
-	clrw d1
-	moveb a0@(d0:l),d1
-	movew d1,a6@(-26)
-	movew a6@(-26),d0
-	extl d0
-	moveq #1,d1
-	movel d1,d3
-	lsll d0,d3
-	movel d3,d0
-	movew d0,a6@(-26)
-	movew a6@(-22),d0
-	andw #4,d0
-	tstw d0
-	jne L48
-	clrl d0
-	moveb a6@(-15),d0
-	movel #_in_use,d1
-	movel d1,a0
-	addl d0,a0
-	clrl d0
-	moveb a6@(-15),d0
-	movel #_in_use,d1
-	movel d1,a1
-	addl d0,a1
-	moveb a1@(1024),d2
-	orb a6@(-25),d2
-	moveb d2,a0@(1024)
-	movew a6@(-30),d0
-	andw #1,d0
-	tstw d0
-	jeq L49
-	clrl d0
-	moveb a6@(-15),d0
-	movel #_in_use,d1
-	movel d1,a0
-	addl d0,a0
-	clrl d0
-	moveb a6@(-15),d0
-	movel #_in_use,d1
-	movel d1,a1
-	addl d0,a1
-	moveb a1@(1296),d3
-	orb a6@(-27),d3
-	moveb d3,a0@(1296)
-	jra L50
-	.even
-L49:
-	clrl d0
-	moveb a6@(-15),d0
-	movel #_in_use,d1
-	movel d1,a0
-	addl d0,a0
-	clrl d0
-	moveb a6@(-15),d0
-	movel #_in_use,d1
-	movel d1,a1
-	addl d0,a1
-	moveb a1@(1552),d2
-	orb a6@(-27),d2
-	moveb d2,a0@(1552)
-L50:
-	jra L47
-	.even
-L48:
+	movew #255,%a6@(-24)
+.L41:
+	tstw %a6@(-24)
+	jge .L44
+	jra .L40
+.L44:
+	movew %a6@(-24),%a0
+	lea _in_use,%a1
+	movew %a6@(-24),%a2
+	lea _in_use,%a3
+	moveb %a3@(%a2:l),%d3
+	orb %a6@(-25),%d3
+	moveb %d3,%a1@(%a0:l)
+	movew %a6@(-30),%d0
+	andw #1,%d0
+	tstw %d0
+	jeq .L45
+	movew %a6@(-24),%a0
+	lea _in_use+512,%a1
+	movew %a6@(-24),%a2
+	lea _in_use+512,%a3
+	moveb %a3@(%a2:l),%d2
+	orb %a6@(-27),%d2
+	moveb %d2,%a1@(%a0:l)
+	jra .L43
+.L45:
+	movew %a6@(-24),%a0
+	lea _in_use+768,%a1
+	movew %a6@(-24),%a2
+	lea _in_use+768,%a3
+	moveb %a3@(%a2:l),%d3
+	orb %a6@(-27),%d3
+	moveb %d3,%a1@(%a0:l)
+.L46:
+.L43:
+	subqw #1,%a6@(-24)
+	jra .L41
+.L42:
+.L40:
+	jra .L47
+.L36:
+	clrl %d0
+	moveb %a6@(-16),%d0
+	lea _in_use+1280,%a0
+	clrl %d1
+	moveb %a6@(-16),%d1
+	lea _in_use+1280,%a1
+	moveb %a1@(%d1:l),%d2
+	orb %a6@(-27),%d2
+	moveb %d2,%a0@(%d0:l)
+	clrl %d0
+	moveb %a6@(-16),%d0
+	lea _time_event_index,%a0
+	clrw %d1
+	moveb %a0@(%d0:l),%d1
+	movew %d1,%a6@(-26)
+	movew %a6@(-26),%d0
+	extl %d0
+	moveq #1,%d1
+	movel %d1,%d3
+	asll %d0,%d3
+	movel %d3,%d0
+	movew %d0,%a6@(-26)
+	movew %a6@(-22),%d0
+	andw #4,%d0
+	tstw %d0
+	jne .L48
+	clrl %d0
+	moveb %a6@(-15),%d0
+	lea _in_use+1024,%a0
+	clrl %d1
+	moveb %a6@(-15),%d1
+	lea _in_use+1024,%a1
+	moveb %a1@(%d1:l),%d2
+	orb %a6@(-25),%d2
+	moveb %d2,%a0@(%d0:l)
+	movew %a6@(-30),%d0
+	andw #1,%d0
+	tstw %d0
+	jeq .L49
+	clrl %d0
+	moveb %a6@(-15),%d0
+	lea _in_use+1296,%a0
+	clrl %d1
+	moveb %a6@(-15),%d1
+	lea _in_use+1296,%a1
+	moveb %a1@(%d1:l),%d3
+	orb %a6@(-27),%d3
+	moveb %d3,%a0@(%d0:l)
+	jra .L50
+.L49:
+	clrl %d0
+	moveb %a6@(-15),%d0
+	lea _in_use+1552,%a0
+	clrl %d1
+	moveb %a6@(-15),%d1
+	lea _in_use+1552,%a1
+	moveb %a1@(%d1:l),%d2
+	orb %a6@(-27),%d2
+	moveb %d2,%a0@(%d0:l)
+.L50:
+	jra .L47
+.L48:
 	nop
-	movew #255,a6@(-24)
-L52:
-	tstw a6@(-24)
-	jge L55
-	jra L47
-	.even
-L55:
-	movew a6@(-24),a0
-	movel #_in_use,d0
-	lea a0@(0,d0:l),a0
-	movew a6@(-24),a1
-	movel #_in_use,d0
-	lea a1@(0,d0:l),a1
-	moveb a1@(1024),d3
-	orb a6@(-25),d3
-	moveb d3,a0@(1024)
-	movew a6@(-30),d0
-	andw #1,d0
-	tstw d0
-	jeq L56
-	movew a6@(-24),a0
-	movel #_in_use,d0
-	lea a0@(0,d0:l),a0
-	movew a6@(-24),a1
-	movel #_in_use,d0
-	lea a1@(0,d0:l),a1
-	moveb a1@(1296),d2
-	orb a6@(-27),d2
-	moveb d2,a0@(1296)
-	jra L54
-	.even
-L56:
-	movew a6@(-24),a0
-	movel #_in_use,d0
-	lea a0@(0,d0:l),a0
-	movew a6@(-24),a1
-	movel #_in_use,d0
-	lea a1@(0,d0:l),a1
-	moveb a1@(1552),d3
-	orb a6@(-27),d3
-	moveb d3,a0@(1552)
-L57:
-L54:
-	subqw #1,a6@(-24)
-	jra L52
-	.even
-L53:
-L51:
-L47:
-	movew a6@(-32),d1
-	movew d1,d0
-	asrw #2,d0
-	movew d0,d1
-	andw #1,d1
-	tstw d1
-	jne L58
-	movel a6@(-16),_ins+2
-	movew a6@(-30),d0
-	andw #1,d0
-	tstw d0
-	jeq L59
-	movew #255,d0
-	jra L60
-	.even
-L59:
-	clrw d0
-L60:
-	movew d0,_ins+6
-	jra L61
-	.even
-L58:
+	movew #255,%a6@(-24)
+.L52:
+	tstw %a6@(-24)
+	jge .L55
+	jra .L47
+.L55:
+	movew %a6@(-24),%a0
+	lea _in_use+1024,%a1
+	movew %a6@(-24),%a2
+	lea _in_use+1024,%a3
+	moveb %a3@(%a2:l),%d3
+	orb %a6@(-25),%d3
+	moveb %d3,%a1@(%a0:l)
+	movew %a6@(-30),%d0
+	andw #1,%d0
+	tstw %d0
+	jeq .L56
+	movew %a6@(-24),%a0
+	lea _in_use+1296,%a1
+	movew %a6@(-24),%a2
+	lea _in_use+1296,%a3
+	moveb %a3@(%a2:l),%d2
+	orb %a6@(-27),%d2
+	moveb %d2,%a1@(%a0:l)
+	jra .L54
+.L56:
+	movew %a6@(-24),%a0
+	lea _in_use+1552,%a1
+	movew %a6@(-24),%a2
+	lea _in_use+1552,%a3
+	moveb %a3@(%a2:l),%d3
+	orb %a6@(-27),%d3
+	moveb %d3,%a1@(%a0:l)
+.L57:
+.L54:
+	subqw #1,%a6@(-24)
+	jra .L52
+.L53:
+.L51:
+.L47:
+	movew %a6@(-32),%d1
+	movew %d1,%d0
+	asrw #2,%d0
+	movew %d0,%d1
+	andw #1,%d1
+	tstw %d1
+	jne .L58
+	movel %a6@(-16),_ins+2
+	movew %a6@(-30),%d0
+	andw #1,%d0
+	tstw %d0
+	jeq .L59
+	movew #255,%d0
+	jra .L60
+.L59:
+	clrw %d0
+.L60:
+	movew %d0,_ins+6
+	jra .L61
+.L58:
 	clrl _ins+2
 	clrw _ins+6
-L61:
-	tstl a6@(12)
-	jeq L62
-	movel a6@(-8),a0
-	movel a6@(-8),a1
-	movew a1@(4),d2
-	orw #8,d2
-	movew d2,a0@(4)
-	movew #1,a6@(-24)
-	movel a6@(-8),a6@(-12)
-L63:
-	movew a6@(-36),d3
-	cmpw a6@(-24),d3
-	jgt L66
-	jra L62
-	.even
-L66:
-	moveq #32,d2
-	addl d2,a6@(-12)
-	movel a6@(-12),d0
-	movel a6@(-8),d1
-	movel d1,a0
-	movel d0,a1
-	movel a0@,a1@
-	addql #4,a1
-	addql #4,a0
-	movel a0@,a1@
-	addql #4,a1
-	addql #4,a0
-	movel a0@,a1@
-	addql #4,a1
-	addql #4,a0
-	movel a0@,a1@
-	addql #4,a1
-	addql #4,a0
-	movel a0@,a1@
-	addql #4,a1
-	addql #4,a0
-	movel a0@,a1@
-	addql #4,a1
-	addql #4,a0
-	movel a0@,a1@
-	addql #4,a1
-	addql #4,a0
-	movel a0@,a1@
-	addql #4,a1
-	addql #4,a0
-	movel a6@(-12),a1
-	movel a6@(-4),a0
-	movew a6@(-24),a2
-	movel a2,d0
-	movel d0,d1
-	addl d1,d1
-	movew a0@(8,d1:l),a1@(10)
-	movel a6@(-12),a0
-	movel a6@(-4),a1
-	movew a6@(-24),a2
-	movel a2,d0
-	movel d0,d1
-	addl d1,d1
-	movew a1@(56,d1:l),d0
-	movew d0,a6@(-34)
-	movew d0,a0@(4)
-	movel a6@(-12),a0
-	movel a6@(-4),a1
-	movew a6@(-24),a2
-	movel a2,d0
-	movel d0,d1
-	addl d1,d1
-	movew a6@(-38),d3
-	addw a1@(104,d1:l),d3
-	movew d3,a0@(6)
-	movew a6@(-34),d1
-	movew d1,d0
-	asrw #8,d0
-	movew d0,d2
-	andw #7,d2
-	movew d2,a6@(-22)
-	tstw a6@(-22)
-	jeq L67
-	movew a6@(-22),d0
-	subqw #1,d0
-	jra L68
-	.even
-L67:
-	moveq #7,d0
-L68:
-	movew d0,a6@(-22)
-	movew a6@(-22),a0
-	movel a6@(-8),a1
-	clrl d0
-	moveb a1@(14),d0
-	cmpl a0,d0
-	jeq L69
-	moveq #-2,d0
-	jra L21
-	.even
-L69:
-	movew a6@(-34),a0
-	movel a0,sp@-
+.L61:
+	tstl %a6@(12)
+	jeq .L62
+	movel %a6@(-8),%a0
+	movel %a6@(-8),%a1
+	movew %a1@(4),%d2
+	orw #8,%d2
+	movew %d2,%a0@(4)
+	movew #1,%a6@(-24)
+	movel %a6@(-8),%a6@(-12)
+.L63:
+	movew %a6@(-36),%d3
+	cmpw %a6@(-24),%d3
+	jgt .L66
+	jra .L62
+.L66:
+	moveq #32,%d2
+	addl %d2,%a6@(-12)
+	movel %a6@(-12),%d0
+	movel %a6@(-8),%d1
+	movel %d1,%a0
+	movel %d0,%a1
+	movel %a0@,%a1@
+	addqw #4,%a1
+	addqw #4,%a0
+	movel %a0@,%a1@
+	addqw #4,%a1
+	addqw #4,%a0
+	movel %a0@,%a1@
+	addqw #4,%a1
+	addqw #4,%a0
+	movel %a0@,%a1@
+	addqw #4,%a1
+	addqw #4,%a0
+	movel %a0@,%a1@
+	addqw #4,%a1
+	addqw #4,%a0
+	movel %a0@,%a1@
+	addqw #4,%a1
+	addqw #4,%a0
+	movel %a0@,%a1@
+	addqw #4,%a1
+	addqw #4,%a0
+	movel %a0@,%a1@
+	addqw #4,%a1
+	addqw #4,%a0
+	movel %a6@(-12),%a1
+	movel %a6@(-4),%a0
+	movew %a6@(-24),%a2
+	movew %a0@(8,%a2:l:2),%a1@(10)
+	movel %a6@(-12),%a0
+	movel %a6@(-4),%a1
+	movew %a6@(-24),%a2
+	movew %a1@(56,%a2:l:2),%d0
+	movew %d0,%a6@(-34)
+	movew %d0,%a0@(4)
+	movel %a6@(-12),%a0
+	movel %a6@(-4),%a1
+	movew %a6@(-24),%a2
+	movew %a6@(-38),%d3
+	addw %a1@(104,%a2:l:2),%d3
+	movew %d3,%a0@(6)
+	movew %a6@(-34),%d1
+	movew %d1,%d0
+	asrw #8,%d0
+	movew %d0,%d2
+	andw #7,%d2
+	movew %d2,%a6@(-22)
+	tstw %a6@(-22)
+	jeq .L67
+	movew %a6@(-22),%d0
+	subqw #1,%d0
+	jra .L68
+.L67:
+	moveq #7,%d0
+.L68:
+	movew %d0,%a6@(-22)
+	movew %a6@(-22),%a0
+	movel %a6@(-8),%a1
+	clrl %d0
+	moveb %a1@(14),%d0
+	cmpl %a0,%d0
+	jeq .L69
+	moveq #-2,%d0
+	jra .L21
+.L69:
+	movew %a6@(-34),%a0
+	movel %a0,%sp@-
 	jbsr _GetXConfiguration
-	addql #4,sp
-	movew d0,a6@(-22)
-	tstw a6@(-22)
-	jge L70
-	movew a6@(-22),a0
-	movel a0,d0
-	jra L21
-	.even
-L70:
-	movew a6@(-22),d0
-	andw #1,d0
-	movew a6@(-30),d1
-	andw #1,d1
-	cmpw d0,d1
-	jeq L71
-	moveq #-2,d0
-	jra L21
-	.even
-L71:
-	movel a6@(-12),a0
-	movew a6@(-22),a0@(12)
-	movew a6@(-22),d0
-	andw #1,d0
-	tstw d0
-	jeq L72
-	movel a6@(-12),a0
-	tstw a0@(6)
-	jne L73
-	moveq #-5,d0
-	jra L21
-	.even
-L73:
-	jra L74
-	.even
-L72:
-	movel a6@(-12),a0
-	clrw a0@(6)
-L74:
-	movew a6@(-34),d1
-	movew d1,d0
-	moveq #14,d3
-	asrw d3,d0
-	movew d0,d1
-	andw #3,d1
-	tstw d1
-	jne L75
-	orw #4,a6@(-34)
-L75:
-	orw #24,a6@(-34)
-	movel a6@(-12),a0
-	movew a6@(-34),a0@(4)
-	movew a6@(-34),d1
-	movew d1,d0
-	asrw #2,d0
-	movew d0,d1
-	andw #1,d1
-	tstw d1
-	jne L65
-	movel a6@(-12),a0
-	movel a6@(-12),a1
-	moveb a1@(15),d2
-	orb #1,d2
-	moveb d2,a0@(15)
-L76:
-L65:
-	addqw #1,a6@(-24)
-	jra L63
-	.even
-L64:
-L62:
+	addqw #4,%sp
+	movew %d0,%a6@(-22)
+	tstw %a6@(-22)
+	jge .L70
+	movew %a6@(-22),%a0
+	movel %a0,%d0
+	jra .L21
+.L70:
+	movew %a6@(-22),%d0
+	andw #1,%d0
+	movew %a6@(-30),%d1
+	andw #1,%d1
+	cmpw %d0,%d1
+	jeq .L71
+	moveq #-2,%d0
+	jra .L21
+.L71:
+	movel %a6@(-12),%a0
+	movew %a6@(-22),%a0@(12)
+	movew %a6@(-22),%d0
+	andw #1,%d0
+	tstw %d0
+	jeq .L72
+	movel %a6@(-12),%a0
+	tstw %a0@(6)
+	jne .L73
+	moveq #-5,%d0
+	jra .L21
+.L73:
+	jra .L74
+.L72:
+	movel %a6@(-12),%a0
+	clrw %a0@(6)
+.L74:
+	movew %a6@(-34),%d1
+	movew %d1,%d0
+	moveq #14,%d3
+	asrw %d3,%d0
+	movew %d0,%d1
+	andw #3,%d1
+	tstw %d1
+	jne .L75
+	orw #4,%a6@(-34)
+.L75:
+	orw #24,%a6@(-34)
+	movel %a6@(-12),%a0
+	movew %a6@(-34),%a0@(4)
+	movew %a6@(-34),%d1
+	movew %d1,%d0
+	asrw #2,%d0
+	movew %d0,%d1
+	andw #1,%d1
+	tstw %d1
+	jne .L65
+	movel %a6@(-12),%a0
+	movel %a6@(-12),%a1
+	moveb %a1@(15),%d2
+	orb #1,%d2
+	moveb %d2,%a0@(15)
+.L76:
+.L65:
+	addqw #1,%a6@(-24)
+	jra .L63
+.L64:
+.L62:
 #APP
 	trap #1
 #NO_APP
-L32:
-	movew a6@(-32),d1
-	movew d1,d0
-	asrw #2,d0
-	movew d0,d1
-	andw #1,d1
-	tstw d1
-	jne L77
-	movel a6@(-8),a0
-	movel a6@(-8),a1
-	moveb a1@(15),d3
-	orb #1,d3
-	moveb d3,a0@(15)
-L77:
-	movew a6@(-36),d2
-	addw d2,_ins
-	movel _dpm,a0
-	movew a0@(372),d0
-	cmpw _ins,d0
-	jcc L78
-	movel _dpm,a0
-	movew _ins,a0@(372)
-L78:
-	clrl d0
-	jra L21
-	.even
-L21:
-	moveml a6@(-56),#0xc0c
-	unlk a6
+.L32:
+	movew %a6@(-32),%d1
+	movew %d1,%d0
+	asrw #2,%d0
+	movew %d0,%d1
+	andw #1,%d1
+	tstw %d1
+	jne .L77
+	movel %a6@(-8),%a0
+	movel %a6@(-8),%a1
+	moveb %a1@(15),%d3
+	orb #1,%d3
+	moveb %d3,%a0@(15)
+.L77:
+	movew %a6@(-36),%d2
+	addw %d2,_ins
+	movel _dpm,%a0
+	movew %a0@(372),%d0
+	cmpw _ins,%d0
+	jcc .L78
+	movel _dpm,%a0
+	movew _ins,%a0@(372)
+.L78:
+	clrl %d0
+	jra .L21
+.L21:
+	movel %a6@(-48),%a2
+	movel %a6@(-44),%a3
+	unlk %a6
 	rts
-	.even
+	.balign 2
 _GetXConfiguration:
-	link a6,#-4
-	movel d2,sp@-
-	clrl a6@(-4)
-	movel a6@(8),d0
-	movel d0,d1
-	moveq #14,d2
-	asrl d2,d1
-	moveq #3,d0
-	andl d1,d0
-	moveq #2,d2
-	cmpl d0,d2
-	jeq L83
-	moveq #2,d2
-	cmpl d0,d2
-	jlt L86
-	moveq #1,d2
-	cmpl d0,d2
-	jeq L81
-	jra L80
-	.even
-L86:
-	moveq #3,d2
-	cmpl d0,d2
-	jeq L82
-	jra L80
-	.even
-L81:
-	moveq #1,d2
-	orl d2,a6@(-4)
-	jra L80
-	.even
-L82:
-	moveq #1,d2
-	orl d2,a6@(-4)
-L83:
-	moveq #4,d2
-	orl d2,a6@(-4)
-	jra L80
-	.even
-L85:
-L80:
-	moveq #3,d0
-	andl a6@(8),d0
-	moveq #2,d2
-	cmpl d0,d2
-	jeq L89
-	moveq #2,d2
-	cmpl d0,d2
-	jlt L93
-	tstl d0
-	jeq L88
-	jra L91
-	.even
-L93:
-	moveq #3,d2
-	cmpl d0,d2
-	jeq L90
-	jra L91
-	.even
-L88:
-	jra L87
-	.even
-L89:
-	moveq #16,d2
-	orl d2,a6@(-4)
-	jra L87
-	.even
-L90:
-	moveq #24,d2
-	orl d2,a6@(-4)
-	jra L87
-	.even
-L91:
-	moveq #-6,d0
-	jra L79
-	.even
-L87:
-	movel a6@(8),d0
-	movel d0,d1
-	asrl #6,d1
-	moveq #3,d0
-	andl d1,d0
-	moveq #1,d2
-	cmpl d0,d2
-	jeq L96
-	moveq #1,d2
-	cmpl d0,d2
-	jlt L100
-	tstl d0
-	jeq L95
-	jra L98
-	.even
-L100:
-	moveq #2,d2
-	cmpl d0,d2
-	jeq L97
-	jra L98
-	.even
-L95:
-	moveq #64,d2
-	orl d2,a6@(-4)
-	jra L94
-	.even
-L96:
-	orw #128,a6@(-2)
-	jra L94
-	.even
-L97:
-	moveq #32,d2
-	orl d2,a6@(-4)
-	jra L94
-	.even
-L98:
-	moveq #-7,d0
-	jra L79
-	.even
-L94:
-	movel a6@(-4),d1
-	movel d1,d0
-	jra L79
-	.even
-L79:
-	movel sp@+,d2
-	unlk a6
+	link %a6,#-4
+	clrl %a6@(-4)
+	movel %a6@(8),%d0
+	movel %d0,%d1
+	moveq #14,%d2
+	asrl %d2,%d1
+	moveq #3,%d0
+	andl %d1,%d0
+	moveq #2,%d2
+	cmpl %d0,%d2
+	jeq .L83
+	moveq #2,%d2
+	cmpl %d0,%d2
+	jlt .L86
+	moveq #1,%d2
+	cmpl %d0,%d2
+	jeq .L81
+	jra .L80
+.L86:
+	moveq #3,%d2
+	cmpl %d0,%d2
+	jeq .L82
+	jra .L80
+.L81:
+	moveq #1,%d2
+	orl %d2,%a6@(-4)
+	jra .L80
+.L82:
+	moveq #1,%d2
+	orl %d2,%a6@(-4)
+.L83:
+	moveq #4,%d2
+	orl %d2,%a6@(-4)
+	jra .L80
+.L85:
+.L80:
+	moveq #3,%d0
+	andl %a6@(8),%d0
+	moveq #2,%d2
+	cmpl %d0,%d2
+	jeq .L89
+	moveq #2,%d2
+	cmpl %d0,%d2
+	jlt .L93
+	tstl %d0
+	jeq .L88
+	jra .L91
+.L93:
+	moveq #3,%d2
+	cmpl %d0,%d2
+	jeq .L90
+	jra .L91
+.L88:
+	jra .L87
+.L89:
+	moveq #16,%d2
+	orl %d2,%a6@(-4)
+	jra .L87
+.L90:
+	moveq #24,%d2
+	orl %d2,%a6@(-4)
+	jra .L87
+.L91:
+	moveq #-6,%d0
+	jra .L79
+.L87:
+	movel %a6@(8),%d0
+	movel %d0,%d1
+	asrl #6,%d1
+	moveq #3,%d0
+	andl %d1,%d0
+	moveq #1,%d2
+	cmpl %d0,%d2
+	jeq .L96
+	moveq #1,%d2
+	cmpl %d0,%d2
+	jlt .L100
+	tstl %d0
+	jeq .L95
+	jra .L98
+.L100:
+	moveq #2,%d2
+	cmpl %d0,%d2
+	jeq .L97
+	jra .L98
+.L95:
+	moveq #64,%d2
+	orl %d2,%a6@(-4)
+	jra .L94
+.L96:
+	orw #128,%a6@(-2)
+	jra .L94
+.L97:
+	moveq #32,%d2
+	orl %d2,%a6@(-4)
+	jra .L94
+.L98:
+	moveq #-7,%d0
+	jra .L79
+.L94:
+	movel %a6@(-4),%d0
+	jra .L79
+.L79:
+	unlk %a6
 	rts
-	.even
+	.balign 2
 _memset:
-	link a6,#-8
-	movel d2,sp@-
-	movel a6@(12),d0
-	movew d0,a6@(-2)
-	movel a6@(8),a6@(-6)
-	movel a6@(16),d0
-	movel d0,d1
-	lsrl #1,d1
-	movel d1,a6@(16)
-L102:
-	subql #1,a6@(16)
-	moveq #-1,d2
-	cmpl a6@(16),d2
-	jne L104
-	jra L103
-	.even
-L104:
-	movel a6@(-6),a0
-	movew a6@(-2),a0@
-	addql #2,a6@(-6)
-	jra L102
-	.even
-L103:
-L101:
-	movel sp@+,d2
-	unlk a6
+	link %a6,#-8
+	movel %a6@(12),%d0
+	movew %d0,%a6@(-2)
+	movel %a6@(8),%a6@(-6)
+	movel %a6@(16),%d1
+	movel %d1,%d2
+	lsrl #1,%d2
+	movel %d2,%a6@(16)
+.L102:
+	subql #1,%a6@(16)
+	moveq #-1,%d3
+	cmpl %a6@(16),%d3
+	jne .L104
+	jra .L103
+.L104:
+	movel %a6@(-6),%a0
+	movew %a6@(-2),%a0@
+	addql #2,%a6@(-6)
+	jra .L102
+.L103:
+.L101:
+	unlk %a6
 	rts
-	.even
+	.balign 2
 _memcpy16:
-	link a6,#0
-	movel a6@(16),d1
-	movel d1,d0
-	asrl #1,d0
-L106:
-	tstl d0
-	jgt L109
-	jra L107
-	.even
-L109:
-	movel a6@(8),a0
-	movel a6@(12),a1
-	movew a1@,a0@
-	addql #2,a6@(12)
-	addql #2,a6@(8)
-L108:
-	subql #1,d0
-	jra L106
-	.even
-L107:
-	moveq #1,d1
-	andl a6@(16),d1
-	tstl d1
-	jeq L110
-	movel a6@(8),a0
-	movel a6@(12),a1
-	moveb a1@,a0@
-L110:
-L105:
-	unlk a6
+	link %a6,#0
+	movel %a6@(16),%d1
+	movel %d1,%d0
+	asrl #1,%d0
+.L106:
+	tstl %d0
+	jgt .L109
+	jra .L107
+.L109:
+	movel %a6@(8),%a0
+	movel %a6@(12),%a1
+	movew %a1@,%a0@
+	addql #2,%a6@(12)
+	addql #2,%a6@(8)
+.L108:
+	subql #1,%d0
+	jra .L106
+.L107:
+	moveq #1,%d1
+	andl %a6@(16),%d1
+	tstl %d1
+	jeq .L110
+	movel %a6@(8),%a0
+	movel %a6@(12),%a1
+	moveb %a1@,%a0@
+.L110:
+.L105:
+	unlk %a6
 	rts
-	.even
+	.balign 2
 _bcopy:
-	link a6,#0
-	movel a6@(16),d1
-	movel d1,d0
-	asrl #1,d0
-L112:
-	tstl d0
-	jgt L115
-	jra L113
-	.even
-L115:
-	movel a6@(12),a0
-	movel a6@(8),a1
-	movew a1@,a0@
-	addql #2,a6@(8)
-	addql #2,a6@(12)
-L114:
-	subql #1,d0
-	jra L112
-	.even
-L113:
-	moveq #1,d1
-	andl a6@(16),d1
-	tstl d1
-	jeq L116
-	movel a6@(12),a0
-	movel a6@(8),a1
-	moveb a1@,a0@
-L116:
-L111:
-	unlk a6
+	link %a6,#0
+	movel %a6@(16),%d1
+	movel %d1,%d0
+	asrl #1,%d0
+.L112:
+	tstl %d0
+	jgt .L115
+	jra .L113
+.L115:
+	movel %a6@(12),%a0
+	movel %a6@(8),%a1
+	movew %a1@,%a0@
+	addql #2,%a6@(8)
+	addql #2,%a6@(12)
+.L114:
+	subql #1,%d0
+	jra .L112
+.L113:
+	moveq #1,%d1
+	andl %a6@(16),%d1
+	tstl %d1
+	jeq .L116
+	movel %a6@(12),%a0
+	movel %a6@(8),%a1
+	moveb %a1@,%a0@
+.L116:
+.L111:
+	unlk %a6
 	rts
-	.even
+	.balign 2
 _Debug:
-	link a6,#-4
-	movel a6@(8),d0
-	movew d0,a6@(-2)
-L118:
-	movel _dpm,a0
-	movew a0@(352),d0
-	tstw d0
-	jne L120
-	jra L119
-	.even
-L120:
-	jra L118
-	.even
-L119:
-	movel _dpm,a0
-	movew a6@(-2),a0@(352)
-L117:
-	unlk a6
+	link %a6,#-4
+	movel %a6@(8),%d0
+	movew %d0,%a6@(-2)
+.L118:
+	movel _dpm,%a0
+	movew %a0@(352),%d1
+	tstw %d1
+	jne .L120
+	jra .L119
+.L120:
+	jra .L118
+.L119:
+	movel _dpm,%a0
+	movew %a6@(-2),%a0@(352)
+.L117:
+	unlk %a6
 	rts
-	.even
-.globl _DecToBcd
+	.balign 2
+	.globl _DecToBcd
 _DecToBcd:
-	link a6,#-4
-	moveml #0x3c00,sp@-
-	movel a6@(8),d0
-	moveb d0,a6@(-1)
-	clrw d1
-	moveb a6@(-1),d1
-	clrl d0
-	movew d1,d0
-	movel d0,d1
-	movel d1,d2
-	addl d2,d2
-	movel d2,d3
-	addl d0,d3
-	movel d3,d1
-	lsll #4,d1
-	movel d3,d2
-	addl d1,d2
-	movel d2,d1
-	lsll #8,d1
-	addl d1,d2
-	movel d2,d1
-	lsll #2,d1
-	addl d1,d0
-	movel d0,d2
-	clrw d2
-	swap d2
-	movew d2,d1
-	lsrw #3,d1
-	moveb d1,d0
-	lslb #4,d0
-	clrw d1
-	moveb a6@(-1),d1
-	clrl d2
-	movew d1,d2
-	movel d2,d3
-	movel d3,d4
-	addl d4,d4
-	movel d4,d5
-	addl d2,d5
-	movel d5,d3
-	lsll #4,d3
-	movel d5,d4
-	addl d3,d4
-	movel d4,d3
-	lsll #8,d3
-	addl d3,d4
-	movel d4,d3
-	lsll #2,d3
-	addl d3,d2
-	movel d2,d3
-	clrw d3
-	swap d3
-	movew d3,d2
-	lsrw #3,d2
-	movew d2,d3
-	movew d3,d4
-	lslw #2,d4
-	addw d4,d2
-	movew d2,d3
-	lslw #1,d3
-	subw d3,d1
-	moveb d1,d2
-	andb #15,d2
-	orb d2,d0
-	clrl d1
-	moveb d0,d1
-	movel d1,d0
-	jra L121
-	.even
-L121:
-	moveml sp@+,#0x3c
-	unlk a6
+	link %a6,#-4
+	movel %d6,%sp@-
+	movel %d5,%sp@-
+	movel %d4,%sp@-
+	movel %a6@(8),%d1
+	moveb %d1,%a6@(-1)
+	clrw %d2
+	moveb %a6@(-1),%d2
+	clrl %d0
+	movew %d2,%d0
+	movel %d0,%d2
+	movel %d2,%d3
+	addl %d3,%d3
+	movel %d3,%d4
+	addl %d0,%d4
+	movel %d4,%d2
+	asll #4,%d2
+	movel %d4,%d3
+	addl %d2,%d3
+	movel %d3,%d2
+	asll #8,%d2
+	addl %d2,%d3
+	movel %d3,%d2
+	asll #2,%d2
+	addl %d2,%d0
+	movel %d0,%d3
+	clrw %d3
+	swap %d3
+	movew %d3,%d2
+	lsrw #3,%d2
+	moveb %d2,%d0
+	aslb #4,%d0
+	clrw %d2
+	moveb %a6@(-1),%d2
+	clrl %d3
+	movew %d2,%d3
+	movel %d3,%d4
+	movel %d4,%d5
+	addl %d5,%d5
+	movel %d5,%d6
+	addl %d3,%d6
+	movel %d6,%d4
+	asll #4,%d4
+	movel %d6,%d5
+	addl %d4,%d5
+	movel %d5,%d4
+	asll #8,%d4
+	addl %d4,%d5
+	movel %d5,%d4
+	asll #2,%d4
+	addl %d4,%d3
+	movel %d3,%d4
+	clrw %d4
+	swap %d4
+	movew %d4,%d3
+	lsrw #3,%d3
+	movew %d3,%d4
+	movew %d4,%d5
+	aslw #2,%d5
+	addw %d5,%d3
+	movew %d3,%d4
+	aslw #1,%d4
+	subw %d4,%d2
+	moveb %d2,%d3
+	andb #15,%d3
+	orb %d3,%d0
+	clrl %d2
+	moveb %d0,%d2
+	movel %d2,%d0
+	jra .L121
+.L121:
+	moveml %a6@(-16),#0x70
+	unlk %a6
 	rts
-	.even
-.globl _UtcToTime
+	.balign 2
+	.globl _UtcToTime
 _UtcToTime:
-	link a6,#-24
-	movel d4,sp@-
-	movel d3,sp@-
-	movel d2,sp@-
+	link %a6,#-24
+	movel %d4,%sp@-
 	addl #-1041379200,_utc
-	clrl a6@(-10)
-L123:
-	movel #31536000,a6@(-4)
-	clrb a6@(-5)
-	movel a6@(-10),d0
-	addql #3,d0
-	moveq #3,d1
-	andl d0,d1
-	tstl d1
-	jne L126
-	addl #86400,a6@(-4)
-	moveb #1,a6@(-5)
-L126:
-	movel _utc,d4
-	cmpl a6@(-4),d4
-	jcs L127
-	movel a6@(-4),d4
-	subl d4,_utc
-	jra L128
-	.even
-L127:
-	jra L124
-	.even
-L128:
-	addql #1,a6@(-10)
-L125:
-	jra L129
-	.even
-	jra L124
-	.even
-L129:
-	jra L123
-	.even
-L124:
-	moveb a6@(-7),d0
-	addqb #3,d0
-	clrl d1
-	moveb d0,d1
-	movel d1,sp@-
+	clrl %a6@(-10)
+.L123:
+	movel #31536000,%a6@(-4)
+	clrb %a6@(-5)
+	movel %a6@(-10),%d0
+	addql #3,%d0
+	moveq #3,%d1
+	andl %d0,%d1
+	tstl %d1
+	jne .L126
+	addl #86400,%a6@(-4)
+	moveb #1,%a6@(-5)
+.L126:
+	movel _utc,%d4
+	cmpl %a6@(-4),%d4
+	jcs .L127
+	movel %a6@(-4),%d4
+	subl %d4,_utc
+	jra .L128
+.L127:
+	jra .L124
+.L128:
+	addql #1,%a6@(-10)
+.L125:
+	jra .L129
+	jra .L124
+.L129:
+	jra .L123
+.L124:
+	moveb %a6@(-7),%d0
+	addqb #3,%d0
+	clrl %d1
+	moveb %d0,%d1
+	movel %d1,%sp@-
 	jbsr _DecToBcd
-	addql #4,sp
-	moveb d0,a6@(-22)
-	clrl a6@(-10)
-L130:
-	movel a6@(-10),d1
-	lea _dm,a0
-	clrl d0
-	moveb a0@(d1:l),d0
-	movel d0,d1
-	movel d1,d2
-	addl d2,d2
-	movel d2,d1
-	addl d0,d1
-	movel d1,d0
-	lsll #4,d0
-	movel d0,d4
-	subl d1,d4
-	movel d4,d1
-	movel d1,d0
-	lsll #4,d0
-	movel d0,d4
-	subl d1,d4
-	movel d4,d1
-	movel d1,d0
-	lsll #7,d0
-	movel d0,a6@(-4)
-	tstb a6@(-5)
-	jeq L133
-	moveq #1,d4
-	cmpl a6@(-10),d4
-	jne L133
-	addl #86400,a6@(-4)
-L133:
-	movel _utc,d4
-	cmpl a6@(-4),d4
-	jcs L134
-	movel a6@(-4),d4
-	subl d4,_utc
-	jra L135
-	.even
-L134:
-	jra L131
-	.even
-L135:
-	addql #1,a6@(-10)
-L132:
-	jra L136
-	.even
-	jra L131
-	.even
-L136:
-	jra L130
-	.even
-L131:
-	moveb a6@(-7),d0
-	addqb #1,d0
-	clrl d1
-	moveb d0,d1
-	movel d1,sp@-
+	addqw #4,%sp
+	moveb %d0,%a6@(-22)
+	clrl %a6@(-10)
+.L130:
+	movel #_dm,%d0
+	movel %d0,%a0
+	addl %a6@(-10),%a0
+	clrl %d0
+	moveb %a0@,%d0
+	movel %d0,%d1
+	movel %d1,%d2
+	addl %d2,%d2
+	movel %d2,%d1
+	addl %d0,%d1
+	movel %d1,%d0
+	asll #4,%d0
+	movel %d0,%d4
+	subl %d1,%d4
+	movel %d4,%d1
+	movel %d1,%d0
+	asll #4,%d0
+	movel %d0,%d4
+	subl %d1,%d4
+	movel %d4,%d1
+	movel %d1,%d0
+	asll #7,%d0
+	movel %d0,%a6@(-4)
+	tstb %a6@(-5)
+	jeq .L133
+	moveq #1,%d4
+	cmpl %a6@(-10),%d4
+	jne .L133
+	addl #86400,%a6@(-4)
+.L133:
+	movel _utc,%d4
+	cmpl %a6@(-4),%d4
+	jcs .L134
+	movel %a6@(-4),%d4
+	subl %d4,_utc
+	jra .L135
+.L134:
+	jra .L131
+.L135:
+	addql #1,%a6@(-10)
+.L132:
+	jra .L136
+	jra .L131
+.L136:
+	jra .L130
+.L131:
+	moveb %a6@(-7),%d0
+	addqb #1,%d0
+	clrl %d1
+	moveb %d0,%d1
+	movel %d1,%sp@-
 	jbsr _DecToBcd
-	addql #4,sp
-	moveb d0,a6@(-21)
-	movel _utc,d1
-	movel #0xc22e4507,d2
-	movel d1,d0
-	mulul d2,d1:d0
-	movel d1,d0
-	clrw d0
-	swap d0
-	moveb d0,d1
-	addqb #1,d1
-	clrl d0
-	moveb d1,d0
-	movel d0,sp@-
+	addqw #4,%sp
+	moveb %d0,%a6@(-21)
+	movel _utc,%d1
+	movel #0xc22e4507,%d2
+	movel %d1,%d0
+	mulul %d2,%d1:%d0
+	movel %d1,%d0
+	clrw %d0
+	swap %d0
+	moveb %d0,%d1
+	addqb #1,%d1
+	clrl %d0
+	moveb %d1,%d0
+	movel %d0,%sp@-
 	jbsr _DecToBcd
-	addql #4,sp
-	moveb d0,a6@(-20)
-	movel _utc,d0
-	movel #0xc22e4507,d3
-	movel d0,d1
-	mulul d3,d2:d1
-	movel d2,d1
-	clrw d1
-	swap d1
-	movel d1,d2
-	movel d2,d3
-	addl d3,d3
-	movel d3,d2
-	addl d1,d2
-	movel d2,d1
-	lsll #4,d1
-	movel d1,d4
-	subl d2,d4
-	movel d4,d2
-	movel d2,d1
-	lsll #4,d1
-	movel d1,d4
-	subl d2,d4
-	movel d4,d2
-	movel d2,d1
-	lsll #7,d1
-	subl d1,d0
-	movel d0,_utc
-	movel _utc,d1
-	movel #0x91a2b3c5,d2
-	movel d1,d0
-	mulul d2,d1:d0
-	movel d1,d0
-	moveq #11,d4
-	lsrl d4,d0
-	clrl d1
-	moveb d0,d1
-	movel d1,sp@-
+	addqw #4,%sp
+	moveb %d0,%a6@(-20)
+	movel _utc,%d0
+	movel #0xc22e4507,%d3
+	movel %d0,%d1
+	mulul %d3,%d2:%d1
+	movel %d2,%d1
+	clrw %d1
+	swap %d1
+	movel %d1,%d2
+	movel %d2,%d3
+	addl %d3,%d3
+	movel %d3,%d2
+	addl %d1,%d2
+	movel %d2,%d1
+	asll #4,%d1
+	movel %d1,%d4
+	subl %d2,%d4
+	movel %d4,%d2
+	movel %d2,%d1
+	asll #4,%d1
+	movel %d1,%d4
+	subl %d2,%d4
+	movel %d4,%d2
+	movel %d2,%d1
+	asll #7,%d1
+	subl %d1,%d0
+	movel %d0,_utc
+	movel _utc,%d1
+	movel #0x91a2b3c5,%d2
+	movel %d1,%d0
+	mulul %d2,%d1:%d0
+	movel %d1,%d0
+	moveq #11,%d4
+	lsrl %d4,%d0
+	clrl %d1
+	moveb %d0,%d1
+	movel %d1,%sp@-
 	jbsr _DecToBcd
-	addql #4,sp
-	moveb d0,a6@(-17)
-	movel _utc,d0
-	movel #0x91a2b3c5,d3
-	movel d0,d1
-	mulul d3,d2:d1
-	movel d2,d1
-	moveq #11,d4
-	lsrl d4,d1
-	movel d1,d2
-	movel d2,d3
-	lsll #3,d3
-	movel d3,d2
-	subl d1,d2
-	movel d2,d3
-	lsll #5,d3
-	addl d3,d1
-	movel d1,d2
-	lsll #4,d2
-	subl d2,d0
-	movel d0,_utc
-	movel _utc,d1
-	movel #0x88888889,d2
-	movel d1,d0
-	mulul d2,d1:d0
-	movel d1,d0
-	lsrl #5,d0
-	clrl d1
-	moveb d0,d1
-	movel d1,sp@-
+	addqw #4,%sp
+	moveb %d0,%a6@(-17)
+	movel _utc,%d0
+	movel #0x91a2b3c5,%d3
+	movel %d0,%d1
+	mulul %d3,%d2:%d1
+	movel %d2,%d1
+	moveq #11,%d4
+	lsrl %d4,%d1
+	movel %d1,%d2
+	movel %d2,%d3
+	asll #3,%d3
+	movel %d3,%d2
+	subl %d1,%d2
+	movel %d2,%d3
+	asll #5,%d3
+	addl %d3,%d1
+	movel %d1,%d2
+	asll #4,%d2
+	subl %d2,%d0
+	movel %d0,_utc
+	movel _utc,%d1
+	movel #0x88888889,%d2
+	movel %d1,%d0
+	mulul %d2,%d1:%d0
+	movel %d1,%d0
+	lsrl #5,%d0
+	clrl %d1
+	moveb %d0,%d1
+	movel %d1,%sp@-
 	jbsr _DecToBcd
-	addql #4,sp
-	moveb d0,a6@(-16)
-	movel _utc,d0
-	movel #0x88888889,d3
-	movel d0,d1
-	mulul d3,d2:d1
-	movel d2,d1
-	lsrl #5,d1
-	movel d1,d2
-	movel d2,d3
-	lsll #4,d3
-	movel d3,d4
-	subl d1,d4
-	movel d4,d1
-	movel d1,d2
-	lsll #2,d2
-	subl d2,d0
-	movel d0,_utc
-	clrl d0
-	moveb _utc+3,d0
-	movel d0,sp@-
+	addqw #4,%sp
+	moveb %d0,%a6@(-16)
+	movel _utc,%d0
+	movel #0x88888889,%d3
+	movel %d0,%d1
+	mulul %d3,%d2:%d1
+	movel %d2,%d1
+	lsrl #5,%d1
+	movel %d1,%d2
+	movel %d2,%d3
+	asll #4,%d3
+	movel %d3,%d4
+	subl %d1,%d4
+	movel %d4,%d1
+	movel %d1,%d2
+	asll #2,%d2
+	subl %d2,%d0
+	movel %d0,_utc
+	clrl %d0
+	moveb _utc+3,%d0
+	movel %d0,%sp@-
 	jbsr _DecToBcd
-	addql #4,sp
-	moveb d0,a6@(-15)
+	addqw #4,%sp
+	moveb %d0,%a6@(-15)
 	pea 12:w
-	lea a6@(-22),a0
-	movel a0,sp@-
-	movel _dpm,d0
-	addl #376,d0
-	movel d0,sp@-
+	lea %a6@(-22),%a0
+	movel %a0,%sp@-
+	movel _dpm,%d0
+	addl #376,%d0
+	movel %d0,%sp@-
 	jbsr _memcpy16
-	addql #8,sp
-	addql #4,sp
-	jra L122
-	.even
-L122:
-	moveml a6@(-36),#0x1c
-	unlk a6
+	addqw #8,%sp
+	addqw #4,%sp
+	jra .L122
+.L122:
+	movel %a6@(-28),%d4
+	unlk %a6
 	rts
-	.even
+	.balign 2
 _MbxProcess:
-	link a6,#-56
-	moveml #0x3830,sp@-
+	link %a6,#-48
+	movel %a3,%sp@-
+	movel %a2,%sp@-
+	movel %d4,%sp@-
 	nop
-L138:
+.L138:
 #APP
 	movew #0x55,SimServ
 		  movew #0xAA,SimServ
@@ -2821,1287 +2701,1200 @@ L138:
 		  andiw #~OkLed,SimDataF1
 		  oriw  #OkLed,SimDataF1
 #NO_APP
-	movel _xlx,a0
-	movew a0@(36),d0
-	movew d0,a6@(-36)
-	tstw d0
-	jeq L141
-	moveb a6@(-35),_rcv_error
-	movel _dpm,a0
-	lea a0@(380),a0
-	movew _rcv_error,a0@
-L141:
+	movel _xlx,%a0
+	movew %a0@(36),%d0
+	movew %d0,%a6@(-36)
+	tstw %d0
+	jeq .L141
+	moveb %a6@(-35),_rcv_error
+	movel _dpm,%a0
+	addw #380,%a0
+	movew _rcv_error,%a0@
+.L141:
 	tstw _eprog
-	jeq L142
-	movel _dpm,a0
-	movew a0@(354),d0
-	tstw d0
-	jne L142
+	jeq .L142
+	movel _dpm,%a0
+	movew %a0@(354),%d0
+	tstw %d0
+	jne .L142
 #APP
 	trap  #3
 #NO_APP
-L142:
-	movel _dpm,a0
-	movew a0@(360),d1
-	clrl d0
-	movew d1,d0
-	moveq #17,d3
-	cmpl d0,d3
-	jcs L266
-	movel d0,d1
-	addl d1,d1
-	movel #L267,a0
-	movew a0@(d1:l),d0
-	jmp pc@(2,d0:w)
-L267:
-	.word L144-L267
-	.word L145-L267
-	.word L152-L267
-	.word L265-L267
-	.word L244-L267
-	.word L228-L267
-	.word L185-L267
-	.word L194-L267
-	.word L154-L267
-	.word L161-L267
-	.word L167-L267
-	.word L176-L267
-	.word L202-L267
-	.word L216-L267
-	.word L222-L267
-	.word L209-L267
-	.word L146-L267
-	.word L153-L267
-	.even
-L144:
-	jra L140
-	.even
-L145:
-	jra L143
-	.even
-L146:
-	movel _dpm,a0
-	movew a0@(696),d0
-	clrl d1
-	movew d0,d1
-	movel d1,a6@(-24)
-	clrl a6@(-28)
-L147:
-	tstl a6@(-24)
-	jne L150
-	jra L148
-	.even
-L150:
-	moveq #1,d0
-	andl a6@(-24),d0
-	tstl d0
-	jeq L149
-	movel _xlx,a0
-	movel a6@(-28),d0
-	movel d0,d1
-	movel d1,d0
-	addl d0,d0
-	movew #1,a0@(d0:l)
-	movel _xlx,a0
-	movel a6@(-28),d0
-	movel d0,d1
-	movel d1,d0
-	addl d0,d0
-	movew #65,a0@(16,d0:l)
-	movel a6@(-28),d0
-	movel d0,d1
-	movel d1,d2
-	lsll #2,d2
-	addl d2,d0
-	movel d0,d1
-	lsll #2,d1
-	movel d1,d0
-	addql #8,d0
-	movel _dpm,d4
-	addl d0,d4
-	movel d4,a6@(-44)
-	movel a6@(-28),d0
-	movel d0,d1
-	movel d1,d0
-	lsll #2,d0
-	movel #_eprog,d1
-	movel d1,a0
-	addl d0,a0
-	movel a6@(-44),a0@(182)
-	movel a6@(-28),d0
-	movel d0,d1
-	movel d1,d0
-	lsll #2,d0
-	movel #_eprog,d1
-	movel d1,a0
-	addl d0,a0
-	movel #_sim_rec,a0@(214)
-	movel a6@(-44),a0
-	moveq #-1,d3
-	movel d3,a0@(12)
-	movel a6@(-44),a0
-	clrl a0@
-	movel a6@(-44),a0
-	movel _dpm,a1
-	movel a1@(344),a0@(4)
-	movel a6@(-44),a0
-	movel _dpm,a1
-	movel a1@(340),a0@(8)
-	moveb _rcv_error,a6@(-40)
-	clrb a6@(-39)
-	clrb a6@(-38)
-	moveb #1,a6@(-37)
-	movel a6@(-44),a1
-	lea a6@(-40),a0
-	addql #8,a1
-	addql #8,a1
-	moveb a0@,a1@
-	addql #1,a1
-	addql #1,a0
-	moveb a0@,a1@
-	addql #1,a1
-	addql #1,a0
-	moveb a0@,a1@
-	addql #1,a1
-	addql #1,a0
-	moveb a0@,a1@
-	addql #1,a1
-	addql #1,a0
-L151:
-L149:
-	addql #1,a6@(-28)
-	movel a6@(-24),d0
-	movel d0,d1
-	asrl #1,d1
-	movel d1,a6@(-24)
-	jra L147
-	.even
-L148:
-	jra L143
-	.even
-L152:
-	movel _dpm,d4
-	addl #696,d4
-	movel d4,a6@(-44)
-	movel a6@(-44),a0
-	movel _dpm,a1
-	movew a1@(364),a0@(24)
-	movel a6@(-44),a0
-	movel _dpm,a1
-	movew a1@(374),a0@(28)
-	movel _dpm,a0
-	clrw a0@(374)
-	movel _dpm,a0
-	movel _dpm,a1
-	movew a1@(364),d0
-	movew d0,d1
-	andw #65533,d1
-	movew d1,a0@(364)
-	movel a6@(-44),a0
-	movel _dpm,a1
-	movew a1@(362),a0@(26)
-	movel a6@(-44),a0
-	movel _dpm,a1
-	movew a1@,a0@(20)
-	movel a6@(-44),a0
-	movel _dpm,a1
-	movel a1@(4),a0@(16)
-	movel a6@(-44),a0
-	movel _dpm,a1
-	movel a1@(340),a0@(12)
-	movel a6@(-44),d0
-	movel _dpm,a1
-	lea a1@(376),a0
-	movel d0,a1
-	movel a0@,a1@
-	addql #4,a1
-	addql #4,a0
-	movel a0@,a1@
-	addql #4,a1
-	addql #4,a0
-	movel a0@,a1@
-	addql #4,a1
-	addql #4,a0
-	movel _dpm,a1
-	clrw a1@(408)
-	jra L143
-	.even
-L153:
-	movel _dpm,a0
-	lea a0@(696),a1
+.L142:
+	movel _dpm,%a0
+	movew %a0@(360),%d1
+	clrl %d0
+	movew %d1,%d0
+	moveq #17,%d3
+	cmpl %d0,%d3
+	jcs .L266
+	movel %d0,%d1
+	asll #2,%d1
+	movel #.L267,%a0
+	movel %a0@(%d1:l),%a1
+	jmp %a1@
+	.balign 2
+	.balign 2
+.L267:
+	.long .L144
+	.long .L145
+	.long .L152
+	.long .L265
+	.long .L244
+	.long .L228
+	.long .L185
+	.long .L194
+	.long .L154
+	.long .L161
+	.long .L167
+	.long .L176
+	.long .L202
+	.long .L216
+	.long .L222
+	.long .L209
+	.long .L146
+	.long .L153
+.L144:
+	jra .L140
+.L145:
+	jra .L143
+.L146:
+	movel _dpm,%a0
+	movew %a0@(696),%d0
+	clrl %d1
+	movew %d0,%d1
+	movel %d1,%a6@(-24)
+	clrl %a6@(-28)
+.L147:
+	tstl %a6@(-24)
+	jne .L150
+	jra .L148
+.L150:
+	moveq #1,%d0
+	andl %a6@(-24),%d0
+	tstl %d0
+	jeq .L149
+	movel _xlx,%a0
+	movel %a6@(-28),%d0
+	movew #1,%a0@(%d0:l:2)
+	movel _xlx,%a0
+	movel %a6@(-28),%d0
+	movew #65,%a0@(16,%d0:l:2)
+	movel %a6@(-28),%d0
+	movel %d0,%d1
+	movel %d1,%d2
+	asll #2,%d2
+	addl %d2,%d0
+	movel %d0,%d1
+	asll #2,%d1
+	movel %d1,%d0
+	addql #8,%d0
+	movel _dpm,%d4
+	addl %d0,%d4
+	movel %d4,%a6@(-44)
+	movel %a6@(-28),%d0
+	movel %d0,%d1
+	movel %d1,%d0
+	asll #2,%d0
+	lea _eprog+182,%a0
+	movel %a6@(-44),%a0@(%d0:l)
+	movel %a6@(-28),%d0
+	movel %d0,%d1
+	movel %d1,%d0
+	asll #2,%d0
+	lea _eprog+214,%a0
+	movel #_sim_rec,%a0@(%d0:l)
+	movel %a6@(-44),%a0
+	moveq #-1,%d3
+	movel %d3,%a0@(12)
+	movel %a6@(-44),%a0
+	clrl %a0@
+	movel %a6@(-44),%a0
+	movel _dpm,%a1
+	movel %a1@(344),%a0@(4)
+	movel %a6@(-44),%a0
+	movel _dpm,%a1
+	movel %a1@(340),%a0@(8)
+	moveb _rcv_error,%a6@(-40)
+	clrb %a6@(-39)
+	clrb %a6@(-38)
+	moveb #1,%a6@(-37)
+	movel %a6@(-44),%a0
+	movel %a6@(-40),%a0@(16)
+.L151:
+.L149:
+	addql #1,%a6@(-28)
+	movel %a6@(-24),%d0
+	movel %d0,%d1
+	asrl #1,%d1
+	movel %d1,%a6@(-24)
+	jra .L147
+.L148:
+	jra .L143
+.L152:
+	movel _dpm,%d4
+	addl #696,%d4
+	movel %d4,%a6@(-44)
+	movel %a6@(-44),%a0
+	movel _dpm,%a1
+	movew %a1@(364),%a0@(24)
+	movel %a6@(-44),%a0
+	movel _dpm,%a1
+	movew %a1@(374),%a0@(28)
+	movel _dpm,%a0
+	clrw %a0@(374)
+	movel _dpm,%a0
+	movel _dpm,%a1
+	movew %a1@(364),%d0
+	movew %d0,%d1
+	andw #65533,%d1
+	movew %d1,%a0@(364)
+	movel %a6@(-44),%a0
+	movel _dpm,%a1
+	movew %a1@(362),%a0@(26)
+	movel %a6@(-44),%a0
+	movel _dpm,%a1
+	movew %a1@,%a0@(20)
+	movel %a6@(-44),%a0
+	movel _dpm,%a1
+	movel %a1@(4),%a0@(16)
+	movel %a6@(-44),%a0
+	movel _dpm,%a1
+	movel %a1@(340),%a0@(12)
+	movel %a6@(-44),%d0
+	movel _dpm,%a1
+	lea %a1@(376),%a0
+	movel %d0,%a1
+	movel %a0@,%a1@
+	addqw #4,%a1
+	addqw #4,%a0
+	movel %a0@,%a1@
+	addqw #4,%a1
+	addqw #4,%a0
+	movel %a0@,%a1@
+	addqw #4,%a1
+	addqw #4,%a0
+	movel _dpm,%a1
+	clrw %a1@(408)
+	jra .L143
+.L153:
+	movel _dpm,%a1
+	lea %a1@(696),%a0
 	pea 348:w
-	movel a1,sp@-
 	pea _info
-	jbsr _bcopy
-	addql #8,sp
-	addql #4,sp
-	jra L143
-	.even
-L154:
-	movel _dpm,a3
-	lea a3@(696),a3
-	movel a3,a6@(-44)
-	movel a6@(-44),a0
-	movew a0@,d3
-	andw #255,d3
-	movew d3,_ins
-	movel a6@(-44),a0
-	clrl d0
-	movew a0@(2),d0
-	movel d0,a6@(-28)
-	clrl d0
-	movew _ins,d0
-	addl a6@(-28),d0
-	cmpl #256,d0
-	jle L155
-	clrl d0
-	movew _ins,d0
-	movel #256,d4
-	subl d0,d4
-	movel d4,a6@(-28)
-L155:
+	movel %a0,%sp@-
+	jbsr _memcpy
+	addqw #8,%sp
+	addqw #4,%sp
+	jra .L143
+.L154:
+	movel _dpm,%a3
+	addw #696,%a3
+	movel %a3,%a6@(-44)
+	movel %a6@(-44),%a0
+	movew %a0@,%d3
+	andw #255,%d3
+	movew %d3,_ins
+	movel %a6@(-44),%a0
+	clrl %d0
+	movew %a0@(2),%d0
+	movel %d0,%a6@(-28)
+	clrl %d0
+	movew _ins,%d0
+	addl %a6@(-28),%d0
+	cmpl #256,%d0
+	jle .L155
+	clrl %d0
+	movew _ins,%d0
+	movel #256,%d4
+	subl %d0,%d4
+	movel %d4,%a6@(-28)
+.L155:
 	nop
-	movel a6@(-44),a3
-	addql #4,a3
-	movel a3,a6@(-8)
-	clrl d0
-	movew _ins,d0
-	movel d0,d1
-	lsll #2,d1
-	lea _act,a0
-	movel a0@(d1:l),a6@(-4)
-L156:
-	tstl a6@(-28)
-	jgt L159
-	jra L157
-	.even
-L159:
-	movel a6@(-8),a0
-	movel a6@(-4),a1
-	movel a1@,d3
-	movel a1@(4),d4
-	movel d3,a0@
-	movel d4,a0@(4)
-	movel a6@(-8),a0
-	tstw a0@(6)
-	jeq L158
-	movel a6@(-8),a0
-	subqw #1,a0@(6)
-L160:
-L158:
-	subql #1,a6@(-28)
+	movel %a6@(-44),%a3
+	addqw #4,%a3
+	movel %a3,%a6@(-8)
+	clrl %d0
+	movew _ins,%d0
+	movel %d0,%d1
+	asll #2,%d1
+	lea _act,%a0
+	movel %a0@(%d1:l),%a6@(-4)
+.L156:
+	tstl %a6@(-28)
+	jgt .L159
+	jra .L157
+.L159:
+	movel %a6@(-8),%a0
+	movel %a6@(-4),%a1
+	movel %a1@,%d3
+	movel %a1@(4),%d4
+	movel %d3,%a0@
+	movel %d4,%a0@(4)
+	movel %a6@(-8),%a0
+	tstw %a0@(6)
+	jeq .L158
+	movel %a6@(-8),%a0
+	subqw #1,%a0@(6)
+.L160:
+.L158:
+	subql #1,%a6@(-28)
 	addqw #1,_ins
-	addql #8,a6@(-8)
-	moveq #32,d4
-	addl d4,a6@(-4)
-	jra L156
-	.even
-L157:
-	movel a6@(-44),a0
-	movew _ins,a0@
-	jra L143
-	.even
-L161:
-	movel _dpm,a3
-	lea a3@(696),a3
-	movel a3,a6@(-44)
-	movel a6@(-44),a0
-	movew a0@,d3
-	andw #255,d3
-	movew d3,_ins
-	movel a6@(-44),a0
-	clrl d0
-	movew a0@(2),d0
-	movel d0,a6@(-28)
-	clrl d0
-	movew _ins,d0
-	addl a6@(-28),d0
-	cmpl #256,d0
-	jle L162
-	clrl d0
-	movew _ins,d0
-	movel #256,d4
-	subl d0,d4
-	movel d4,a6@(-28)
-L162:
+	addql #8,%a6@(-8)
+	moveq #32,%d4
+	addl %d4,%a6@(-4)
+	jra .L156
+.L157:
+	movel %a6@(-44),%a0
+	movew _ins,%a0@
+	jra .L143
+.L161:
+	movel _dpm,%a3
+	addw #696,%a3
+	movel %a3,%a6@(-44)
+	movel %a6@(-44),%a0
+	movew %a0@,%d3
+	andw #255,%d3
+	movew %d3,_ins
+	movel %a6@(-44),%a0
+	clrl %d0
+	movew %a0@(2),%d0
+	movel %d0,%a6@(-28)
+	clrl %d0
+	movew _ins,%d0
+	addl %a6@(-28),%d0
+	cmpl #256,%d0
+	jle .L162
+	clrl %d0
+	movew _ins,%d0
+	movel #256,%d4
+	subl %d0,%d4
+	movel %d4,%a6@(-28)
+.L162:
 	nop
-	movel a6@(-44),a3
-	addql #4,a3
-	movel a3,a6@(-48)
-	clrl d0
-	movew _ins,d0
-	movel d0,d1
-	lsll #2,d1
-	lea _act,a0
-	movel a0@(d1:l),a6@(-4)
-L163:
-	tstl a6@(-28)
-	jgt L166
-	jra L164
-	.even
-L166:
-	movel a6@(-48),d0
-	movel a6@(-4),a1
-	lea a1@(16),a0
-	movel d0,a1
-	movel a0@,a1@
-	addql #4,a1
-	addql #4,a0
-	movel a0@,a1@
-	addql #4,a1
-	addql #4,a0
-	movel a0@,a1@
-	addql #4,a1
-	addql #4,a0
-	movel a0@,a1@
-	addql #4,a1
-	addql #4,a0
-L165:
-	subql #1,a6@(-28)
+	movel %a6@(-44),%a3
+	addqw #4,%a3
+	movel %a3,%a6@(-40)
+	clrl %d0
+	movew _ins,%d0
+	movel %d0,%d1
+	asll #2,%d1
+	lea _act,%a0
+	movel %a0@(%d1:l),%a6@(-4)
+.L163:
+	tstl %a6@(-28)
+	jgt .L166
+	jra .L164
+.L166:
+	movel %a6@(-40),%d0
+	movel %a6@(-4),%a1
+	lea %a1@(16),%a0
+	movel %d0,%a1
+	movel %a0@,%a1@
+	addqw #4,%a1
+	addqw #4,%a0
+	movel %a0@,%a1@
+	addqw #4,%a1
+	addqw #4,%a0
+	movel %a0@,%a1@
+	addqw #4,%a1
+	addqw #4,%a0
+	movel %a0@,%a1@
+	addqw #4,%a1
+	addqw #4,%a0
+.L165:
+	subql #1,%a6@(-28)
 	addqw #1,_ins
-	moveq #16,d3
-	addl d3,a6@(-48)
-	moveq #32,d4
-	addl d4,a6@(-4)
-	jra L163
-	.even
-L164:
-	movel a6@(-44),a0
-	movew _ins,a0@
-	jra L143
-	.even
-L167:
-	movel _dpm,a3
-	lea a3@(696),a3
-	movel a3,a6@(-48)
-	movel a6@(-48),a0
-	clrl d0
-	movew a0@(2),d0
-	movel d0,a6@(-28)
-	movel a6@(-48),a0
-	clrl d0
-	movew a0@,d0
-	movel d0,a6@(-32)
-	tstl a6@(-32)
-	jne L168
-	movew _hist+2,a3
-	movel a3,a6@(-32)
-L168:
-	cmpl #999,a6@(-32)
-	jle L169
-	movel #999,a6@(-32)
-L169:
-	movel a6@(-32),d0
-	movel d0,d1
-	movel d1,d0
-	lsll #4,d0
-	movel #_hist+8,d1
-	movel d1,d3
-	addl d0,d3
-	movel d3,a6@(-44)
-	clrl a6@(-24)
-	movel a6@(-48),d4
-	addql #4,d4
-	movel d4,a6@(-52)
-L170:
-	movel a6@(-24),a3
-	cmpl a6@(-28),a3
-	jlt L173
-	jra L171
-	.even
-L173:
-	subql #1,a6@(-32)
-	tstl a6@(-32)
-	jge L174
-	movel #999,a6@(-32)
-	movel a6@(-32),d0
-	movel d0,d1
-	movel d1,d0
-	lsll #4,d0
-	movel #_hist+8,d1
-	movel d1,d3
-	addl d0,d3
-	movel d3,a6@(-44)
-	jra L175
-	.even
-L174:
-	moveq #-16,d4
-	addl d4,a6@(-44)
-L175:
-	movel a6@(-52),d0
-	movel a6@(-44),d1
-	movel d1,a0
-	movel d0,a1
-	movel a0@,a1@
-	addql #4,a1
-	addql #4,a0
-	movel a0@,a1@
-	addql #4,a1
-	addql #4,a0
-	movel a0@,a1@
-	addql #4,a1
-	addql #4,a0
-	movel a0@,a1@
-	addql #4,a1
-	addql #4,a0
-L172:
-	addql #1,a6@(-24)
-	moveq #16,d3
-	addl d3,a6@(-52)
-	jra L170
-	.even
-L171:
-	movel a6@(-48),a0
-	movew a6@(-30),a0@
-	jra L143
-	.even
-L176:
-	movel _dpm,d4
-	addl #696,d4
-	movel d4,a6@(-48)
-	movel a6@(-48),a0
-	clrl d0
-	movew a0@(2),d0
-	movel d0,a6@(-28)
-	movel a6@(-48),a0
-	clrl d0
-	movew a0@,d0
-	movel d0,a6@(-32)
-	tstl a6@(-32)
-	jne L177
-	movew _clk+2,a3
-	movel a3,a6@(-32)
-L177:
-	moveq #15,d3
-	cmpl a6@(-32),d3
-	jge L178
-	moveq #15,d4
-	movel d4,a6@(-32)
-L178:
-	movel a6@(-32),d0
-	movel d0,d1
-	movel d1,d2
-	lsll #2,d2
-	addl d2,d0
-	movel d0,d1
-	lsll #2,d1
-	movel #_clk+8,d0
-	movel d0,a3
-	addl d1,a3
-	movel a3,a6@(-44)
-	clrl a6@(-24)
-	movel a6@(-48),d3
-	addql #4,d3
-	movel d3,a6@(-56)
-L179:
-	movel a6@(-24),d4
-	cmpl a6@(-28),d4
-	jlt L182
-	jra L180
-	.even
-L182:
-	subql #1,a6@(-32)
-	tstl a6@(-32)
-	jge L183
-	moveq #15,d3
-	movel d3,a6@(-32)
-	movel a6@(-32),d0
-	movel d0,d1
-	movel d1,d2
-	lsll #2,d2
-	addl d2,d0
-	movel d0,d1
-	lsll #2,d1
-	movel #_clk+8,d0
-	movel d0,d4
-	addl d1,d4
-	movel d4,a6@(-44)
-	jra L184
-	.even
-L183:
-	moveq #-20,d3
-	addl d3,a6@(-44)
-L184:
-	movel a6@(-56),d0
-	movel a6@(-44),d1
-	movel d1,a0
-	movel d0,a1
-	movel a0@,a1@
-	addql #4,a1
-	addql #4,a0
-	movel a0@,a1@
-	addql #4,a1
-	addql #4,a0
-	movel a0@,a1@
-	addql #4,a1
-	addql #4,a0
-	movel a0@,a1@
-	addql #4,a1
-	addql #4,a0
-	movel a0@,a1@
-	addql #4,a1
-	addql #4,a0
-L181:
-	addql #1,a6@(-24)
-	moveq #20,d4
-	addl d4,a6@(-56)
-	jra L179
-	.even
-L180:
-	movel a6@(-48),a0
-	movew a6@(-30),a0@
-	jra L143
-	.even
-L185:
-	movel _dpm,a3
-	lea a3@(696),a3
-	movel a3,a6@(-48)
-	movel a6@(-48),a0
-	movew a0@,d0
-	andw #255,d0
-	clrl d1
-	movew d0,d1
-	movel d1,d0
-	movel d0,a6@(-32)
-	movew d0,_ins
-	movel a6@(-48),a0
-	clrl d0
-	movew a0@(2),d0
-	movel d0,a6@(-28)
-	clrl d0
-	movew _ins,d0
-	addl a6@(-28),d0
-	cmpl #256,d0
-	jle L186
-	clrl d0
-	movew _ins,d0
-	movel #256,d3
-	subl d0,d3
-	movel d3,a6@(-28)
-L186:
+	moveq #16,%d3
+	addl %d3,%a6@(-40)
+	moveq #32,%d4
+	addl %d4,%a6@(-4)
+	jra .L163
+.L164:
+	movel %a6@(-44),%a0
+	movew _ins,%a0@
+	jra .L143
+.L167:
+	movel _dpm,%a3
+	addw #696,%a3
+	movel %a3,%a6@(-44)
+	movel %a6@(-44),%a0
+	clrl %d0
+	movew %a0@(2),%d0
+	movel %d0,%a6@(-28)
+	movel %a6@(-44),%a0
+	clrl %d0
+	movew %a0@,%d0
+	movel %d0,%a6@(-32)
+	tstl %a6@(-32)
+	jne .L168
+	movew _hist+2,%a3
+	movel %a3,%a6@(-32)
+.L168:
+	cmpl #999,%a6@(-32)
+	jle .L169
+	movel #999,%a6@(-32)
+.L169:
+	movel %a6@(-32),%d0
+	movel %d0,%d1
+	movel %d1,%d0
+	asll #4,%d0
+	movel #_hist+8,%d1
+	movel %d1,%d3
+	addl %d0,%d3
+	movel %d3,%a6@(-40)
+	clrl %a6@(-24)
+	movel %a6@(-44),%d4
+	addql #4,%d4
+	movel %d4,%a6@(-48)
+.L170:
+	movel %a6@(-24),%a3
+	cmpl %a6@(-28),%a3
+	jlt .L173
+	jra .L171
+.L173:
+	subql #1,%a6@(-32)
+	tstl %a6@(-32)
+	jge .L174
+	movel #999,%a6@(-32)
+	movel %a6@(-32),%d0
+	movel %d0,%d1
+	movel %d1,%d0
+	asll #4,%d0
+	movel #_hist+8,%d1
+	movel %d1,%d3
+	addl %d0,%d3
+	movel %d3,%a6@(-40)
+	jra .L175
+.L174:
+	moveq #-16,%d4
+	addl %d4,%a6@(-40)
+.L175:
+	movel %a6@(-48),%d0
+	movel %a6@(-40),%d1
+	movel %d1,%a0
+	movel %d0,%a1
+	movel %a0@,%a1@
+	addqw #4,%a1
+	addqw #4,%a0
+	movel %a0@,%a1@
+	addqw #4,%a1
+	addqw #4,%a0
+	movel %a0@,%a1@
+	addqw #4,%a1
+	addqw #4,%a0
+	movel %a0@,%a1@
+	addqw #4,%a1
+	addqw #4,%a0
+.L172:
+	addql #1,%a6@(-24)
+	moveq #16,%d3
+	addl %d3,%a6@(-48)
+	jra .L170
+.L171:
+	movel %a6@(-44),%a0
+	movew %a6@(-30),%a0@
+	jra .L143
+.L176:
+	movel _dpm,%d4
+	addl #696,%d4
+	movel %d4,%a6@(-48)
+	movel %a6@(-48),%a0
+	clrl %d0
+	movew %a0@(2),%d0
+	movel %d0,%a6@(-28)
+	movel %a6@(-48),%a0
+	clrl %d0
+	movew %a0@,%d0
+	movel %d0,%a6@(-32)
+	tstl %a6@(-32)
+	jne .L177
+	movew _clk+2,%a3
+	movel %a3,%a6@(-32)
+.L177:
+	moveq #15,%d3
+	cmpl %a6@(-32),%d3
+	jge .L178
+	moveq #15,%d4
+	movel %d4,%a6@(-32)
+.L178:
+	movel %a6@(-32),%d0
+	movel %d0,%d1
+	movel %d1,%d2
+	asll #2,%d2
+	addl %d2,%d0
+	movel %d0,%d1
+	asll #2,%d1
+	movel #_clk+8,%d0
+	movel %d0,%a3
+	addl %d1,%a3
+	movel %a3,%a6@(-44)
+	clrl %a6@(-24)
+	movel %a6@(-48),%d3
+	addql #4,%d3
+	movel %d3,%a6@(-40)
+.L179:
+	movel %a6@(-24),%d4
+	cmpl %a6@(-28),%d4
+	jlt .L182
+	jra .L180
+.L182:
+	subql #1,%a6@(-32)
+	tstl %a6@(-32)
+	jge .L183
+	moveq #15,%d3
+	movel %d3,%a6@(-32)
+	movel %a6@(-32),%d0
+	movel %d0,%d1
+	movel %d1,%d2
+	asll #2,%d2
+	addl %d2,%d0
+	movel %d0,%d1
+	asll #2,%d1
+	movel #_clk+8,%d0
+	movel %d0,%d4
+	addl %d1,%d4
+	movel %d4,%a6@(-44)
+	jra .L184
+.L183:
+	moveq #-20,%d3
+	addl %d3,%a6@(-44)
+.L184:
+	movel %a6@(-40),%d0
+	movel %a6@(-44),%d1
+	movel %d1,%a0
+	movel %d0,%a1
+	movel %a0@,%a1@
+	addqw #4,%a1
+	addqw #4,%a0
+	movel %a0@,%a1@
+	addqw #4,%a1
+	addqw #4,%a0
+	movel %a0@,%a1@
+	addqw #4,%a1
+	addqw #4,%a0
+	movel %a0@,%a1@
+	addqw #4,%a1
+	addqw #4,%a0
+	movel %a0@,%a1@
+	addqw #4,%a1
+	addqw #4,%a0
+.L181:
+	addql #1,%a6@(-24)
+	moveq #20,%d4
+	addl %d4,%a6@(-40)
+	jra .L179
+.L180:
+	movel %a6@(-48),%a0
+	movew %a6@(-30),%a0@
+	jra .L143
+.L185:
+	movel _dpm,%a3
+	addw #696,%a3
+	movel %a3,%a6@(-48)
+	movel %a6@(-48),%a0
+	movew %a0@,%d0
+	andw #255,%d0
+	clrl %d1
+	movew %d0,%d1
+	movel %d1,%d0
+	movel %d0,%a6@(-32)
+	movew %d0,_ins
+	movel %a6@(-48),%a0
+	clrl %d0
+	movew %a0@(2),%d0
+	movel %d0,%a6@(-28)
+	clrl %d0
+	movew _ins,%d0
+	addl %a6@(-28),%d0
+	cmpl #256,%d0
+	jle .L186
+	clrl %d0
+	movew _ins,%d0
+	movel #256,%d3
+	subl %d0,%d3
+	movel %d3,%a6@(-28)
+.L186:
 	clrl _ins+2
 	clrw _ins+6
-	clrl d0
-	movew _ins,d0
-	movel d0,d1
-	lsll #2,d1
-	lea _act,a0
-	movel a0@(d1:l),a6@(-4)
-L187:
-	tstl a6@(-28)
-	jle L191
-	movel _dpm,a0
-	movew a0@(372),d0
-	cmpw _ins,d0
-	jhi L190
-	jra L191
-	.even
-L191:
-	jra L188
-	.even
-L190:
+	clrl %d0
+	movew _ins,%d0
+	movel %d0,%d1
+	asll #2,%d1
+	lea _act,%a0
+	movel %a0@(%d1:l),%a6@(-4)
+.L187:
+	tstl %a6@(-28)
+	jle .L191
+	movel _dpm,%a0
+	movew %a0@(372),%d0
+	cmpw _ins,%d0
+	jhi .L190
+	jra .L191
+.L191:
+	jra .L188
+.L190:
 	pea 32:w
-	clrl sp@-
-	movel a6@(-4),sp@-
+	clrl %sp@-
+	movel %a6@(-4),%sp@-
 	jbsr _memset
-	addql #8,sp
-	addql #4,sp
+	addqw #8,%sp
+	addqw #4,%sp
 #APP
 	trap #1
 #NO_APP
-L189:
-	subql #1,a6@(-28)
-	moveq #32,d4
-	addl d4,a6@(-4)
+.L189:
+	subql #1,%a6@(-28)
+	moveq #32,%d4
+	addl %d4,%a6@(-4)
 	addqw #1,_ins
-	jra L187
-	.even
-L188:
-	movel _dpm,a0
-	movew a0@(372),d0
-	cmpw _ins,d0
-	jne L192
-	movel _dpm,a0
-	movew a6@(-30),a0@(372)
-	tstl a6@(-32)
-	jne L192
+	jra .L187
+.L188:
+	movel _dpm,%a0
+	movew %a0@(372),%d0
+	cmpw _ins,%d0
+	jne .L192
+	movel _dpm,%a0
+	movew %a6@(-30),%a0@(372)
+	tstl %a6@(-32)
+	jne .L192
 	pea 320:w
-	clrl sp@-
-	movel _dpm,d0
-	addql #8,d0
-	movel d0,sp@-
+	clrl %sp@-
+	movel _dpm,%d0
+	addql #8,%d0
+	movel %d0,%sp@-
 	jbsr _memset
-	addql #8,sp
-	addql #4,sp
+	addqw #8,%sp
+	addqw #4,%sp
 	pea 1808:w
-	clrl sp@-
+	clrl %sp@-
 	pea _in_use
 	jbsr _memset
-	addql #8,sp
-	addql #4,sp
-L193:
-L192:
-	jra L143
-	.even
-L194:
-	movel _dpm,a3
-	lea a3@(696),a3
-	movel a3,a6@(-48)
-	movel a6@(-48),a0
-	movew a0@,d3
-	andw #255,d3
-	movew d3,_ins
-	movel a6@(-48),a0
-	clrl d0
-	movew a0@(2),d0
-	movel d0,a6@(-28)
-	clrl d0
-	movew _ins,d0
-	addl a6@(-28),d0
-	cmpl #256,d0
-	jle L195
-	clrl d0
-	movew _ins,d0
-	movel #256,d4
-	subl d0,d4
-	movel d4,a6@(-28)
-L195:
+	addqw #8,%sp
+	addqw #4,%sp
+.L193:
+.L192:
+	jra .L143
+.L194:
+	movel _dpm,%a3
+	addw #696,%a3
+	movel %a3,%a6@(-48)
+	movel %a6@(-48),%a0
+	movew %a0@,%d3
+	andw #255,%d3
+	movew %d3,_ins
+	movel %a6@(-48),%a0
+	clrl %d0
+	movew %a0@(2),%d0
+	movel %d0,%a6@(-28)
+	clrl %d0
+	movew _ins,%d0
+	addl %a6@(-28),%d0
+	cmpl #256,%d0
+	jle .L195
+	clrl %d0
+	movew _ins,%d0
+	movel #256,%d4
+	subl %d0,%d4
+	movel %d4,%a6@(-28)
+.L195:
 	nop
-	movel a6@(-48),a3
-	addql #4,a3
-	movel a3,a6@(-8)
-L196:
-	tstl a6@(-28)
-	jgt L199
-	jra L197
-	.even
-L199:
-	clrl sp@-
-	movel a6@(-8),sp@-
+	movel %a6@(-48),%a3
+	addqw #4,%a3
+	movel %a3,%a6@(-8)
+.L196:
+	tstl %a6@(-28)
+	jgt .L199
+	jra .L197
+.L199:
+	clrl %sp@-
+	movel %a6@(-8),%sp@-
 	jbsr _InsertAction
-	addql #8,sp
-	movel d0,a6@(-24)
-	tstl a6@(-24)
-	jge L198
-	movel _dpm,a0
-	movew _ins,a0@(352)
-	movel _dpm,a0
-	movew a6@(-22),a0@(362)
-	jra L201
-	.even
-L200:
-L198:
-	subql #1,a6@(-28)
-	addql #8,a6@(-8)
-	jra L196
-	.even
-L197:
-	movel a6@(-48),a0
-	movew _ins,a0@
-	jra L143
-	.even
-L202:
-	movel _dpm,d3
-	addl #696,d3
-	movel d3,a6@(-48)
-	movel a6@(-48),a0
-	movew a0@,d4
-	andw #255,d4
-	movew d4,_ins
-	movel a6@(-48),a0
-	clrl d0
-	movew a0@(2),d0
-	movel d0,a6@(-28)
-	clrl d0
-	movew _ins,d0
-	addl a6@(-28),d0
-	cmpl #256,d0
-	jle L203
-	clrl d0
-	movew _ins,d0
-	movew #256,a3
-	subl d0,a3
-	movel a3,a6@(-28)
-L203:
+	addqw #8,%sp
+	movel %d0,%a6@(-24)
+	tstl %a6@(-24)
+	jge .L198
+	movel _dpm,%a0
+	movew _ins,%a0@(352)
+	movel _dpm,%a0
+	movew %a6@(-22),%a0@(362)
+	jra .L201
+.L200:
+.L198:
+	subql #1,%a6@(-28)
+	addql #8,%a6@(-8)
+	jra .L196
+.L197:
+	movel %a6@(-48),%a0
+	movew _ins,%a0@
+	jra .L143
+.L202:
+	movel _dpm,%d3
+	addl #696,%d3
+	movel %d3,%a6@(-48)
+	movel %a6@(-48),%a0
+	movew %a0@,%d4
+	andw #255,%d4
+	movew %d4,_ins
+	movel %a6@(-48),%a0
+	clrl %d0
+	movew %a0@(2),%d0
+	movel %d0,%a6@(-28)
+	clrl %d0
+	movew _ins,%d0
+	addl %a6@(-28),%d0
+	cmpl #256,%d0
+	jle .L203
+	clrl %d0
+	movew _ins,%d0
+	movew #256,%a3
+	subl %d0,%a3
+	movel %a3,%a6@(-28)
+.L203:
 	nop
-	movel a6@(-48),d3
-	addql #4,d3
-	movel d3,a6@(-12)
-L204:
-	tstl a6@(-28)
-	jgt L207
-	jra L205
-	.even
-L207:
+	movel %a6@(-48),%d3
+	addql #4,%d3
+	movel %d3,%a6@(-12)
+.L204:
+	tstl %a6@(-28)
+	jgt .L207
+	jra .L205
+.L207:
 	pea 1:w
-	movel a6@(-12),sp@-
+	movel %a6@(-12),%sp@-
 	jbsr _InsertAction
-	addql #8,sp
-	movel d0,a6@(-24)
-	tstl a6@(-24)
-	jge L206
-	movel _dpm,a0
-	movew _ins,a0@(352)
-	movel _dpm,a0
-	movew a6@(-22),a0@(362)
-	jra L201
-	.even
-L208:
-L206:
-	subql #1,a6@(-28)
-	addl #152,a6@(-12)
-	jra L204
-	.even
-L205:
-	movel a6@(-48),a0
-	movew _ins,a0@
-	jra L143
-	.even
-L209:
-	movel _dpm,d4
-	addl #696,d4
-	movel d4,a6@(-48)
-	movel a6@(-48),a0
-	movew a0@,d3
-	andw #255,d3
-	movew d3,_ins
-	movel a6@(-48),a0
-	clrl d0
-	movew a0@(2),d0
-	movel d0,a6@(-28)
-	clrl d0
-	movew _ins,d0
-	addl a6@(-28),d0
-	cmpl #256,d0
-	jle L210
-	clrl d0
-	movew _ins,d0
-	movel #256,d4
-	subl d0,d4
-	movel d4,a6@(-28)
-L210:
+	addqw #8,%sp
+	movel %d0,%a6@(-24)
+	tstl %a6@(-24)
+	jge .L206
+	movel _dpm,%a0
+	movew _ins,%a0@(352)
+	movel _dpm,%a0
+	movew %a6@(-22),%a0@(362)
+	jra .L201
+.L208:
+.L206:
+	subql #1,%a6@(-28)
+	addl #152,%a6@(-12)
+	jra .L204
+.L205:
+	movel %a6@(-48),%a0
+	movew _ins,%a0@
+	jra .L143
+.L209:
+	movel _dpm,%d4
+	addl #696,%d4
+	movel %d4,%a6@(-48)
+	movel %a6@(-48),%a0
+	movew %a0@,%d3
+	andw #255,%d3
+	movew %d3,_ins
+	movel %a6@(-48),%a0
+	clrl %d0
+	movew %a0@(2),%d0
+	movel %d0,%a6@(-28)
+	clrl %d0
+	movew _ins,%d0
+	addl %a6@(-28),%d0
+	cmpl #256,%d0
+	jle .L210
+	clrl %d0
+	movew _ins,%d0
+	movel #256,%d4
+	subl %d0,%d4
+	movel %d4,%a6@(-28)
+.L210:
 	nop
-	movel a6@(-48),a3
-	addql #4,a3
-	movel a3,a6@(-16)
-	clrl d0
-	movew _ins,d0
-	movel d0,d1
-	lsll #2,d1
-	lea _act,a0
-	movel a0@(d1:l),a6@(-4)
-L211:
-	tstl a6@(-28)
-	jgt L214
-	jra L212
-	.even
-L214:
-	movel a6@(-16),a0
-	movel a6@(-4),a1
-	movel a1@,d3
-	movel a1@(4),d4
-	movel d3,a0@
-	movel d4,a0@(4)
-	movel a6@(-16),a0
-	tstw a0@(6)
-	jeq L215
-	movel a6@(-16),a0
-	subqw #1,a0@(6)
-L215:
-	movel a6@(-16),a0
-	movel a6@(-4),a1
-	movel a1@(8),a0@(8)
-L213:
-	subql #1,a6@(-28)
+	movel %a6@(-48),%a3
+	addqw #4,%a3
+	movel %a3,%a6@(-16)
+	clrl %d0
+	movew _ins,%d0
+	movel %d0,%d1
+	asll #2,%d1
+	lea _act,%a0
+	movel %a0@(%d1:l),%a6@(-4)
+.L211:
+	tstl %a6@(-28)
+	jgt .L214
+	jra .L212
+.L214:
+	movel %a6@(-16),%a0
+	movel %a6@(-4),%a1
+	movel %a1@,%d3
+	movel %a1@(4),%d4
+	movel %d3,%a0@
+	movel %d4,%a0@(4)
+	movel %a6@(-16),%a0
+	tstw %a0@(6)
+	jeq .L215
+	movel %a6@(-16),%a0
+	subqw #1,%a0@(6)
+.L215:
+	movel %a6@(-16),%a0
+	movel %a6@(-4),%a1
+	movel %a1@(8),%a0@(8)
+.L213:
+	subql #1,%a6@(-28)
 	addqw #1,_ins
-	moveq #12,d4
-	addl d4,a6@(-16)
-	moveq #32,d3
-	addl d3,a6@(-4)
-	jra L211
-	.even
-L212:
-	movel a6@(-48),a0
-	movew _ins,a0@
-	jra L143
-	.even
-L216:
-	movel _dpm,d4
-	addl #696,d4
-	movel d4,a6@(-48)
-	movel a6@(-48),a0
-	movew a0@,d3
-	andw #255,d3
-	movew d3,_ins
-	movel a6@(-48),a0
-	clrl d0
-	movew a0@(2),d0
-	movel d0,a6@(-28)
-	clrl d0
-	movew _ins,d0
-	addl a6@(-28),d0
-	cmpl #256,d0
-	jle L217
-	clrl d0
-	movew _ins,d0
-	movel #256,d4
-	subl d0,d4
-	movel d4,a6@(-28)
-L217:
+	moveq #12,%d4
+	addl %d4,%a6@(-16)
+	moveq #32,%d3
+	addl %d3,%a6@(-4)
+	jra .L211
+.L212:
+	movel %a6@(-48),%a0
+	movew _ins,%a0@
+	jra .L143
+.L216:
+	movel _dpm,%d4
+	addl #696,%d4
+	movel %d4,%a6@(-48)
+	movel %a6@(-48),%a0
+	movew %a0@,%d3
+	andw #255,%d3
+	movew %d3,_ins
+	movel %a6@(-48),%a0
+	clrl %d0
+	movew %a0@(2),%d0
+	movel %d0,%a6@(-28)
+	clrl %d0
+	movew _ins,%d0
+	addl %a6@(-28),%d0
+	cmpl #256,%d0
+	jle .L217
+	clrl %d0
+	movew _ins,%d0
+	movel #256,%d4
+	subl %d0,%d4
+	movel %d4,%a6@(-28)
+.L217:
 	nop
-	movel a6@(-48),a3
-	addql #4,a3
-	movel a3,a6@(-20)
-	clrl d0
-	movew _ins,d0
-	movel d0,d1
-	lsll #2,d1
-	lea _act,a0
-	movel a0@(d1:l),a6@(-4)
-L218:
-	tstl a6@(-28)
-	jgt L221
-	jra L219
-	.even
-L221:
-	movel a6@(-4),a0
-	movel a6@(-20),a1
-	movel a1@,a0@(8)
-L220:
-	subql #1,a6@(-28)
-	addql #4,a6@(-20)
-	moveq #32,d3
-	addl d3,a6@(-4)
+	movel %a6@(-48),%a3
+	addqw #4,%a3
+	movel %a3,%a6@(-20)
+	clrl %d0
+	movew _ins,%d0
+	movel %d0,%d1
+	asll #2,%d1
+	lea _act,%a0
+	movel %a0@(%d1:l),%a6@(-4)
+.L218:
+	tstl %a6@(-28)
+	jgt .L221
+	jra .L219
+.L221:
+	movel %a6@(-4),%a0
+	movel %a6@(-20),%a1
+	movel %a1@,%a0@(8)
+.L220:
+	subql #1,%a6@(-28)
+	addql #4,%a6@(-20)
+	moveq #32,%d3
+	addl %d3,%a6@(-4)
 	addqw #1,_ins
-	jra L218
-	.even
-L219:
-	movel a6@(-48),a0
-	movew _ins,a0@
-	jra L143
-	.even
-L222:
-	movel _dpm,d4
-	addl #696,d4
-	movel d4,a6@(-48)
-	movel a6@(-48),a0
-	movew a0@,d3
-	andw #255,d3
-	movew d3,_ins
-	movel a6@(-48),a0
-	clrl d0
-	movew a0@(2),d0
-	movel d0,a6@(-28)
-	clrl d0
-	movew _ins,d0
-	addl a6@(-28),d0
-	cmpl #256,d0
-	jle L223
-	clrl d0
-	movew _ins,d0
-	movel #256,d4
-	subl d0,d4
-	movel d4,a6@(-28)
-L223:
+	jra .L218
+.L219:
+	movel %a6@(-48),%a0
+	movew _ins,%a0@
+	jra .L143
+.L222:
+	movel _dpm,%d4
+	addl #696,%d4
+	movel %d4,%a6@(-48)
+	movel %a6@(-48),%a0
+	movew %a0@,%d3
+	andw #255,%d3
+	movew %d3,_ins
+	movel %a6@(-48),%a0
+	clrl %d0
+	movew %a0@(2),%d0
+	movel %d0,%a6@(-28)
+	clrl %d0
+	movew _ins,%d0
+	addl %a6@(-28),%d0
+	cmpl #256,%d0
+	jle .L223
+	clrl %d0
+	movew _ins,%d0
+	movel #256,%d4
+	subl %d0,%d4
+	movel %d4,%a6@(-28)
+.L223:
 	nop
-	movel a6@(-48),a3
-	addql #4,a3
-	movel a3,a6@(-44)
-	clrl d0
-	movew _ins,d0
-	movel d0,d1
-	lsll #2,d1
-	lea _act,a0
-	movel a0@(d1:l),a6@(-4)
-L224:
-	tstl a6@(-28)
-	jgt L227
-	jra L225
-	.even
-L227:
-	movel a6@(-4),a0
-	movel a6@(-4),a1
-	moveb a1@(15),d3
-	andb #1,d3
-	moveb d3,a0@(15)
-	movel a6@(-4),a0
-	movel a6@(-4),a1
-	movel a6@(-44),a2
-	moveb a2@,d1
-	moveb d1,d0
-	lslb #1,d0
-	moveb a1@(15),d4
-	orb d0,d4
-	moveb d4,a0@(15)
-L226:
-	subql #1,a6@(-28)
-	addql #1,a6@(-44)
-	moveq #32,d3
-	addl d3,a6@(-4)
+	movel %a6@(-48),%a3
+	addqw #4,%a3
+	movel %a3,%a6@(-44)
+	clrl %d0
+	movew _ins,%d0
+	movel %d0,%d1
+	asll #2,%d1
+	lea _act,%a0
+	movel %a0@(%d1:l),%a6@(-4)
+.L224:
+	tstl %a6@(-28)
+	jgt .L227
+	jra .L225
+.L227:
+	movel %a6@(-4),%a0
+	movel %a6@(-4),%a1
+	moveb %a1@(15),%d3
+	andb #1,%d3
+	moveb %d3,%a0@(15)
+	movel %a6@(-4),%a0
+	movel %a6@(-4),%a1
+	movel %a6@(-44),%a2
+	moveb %a2@,%d1
+	moveb %d1,%d0
+	aslb #1,%d0
+	moveb %a1@(15),%d4
+	orb %d0,%d4
+	moveb %d4,%a0@(15)
+.L226:
+	subql #1,%a6@(-28)
+	addql #1,%a6@(-44)
+	moveq #32,%d3
+	addl %d3,%a6@(-4)
 	addqw #1,_ins
-	jra L224
-	.even
-L225:
-	movel a6@(-48),a0
-	movew _ins,a0@
-	jra L143
-	.even
-L228:
-	movel _dpm,d4
-	addl #696,d4
-	movel d4,a6@(-48)
-	movel a6@(-48),a0
-	movew a0@,d3
-	andw #255,d3
-	movew d3,_ins
-	movel a6@(-48),a0
-	clrl d0
-	movew a0@(2),d0
-	movel d0,a6@(-28)
-	clrl d0
-	movew _ins,d0
-	addl a6@(-28),d0
-	cmpl #256,d0
-	jle L229
-	clrl d0
-	movew _ins,d0
-	movel #256,d4
-	subl d0,d4
-	movel d4,a6@(-28)
-L229:
+	jra .L224
+.L225:
+	movel %a6@(-48),%a0
+	movew _ins,%a0@
+	jra .L143
+.L228:
+	movel _dpm,%d4
+	addl #696,%d4
+	movel %d4,%a6@(-48)
+	movel %a6@(-48),%a0
+	movew %a0@,%d3
+	andw #255,%d3
+	movew %d3,_ins
+	movel %a6@(-48),%a0
+	clrl %d0
+	movew %a0@(2),%d0
+	movel %d0,%a6@(-28)
+	clrl %d0
+	movew _ins,%d0
+	addl %a6@(-28),%d0
+	cmpl #256,%d0
+	jle .L229
+	clrl %d0
+	movew _ins,%d0
+	movel #256,%d4
+	subl %d0,%d4
+	movel %d4,%a6@(-28)
+.L229:
 	nop
-	clrl d0
-	movew _ins,d0
-	movel d0,d1
-	lsll #2,d1
-	lea _act,a0
-	movel a0@(d1:l),a6@(-4)
-L230:
-	tstl a6@(-28)
-	jgt L233
-	jra L231
-	.even
-L233:
-	movel a6@(-4),a0
-	movew a0@(12),d0
-	andw #1,d0
-	tstw d0
-	jeq L232
-	movel a6@(-48),a0
-	cmpw #65535,a0@(4)
-	jne L235
-	movel _dpm,a0
-	movew _ins,a0@(352)
-	movel _dpm,a0
-	movew #-5,a0@(362)
-	jra L201
-	.even
-L235:
-	movel a6@(-48),a0
-	tstw a0@(6)
-	jeq L236
-	movel a6@(-4),a0
-	movew a0@(12),d3
-	andw #65511,d3
-	movew d3,a6@(-34)
-	movel a6@(-48),a0
-	movel a6@(-48),a1
-	movew a1@(6),d0
-	andw #3,d0
-	movew d0,d1
-	movew d1,a0@(6)
-	clrl d0
-	movew d1,d0
-	moveq #2,d4
-	cmpl d0,d4
-	jeq L239
-	moveq #2,d3
-	cmpl d0,d3
-	jlt L243
-	tstl d0
-	jeq L238
-	jra L241
-	.even
-L243:
-	moveq #3,d4
-	cmpl d0,d4
-	jeq L240
-	jra L241
-	.even
-L238:
-	jra L237
-	.even
-L239:
-	orw #16,a6@(-34)
-	jra L237
-	.even
-L240:
-	orw #24,a6@(-34)
-	jra L237
-	.even
-L241:
-	movel _dpm,a0
-	movew _ins,a0@(352)
-	movel _dpm,a0
-	movew #-6,a0@(362)
-	jra L201
-	.even
-L237:
-	movel a6@(-4),a0
-	movel a6@(-4),a1
-	movew a1@(4),d3
-	andw #65532,d3
-	movew d3,a0@(4)
-	movel a6@(-4),a0
-	movel a6@(-4),a1
-	movel a6@(-48),a2
-	movew a1@(4),d4
-	orw a2@(6),d4
-	movew d4,a0@(4)
-	movel a6@(-4),a0
-	movew a6@(-34),a0@(12)
-L236:
-	movel a6@(-4),a0
-	movel a6@(-48),a1
-	movew a1@(4),a3
-	addqw #1,a3
-	movew a3,a0@(6)
-L234:
-L232:
-	subql #1,a6@(-28)
-	moveq #32,d3
-	addl d3,a6@(-4)
+	clrl %d0
+	movew _ins,%d0
+	movel %d0,%d1
+	asll #2,%d1
+	lea _act,%a0
+	movel %a0@(%d1:l),%a6@(-4)
+.L230:
+	tstl %a6@(-28)
+	jgt .L233
+	jra .L231
+.L233:
+	movel %a6@(-4),%a0
+	movew %a0@(12),%d0
+	andw #1,%d0
+	tstw %d0
+	jeq .L232
+	movel %a6@(-48),%a0
+	cmpw #65535,%a0@(4)
+	jne .L235
+	movel _dpm,%a0
+	movew _ins,%a0@(352)
+	movel _dpm,%a0
+	movew #-5,%a0@(362)
+	jra .L201
+.L235:
+	movel %a6@(-48),%a0
+	tstw %a0@(6)
+	jeq .L236
+	movel %a6@(-4),%a0
+	movew %a0@(12),%d3
+	andw #65511,%d3
+	movew %d3,%a6@(-34)
+	movel %a6@(-48),%a0
+	movel %a6@(-48),%a1
+	movew %a1@(6),%d0
+	andw #3,%d0
+	movew %d0,%d1
+	movew %d1,%a0@(6)
+	clrl %d0
+	movew %d1,%d0
+	moveq #2,%d4
+	cmpl %d0,%d4
+	jeq .L239
+	moveq #2,%d3
+	cmpl %d0,%d3
+	jlt .L243
+	tstl %d0
+	jeq .L238
+	jra .L241
+.L243:
+	moveq #3,%d4
+	cmpl %d0,%d4
+	jeq .L240
+	jra .L241
+.L238:
+	jra .L237
+.L239:
+	orw #16,%a6@(-34)
+	jra .L237
+.L240:
+	orw #24,%a6@(-34)
+	jra .L237
+.L241:
+	movel _dpm,%a0
+	movew _ins,%a0@(352)
+	movel _dpm,%a0
+	movew #-6,%a0@(362)
+	jra .L201
+.L237:
+	movel %a6@(-4),%a0
+	movel %a6@(-4),%a1
+	movew %a1@(4),%d3
+	andw #65532,%d3
+	movew %d3,%a0@(4)
+	movel %a6@(-4),%a0
+	movel %a6@(-4),%a1
+	movel %a6@(-48),%a2
+	movew %a1@(4),%d4
+	orw %a2@(6),%d4
+	movew %d4,%a0@(4)
+	movel %a6@(-4),%a0
+	movew %a6@(-34),%a0@(12)
+.L236:
+	movel %a6@(-4),%a0
+	movel %a6@(-48),%a1
+	movew %a1@(4),%a3
+	addqw #1,%a3
+	movew %a3,%a0@(6)
+.L234:
+.L232:
+	subql #1,%a6@(-28)
+	moveq #32,%d3
+	addl %d3,%a6@(-4)
 	addqw #1,_ins
-	jra L230
-	.even
-L231:
-	movel a6@(-48),a0
-	movew _ins,a0@
-	jra L143
-	.even
-L244:
-	movel _dpm,d4
-	addl #696,d4
-	movel d4,a6@(-48)
-	movel a6@(-48),a0
-	movew a0@,d3
-	andw #255,d3
-	movew d3,_ins
-	movel a6@(-48),a0
-	clrl d0
-	movew a0@(2),d0
-	movel d0,a6@(-28)
-	clrl d0
-	movew _ins,d0
-	addl a6@(-28),d0
-	cmpl #256,d0
-	jle L245
-	clrl d0
-	movew _ins,d0
-	movel #256,d4
-	subl d0,d4
-	movel d4,a6@(-28)
-L245:
+	jra .L230
+.L231:
+	movel %a6@(-48),%a0
+	movew _ins,%a0@
+	jra .L143
+.L244:
+	movel _dpm,%d4
+	addl #696,%d4
+	movel %d4,%a6@(-48)
+	movel %a6@(-48),%a0
+	movew %a0@,%d3
+	andw #255,%d3
+	movew %d3,_ins
+	movel %a6@(-48),%a0
+	clrl %d0
+	movew %a0@(2),%d0
+	movel %d0,%a6@(-28)
+	clrl %d0
+	movew _ins,%d0
+	addl %a6@(-28),%d0
+	cmpl #256,%d0
+	jle .L245
+	clrl %d0
+	movew _ins,%d0
+	movel #256,%d4
+	subl %d0,%d4
+	movel %d4,%a6@(-28)
+.L245:
 	nop
-	clrl d0
-	movew _ins,d0
-	movel d0,d1
-	lsll #2,d1
-	lea _act,a0
-	movel a0@(d1:l),a6@(-4)
-L246:
-	tstl a6@(-28)
-	jgt L249
-	jra L247
-	.even
-L249:
-	movel a6@(-48),a0
-	clrl d0
-	movew a0@(4),d0
-	moveq #5,d3
-	cmpl d0,d3
-	jcs L248
-	movel d0,d1
-	addl d1,d1
-	movel #L263,a0
-	movew a0@(d1:l),d0
-	jmp pc@(2,d0:w)
-L263:
-	.word L257-L263
-	.word L251-L263
-	.word L261-L263
-	.word L262-L263
-	.word L260-L263
-	.word L254-L263
-	.even
-L251:
-	movel a6@(-4),a0
-	movew a0@(4),d1
-	movew d1,d0
-	lsrw #3,d0
-	movew d0,d1
-	andw #3,d1
-	tstw d1
-	jeq L254
-	jra L253
-	.even
-L252:
-L254:
-	movel a6@(-4),a0
-	movel a0@,_ins+2
-	movel a6@(-4),a0
-	movew a0@(12),d0
-	andw #1,d0
-	tstw d0
-	jeq L255
-	movew #255,d0
-	jra L256
-	.even
-L255:
-	clrw d0
-L256:
-	movew d0,_ins+6
+	clrl %d0
+	movew _ins,%d0
+	movel %d0,%d1
+	asll #2,%d1
+	lea _act,%a0
+	movel %a0@(%d1:l),%a6@(-4)
+.L246:
+	tstl %a6@(-28)
+	jgt .L249
+	jra .L247
+.L249:
+	movel %a6@(-48),%a0
+	clrl %d0
+	movew %a0@(4),%d0
+	moveq #5,%d3
+	cmpl %d0,%d3
+	jcs .L248
+	movel %d0,%d1
+	asll #2,%d1
+	movel #.L263,%a0
+	movel %a0@(%d1:l),%a1
+	jmp %a1@
+	.balign 2
+	.balign 2
+.L263:
+	.long .L257
+	.long .L251
+	.long .L261
+	.long .L262
+	.long .L260
+	.long .L254
+.L251:
+	movel %a6@(-4),%a0
+	movew %a0@(4),%d1
+	movew %d1,%d0
+	lsrw #3,%d0
+	movew %d0,%d1
+	andw #3,%d1
+	tstw %d1
+	jeq .L254
+	jra .L253
+.L252:
+.L254:
+	movel %a6@(-4),%a0
+	movel %a0@,_ins+2
+	movel %a6@(-4),%a0
+	movew %a0@(12),%d0
+	andw #1,%d0
+	tstw %d0
+	jeq .L255
+	movew #255,%d0
+	jra .L256
+.L255:
+	clrw %d0
+.L256:
+	movew %d0,_ins+6
 #APP
 	trap #1
 #NO_APP
-L253:
-	movel a6@(-4),a0
-	movel a6@(-4),a1
-	moveb a1@(15),d4
-	orb #1,d4
-	moveb d4,a0@(15)
-	movel a6@(-4),a0
-	movel a6@(-4),a1
-	movew a1@(4),d3
-	andw #65531,d3
-	movew d3,a0@(4)
-	jra L248
-	.even
-L257:
-	movel a6@(-4),a0
-	movew a0@(4),d1
-	movew d1,d0
-	lsrw #3,d0
-	movew d0,d1
-	andw #3,d1
-	tstw d1
-	jeq L260
-	jra L259
-	.even
-L258:
-L260:
+.L253:
+	movel %a6@(-4),%a0
+	movel %a6@(-4),%a1
+	moveb %a1@(15),%d4
+	orb #1,%d4
+	moveb %d4,%a0@(15)
+	movel %a6@(-4),%a0
+	movel %a6@(-4),%a1
+	movew %a1@(4),%d3
+	andw #65531,%d3
+	movew %d3,%a0@(4)
+	jra .L248
+.L257:
+	movel %a6@(-4),%a0
+	movew %a0@(4),%d1
+	movew %d1,%d0
+	lsrw #3,%d0
+	movew %d0,%d1
+	andw #3,%d1
+	tstw %d1
+	jeq .L260
+	jra .L259
+.L258:
+.L260:
 	clrl _ins+2
 	clrw _ins+6
 #APP
 	trap #1
 #NO_APP
-L259:
-	movel a6@(-4),a0
-	movel a6@(-4),a1
-	moveb a1@(15),d4
-	andb #254,d4
-	moveb d4,a0@(15)
-	movel a6@(-4),a0
-	movel a6@(-4),a1
-	movew a1@(4),d3
-	orw #4,d3
-	movew d3,a0@(4)
-	jra L248
-	.even
-L261:
-	movel a6@(-4),a0
-	movel a6@(-4),a1
-	movew a1@(12),d4
-	orw #4,d4
-	movew d4,a0@(12)
-	movel a6@(-4),a0
-	movel a6@(-4),a1
-	movew a1@(4),d3
-	orw #32768,d3
-	movew d3,a0@(4)
-	jra L248
-	.even
-L262:
-	movel a6@(-4),a0
-	movel a6@(-4),a1
-	movew a1@(12),d4
-	andw #65531,d4
-	movew d4,a0@(12)
-	movel a6@(-4),a0
-	movel a6@(-4),a1
-	movew a1@(4),d3
-	andw #32767,d3
-	movew d3,a0@(4)
-	jra L248
-	.even
-L264:
-L250:
-L248:
-	subql #1,a6@(-28)
-	moveq #32,d4
-	addl d4,a6@(-4)
+.L259:
+	movel %a6@(-4),%a0
+	movel %a6@(-4),%a1
+	moveb %a1@(15),%d4
+	andb #254,%d4
+	moveb %d4,%a0@(15)
+	movel %a6@(-4),%a0
+	movel %a6@(-4),%a1
+	movew %a1@(4),%d3
+	orw #4,%d3
+	movew %d3,%a0@(4)
+	jra .L248
+.L261:
+	movel %a6@(-4),%a0
+	movel %a6@(-4),%a1
+	movew %a1@(12),%d4
+	orw #4,%d4
+	movew %d4,%a0@(12)
+	movel %a6@(-4),%a0
+	movel %a6@(-4),%a1
+	movew %a1@(4),%d3
+	orw #32768,%d3
+	movew %d3,%a0@(4)
+	jra .L248
+.L262:
+	movel %a6@(-4),%a0
+	movel %a6@(-4),%a1
+	movew %a1@(12),%d4
+	andw #65531,%d4
+	movew %d4,%a0@(12)
+	movel %a6@(-4),%a0
+	movel %a6@(-4),%a1
+	movew %a1@(4),%d3
+	andw #32767,%d3
+	movew %d3,%a0@(4)
+	jra .L248
+.L264:
+.L250:
+.L248:
+	subql #1,%a6@(-28)
+	moveq #32,%d4
+	addl %d4,%a6@(-4)
 	addqw #1,_ins
-	jra L246
-	.even
-L247:
-	jra L143
-	.even
-L265:
-	movel _xlx,a0
-	movew a0@(36),d0
-	movew d0,a3
-	movel a3,a6@(-24)
-	movel _xlx,a0
-	clrw a0@(36)
-	movel _xlx,a0
-	movel _dpm,a1
-	movew a1@(366),a0@(32)
-	jra L143
-	.even
-L266:
-	movel _dpm,a0
-	movew #-1,a0@(362)
-	jra L201
-	.even
-L143:
-	movel _dpm,a0
-	clrw a0@(362)
-L201:
-	movel _dpm,a0
-	clrw a0@(360)
-	movel _dpm,a0
-	movew a0@(354),d1
-	movew d1,d0
-	andw #1,d0
-	tstw d0
-	jeq L268
+	jra .L246
+.L247:
+	jra .L143
+.L265:
+	movel _xlx,%a0
+	movew %a0@(36),%d0
+	movew %d0,%a3
+	movel %a3,%a6@(-24)
+	movel _xlx,%a0
+	clrw %a0@(36)
+	movel _xlx,%a0
+	movel _dpm,%a1
+	movew %a1@(366),%a0@(32)
+	jra .L143
+.L266:
+	movel _dpm,%a0
+	movew #-1,%a0@(362)
+	jra .L201
+.L143:
+	movel _dpm,%a0
+	clrw %a0@(362)
+.L201:
+	movel _dpm,%a0
+	clrw %a0@(360)
+	movel _dpm,%a0
+	movew %a0@(354),%d1
+	movew %d1,%d0
+	andw #1,%d0
+	tstw %d0
+	jeq .L268
 	orw #2048,_eprog+2
-	movel _dpm,a0
-	movel _dpm,a1
-	movew a1@(374),d0
-	movew d0,d1
-	orw _eprog+2,d1
-	movew d1,a0@(374)
-	movel _dpm,a0
-	movel _dpm,a1
-	movew a1@(364),d0
-	movew d0,d1
-	orw #2,d1
-	movew d1,a0@(364)
-L268:
+	movel _dpm,%a0
+	movel _dpm,%a1
+	movew %a1@(374),%d0
+	movew %d0,%d1
+	orw _eprog+2,%d1
+	movew %d1,%a0@(374)
+	movel _dpm,%a0
+	movel _dpm,%a1
+	movew %a1@(364),%d0
+	movew %d0,%d1
+	orw #2,%d1
+	movew %d1,%a0@(364)
+.L268:
 	orw #1,_eprog
-L140:
-	jra L138
-	.even
-L139:
-L137:
-	moveml a6@(-76),#0xc1c
-	unlk a6
+.L140:
+	jra .L138
+.L139:
+.L137:
+	moveml %a6@(-60),#0xc10
+	unlk %a6
 	rts
-	.even
-.globl _dummyIsrEtc
+	.balign 2
+	.globl _dummyIsrEtc
 _dummyIsrEtc:
-	link a6,#0
+	link %a6,#0
 #APP
 	 .text
 	 .globl _SetIntSourceMask
@@ -4111,18 +3904,18 @@ _SetIntSourceMask:
        
 #NO_APP
 	tstw _eprog
-	jeq L270
-	movel _dpm,a0
-	movew a0@(354),d1
-	tstw d1
-	jne L270
-	movel _dpm,a0
-	movew _eprog,a0@(354)
+	jeq .L270
+	movel _dpm,%a0
+	movew %a0@(354),%d1
+	tstw %d1
+	jne .L270
+	movel _dpm,%a0
+	movew _eprog,%a0@(354)
 	clrw _eprog
-	movel _dpm,a0
-	lea a0@(2044),a0
-	movew #1,a0@
-L270:
+	movel _dpm,%a0
+	addw #2044,%a0
+	movew #1,%a0@
+.L270:
 #APP
 	  moveml  _regic,a2/a3
 	   rte 
@@ -4132,19 +3925,19 @@ _InsertToCam:
 	 moveml d4/a2/a3,_regic 
 	 oriw  #CamDATA_MODE,SimDataF1 
 #NO_APP
-	movel _cam,a0
-	movew _ins+2,a0@
-	movel _cam,a0
-	movew _ins+4,a0@
-	movel _cam,a0
-	movew _ins+6,a0@
+	movel _cam,%a0
+	movew _ins+2,%a0@
+	movel _cam,%a0
+	movew _ins+4,%a0@
+	movel _cam,%a0
+	movew _ins+6,%a0@
 #APP
 	 andiw #CamCOMMAND_MODE,SimDataF1 
 #NO_APP
-	movel _cam,a0
-	movew _ins,d1
-	orw #57344,d1
-	movew d1,a0@
+	movel _cam,%a0
+	movew _ins,%d1
+	orw #57344,%d1
+	movew %d1,%a0@
 #APP
 	 moveml _regic,d4/a2/a3
 	 rte 
@@ -4292,10 +4085,10 @@ _Abort_Isr:
 JmpToMonitor: 
 	 movew #Tg8DISABLE_INTERRUPTS,SR 
 #NO_APP
-	movel _tpu,a0
-	clrw a0@(10)
-	movel _sim,a0
-	clrw a0@(32)
+	movel _tpu,%a0
+	clrw %a0@(10)
+	movel _sim,%a0
+	clrw %a0@(32)
 #APP
 	
          movel #0x6e12a,a0  /* and start the 332 BUG */
@@ -4330,14 +4123,14 @@ _Dsc_Isr:  rte
   stop  #Tg8DISABLE_INTERRUPTS
   rte
 #NO_APP
-L269:
-	unlk a6
+.L269:
+	unlk %a6
 	rts
-	.even
-.globl _dummyIsr
+	.balign 2
+	.globl _dummyIsr
 _dummyIsr:
-	link a6,#0
-	moveml #0x3e30,sp@-
+	link %a6,#0
+	moveml #0xe30,%sp@-
 #APP
 	 .text
 	 .globl _Xr_Isr
@@ -4346,28 +4139,27 @@ _Xr_Isr:
 	  moveml  d0-d7/a0-a6,_xr_context
 #NO_APP
 	tstw _camBusy
-	jne L272
+	jne .L272
 	tstl _atQueue+12
-	jne L272
+	jne .L272
 	tstw _eprog+16
-	jeq L273
+	jeq .L273
 #APP
 	 movew   sp@,_imm_ccr    /* Save CCR */
                 movel   sp@(2),_imm_pc  /* Save PC */
 	        moveml  d0-d7/a0-a6,_imm_context /* Save registers */
 	      
 #NO_APP
-	jra L272
-	.even
-L273:
+	jra .L272
+.L273:
 #APP
 	 movew   sp@,_mbx_ccr    /* Save CCR */
                 movel   sp@(2),_mbx_pc  /* Save PC */
 	        moveml  d0-d7/a0-a6,_mbx_context /* Save registers */
 	      
 #NO_APP
-L274:
-L272:
+.L274:
+.L272:
 #APP
 	 movel  XWsscRframe1,d0       /* Read frame's word1 and word2 */
 	 rorw   #8,d0                 /* Unscramble incomming frame byte order */
@@ -4377,430 +4169,406 @@ L272:
 	 movew  d0,_timing_frame
        
 #NO_APP
-	clrw d0
-	moveb _timing_frame,d0
-	movew d0,_curhd
+	clrw %d0
+	moveb _timing_frame,%d0
+	movew %d0,_curhd
 	cmpw #1,_curhd
-	jne L275
+	jne .L275
 	movew _timing_frame+2,_curms
-	movew _curms,d6
-	subw _lstms,d6
-	movew d6,_incms
+	movew _curms,%d6
+	subw _lstms,%d6
+	movew %d6,_incms
 	cmpw #4,_incms
-	jls L276
+	jls .L276
 	cmpw #3,_curms
-	jhi L277
-	movew _curms,a3
-	addqw #1,a3
-	movew a3,_incms
+	jhi .L277
+	movew _curms,%a3
+	addqw #1,%a3
+	movew %a3,_incms
 	movew _curms,_lstms
-	jra L278
-	.even
-L277:
+	jra .L278
+.L277:
 	movew #1,_incms
 	addqw #1,_lstms
-	movew _lstms,d6
-	addqw #1,d6
-	movew d6,_curms
-L278:
-	jra L279
-	.even
-L276:
+	movew _lstms,%d6
+	addqw #1,%d6
+	movew %d6,_curms
+.L278:
+	jra .L279
+.L276:
 	movew _curms,_lstms
-L279:
-	movew _sscms,d6
-	cmpw _curms,d6
-	jcc L280
+.L279:
+	movew _sscms,%d6
+	cmpw _curms,%d6
+	jcc .L280
 	movew _curms,_sscms
-	jra L281
-	.even
-L280:
-	movew _incms,d6
-	addw d6,_sscms
-L281:
-	movel _dpm,a0
-	clrl d0
-	movew _sscms,d0
-	movel d0,a0@(340)
-	movel _dpm,a0
-	movel _timing_frame,a0@(332)
-	movel _dpm,a0
-	movel _dpm,a1
-	movew a1@(384),d0
-	movew d0,d1
-	addw _incms,d1
-	movew d1,a0@(384)
-	movel _xlx,a0
-	movew a0@(36),d2
-	moveb d2,_rcv_error
-	movew _rcv_error,d2
-	movel _dpm,a0
-	lea a0@(380),a0
-	movew d2,a0@
+	jra .L281
+.L280:
+	movew _incms,%d6
+	addw %d6,_sscms
+.L281:
+	movel _dpm,%a0
+	clrl %d0
+	movew _sscms,%d0
+	movel %d0,%a0@(340)
+	movel _dpm,%a0
+	movel _timing_frame,%a0@(332)
+	movel _dpm,%a0
+	movel _dpm,%a1
+	movew %a1@(384),%d0
+	movew %d0,%d1
+	addw _incms,%d1
+	movew %d1,%a0@(384)
+	movel _xlx,%a0
+	movew %a0@(36),%d4
+	moveb %d4,_rcv_error
+	movew _rcv_error,%d4
+	movel _dpm,%a0
+	addw #380,%a0
+	movew %d4,%a0@
 	tstl _atQueue+12
-	jeq L282
-	movel _dpm,a0
-	movel _dpm,a1
-	movew a1@(374),d0
-	movew d0,d1
-	orw #128,d1
-	movew d1,a0@(374)
-	movel _dpm,a0
-	movew _atQueue+14,a0@(410)
-	movel _dpm,a0
-	movel _dpm,a1
-	movel a1@(340),a0@(412)
-	movel _dpm,a0
-	movel _dpm,a1
-	movel a1@(344),a0@(416)
-	jra L283
-	.even
-L282:
-	movel _dpm,a0
-	clrw a0@(420)
-L283:
+	jeq .L282
+	movel _dpm,%a0
+	movel _dpm,%a1
+	movew %a1@(374),%d0
+	movew %d0,%d1
+	orw #128,%d1
+	movew %d1,%a0@(374)
+	movel _dpm,%a0
+	movew _atQueue+14,%a0@(410)
+	movel _dpm,%a0
+	movel _dpm,%a1
+	movel %a1@(340),%a0@(412)
+	movel _dpm,%a0
+	movel _dpm,%a1
+	movel %a1@(344),%a0@(416)
+	jra .L283
+.L282:
+	movel _dpm,%a0
+	clrw %a0@(420)
+.L283:
 	tstb _rcv_error
-	jeq L284
-	movel _xlx,a0
-	clrw a0@(36)
-	movel _clk+4,a0
-	movel _dpm,a1
-	movel a1@(332),a0@
-	movel _clk+4,a0
-	movel _dpm,a1
-	movel a1@(344),a0@(8)
-	movel _clk+4,a0
-	movel _dpm,a1
-	movel a1@(340),a0@(12)
-	movel _clk+4,a3
-	lea a3@(16),a0
-	movel _dpm,a1
-	lea a1@(380),a1
-	movel a1@,a0@
+	jeq .L284
+	movel _xlx,%a0
+	clrw %a0@(36)
+	movel _clk+4,%a0
+	movel _dpm,%a1
+	movel %a1@(332),%a0@
+	movel _clk+4,%a0
+	movel _dpm,%a1
+	movel %a1@(344),%a0@(8)
+	movel _clk+4,%a0
+	movel _dpm,%a1
+	movel %a1@(340),%a0@(12)
+	movel _clk+4,%a3
+	lea %a3@(16),%a0
+	movel _dpm,%a1
+	addw #380,%a1
+	movel %a1@,%a0@
 	addqw #1,_clk+2
 	cmpw #15,_clk+2
-	jle L285
+	jle .L285
 	clrw _clk+2
 	movel #_clk+8,_clk+4
-	jra L286
-	.even
-L285:
-	moveq #20,d6
-	addl d6,_clk+4
-L286:
-	movel _clk+4,a0
-	clrl a0@(4)
-L284:
+	jra .L286
+.L285:
+	moveq #20,%d6
+	addl %d6,_clk+4
+.L286:
+	movel _clk+4,%a0
+	clrl %a0@(4)
+.L284:
 	tstw _eprog+18
-	jeq L287
+	jeq .L287
 	movew #1,_doImm
-	jra L288
-	.even
-L287:
-	clrl d0
-	moveb _timing_frame+1,d0
-	movel #_in_use,d1
-	movel d1,a0
-	addl d0,a0
-	moveb a0@(1024),d0
-	andb #2,d0
-	tstb d0
-	jeq L289
-	jra L288
-	.even
-L289:
-	jra L290
-	.even
-L275:
-	movew _curhd,d0
-	andw #15,d0
-	cmpw #4,d0
-	jeq L292
-	movew _curhd,d0
-	andw #15,d0
-	cmpw #3,d0
-	jeq L292
-	jra L291
-	.even
-L292:
-	jra L290
-	.even
-L291:
+	jra .L288
+.L287:
+	clrl %d0
+	moveb _timing_frame+1,%d0
+	lea _in_use+1024,%a0
+	moveb %a0@(%d0:l),%d0
+	andb #2,%d0
+	tstb %d0
+	jeq .L289
+	jra .L288
+.L289:
+	jra .L290
+.L275:
+	movew _curhd,%d0
+	andw #15,%d0
+	cmpw #4,%d0
+	jeq .L292
+	movew _curhd,%d0
+	andw #15,%d0
+	cmpw #3,%d0
+	jeq .L292
+	jra .L291
+.L292:
+	jra .L290
+.L291:
 	cmpw #32,_curhd
-	jne L293
-	movew _sscms,d0
-	movew d0,d3
-	lsrw #4,d3
-	clrl d1
-	movew d3,d1
-	movel d1,d3
-	movel d3,d4
-	addl d4,d4
-	movel d4,d3
-	addl d1,d3
-	movel d3,d4
-	lsll #5,d4
-	movel d4,d5
-	addl d1,d5
-	movel d5,d3
-	lsll #3,d3
-	movel d5,d4
-	addl d3,d4
-	movel d4,d3
-	addl d1,d3
-	movel d3,d1
-	clrw d1
-	swap d1
-	movew d1,d3
-	movew d3,d4
-	lslw #2,d4
-	movew d4,d3
-	addw d1,d3
-	movew d3,d1
-	lslw #4,d1
-	movew d1,a3
-	subw d3,a3
-	movew a3,d3
-	movew d3,d1
-	lslw #4,d1
-	subw d1,d0
-	movew d0,_remms
+	jne .L293
+	movew _sscms,%d0
+	movew %d0,%d2
+	lsrw #4,%d2
+	clrl %d1
+	movew %d2,%d1
+	movel %d1,%d2
+	movel %d2,%d3
+	addl %d3,%d3
+	movel %d3,%d2
+	addl %d1,%d2
+	movel %d2,%d3
+	asll #5,%d3
+	movel %d3,%d5
+	addl %d1,%d5
+	movel %d5,%d2
+	asll #3,%d2
+	movel %d5,%d3
+	addl %d2,%d3
+	movel %d3,%d2
+	addl %d1,%d2
+	movel %d2,%d1
+	clrw %d1
+	swap %d1
+	movew %d1,%d2
+	movew %d2,%d3
+	aslw #2,%d3
+	movew %d3,%d2
+	addw %d1,%d2
+	movew %d2,%d1
+	aslw #4,%d1
+	movew %d1,%a3
+	subw %d2,%a3
+	movew %a3,%d2
+	movew %d2,%d1
+	aslw #4,%d1
+	subw %d1,%d0
+	movew %d0,_remms
 	tstw _remms
-	jeq L294
-	movew #1200,d6
-	subw _remms,d6
-	movew d6,_remms
-L294:
-	movew _remms,d6
-	addw d6,_sscms
-	movel _dpm,a0
-	clrl d0
-	movew _sscms,d0
-	movel d0,a0@(336)
-	movel _dpm,a0
-	clrl d0
-	movew _curms,d0
-	movel d0,a0@(340)
+	jeq .L294
+	movew #1200,%d6
+	subw _remms,%d6
+	movew %d6,_remms
+.L294:
+	movew _remms,%d6
+	addw %d6,_sscms
+	movel _dpm,%a0
+	clrl %d0
+	movew _sscms,%d0
+	movel %d0,%a0@(336)
+	movel _dpm,%a0
+	clrl %d0
+	movew _curms,%d0
+	movel %d0,%a0@(340)
 	movew _curms,_sscms
-	movel _dpm,a0
-	movel _dpm,a1
-	movew a1@(368),a0@(370)
-	movel _dpm,a0
-	clrw a0@(368)
-	movel _dpm,a0
-	clrl d0
-	moveb _timing_frame+1,d0
-	clrl d1
-	moveb _timing_frame+2,d1
-	lsll #8,d1
-	movel d0,a1
-	addl d1,a1
-	clrl d0
-	moveb _timing_frame+3,d0
-	swap d0
-	clrw d0
-	addl d0,a1
-	movel a1,a0@(344)
-	movel _dpm,d0
-	movel _dpm,a0
-	movel _dpm,a1
-	movel a1@(348),a2
-	lea a2@(1),a1
-	movel a1,a0@(348)
-L293:
-	movew _curhd,d0
-	andw #240,d0
-	cmpw #32,d0
-	jne L295
-	movel _dpm,a0
-	movel _timing_frame,a0@(328)
-	movel _dpm,d0
-	movel _dpm,a0
-	movel _dpm,a1
-	movew a1@(368),d0
-	movew d0,d1
-	addqw #1,d1
-	movew d1,a0@(368)
-	movel _hist+4,a0
-	movel _timing_frame,a0@
-	movel _hist+4,a0
-	movel _dpm,a1
-	movel a1@(344),a0@(4)
-	movel _hist+4,a0
-	movel _dpm,a1
-	movel a1@(340),a0@(8)
-	movel _hist+4,a3
-	lea a3@(12),a0
-	movel _dpm,a1
-	lea a1@(380),a1
-	movel a1@,a0@
+	movel _dpm,%a0
+	movel _dpm,%a1
+	movew %a1@(368),%a0@(370)
+	movel _dpm,%a0
+	clrw %a0@(368)
+	movel _dpm,%a0
+	clrl %d0
+	moveb _timing_frame+1,%d0
+	clrl %d1
+	moveb _timing_frame+2,%d1
+	asll #8,%d1
+	movel %d0,%a1
+	addl %d1,%a1
+	clrl %d0
+	moveb _timing_frame+3,%d0
+	swap %d0
+	clrw %d0
+	addl %d0,%a1
+	movel %a1,%a0@(344)
+	movel _dpm,%d0
+	movel _dpm,%a0
+	movel _dpm,%a1
+	movel %a1@(348),%a2
+	lea %a2@(1),%a1
+	movel %a1,%a0@(348)
+	movel %a0@(348),%d0
+.L293:
+	movew _curhd,%d0
+	andw #240,%d0
+	cmpw #32,%d0
+	jne .L295
+	movel _dpm,%a0
+	movel _timing_frame,%a0@(328)
+	movel _dpm,%d0
+	movel _dpm,%a0
+	movel _dpm,%a1
+	movew %a1@(368),%d0
+	movew %d0,%d1
+	addqw #1,%d1
+	movew %d1,%a0@(368)
+	movew %a0@(368),%d0
+	movel _hist+4,%a0
+	movel _timing_frame,%a0@
+	movel _hist+4,%a0
+	movel _dpm,%a1
+	movel %a1@(344),%a0@(4)
+	movel _hist+4,%a0
+	movel _dpm,%a1
+	movel %a1@(340),%a0@(8)
+	movel _hist+4,%a3
+	lea %a3@(12),%a0
+	movel _dpm,%a1
+	addw #380,%a1
+	movel %a1@,%a0@
 	addqw #1,_hist+2
 	cmpw #999,_hist+2
-	jle L296
+	jle .L296
 	clrw _hist+2
 	movel #_hist+8,_hist+4
-	jra L295
-	.even
-L296:
-	moveq #16,d6
-	addl d6,_hist+4
-L297:
-L295:
-	clrl d0
-	movew _curhd,d0
-	cmpl #181,d0
-	jeq L299
-	cmpl #182,d0
-	jeq L300
-	jra L301
-	.even
-L299:
-	clrl d0
-	movew _timing_frame+2,d0
-	movel d0,_utc
-	jra L298
-	.even
-L300:
-	clrl d0
-	movew _timing_frame+2,d0
-	swap d0
-	clrw d0
-	orl d0,_utc
+	jra .L295
+.L296:
+	moveq #16,%d6
+	addl %d6,_hist+4
+.L297:
+.L295:
+	clrl %d0
+	movew _curhd,%d0
+	cmpl #181,%d0
+	jeq .L299
+	cmpl #182,%d0
+	jeq .L300
+	jra .L301
+.L299:
+	clrl %d0
+	movew _timing_frame+2,%d0
+	movel %d0,_utc
+	jra .L298
+.L300:
+	clrl %d0
+	movew _timing_frame+2,%d0
+	swap %d0
+	clrw %d0
+	orl %d0,_utc
 	movel _utc,_utcl
 	jbsr _UtcToTime
 	clrl _utc
-	movel _dpm,a0
-	moveb a0@(381),_rcv_error+1
-	movel _dpm,a0
-	movel _dpm,a1
-	movew a1@(384),a0@(386)
-	movel _dpm,a0
-	clrw a0@(384)
-	jra L298
-	.even
-L301:
-	movew _curhd,d0
-	movew d0,d1
-	lsrw #4,d1
-	clrl d0
-	movew d1,d0
-	tstl d0
-	jeq L305
-	moveq #2,d6
-	cmpl d0,d6
-	jeq L303
-	jra L307
-	.even
-L303:
-	clrl d0
-	moveb _timing_frame+1,d0
-	lea _in_use,a0
-	moveb a0@(d0:l),d0
-	andb #4,d0
-	tstb d0
-	jne L304
-	jra L290
-	.even
-L304:
-	jra L302
-	.even
-L305:
-	clrl d0
-	moveb _timing_frame+1,d0
-	movel #_in_use,d1
-	movel d1,a0
-	addl d0,a0
-	moveb a0@(1024),d0
-	andb #1,d0
-	tstb d0
-	jeq L307
-	jra L302
-	.even
-L306:
-L307:
-	jra L302
-	.even
-L302:
-	jra L298
-	.even
-L298:
+	movel _dpm,%a0
+	moveb %a0@(381),_rcv_error+1
+	movel _dpm,%a0
+	movel _dpm,%a1
+	movew %a1@(384),%a0@(386)
+	movel _dpm,%a0
+	clrw %a0@(384)
+	jra .L298
+.L301:
+	movew _curhd,%d0
+	movew %d0,%d1
+	lsrw #4,%d1
+	clrl %d0
+	movew %d1,%d0
+	tstl %d0
+	jeq .L305
+	moveq #2,%d6
+	cmpl %d0,%d6
+	jeq .L303
+	jra .L307
+.L303:
+	clrl %d0
+	moveb _timing_frame+1,%d0
+	lea _in_use,%a0
+	moveb %a0@(%d0:l),%d0
+	andb #4,%d0
+	tstb %d0
+	jne .L304
+	jra .L290
+.L304:
+	jra .L302
+.L305:
+	clrl %d0
+	moveb _timing_frame+1,%d0
+	lea _in_use+1024,%a0
+	moveb %a0@(%d0:l),%d0
+	andb #1,%d0
+	tstb %d0
+	jeq .L307
+	jra .L302
+.L306:
+.L307:
+	jra .L302
+.L302:
+	jra .L298
+.L298:
 	nop
-L288:
-	moveq #3,d6
-	cmpl _atQueue+12,d6
-	jge L310
-	movel _dpm,a0
-	movel _dpm,a1
-	movew a1@(374),d0
-	movew d0,d1
-	orw #16,d1
-	movew d1,a0@(374)
-	moveq #31,d6
-	cmpl _atQueue+12,d6
-	jge L310
-	movel _dpm,a0
-	movel _dpm,a1
-	movew a1@(374),d0
-	movew d0,d1
-	orw #8,d1
-	movew d1,a0@(374)
-	jra L290
-	.even
-L311:
-L310:
-	movel _dpm,d0
-	movel _atQueue+12,d1
-	movel d1,d3
-	movel d3,d1
-	lsll #2,d1
-	movel d0,a0
-	addl d1,a0
-	movel _timing_frame,a0@(424)
+.L288:
+	moveq #3,%d6
+	cmpl _atQueue+12,%d6
+	jge .L310
+	movel _dpm,%a0
+	movel _dpm,%a1
+	movew %a1@(374),%d0
+	movew %d0,%d1
+	orw #16,%d1
+	movew %d1,%a0@(374)
+	moveq #31,%d6
+	cmpl _atQueue+12,%d6
+	jge .L310
+	movel _dpm,%a0
+	movel _dpm,%a1
+	movew %a1@(374),%d0
+	movew %d0,%d1
+	orw #8,%d1
+	movew %d1,%a0@(374)
+	jra .L290
+.L311:
+.L310:
+	movel _dpm,%d0
+	movel _atQueue+12,%d1
+	movel %d1,%d2
+	movel %d2,%d1
+	asll #2,%d1
+	movel %d1,%a0
+	addl %d0,%a0
+	movel _timing_frame,%a0@(424)
 	addql #1,_atQueue+12
-	movel _atQueue+4,a0
-	movel _timing_frame,a0@
+	movel _atQueue+4,%a0
+	movel _timing_frame,%a0@
 	addql #4,_atQueue+4
-	moveq #31,d6
-	cmpl _immQueue+12,d6
-	jge L312
-	movel _dpm,a0
-	movel _dpm,a1
-	movew a1@(374),d0
-	movew d0,d1
-	orw #1024,d1
-	movew d1,a0@(374)
-	jra L313
-	.even
-L312:
+	moveq #31,%d6
+	cmpl _immQueue+12,%d6
+	jge .L312
+	movel _dpm,%a0
+	movel _dpm,%a1
+	movew %a1@(374),%d0
+	movew %d0,%d1
+	orw #1024,%d1
+	movew %d1,%a0@(374)
+	jra .L313
+.L312:
 	addql #1,_immQueue+12
-	movel _immQueue+4,a0
-	movel _timing_frame,a0@
+	movel _immQueue+4,%a0
+	movel _timing_frame,%a0@
 	addql #4,_immQueue+4
-L313:
-	movel _dpm,a0
-	movew _atQueue+14,a0@(406)
-	movel _dpm,a0
-	movew a0@(408),d0
-	clrl d1
-	movew d0,d1
-	cmpl _atQueue+12,d1
-	jge L314
-	movel _dpm,a0
-	movew _atQueue+14,a0@(408)
-L314:
-	moveq #1,d6
-	cmpl _atQueue+12,d6
-	jne L315
+.L313:
+	movel _dpm,%a0
+	movew _atQueue+14,%a0@(406)
+	movel _dpm,%a0
+	movew %a0@(408),%d0
+	clrl %d1
+	movew %d0,%d1
+	cmpl _atQueue+12,%d1
+	jge .L314
+	movel _dpm,%a0
+	movew _atQueue+14,%a0@(408)
+.L314:
+	moveq #1,%d6
+	cmpl _atQueue+12,%d6
+	jne .L315
 	tstw _camBusy
-	jne L315
+	jne .L315
 #APP
 	
       movel  #_AtProcess,sp@(2)
       rte 
 #NO_APP
-L315:
+.L315:
 	nop
-L290:
+.L290:
 #APP
 	
    moveml  _xr_context,d0-d7/a0-a6
@@ -4820,26 +4588,26 @@ _AtCompletion:
 #NO_APP
 	subql #1,_atQueue+12
 	tstl _atQueue+12
-	jne L316
-	movel #_atQueue+16,d0
-	movel d0,_atQueue
-	movel d0,_atQueue+4
+	jne .L316
+	movel #_atQueue+16,%d0
+	movel %d0,_atQueue
+	movel %d0,_atQueue+4
 	tstw _eprog+16
-	jeq L317
+	jeq .L317
 #APP
 	 movew  _imm_ccr,sp@
 		        movel  _imm_pc,sp@(2)
 		        moveml _imm_context,d0-d7/a0-a6
 		        rte
 #NO_APP
-L317:
+.L317:
 #APP
 	
          movew  #1,_eprog+ImmRun
          movel  #_ImmProcess,sp@(2) /* Serve the next entry in the IMM queue */
 	 rte
 #NO_APP
-L316:
+.L316:
 	addql #4,_atQueue
 #APP
 	 movel  #_AtProcess,sp@(2)
@@ -4847,45 +4615,36 @@ L316:
 	.globl _AtProcess
 _AtProcess: 
 #NO_APP
-L318:
-	movel _atQueue,a0
-	movel a0@,_eprog+4
+.L318:
+	movel _atQueue,%a0
+	movel %a0@,_eprog+4
 	cmpb #1,_eprog+4
-	jeq L319
-	clrl d0
-	moveb _eprog+5,d0
-	movel #_in_use,d1
-	movel d1,a0
-	addl d0,a0
-	clrl d0
-	moveb _eprog+4,d0
-	movel #_in_use,d1
-	movel d1,a1
-	addl d0,a1
-	moveb a0@(512),d0
-	andb a1@(256),d0
-	clrw d1
-	moveb d0,d1
-	movew d1,_eprog+12
-	jra L320
-	.even
-L319:
-	clrl d0
-	moveb _eprog+5,d0
-	movel #_in_use,d1
-	movel d1,a0
-	addl d0,a0
-	clrl d0
-	moveb _eprog+4,d0
-	movel #_in_use,d1
-	movel d1,a1
-	addl d0,a1
-	moveb a0@(1296),d0
-	andb a1@(1280),d0
-	clrw d1
-	moveb d0,d1
-	movew d1,_eprog+12
-L320:
+	jeq .L319
+	clrl %d0
+	moveb _eprog+5,%d0
+	lea _in_use+512,%a0
+	clrl %d1
+	moveb _eprog+4,%d1
+	lea _in_use+256,%a1
+	moveb %a0@(%d0:l),%d0
+	andb %a1@(%d1:l),%d0
+	clrw %d1
+	moveb %d0,%d1
+	movew %d1,_eprog+12
+	jra .L320
+.L319:
+	clrl %d0
+	moveb _eprog+5,%d0
+	lea _in_use+1296,%a0
+	clrl %d1
+	moveb _eprog+4,%d1
+	lea _in_use+1280,%a1
+	moveb %a0@(%d0:l),%d0
+	andb %a1@(%d1:l),%d0
+	clrw %d1
+	moveb %d0,%d1
+	movew %d1,_eprog+12
+.L320:
 #APP
 	
    /* For each wild card combination present scan the CAM */
@@ -4955,227 +4714,211 @@ L320:
 
 5: 
 #NO_APP
-	movel _dpm,d0
-	movel _dpm,a0
-	movel _dpm,a1
-	movew a1@(420),d0
-	movew d0,d1
-	addqw #1,d1
-	movew d1,a0@(420)
-	movel _dpm,d0
-	movel _dpm,a0
-	movel _dpm,a1
-	movew a1@(406),d0
-	movew d0,d1
-	subqw #1,d1
-	movew d1,a0@(406)
-	moveq #1,d6
-	cmpl _atQueue+12,d6
-	jge L321
+	movel _dpm,%d0
+	movel _dpm,%a0
+	movel _dpm,%a1
+	movew %a1@(420),%d0
+	movew %d0,%d1
+	addqw #1,%d1
+	movew %d1,%a0@(420)
+	movew %a0@(420),%d0
+	movel _dpm,%d1
+	movel _dpm,%a0
+	movel _dpm,%a1
+	movew %a1@(406),%d0
+	movew %d0,%d1
+	subqw #1,%d1
+	movew %d1,%a0@(406)
+	movew %a0@(406),%d0
+	moveq #1,%d6
+	cmpl _atQueue+12,%d6
+	jge .L321
 	subql #1,_atQueue+12
 	addql #4,_atQueue
-	jra L318
-	.even
-L321:
+	jra .L318
+.L321:
 #APP
 	 trap #0 
 #NO_APP
-L271:
-	moveml a6@(-28),#0xc7c
-	unlk a6
+.L271:
+	moveml %a6@(-20),#0xc70
+	unlk %a6
 	rts
-	.even
-.globl _StartActions
+	.balign 2
+	.globl _StartActions
 _StartActions:
-	link a6,#-40
-	movel a2,sp@-
-	movel d2,sp@-
+	link %a6,#-40
+	movel %a3,%sp@-
+	movel %a2,%sp@-
 	nop
-	movel #_match+8,a6@(-28)
-L323:
-	movel a6@(-28),d2
-	cmpl _match,d2
-	jne L326
-	jra L324
-	.even
-L326:
-	movel a6@(-28),a0
-	clrw d0
-	moveb a0@,d0
-	movew d0,a6@(-30)
-	movew a6@(-30),a0
-	movel a0,d0
-	movel d0,d1
-	lsll #2,d1
-	lea _act,a0
-	movel a0@(d1:l),a6@(-4)
-	movel a6@(-4),a0
-	moveb a0@(15),d0
-	andb #1,d0
-	tstb d0
-	jne L327
-	jra L325
-	.even
-L327:
-	movel a6@(-4),a0
-	clrw d0
-	moveb a0@(14),d0
-	movew d0,a6@(-32)
-	movel _xlx,a0
-	movew a6@(-32),a1
-	movel a1,d0
-	movel d0,d1
-	addl d1,d1
-	movel a6@(-4),a1
-	movew a1@(6),a0@(d1:l)
-	movel _xlx,a0
-	movew a6@(-32),a1
-	movel a1,d0
-	movel d0,d1
-	addl d1,d1
-	movel a6@(-4),a1
-	movew a1@(12),a0@(16,d1:l)
-	moveq #20,d1
-	movew a6@(-32),d0
-	muls d1,d0
-	movel d0,d1
-	addql #8,d1
-	movel _dpm,a2
-	addl d1,a2
-	movel a2,a6@(-12)
-	movew a6@(-32),a0
-	movel a0,d0
-	movel d0,d1
-	lsll #2,d1
-	movel #_eprog,d0
-	movel d0,a0
-	addl d1,a0
-	movel a6@(-12),a0@(182)
-	movew a6@(-32),a0
-	movel a0,d0
-	movel d0,d1
-	lsll #2,d1
-	movel #_eprog,d0
-	movel d0,a0
-	addl d1,a0
-	moveq #16,d2
-	addl a6@(-4),d2
-	movel d2,a0@(214)
-	movel a6@(-4),a0
-	movel _dpm,a1
-	movel a1@(344),a0@(16)
-	movel a6@(-4),a0
-	movel _dpm,a1
-	movel a1@(340),a0@(20)
-	movel a6@(-4),a0
-	moveq #-1,d2
-	movel d2,a0@(24)
-	movel a6@(-4),a0
-	addqw #1,a0@(28)
-	movel a6@(-12),a2
-	lea a2@(16),a0
-	movew a0@,a6@(-16)
-	movel a6@(-12),a2
-	lea a2@(18),a0
-	movew a0@,a6@(-14)
-	movel a6@(-12),a0
-	moveq #-1,d2
-	cmpl a0@(12),d2
-	jne L328
+	movel #_match+8,%a6@(-28)
+.L323:
+	movel %a6@(-28),%d2
+	cmpl _match,%d2
+	jne .L326
+	jra .L324
+.L326:
+	movel %a6@(-28),%a0
+	clrw %d0
+	moveb %a0@,%d0
+	movew %d0,%a6@(-30)
+	movew %a6@(-30),%a0
+	movel %a0,%d0
+	movel %d0,%d1
+	asll #2,%d1
+	lea _act,%a0
+	movel %a0@(%d1:l),%a6@(-4)
+	movel %a6@(-4),%a0
+	moveb %a0@(15),%d0
+	andb #1,%d0
+	tstb %d0
+	jne .L327
+	jra .L325
+.L327:
+	movel %a6@(-4),%a0
+	clrw %d0
+	moveb %a0@(14),%d0
+	movew %d0,%a6@(-32)
+	movel _xlx,%a0
+	movew %a6@(-32),%a1
+	movel %a6@(-4),%a2
+	movew %a2@(6),%a0@(%a1:l:2)
+	movel _xlx,%a0
+	movew %a6@(-32),%a1
+	movel %a6@(-4),%a2
+	movew %a2@(12),%a0@(16,%a1:l:2)
+	moveq #20,%d1
+	movew %a6@(-32),%d0
+	muls %d1,%d0
+	movel %d0,%d1
+	addql #8,%d1
+	movel _dpm,%a3
+	addl %d1,%a3
+	movel %a3,%a6@(-12)
+	movew %a6@(-32),%a0
+	movel %a0,%d0
+	movel %d0,%d1
+	asll #2,%d1
+	lea _eprog+182,%a0
+	movel %a6@(-12),%a0@(%d1:l)
+	movew %a6@(-32),%a0
+	movel %a0,%d0
+	movel %d0,%d1
+	asll #2,%d1
+	lea _eprog+214,%a0
+	moveq #16,%d2
+	addl %a6@(-4),%d2
+	movel %d2,%a0@(%d1:l)
+	movel %a6@(-4),%a0
+	movel _dpm,%a1
+	movel %a1@(344),%a0@(16)
+	movel %a6@(-4),%a0
+	movel _dpm,%a1
+	movel %a1@(340),%a0@(20)
+	movel %a6@(-4),%a0
+	moveq #-1,%d2
+	movel %d2,%a0@(24)
+	movel %a6@(-4),%a0
+	addqw #1,%a0@(28)
+	movel %a6@(-12),%a3
+	lea %a3@(16),%a0
+	movew %a0@,%a6@(-16)
+	movel %a6@(-12),%a3
+	lea %a3@(18),%a0
+	movew %a0@,%a6@(-14)
+	movel %a6@(-12),%a0
+	moveq #-1,%d2
+	cmpl %a0@(12),%d2
+	jne .L328
 	orw #4,_eprog+2
-	movel _dpm,a0
-	movel _dpm,a1
-	movew a1@(374),d0
-	movew d0,d1
-	orw _eprog+2,d1
-	movew d1,a0@(374)
-	movel _dpm,a0
-	movel _dpm,a1
-	movew a1@(364),d0
-	movew d0,d1
-	orw #2,d1
-	movew d1,a0@(364)
-L328:
-	tstb a6@(-13)
-	jeq L329
-	movel a6@(-4),a0
-	movew a0@(12),d0
-	andw #4,d0
-	tstw d0
-	jeq L329
-	movew a6@(-32),a0
-	movel a0,d0
-	movel d0,d1
-	lsll #2,d1
-	movel #_eprog,d0
-	movel d0,a0
-	addl d1,a0
-	movel #_sim_int,a0@(182)
-	movel a6@(-4),a0
-	moveb a6@(-14),a0@(31)
-	movel a6@(-4),a0
-	addqb #1,a0@(30)
+	movel _dpm,%a0
+	movel _dpm,%a1
+	movew %a1@(374),%d0
+	movew %d0,%d1
+	orw _eprog+2,%d1
+	movew %d1,%a0@(374)
+	movel _dpm,%a0
+	movel _dpm,%a1
+	movew %a1@(364),%d0
+	movew %d0,%d1
+	orw #2,%d1
+	movew %d1,%a0@(364)
+.L328:
+	tstb %a6@(-13)
+	jeq .L329
+	movel %a6@(-4),%a0
+	movew %a0@(12),%d0
+	andw #4,%d0
+	tstw %d0
+	jeq .L329
+	movew %a6@(-32),%a0
+	movel %a0,%d0
+	movel %d0,%d1
+	asll #2,%d1
+	lea _eprog+182,%a0
+	movel #_sim_int,%a0@(%d1:l)
+	movel %a6@(-4),%a0
+	moveb %a6@(-14),%a0@(31)
+	movel %a6@(-4),%a0
+	addqb #1,%a0@(30)
 	orw #16384,_eprog+2
-	movel _dpm,a0
-	movel _dpm,a1
-	movew a1@(374),d0
-	movew d0,d1
-	orw _eprog+2,d1
-	movew d1,a0@(374)
-	movel _dpm,a0
-	movel _dpm,a1
-	movew a1@(364),d0
-	movew d0,d1
-	orw #2,d1
-	movew d1,a0@(364)
-	jra L325
-	.even
-L329:
-	movel a6@(-12),a0
-	movel _atQueue,a1
-	movel a1@,a0@
-	movel a6@(-12),a0
-	movel _dpm,a1
-	movel a1@(344),a0@(4)
-	movel a6@(-12),a0
-	movel _dpm,a1
-	movel a1@(340),a0@(8)
-	movel a6@(-12),a0
-	moveq #-1,d2
-	movel d2,a0@(12)
-	moveb _rcv_error,a6@(-20)
-	clrb a6@(-19)
-	moveb a6@(-29),d2
-	addqb #1,d2
-	moveb d2,a6@(-18)
-	movel a6@(-4),a0
-	movew a0@(12),d1
-	movew d1,d0
-	lsrw #2,d0
-	moveb d0,d1
-	andb #1,d1
-	moveb d1,a6@(-17)
-	movel a6@(-12),a2
-	lea a2@(16),a0
-	movew a6@(-20),a0@
-	movel a6@(-12),a2
-	lea a2@(18),a0
-	movew a6@(-18),a0@
-L325:
-	addql #1,a6@(-28)
-	jra L323
-	.even
-L324:
-L322:
-	movel sp@+,d2
-	movel sp@+,a2
-	unlk a6
+	movel _dpm,%a0
+	movel _dpm,%a1
+	movew %a1@(374),%d0
+	movew %d0,%d1
+	orw _eprog+2,%d1
+	movew %d1,%a0@(374)
+	movel _dpm,%a0
+	movel _dpm,%a1
+	movew %a1@(364),%d0
+	movew %d0,%d1
+	orw #2,%d1
+	movew %d1,%a0@(364)
+	jra .L325
+.L329:
+	movel %a6@(-12),%a0
+	movel _atQueue,%a1
+	movel %a1@,%a0@
+	movel %a6@(-12),%a0
+	movel _dpm,%a1
+	movel %a1@(344),%a0@(4)
+	movel %a6@(-12),%a0
+	movel _dpm,%a1
+	movel %a1@(340),%a0@(8)
+	movel %a6@(-12),%a0
+	moveq #-1,%d2
+	movel %d2,%a0@(12)
+	moveb _rcv_error,%a6@(-20)
+	clrb %a6@(-19)
+	moveb %a6@(-29),%d2
+	addqb #1,%d2
+	moveb %d2,%a6@(-18)
+	movel %a6@(-4),%a0
+	movew %a0@(12),%d1
+	movew %d1,%d0
+	lsrw #2,%d0
+	moveb %d0,%d1
+	andb #1,%d1
+	moveb %d1,%a6@(-17)
+	movel %a6@(-12),%a3
+	lea %a3@(16),%a0
+	movew %a6@(-20),%a0@
+	movel %a6@(-12),%a3
+	lea %a3@(18),%a0
+	movew %a6@(-18),%a0@
+.L325:
+	addql #1,%a6@(-28)
+	jra .L323
+.L324:
+.L322:
+	movel %a6@(-48),%a2
+	movel %a6@(-44),%a3
+	unlk %a6
 	rts
-	.even
-.globl _dummyImmEtc
+	.balign 2
+	.globl _dummyImmEtc
 _dummyImmEtc:
-	link a6,#0
-	movel d2,sp@-
+	link %a6,#0
 #APP
 	 .globl _ImmCompletion
 _ImmCompletion:
@@ -5183,10 +4926,10 @@ _ImmCompletion:
 #NO_APP
 	subql #1,_immQueue+12
 	tstl _immQueue+12
-	jne L331
-	movel #_immQueue+16,d0
-	movel d0,_immQueue
-	movel d0,_immQueue+4
+	jne .L331
+	movel #_immQueue+16,%d0
+	movel %d0,_immQueue
+	movel %d0,_immQueue+4
 	clrw _eprog+16
 #APP
 	 movew  _mbx_ccr,sp@
@@ -5194,7 +4937,7 @@ _ImmCompletion:
 		      moveml _mbx_context,d0-d7/a0-a6
 		      rte
 #NO_APP
-L331:
+.L331:
 	addql #4,_immQueue
 #APP
 	 movel  #_ImmProcess,sp@(2)
@@ -5202,87 +4945,77 @@ L331:
 	.globl _ImmProcess
 _ImmProcess: 
 #NO_APP
-L332:
-	movel _immQueue,a0
-	movel a0@,_eprog+8
+.L332:
+	movel _immQueue,%a0
+	movel %a0@,_eprog+8
 	tstw _doImm
-	jeq L333
-	movel _dpm,a0
-	movew _eprog+18,a0@(352)
-	movew _eprog,d0
-	andw #2,d0
-	tstw d0
-	jeq L334
-	movel _dpm,a0
-	movel _dpm,a1
-	movew a1@(374),d0
-	movew d0,d1
-	orw #256,d1
-	movew d1,a0@(374)
-	jra L335
-	.even
-L334:
-	moveq #20,d1
-	movew _eprog+18,d0
-	mulu d1,d0
-	movel d0,sp@-
+	jeq .L333
+	movel _dpm,%a0
+	movew _eprog+18,%a0@(352)
+	movew _eprog,%d0
+	andw #2,%d0
+	tstw %d0
+	jeq .L334
+	movel _dpm,%a0
+	movel _dpm,%a1
+	movew %a1@(374),%d0
+	movew %d0,%d1
+	orw #256,%d1
+	movew %d1,%a0@(374)
+	jra .L335
+.L334:
+	moveq #20,%d1
+	movew _eprog+18,%d0
+	mulu %d1,%d0
+	movel %d0,%sp@-
 	pea _eprog+22
-	movel _dpm,d0
-	addl #168,d0
-	movel d0,sp@-
+	movel _dpm,%d0
+	addl #168,%d0
+	movel %d0,%sp@-
 	jbsr _memcpy16
-	addql #8,sp
-	addql #4,sp
+	addqw #8,%sp
+	addqw #4,%sp
 	orw #2,_eprog
-	movel _dpm,a0
-	movew a0@(354),d0
-	tstw d0
-	jne L336
+	movel _dpm,%a0
+	movew %a0@(354),%d0
+	tstw %d0
+	jne .L336
 #APP
 	trap  #3
 #NO_APP
-L336:
+.L336:
 	clrw _eprog+20
 	clrw _eprog+18
-L335:
+.L335:
 	clrw _doImm
-L333:
+.L333:
 	cmpb #1,_eprog+8
-	jeq L337
-	clrl d0
-	moveb _eprog+9,d0
-	movel #_in_use,d1
-	movel d1,a0
-	addl d0,a0
-	clrl d0
-	moveb _eprog+4,d0
-	movel #_in_use,d1
-	movel d1,a1
-	addl d0,a1
-	moveb a0@(768),d0
-	andb a1@(256),d0
-	clrw d1
-	moveb d0,d1
-	movew d1,_eprog+14
-	jra L338
-	.even
-L337:
-	clrl d0
-	moveb _eprog+9,d0
-	movel #_in_use,d1
-	movel d1,a0
-	addl d0,a0
-	clrl d0
-	moveb _eprog+4,d0
-	movel #_in_use,d1
-	movel d1,a1
-	addl d0,a1
-	moveb a0@(1552),d0
-	andb a1@(1280),d0
-	clrw d1
-	moveb d0,d1
-	movew d1,_eprog+14
-L338:
+	jeq .L337
+	clrl %d0
+	moveb _eprog+9,%d0
+	lea _in_use+768,%a0
+	clrl %d1
+	moveb _eprog+4,%d1
+	lea _in_use+256,%a1
+	moveb %a0@(%d0:l),%d0
+	andb %a1@(%d1:l),%d0
+	clrw %d1
+	moveb %d0,%d1
+	movew %d1,_eprog+14
+	jra .L338
+.L337:
+	clrl %d0
+	moveb _eprog+9,%d0
+	lea _in_use+1552,%a0
+	clrl %d1
+	moveb _eprog+4,%d1
+	lea _in_use+1280,%a1
+	moveb %a0@(%d0:l),%d0
+	andb %a1@(%d1:l),%d0
+	clrw %d1
+	moveb %d0,%d1
+	movew %d1,_eprog+14
+.L338:
 #APP
 	
    /* For each wild card combination present scan the CAM */
@@ -5365,221 +5098,244 @@ L338:
 
 5: 
 #NO_APP
-	moveq #1,d2
-	cmpl _immQueue+12,d2
-	jge L339
+	moveq #1,%d2
+	cmpl _immQueue+12,%d2
+	jge .L339
 	subql #1,_immQueue+12
 	addql #4,_immQueue
-	jra L332
-	.even
-L339:
-	movel _dpm,d0
-	movel _dpm,a0
-	movel _dpm,a1
-	movew a1@(404),d0
-	movew d0,d1
-	addqw #1,d1
-	movew d1,a0@(404)
+	jra .L332
+.L339:
+	movel _dpm,%d0
+	movel _dpm,%a0
+	movel _dpm,%a1
+	movew %a1@(404),%d0
+	movew %d0,%d1
+	addqw #1,%d1
+	movew %d1,%a0@(404)
+	movew %a0@(404),%d0
 #APP
 	 trap #5 
 #NO_APP
-L330:
-	movel a6@(-4),d2
-	unlk a6
+.L330:
+	unlk %a6
 	rts
-	.even
-.globl _StartImmActions
+	.balign 2
+	.globl _StartImmActions
 _StartImmActions:
-	link a6,#0
-	movel a2,sp@-
-	movel d2,sp@-
+	link %a6,#0
+	movel %a2,%sp@-
 	nop
 	movel #_match+264,_alist
-L341:
-	movel _alist,d2
-	cmpl _match+4,d2
-	jcs L344
-	jra L342
-	.even
-L344:
-	movel _alist,a0
-	clrw d0
-	moveb a0@,d0
-	movew d0,_actn
-	clrl d0
-	movew _actn,d0
-	movel d0,d1
-	lsll #2,d1
-	lea _act,a0
-	movel a0@(d1:l),_a
-	movel _a,a0
-	moveb a0@(15),d0
-	andb #1,d0
-	tstb d0
-	jne L345
-	jra L343
-	.even
-L345:
-	moveq #20,d1
-	movew _eprog+20,d0
-	mulu d1,d0
-	movel #_eprog+22,d1
-	movel d1,a2
-	addl d0,a2
-	movel a2,_ip
+.L341:
+	movel _alist,%d2
+	cmpl _match+4,%d2
+	jcs .L344
+	jra .L342
+.L344:
+	movel _alist,%a0
+	clrw %d0
+	moveb %a0@,%d0
+	movew %d0,_actn
+	clrl %d0
+	movew _actn,%d0
+	movel %d0,%d1
+	asll #2,%d1
+	lea _act,%a0
+	movel %a0@(%d1:l),_a
+	movel _a,%a0
+	moveb %a0@(15),%d0
+	andb #1,%d0
+	tstb %d0
+	jne .L345
+	jra .L343
+.L345:
+	moveq #20,%d1
+	movew _eprog+20,%d0
+	mulu %d1,%d0
+	movel #_eprog+22,%d1
+	movel %d1,%a2
+	addl %d0,%a2
+	movel %a2,_ip
 	addqw #1,_eprog+20
 	cmpw #7,_eprog+18
-	jhi L346
+	jhi .L346
 	addqw #1,_eprog+18
-	movel _ip,a0
-	clrb a0@(19)
-	jra L347
-	.even
-L346:
+	movel _ip,%a0
+	clrb %a0@(19)
+	jra .L347
+.L346:
 	orw #2,_eprog+2
-	movel _dpm,a0
-	movel _dpm,a1
-	movew a1@(374),d0
-	movew d0,d1
-	orw _eprog+2,d1
-	movew d1,a0@(374)
-	movel _dpm,a0
-	movel _dpm,a1
-	movew a1@(364),d0
-	movew d0,d1
-	orw #2,d1
-	movew d1,a0@(364)
+	movel _dpm,%a0
+	movel _dpm,%a1
+	movew %a1@(374),%d0
+	movew %d0,%d1
+	orw _eprog+2,%d1
+	movew %d1,%a0@(374)
+	movel _dpm,%a0
+	movel _dpm,%a1
+	movew %a1@(364),%d0
+	movew %d0,%d1
+	orw #2,%d1
+	movew %d1,%a0@(364)
 	cmpw #8,_eprog+20
-	jls L347
+	jls .L347
 	clrw _eprog+20
 	movel #_eprog+22,_ip
-L348:
-L347:
-	movel _a,a0
-	movel _dpm,a1
-	movel a1@(344),a0@(16)
-	movel _a,a0
-	movel _dpm,a1
-	movel a1@(340),a0@(20)
-	movel _a,a0
-	movel _a,a1
-	movel a1@(20),a0@(24)
-	movel _a,a0
-	addqw #1,a0@(28)
-	movel _ip,a2
-	lea a2@(16),a0
-	movew a0@,_u
-	movel _ip,a2
-	lea a2@(18),a0
-	movew a0@,_u+2
+.L348:
+.L347:
+	movel _a,%a0
+	movel _dpm,%a1
+	movel %a1@(344),%a0@(16)
+	movel _a,%a0
+	movel _dpm,%a1
+	movel %a1@(340),%a0@(20)
+	movel _a,%a0
+	movel _a,%a1
+	movel %a1@(20),%a0@(24)
+	movel _a,%a0
+	addqw #1,%a0@(28)
+	movel _ip,%a2
+	lea %a2@(16),%a0
+	movew %a0@,_u
+	movel _ip,%a2
+	lea %a2@(18),%a0
+	movew %a0@,_u+2
 	moveb _rcv_error,_uu
 	tstb _u+3
-	jeq L349
-	movel _a,a0
-	moveb _u+2,a0@(31)
-	movel _a,a0
-	addqb #1,a0@(30)
+	jeq .L349
+	movel _a,%a0
+	moveb _u+2,%a0@(31)
+	movel _a,%a0
+	addqb #1,%a0@(30)
 	orw #16384,_eprog+2
-	movel _dpm,a0
-	movel _dpm,a1
-	movew a1@(374),d0
-	movew d0,d1
-	orw _eprog+2,d1
-	movew d1,a0@(374)
-	movel _dpm,a0
-	movel _dpm,a1
-	movew a1@(364),d0
-	movew d0,d1
-	orw #2,d1
-	movew d1,a0@(364)
-	jra L343
-	.even
-L349:
+	movel _dpm,%a0
+	movel _dpm,%a1
+	movew %a1@(374),%d0
+	movew %d0,%d1
+	orw _eprog+2,%d1
+	movew %d1,%a0@(374)
+	movel _dpm,%a0
+	movel _dpm,%a1
+	movew %a1@(364),%d0
+	movew %d0,%d1
+	orw #2,%d1
+	movew %d1,%a0@(364)
+	jra .L343
+.L349:
 	clrb _uu+1
-	movel _ip,a0
-	movel _immQueue,a1
-	movel a1@,a0@
-	movel _ip,a0
-	movel _dpm,a1
-	movel a1@(344),a0@(4)
-	movel _ip,a0
-	movel _dpm,a1
-	movel a1@(340),a0@(8)
-	movel _ip,a0
-	movel _ip,a1
-	movel a1@(8),a0@(12)
-	moveb _actn+1,d2
-	addqb #1,d2
-	moveb d2,_uu+2
+	movel _ip,%a0
+	movel _immQueue,%a1
+	movel %a1@,%a0@
+	movel _ip,%a0
+	movel _dpm,%a1
+	movel %a1@(344),%a0@(4)
+	movel _ip,%a0
+	movel _dpm,%a1
+	movel %a1@(340),%a0@(8)
+	movel _ip,%a0
+	movel _ip,%a1
+	movel %a1@(8),%a0@(12)
+	moveb _actn+1,%d2
+	addqb #1,%d2
+	moveb %d2,_uu+2
 	moveb #1,_uu+3
-	movel _ip,a2
-	lea a2@(16),a0
-	movew _uu,a0@
-	movel _ip,a2
-	lea a2@(18),a0
-	movew _uu+2,a0@
-L343:
+	movel _ip,%a2
+	lea %a2@(16),%a0
+	movew _uu,%a0@
+	movel _ip,%a2
+	lea %a2@(18),%a0
+	movew _uu+2,%a0@
+.L343:
 	addql #1,_alist
-	jra L341
-	.even
-L342:
-L340:
-	movel sp@+,d2
-	movel sp@+,a2
-	unlk a6
+	jra .L341
+.L342:
+.L340:
+	movel %a6@(-4),%a2
+	unlk %a6
 	rts
-.comm _sim,4
-.comm _tpu,4
-.comm _xlx,4
-.comm _cam,4
-.comm _dpm,4
-.comm _mbx_ccr,2
-.comm _imm_ccr,2
-.comm _mbx_pc,4
-.comm _imm_pc,4
-.comm _mbx_context,64
-.comm _imm_context,64
-.comm _xr_context,64
-.comm _context_c,12
-.comm _regic,20
-.comm _timing_frame,4
-.comm _rcv_error,2
-.lcomm _ins,8
-.lcomm _ins_sav,8
-.lcomm _var,66
-.lcomm _sim_rec,16
-.lcomm _sim_int,20
-.lcomm _utc,4
-.lcomm _utcl,4
-.comm _dm,12
-.lcomm _curms,2
-.lcomm _lstms,2
-.lcomm _incms,2
-.lcomm _curhd,2
-.lcomm _sscms,2
-.lcomm _remms,2
-.comm _wild_c,32
-.comm _time_event_index,16
-.comm _in_use,1808
-.comm _camBusy,2
-.comm _doImm,2
-.comm _eprog,246
-.comm _act,9216
-.comm _clk,328
-.comm _match,520
-.comm _atQueue,144
-.comm _immQueue,144
-.comm _hist,16008
-.comm _tel,264
-.comm _info,348
-.lcomm _a,4
-.lcomm _aa,4
-.lcomm _ip,4
-.lcomm _u,4
-.lcomm _uu,4
-.lcomm _actn,2
-.lcomm _dim,2
-.lcomm _mach,2
-.lcomm _gt,2
-.lcomm _gv,2
-.lcomm _alist,4
+	.globl _sim
+.bss _sim,4,2
+	.globl _tpu
+.bss _tpu,4,2
+	.globl _xlx
+.bss _xlx,4,2
+	.globl _cam
+.bss _cam,4,2
+	.globl _dpm
+.bss _dpm,4,2
+	.globl _mbx_ccr
+.bss _mbx_ccr,2,2
+	.globl _imm_ccr
+.bss _imm_ccr,2,2
+	.globl _mbx_pc
+.bss _mbx_pc,4,2
+	.globl _imm_pc
+.bss _imm_pc,4,2
+	.globl _mbx_context
+.bss _mbx_context,64,2
+	.globl _imm_context
+.bss _imm_context,64,2
+	.globl _xr_context
+.bss _xr_context,64,2
+	.globl _context_c
+.bss _context_c,12,2
+	.globl _regic
+.bss _regic,20,2
+	.globl _timing_frame
+.bss _timing_frame,4,2
+	.globl _rcv_error
+.bss _rcv_error,2,2
+.bss _ins,8,2
+.bss _ins_sav,8,2
+.bss _var,66,2
+.bss _sim_rec,16,2
+.bss _sim_int,20,2
+.bss _utc,4,2
+.bss _utcl,4,2
+	.globl _dm
+.bss _dm,12,1
+.bss _curms,2,2
+.bss _lstms,2,2
+.bss _incms,2,2
+.bss _curhd,2,2
+.bss _sscms,2,2
+.bss _remms,2,2
+	.globl _wild_c
+.bss _wild_c,32,2
+	.globl _time_event_index
+.bss _time_event_index,16,1
+	.globl _in_use
+.bss _in_use,1808,2
+	.globl _camBusy
+.bss _camBusy,2,2
+	.globl _doImm
+.bss _doImm,2,2
+	.globl _eprog
+.bss _eprog,246,2
+	.globl _act
+.bss _act,9216,2
+	.globl _clk
+.bss _clk,328,2
+	.globl _match
+.bss _match,520,2
+	.globl _atQueue
+.bss _atQueue,144,2
+	.globl _immQueue
+.bss _immQueue,144,2
+	.globl _hist
+.bss _hist,16008,2
+	.globl _tel
+.bss _tel,264,2
+	.globl _info
+.bss _info,348,2
+.bss _a,4,2
+.bss _aa,4,2
+.bss _ip,4,2
+.bss _u,4,2
+.bss _uu,4,2
+.bss _actn,2,2
+.bss _dim,2,2
+.bss _mach,2,2
+.bss _gt,2,2
+.bss _gv,2,2
+.bss _alist,4,2

@@ -51,7 +51,7 @@
 
 
 
-# 1 "tg8Pub.h" 1
+# 1 "../firmware/tg8Pub.h" 1
  
  
  
@@ -692,7 +692,7 @@ typedef enum {
  
 # 15 "../firmware/tg8.h" 2
 
-# 1 "tg8Hardw.h" 1
+# 1 "../firmware/tg8Hardw.h" 1
  
  
  
@@ -726,7 +726,7 @@ typedef enum {
 
 
 
-# 1 "mc68332.h" 1
+# 1 "../firmware/mc68332.h" 1
  
  
  
@@ -1058,7 +1058,7 @@ typedef struct {
 
 
  
-# 34 "tg8Hardw.h" 2
+# 34 "../firmware/tg8Hardw.h" 2
 
 
 
@@ -1312,7 +1312,7 @@ typedef enum {
 
 # 16 "../firmware/tg8.h" 2
 
-# 1 "selftest.h" 1
+# 1 "../firmware/selftest.h" 1
  
  
  
@@ -3831,7 +3831,7 @@ StDpm *std;
    immQueue.End = immQueue.Buffer + 32 ;  
 
     
-   memcpy16((short*)&dpm->At.aFwVer,(short*)&("Apr  4 2006"),12);
+   memcpy16((short*)&dpm->At.aFwVer,(short*)&("Aug 17 2011"),12);
 
     
 
@@ -4746,7 +4746,7 @@ done:
 
  
 
-# 1 "macros.h" 1
+# 1 "../firmware/macros.h" 1
  
  
  
@@ -4832,7 +4832,7 @@ done:
 
 
 
-# 101 "macros.h"
+# 101 "../firmware/macros.h"
 
  
  
@@ -4880,7 +4880,7 @@ done:
 
 
 
-# 157 "macros.h"
+# 157 "../firmware/macros.h"
 
 
 
