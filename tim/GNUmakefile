@@ -4,14 +4,9 @@
 
 include /acc/dsc/src/co/Make.auto
 
-CFLAGS= -g -Wall -I. -I/acc/local/$(CPU)/include 
-ifeq ($(CPU),L866)
-CFLAGS += -I/acc/src/dsc/drivers/cohtdrep/lewis/coht/ctr/driver
-else
-CFLAGS +=-I/acc/src/dsc/drivers/ctr/src/driver
-endif
+CFLAGS= -g -Wall -I. -I/acc/local/$(CPU)/include -I/dsrc/drivers/ctr/src/driver
 ifeq ($(CPU),Lces)
-CFLAGS += -I/acc/src/dsc/drivers/Lces/tg8V5/firmware
+CFLAGS += -I/dsrc/drivers/Lces/tg8V5/firmware
 endif
 
 SRCS=TimLib.c TimLib.h ctr/CtrLib.c tg8cps/Tg8CpsLib.c tg8sps/Tg8SpsLib.c netwrk/NetWrkLib.c
