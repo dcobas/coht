@@ -4,10 +4,7 @@
 
 include /acc/dsc/src/co/Make.auto
 
-CFLAGS= -g -Wall -I. -I/acc/local/$(CPU)/include -I/dsrc/drivers/ctr/src/driver
-ifeq ($(CPU),Lces)
-CFLAGS += -I/dsrc/drivers/Lces/tg8V5/firmware
-endif
+CFLAGS= -g -Wall -I. -I/acc/local/$(CPU)/include -I/acc/dsc/src/drivers/cohtdrep/lewis/coht/ctr/driver
 
 SRCS=TimLib.c TimLib.h ctr/CtrLib.c tg8cps/Tg8CpsLib.c tg8sps/Tg8SpsLib.c netwrk/NetWrkLib.c
 
@@ -36,6 +33,6 @@ clean:
 	rm -f libtim.$(CPU).a
 
 install: $(INSTFILES)
-	cp libtim.$(CPU).a /acc/local/$(CPU)/tim/libtim.a
+	dsc_install libtim.$(CPU).a /acc/local/$(CPU)/tim/libtim.a
 	rm -f /acc/local/$(CPU)/tim/TimLib.h
-	cp TimLib.h /acc/local/$(CPU)/tim
+	dsc_install TimLib.h /acc/local/$(CPU)/tim

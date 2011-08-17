@@ -76,7 +76,7 @@ unsigned long CtrLibGetInstalledModuleCount() {
 unsigned long cnt;
 
    if (ctr == 0) return 0;
-   if (ioctl(ctr,CtrDrvrGET_MODULE_COUNT,&cnt) < 0) return 0;
+   if (ioctl(ctr,CtrIoctlGET_MODULE_COUNT,&cnt) < 0) return 0;
    return cnt;
 }
 
@@ -113,10 +113,10 @@ unsigned long p2c, oby; /* VME P2Connector output byte */
       }
       mods = CtrLibGetInstalledModuleCount();
       for (m=1; m<=mods; m++) {
-	 ioctl(ctr,CtrDrvrSET_MODULE,&m);
-	 if (timlib_debug)  ioctl(ctr,CtrDrvrSET_SW_DEBUG,   &timlib_debug);
-	 if (timlib_delay)  ioctl(ctr,CtrDrvrSET_INPUT_DELAY,&timlib_delay);
-	 if (timlib_enable) ioctl(ctr,CtrDrvrENABLE,         &timlib_enable);
+	 ioctl(ctr,CtrIoctlSET_MODULE,&m);
+	 if (timlib_debug)  ioctl(ctr,CtrIoctlSET_SW_DEBUG,   &timlib_debug);
+	 if (timlib_delay)  ioctl(ctr,CtrIoctlSET_INPUT_DELAY,&timlib_delay);
+	 if (timlib_enable) ioctl(ctr,CtrIoctlENABLE,         &timlib_enable);
 
 	 if (m == 1) p2c = timlib_oby1_8;
 	 if (m == 9) p2c = timlib_oby9_16;
@@ -130,7 +130,7 @@ unsigned long p2c, oby; /* VME P2Connector output byte */
 
       }
       m = 1;
-      ioctl(ctr,CtrDrvrSET_MODULE,&m);
+      ioctl(ctr,CtrIoctlSET_MODULE,&m);
 
       return TimLibErrorSUCCESS;
    }
@@ -176,11 +176,11 @@ CtrDrvrConnection con;
    con.Module   = module;
 
    if (con.EqpNum == 0) {
-      if (ioctl(ctr,CtrDrvrDISCONNECT,&con) < 0) return TimLibErrorIO;
+      if (ioctl(ctr,CtrIoctlDISCONNECT,&con) < 0) return TimLibErrorIO;
       ctr_connected = 0;
       return TimLibErrorSUCCESS;
    }
-   if (ioctl(ctr,CtrDrvrCONNECT,&con) < 0) return TimLibErrorCONNECT;
+   if (ioctl(ctr,CtrIoctlCONNECT,&con) < 0) return TimLibErrorCONNECT;
 
    ctr_connected++;
 
@@ -226,10 +226,10 @@ int i ,j;
    trg = &(act.Trigger);
 
    if (module) {
-      if (ioctl(ctr,CtrDrvrSET_MODULE,&module) < 0)
+      if (ioctl(ctr,CtrIoctlSET_MODULE,&module) < 0)
 	 return TimLibErrorMODULE;
    }
-   if (ioctl(ctr,CtrDrvrLIST_CTIM_OBJECTS,&ctimo) < 0) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlLIST_CTIM_OBJECTS,&ctimo) < 0) return TimLibErrorIO;
    for (i=0; i<ctimo.Size; i++) {
       if (ctimo.Objects[i].EqpNum == ctim) {
 
@@ -238,14 +238,14 @@ int i ,j;
 
 	 for (j=1; j<=CtrDrvrRamTableSIZE; j++) {
 	    act.TriggerNumber = j;
-	    if (ioctl(ctr,CtrDrvrGET_ACTION,&act) < 0) return TimLibErrorIO;
+	    if (ioctl(ctr,CtrIoctlGET_ACTION,&act) < 0) return TimLibErrorIO;
 
 	    if (act.EqpClass == CtrDrvrConnectionClassCTIM) {
 	       if (trg->Ctim == ctim) {
 		  trg->Frame.Long = ((ctimo.Objects[i].Frame.Long & 0xFFFF0000)
 				  |  (payload & 0x0000FFFF));
 
-		  if (ioctl(ctr,CtrDrvrSET_ACTION,&act) < 0) return TimLibErrorIO;
+		  if (ioctl(ctr,CtrIoctlSET_ACTION,&act) < 0) return TimLibErrorIO;
 		  else                                       return TimLibErrorSUCCESS;
 	       }
 	    }
@@ -273,7 +273,7 @@ CtrDrvrConnection con;
    con.EqpNum   = equip;
    con.Module   = module;
 
-   if (ioctl(ctr,CtrDrvrDISCONNECT,&con) < 0) return TimLibErrorCONNECT;
+   if (ioctl(ctr,CtrIoctlDISCONNECT,&con) < 0) return TimLibErrorCONNECT;
 
    if (con.EqpNum == 0)   ctr_connected = 0;
    if (ctr_connected > 0) ctr_connected--;
@@ -290,8 +290,8 @@ TimLibError CtrLibQueue(unsigned long qflag,    /* 0=>Queue, 1=>NoQueue  */
 
    if (ctr == 0) return TimLibErrorINIT;
 
-   if (ioctl(ctr,CtrDrvrSET_TIMEOUT,&tmout)    < 0) return TimLibErrorIO;
-   if (ioctl(ctr,CtrDrvrSET_QUEUE_FLAG,&qflag) < 0) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlSET_TIMEOUT,&tmout)    < 0) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlSET_QUEUE_FLAG,&qflag) < 0) return TimLibErrorIO;
 
    return TimLibErrorSUCCESS;
 }
@@ -321,10 +321,10 @@ unsigned long CtrLibGetQueueSize() {
 unsigned long qflag;
 unsigned long qsize;
 
-   if (ioctl(ctr,CtrDrvrGET_QUEUE_FLAG,&qflag) < 0) return 0;
+   if (ioctl(ctr,CtrIoctlGET_QUEUE_FLAG,&qflag) < 0) return 0;
    if (qflag) return 0;
 
-   if (ioctl(ctr,CtrDrvrGET_QUEUE_SIZE,&qsize) < 0) return 0;
+   if (ioctl(ctr,CtrIoctlGET_QUEUE_SIZE,&qsize) < 0) return 0;
 
    return qsize;
 }
@@ -379,15 +379,15 @@ TgmMachine         mch;
    while (1) {
       if (read(ctr,&rbf,sizeof(CtrDrvrReadBuf)) <= 0) return TimLibErrorTIMEOUT;
       if (rbf.Connection.EqpClass == CtrDrvrConnectionClassPTIM) {
-	 ioctl(ctr,CtrDrvrSET_MODULE,&rbf.Connection.Module);
+	 ioctl(ctr,CtrIoctlSET_MODULE,&rbf.Connection.Module);
 	 act.TriggerNumber = rbf.TriggerNumber;
-	 if (ioctl(ctr,CtrDrvrGET_ACTION,&act) < 0) return TimLibErrorIO;
+	 if (ioctl(ctr,CtrIoctlGET_ACTION,&act) < 0) return TimLibErrorIO;
 	 if ((act.Config.OnZero & CtrDrvrCounterOnZeroOUT) == 0) continue;
       }
       break;
    }
    
-   if (cbl == 0) ioctl(ctr,CtrDrvrGET_CABLE_ID,&cbl);
+   if (cbl == 0) ioctl(ctr,CtrIoctlGET_CABLE_ID,&cbl);
    mch = TgvTgvToTgmMachine(TgvFirstMachineForCableId(cbl));
 
    if (iclss)   *iclss   = rbf.Connection.EqpClass;
@@ -405,12 +405,12 @@ TgmMachine         mch;
    if (plnum) {
       if (rbf.Connection.EqpClass == CtrDrvrConnectionClassPTIM) {
 	 ob.EqpNum = rbf.Connection.EqpNum;
-	 ioctl(ctr,CtrDrvrGET_PTIM_BINDING,&ob);
+	 ioctl(ctr,CtrIoctlGET_PTIM_BINDING,&ob);
 	 *plnum  = rbf.TriggerNumber - ob.StartIndex;
       } else *plnum = 0;
    }
-   if (missed) ioctl(ctr,CtrDrvrGET_QUEUE_OVERFLOW,missed);
-   if (qsize)  ioctl(ctr,CtrDrvrGET_QUEUE_SIZE,qsize);
+   if (missed) ioctl(ctr,CtrIoctlGET_QUEUE_OVERFLOW,missed);
+   if (qsize)  ioctl(ctr,CtrIoctlGET_QUEUE_SIZE,qsize);
 
    if (onzero) {
       onzero->Machine = mch;
@@ -541,18 +541,18 @@ CtrDrvrCtimObjects           ctimo;
    if (ctr == 0) return TimLibErrorINIT;
 
    ob.EqpNum = ptim;
-   if (ioctl(ctr,CtrDrvrGET_PTIM_BINDING,&ob) < 0) return TimLibErrorPTIM;
+   if (ioctl(ctr,CtrIoctlGET_PTIM_BINDING,&ob) < 0) return TimLibErrorPTIM;
    anum = ob.StartIndex +1;
 
    module = ob.ModuleIndex +1;
-   ioctl(ctr,CtrDrvrSET_MODULE,&module);
+   ioctl(ctr,CtrIoctlSET_MODULE,&module);
 
    trg = &(act.Trigger);
    cnf = &(act.Config);
    grp = &(trg->Group);
 
    act.TriggerNumber = anum;
-   if (ioctl(ctr,CtrDrvrGET_ACTION,&act) < 0) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlGET_ACTION,&act) < 0) return TimLibErrorIO;
 
    if (plnum) {
       anum += plnum -1;
@@ -560,7 +560,7 @@ CtrDrvrCtimObjects           ctimo;
 
       if (anum > ob.StartIndex + ob.Size) return TimLibErrorGROUP;
 
-      if (ioctl(ctr,CtrDrvrGET_ACTION,&act) < 0) return TimLibErrorIO;
+      if (ioctl(ctr,CtrIoctlGET_ACTION,&act) < 0) return TimLibErrorIO;
 
    } else if (grnum) {
       do {
@@ -570,7 +570,7 @@ CtrDrvrCtimObjects           ctimo;
 	 if (anum++ >= ob.StartIndex + ob.Size) return TimLibErrorGROUP;
 
 	 act.TriggerNumber = anum;
-	 if (ioctl(ctr,CtrDrvrGET_ACTION,&act) < 0) return TimLibErrorGROUP;
+	 if (ioctl(ctr,CtrIoctlGET_ACTION,&act) < 0) return TimLibErrorGROUP;
       } while (1);
    }
    trg->Counter = ob.Counter;
@@ -612,21 +612,21 @@ CtrDrvrCtimObjects           ctimo;
 
 	    case TimLibCcvMaskOMASK:
 	       cmsb.Counter = ob.Counter;
-	       if (ioctl(ctr,CtrDrvrGET_OUT_MASK,&cmsb) < 0) return TimLibErrorIO;
+	       if (ioctl(ctr,CtrIoctlGET_OUT_MASK,&cmsb) < 0) return TimLibErrorIO;
 	       cmsb.Mask = ccv->OutputMask;
-	       if (ioctl(ctr,CtrDrvrSET_OUT_MASK,&cmsb) < 0) return TimLibErrorIO;
+	       if (ioctl(ctr,CtrIoctlSET_OUT_MASK,&cmsb) < 0) return TimLibErrorIO;
 	       break;
 
 	    case TimLibCcvMaskPOLARITY:
 	       cmsb.Counter = ob.Counter;
-	       if (ioctl(ctr,CtrDrvrGET_OUT_MASK,&cmsb) < 0) return TimLibErrorIO;
+	       if (ioctl(ctr,CtrIoctlGET_OUT_MASK,&cmsb) < 0) return TimLibErrorIO;
 	       cmsb.Polarity = ccv->Polarity;
-	       if (ioctl(ctr,CtrDrvrSET_OUT_MASK,&cmsb) < 0) return TimLibErrorIO;
+	       if (ioctl(ctr,CtrIoctlSET_OUT_MASK,&cmsb) < 0) return TimLibErrorIO;
 	       break;
 
 	    case TimLibCcvMaskCTIM:
 	       found = 0;
-	       if (ioctl(ctr,CtrDrvrLIST_CTIM_OBJECTS,&ctimo) < 0) return TimLibErrorIO;
+	       if (ioctl(ctr,CtrIoctlLIST_CTIM_OBJECTS,&ctimo) < 0) return TimLibErrorIO;
 	       if (ccv->Ctim == 0) {
 		  if (ctimo.Size) {
 		     trg->Ctim  = ctimo.Objects[0].EqpNum;
@@ -681,7 +681,7 @@ CtrDrvrCtimObjects           ctimo;
    } while (msk & TimLibCcvMaskBITS);
 
    act.TriggerNumber = anum;
-   if (ioctl(ctr,CtrDrvrSET_ACTION,&act) < 0) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlSET_ACTION,&act) < 0) return TimLibErrorIO;
 
    return TimLibErrorSUCCESS;
 }
@@ -707,18 +707,18 @@ CtrDrvrCounterMaskBuf        cmsb;
    if (ctr == 0) return TimLibErrorINIT;
 
    ob.EqpNum = ptim;
-   if (ioctl(ctr,CtrDrvrGET_PTIM_BINDING,&ob) < 0) return TimLibErrorPTIM;
+   if (ioctl(ctr,CtrIoctlGET_PTIM_BINDING,&ob) < 0) return TimLibErrorPTIM;
    anum = ob.StartIndex +1;
 
    module = ob.ModuleIndex +1;
-   ioctl(ctr,CtrDrvrSET_MODULE,&module);
+   ioctl(ctr,CtrIoctlSET_MODULE,&module);
 
    act.TriggerNumber = anum;
    trg = &(act.Trigger);
    cnf = &(act.Config);
    grp = &(trg->Group);
 
-   if (ioctl(ctr,CtrDrvrGET_ACTION,&act) < 0) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlGET_ACTION,&act) < 0) return TimLibErrorIO;
 
    /* If the Tgm group number is not zero, search for the PTIM action */
 
@@ -728,7 +728,7 @@ CtrDrvrCounterMaskBuf        cmsb;
 
       if (anum > ob.StartIndex + ob.Size) return TimLibErrorGROUP;
 
-      if (ioctl(ctr,CtrDrvrGET_ACTION,&act) < 0) return TimLibErrorIO;
+      if (ioctl(ctr,CtrIoctlGET_ACTION,&act) < 0) return TimLibErrorIO;
 
    } else if (grnum) {
       do {
@@ -738,7 +738,7 @@ CtrDrvrCounterMaskBuf        cmsb;
 	 if (anum++ >= ob.StartIndex + ob.Size) return TimLibErrorGROUP;
 
 	 act.TriggerNumber = anum;
-	 if (ioctl(ctr,CtrDrvrGET_ACTION,&act) < 0) return TimLibErrorIO;
+	 if (ioctl(ctr,CtrIoctlGET_ACTION,&act) < 0) return TimLibErrorIO;
       } while (1);
    }
 
@@ -760,7 +760,7 @@ CtrDrvrCounterMaskBuf        cmsb;
    ccv->GrVal     = grp->GroupValue;
 
    cmsb.Counter = ob.Counter;
-   if (ioctl(ctr,CtrDrvrGET_OUT_MASK,&cmsb) < 0) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlGET_OUT_MASK,&cmsb) < 0) return TimLibErrorIO;
 
    ccv->OutputMask = cmsb.Mask;
    ccv->Polarity   = cmsb.Polarity;
@@ -818,7 +818,7 @@ CtrDrvrTgmGroup             *grp;
 
       case CtrDrvrConnectionClassPTIM:
 	 ob.EqpNum = equip;
-	 if (ioctl(ctr,CtrDrvrGET_PTIM_BINDING,&ob) < 0) return TimLibErrorPTIM;
+	 if (ioctl(ctr,CtrIoctlGET_PTIM_BINDING,&ob) < 0) return TimLibErrorPTIM;
 
 	 if (grnum) anum = grval + ob.StartIndex -1; else anum = 0;
 
@@ -866,17 +866,17 @@ CtrDrvrCounterMaskBuf          cmbf;
 
    if (ctr == 0) return TimLibErrorINIT;
 
-   ioctl(ctr,CtrDrvrSET_MODULE,&module);
+   ioctl(ctr,CtrIoctlSET_MODULE,&module);
 
    crmb.Remote = remflg;
    crmb.Counter = cntr;
 
-   if (ioctl(ctr,CtrDrvrSET_REMOTE,&crmb) < 0) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlSET_REMOTE,&crmb) < 0) return TimLibErrorIO;
 
    msk = ccvm & ~TimLibCcvMaskOMASK;
    if (ccvm & TimLibCcvMaskBITS) {
       cnfb.Counter = cntr;
-      if (ioctl(ctr,CtrDrvrGET_CONFIG,&cnfb) < 0) return TimLibErrorIO;
+      if (ioctl(ctr,CtrIoctlGET_CONFIG,&cnfb) < 0) return TimLibErrorIO;
       cnf = &cnfb.Config;
       if (ccvm & TimLibCcvMaskSTART ) cnf->Start     = ccv->Start;
       if (ccvm & TimLibCcvMaskMODE  ) cnf->Mode      = ccv->Mode;
@@ -889,20 +889,20 @@ CtrDrvrCounterMaskBuf          cmbf;
 	 if (ccv->Enable & TimLibEnableBUS) cnf->OnZero |= CtrDrvrCounterOnZeroBUS;
       }
 
-      if (ioctl(ctr,CtrDrvrSET_CONFIG,&cnfb) < 0) return TimLibErrorIO;
+      if (ioctl(ctr,CtrIoctlSET_CONFIG,&cnfb) < 0) return TimLibErrorIO;
    }
 
    if (ccvm & (TimLibCcvMaskPOLARITY | TimLibCcvMaskOMASK)) {
       cmbf.Counter = cntr;
-      if (ioctl(ctr,CtrDrvrGET_OUT_MASK,&cmbf) < 0) return TimLibErrorIO;
+      if (ioctl(ctr,CtrIoctlGET_OUT_MASK,&cmbf) < 0) return TimLibErrorIO;
       if (ccvm & TimLibCcvMaskPOLARITY) cmbf.Polarity = ccv->Polarity;
       if (ccvm & TimLibCcvMaskOMASK)    cmbf.Mask     = ccv->OutputMask;
-      if (ioctl(ctr,CtrDrvrSET_OUT_MASK,&cmbf) < 0) return TimLibErrorIO;
+      if (ioctl(ctr,CtrIoctlSET_OUT_MASK,&cmbf) < 0) return TimLibErrorIO;
    }
 
    if (rcmd & TimLibRemoteBITS) {
       crmb.Remote = rcmd;
-      if (ioctl(ctr,CtrDrvrREMOTE,&crmb) < 0) return TimLibErrorIO;
+      if (ioctl(ctr,CtrIoctlREMOTE,&crmb) < 0) return TimLibErrorIO;
    }
    return TimLibErrorSUCCESS;
 }
@@ -923,17 +923,17 @@ CtrDrvrCounterMaskBuf          cmbf;
 
    if (ctr == 0) return TimLibErrorINIT;
 
-   ioctl(ctr,CtrDrvrSET_MODULE,&module);
+   ioctl(ctr,CtrIoctlSET_MODULE,&module);
 
    crmb.Counter = cntr;
 
-   if (ioctl(ctr,CtrDrvrGET_REMOTE,&crmb) < 0) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlGET_REMOTE,&crmb) < 0) return TimLibErrorIO;
    if (remflg) *remflg = crmb.Remote;
    if (crmb.Remote == 0) return TimLibErrorSUCCESS;
 
    if ((ccvm) && (ccv)) {
       cnfb.Counter = cntr;
-      if (ioctl(ctr,CtrDrvrGET_CONFIG,&cnfb) < 0) return TimLibErrorIO;
+      if (ioctl(ctr,CtrIoctlGET_CONFIG,&cnfb) < 0) return TimLibErrorIO;
       cnf = &cnfb.Config;
 
       *ccvm = 0;
@@ -948,7 +948,7 @@ CtrDrvrCounterMaskBuf          cmbf;
       if (cnf->OnZero & CtrDrvrCounterOnZeroBUS) ccv->Enable |= TimLibEnableBUS;
 
       cmbf.Counter = cntr;
-      if (ioctl(ctr,CtrDrvrGET_OUT_MASK,&cmbf) < 0) return TimLibErrorIO;
+      if (ioctl(ctr,CtrIoctlGET_OUT_MASK,&cmbf) < 0) return TimLibErrorIO;
       *ccvm |= TimLibCcvMaskPOLARITY;
       ccv->Polarity = cmbf.Polarity;
 
@@ -978,11 +978,11 @@ CtrDrvrTime   *t;
    t = &ct.Time;
 
    if (module) {
-      if (ioctl(ctr,CtrDrvrSET_MODULE,&module)) return TimLibErrorMODULE;
+      if (ioctl(ctr,CtrIoctlSET_MODULE,&module)) return TimLibErrorMODULE;
    }
-   if (ioctl(ctr,CtrDrvrGET_UTC,&ct) < 0) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlGET_UTC,&ct) < 0) return TimLibErrorIO;
 
-   ioctl(ctr,CtrDrvrGET_CABLE_ID,&cbl);
+   ioctl(ctr,CtrIoctlGET_CABLE_ID,&cbl);
 
    utc->Machine = TgvTgvToTgmMachine(TgvFirstMachineForCableId(cbl));
    utc->CTrain  = ct.CTrain;
@@ -1022,10 +1022,10 @@ CtrDrvrTgmBuf  tgmb;
    if (ctr == 0) return TimLibErrorINIT;
 
    if (module) {
-      if (ioctl(ctr,CtrDrvrSET_MODULE,&module)) return TimLibErrorMODULE;
+      if (ioctl(ctr,CtrIoctlSET_MODULE,&module)) return TimLibErrorMODULE;
    }
    tgmb.Machine = TgvTgmToTgvMachine(machine);
-   if (ioctl(ctr,CtrDrvrREAD_TELEGRAM,&tgmb) < 0) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlREAD_TELEGRAM,&tgmb) < 0) return TimLibErrorIO;
    telegram->Size = TgmLastGroupNumber(machine);
    telegram->Machine = machine;
    for (i=0; i<telegram->Size; i++) {
@@ -1048,7 +1048,7 @@ CtrDrvrPtimBinding ob;
    if (ctr == 0) return TimLibErrorINIT;
 
    ob.EqpNum = ptim;
-   if (ioctl(ctr,CtrDrvrGET_PTIM_BINDING,&ob) < 0) return TimLibErrorPTIM;
+   if (ioctl(ctr,CtrIoctlGET_PTIM_BINDING,&ob) < 0) return TimLibErrorPTIM;
 
    if (module) *module = ob.ModuleIndex +1;
    if (counter) *counter = ob.Counter;
@@ -1068,7 +1068,7 @@ CtrDrvrCtimObjects ctimo;
 
    if (ctr == 0) return TimLibErrorINIT;
 
-   if (ioctl(ctr,CtrDrvrLIST_CTIM_OBJECTS,&ctimo) < 0) return TimLibErrorCTIM;
+   if (ioctl(ctr,CtrIoctlLIST_CTIM_OBJECTS,&ctimo) < 0) return TimLibErrorCTIM;
    for (i=0; i<ctimo.Size; i++) {
       if (ctimo.Objects[i].EqpNum == ctim) {
 	 *eventcode = ctimo.Objects[i].Frame.Long;
@@ -1090,7 +1090,7 @@ TimLibError CtrLibGetHandle(int *fd) {
 unsigned long qflag;
 
    if (ctr == 0) return TimLibErrorINIT;
-   if (ioctl(ctr,CtrDrvrGET_QUEUE_FLAG,&qflag) < 0) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlGET_QUEUE_FLAG,&qflag) < 0) return TimLibErrorIO;
    if (qflag == 1) return TimLibErrorQFLAG;
    *fd = ctr;
    return TimLibErrorSUCCESS;
@@ -1115,7 +1115,7 @@ CtrDrvrPtimBinding ptim;
    ptim.Size = dimension;
    ptim.StartIndex = 0;
 
-   cc = ioctl(ctr,CtrDrvrCREATE_PTIM_OBJECT,&ptim);
+   cc = ioctl(ctr,CtrIoctlCREATE_PTIM_OBJECT,&ptim);
    if (errno == EBUSY)  return TimLibErrorEXISTS;
    if (errno == ENOMEM) return TimLibErrorNOMEM;
    if (cc < 0) return TimLibErrorIO;
@@ -1138,7 +1138,7 @@ CtrDrvrCtimBinding ctim;
    ctim.EqpNum = ctimeqp;
    ctim.Frame.Long = eventcode;
 
-   cc = ioctl(ctr,CtrDrvrCREATE_CTIM_OBJECT,&ctim);
+   cc = ioctl(ctr,CtrIoctlCREATE_CTIM_OBJECT,&ctim);
    if (cc == EBUSY)  return TimLibErrorEXISTS;
    if (cc == ENOMEM) return TimLibErrorNOMEM;
    if (cc < 0) return TimLibErrorIO;
@@ -1156,8 +1156,8 @@ TimLibError CtrLibGetCableId(unsigned long module,   /* The given module */
 			     unsigned long *cable) { /* The cable ID */
 
    if (ctr == 0) return TimLibErrorINIT;
-   if (ioctl(ctr,CtrDrvrSET_MODULE,&module)) return TimLibErrorMODULE;
-   if (ioctl(ctr,CtrDrvrGET_CABLE_ID,cable)) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlSET_MODULE,&module)) return TimLibErrorMODULE;
+   if (ioctl(ctr,CtrIoctlGET_CABLE_ID,cable)) return TimLibErrorIO;
    return TimLibErrorSUCCESS;
 }
 
@@ -1174,8 +1174,8 @@ TimLibError CtrLibSetCableId(unsigned long module,  /* The given module */
 			     unsigned long cable) { /* The given CablID */
 
    if (ctr == 0) return TimLibErrorINIT;
-   if (ioctl(ctr,CtrDrvrSET_MODULE,&module))  return TimLibErrorMODULE;
-   if (ioctl(ctr,CtrDrvrSET_CABLE_ID,&cable)) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlSET_MODULE,&module))  return TimLibErrorMODULE;
+   if (ioctl(ctr,CtrIoctlSET_CABLE_ID,&cable)) return TimLibErrorIO;
    return TimLibErrorSUCCESS;
 }
 
@@ -1189,8 +1189,8 @@ CtrDrvrStatus cstat;
 
    if (dev) *dev = TimLibDevice_CTR;
 
-   if (ioctl(ctr,CtrDrvrSET_MODULE,&module)) return TimLibErrorIO;
-   if (ioctl(ctr,CtrDrvrGET_STATUS,&cstat))  return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlSET_MODULE,&module)) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlGET_STATUS,&cstat))  return TimLibErrorIO;
 
    tstat = 0;
    if (cstat & CtrDrvrStatusGMT_OK)       tstat |= TimLibStatusGMT_OK;
@@ -1219,7 +1219,7 @@ CtrDrvrPtimObjects ptimo;
    bzero((void *) &ptimo, sizeof(CtrDrvrPtimObjects));
    if (psize) *psize = 0;
 
-   if (ioctl(ctr,CtrDrvrLIST_PTIM_OBJECTS,&ptimo) < 0) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlLIST_PTIM_OBJECTS,&ptimo) < 0) return TimLibErrorIO;
 
    for (i=0; i<ptimo.Size; i++) {
 
@@ -1245,7 +1245,7 @@ CtrDrvrCtimObjects ctimo;
    bzero((void *) &ctimo, sizeof(CtrDrvrCtimObjects));
    if (csize) *csize = 0;
 
-   if (ioctl(ctr,CtrDrvrLIST_CTIM_OBJECTS,&ctimo) < 0) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlLIST_CTIM_OBJECTS,&ctimo) < 0) return TimLibErrorIO;
 
    for (i=0; i<ctimo.Size; i++) {
 
@@ -1269,9 +1269,9 @@ unsigned long iostat;
    if (ctr == 0) return TimLibErrorINIT;
    if (input == NULL) return TimLibErrorNOMEM;
 
-   if (ioctl(ctr,CtrDrvrSET_MODULE,&module)) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlSET_MODULE,&module)) return TimLibErrorIO;
 
-   if (ioctl(ctr,CtrDrvrGET_IO_STATUS,&iostat) < 0) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlGET_IO_STATUS,&iostat) < 0) return TimLibErrorIO;
 
    *input = 0;
 
@@ -1307,7 +1307,7 @@ unsigned long msk, cntr;
 
    if (ctr == 0) return TimLibErrorINIT;
 
-   if (ioctl(ctr,CtrDrvrSET_MODULE,&module)) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlSET_MODULE,&module)) return TimLibErrorIO;
 
    err = CtrLibGetIoStatus(module,&input);
    if (err != TimLibErrorSUCCESS) return err;
@@ -1319,12 +1319,12 @@ unsigned long msk, cntr;
       if (mask & msk) {
 
 	 cmsb.Counter = cntr;
-	 if (ioctl(ctr,CtrDrvrGET_OUT_MASK,&cmsb) < 0) return TimLibErrorIO;
+	 if (ioctl(ctr,CtrIoctlGET_OUT_MASK,&cmsb) < 0) return TimLibErrorIO;
 
 	 if (msk & output) cmsb.Polarity = CtrDrvrPolarityTTL_BAR;
 	 else              cmsb.Polarity = CtrDrvrPolarityTTL;
 
-	 if (ioctl(ctr,CtrDrvrSET_OUT_MASK,&cmsb) < 0) return TimLibErrorIO;
+	 if (ioctl(ctr,CtrIoctlSET_OUT_MASK,&cmsb) < 0) return TimLibErrorIO;
       }
    }
 
@@ -1348,8 +1348,8 @@ FILE *fver;
    bzero((void *) tver, sizeof(TimLibModuleVersion));
 
    m = 1;
-   if (ioctl(ctr,CtrDrvrSET_MODULE, &m)    < 0) return TimLibErrorIO;
-   if (ioctl(ctr,CtrDrvrGET_VERSION,&cver) < 0) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlSET_MODULE, &m)    < 0) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlGET_VERSION,&cver) < 0) return TimLibErrorIO;
 
    tver->DrvVer    = cver.DrvrVersion;
    tver->ModVer[0] = cver.VhdlVersion;
@@ -1373,10 +1373,10 @@ FILE *fver;
       fclose(fver);
    }
 
-   if (ioctl(ctr,CtrDrvrGET_MODULE_COUNT,&cnt) < 0) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlGET_MODULE_COUNT,&cnt) < 0) return TimLibErrorIO;
    for (m=2; m<=cnt; m++) {
-      if (ioctl(ctr,CtrDrvrSET_MODULE, &m)    < 0) return TimLibErrorIO;
-      if (ioctl(ctr,CtrDrvrGET_VERSION,&cver) < 0) return TimLibErrorIO;
+      if (ioctl(ctr,CtrIoctlSET_MODULE, &m)    < 0) return TimLibErrorIO;
+      if (ioctl(ctr,CtrIoctlGET_VERSION,&cver) < 0) return TimLibErrorIO;
       tver->ModVer[m-1] = cver.VhdlVersion;
    }
    return TimLibErrorSUCCESS;
@@ -1459,13 +1459,13 @@ CtrDrvrModuleStats mstat;
 
    if (ctr == 0) return NULL;
 
-   if (ioctl(ctr,CtrDrvrSET_MODULE, &module) < 0) return NULL;
+   if (ioctl(ctr,CtrIoctlSET_MODULE, &module) < 0) return NULL;
 
    bzero((void *) tmp, TMPLN);
    bzero((void *) res, RESLN);
 
-   if (ioctl(ctr,CtrDrvrGET_PLL,&plb) >= 0) {
-      if (ioctl(ctr,CtrDrvrGET_PLL_ASYNC_PERIOD,&aspn) >= 0) {
+   if (ioctl(ctr,CtrIoctlGET_PLL,&plb) >= 0) {
+      if (ioctl(ctr,CtrIoctlGET_PLL_ASYNC_PERIOD,&aspn) >= 0) {
 
 
 	 ph = aspn * ((double) (int) plb.Phase / (double) (int) plb.NumAverage);
@@ -1505,7 +1505,7 @@ CtrDrvrModuleStats mstat;
       mystrcat(tmp);
    }
 
-   if (ioctl(ctr,CtrDrvrGET_RECEPTION_ERRORS,&rers) >= 0) {
+   if (ioctl(ctr,CtrIoctlGET_RECEPTION_ERRORS,&rers) >= 0) {
       t.Second = rers.LastReset;
       t.TicksHPTDC = 0;
       if (t.Second < tver.CorVer)
@@ -1529,7 +1529,7 @@ CtrDrvrModuleStats mstat;
       mystrcat(tmp);
    }
 
-   if (ioctl(ctr,CtrDrvrGET_IO_STATUS,&stat) >= 0) {
+   if (ioctl(ctr,CtrIoctlGET_IO_STATUS,&stat) >= 0) {
       sprintf(tmp,"\nIoStat:Available\n");
       mystrcat(tmp);
 
@@ -1560,7 +1560,7 @@ CtrDrvrModuleStats mstat;
       if (stat & CtrDrvrIOStatusIDOkP) {
 	 sprintf(tmp,"BoardID:Present\n");
 	 mystrcat(tmp);
-	 if (ioctl(ctr,CtrDrvrGET_IDENTITY,&brid) >= 0) {
+	 if (ioctl(ctr,CtrIoctlGET_IDENTITY,&brid) >= 0) {
 	    if (brid.IdMSL != 0) {
 	       if (brid.IdMSL == 0xFFFFFFFF)
 		  sprintf(tmp,"BoardID:0xFFFFFFFF:Old PCB\n");
@@ -1589,7 +1589,7 @@ CtrDrvrModuleStats mstat;
 
       if (stat & CtrDrvrIOStatusExtendedMemory) {
 	 sprintf(tmp,"ExtMem:Present\n");
-	 if (ioctl(ctr,CtrDrvrGET_MODULE_STATS,&mstat) >= 0) {
+	 if (ioctl(ctr,CtrIoctlGET_MODULE_STATS,&mstat) >= 0) {
 	    sprintf(tmp,"PllErrThresh:%d\n",(int) mstat.PllErrorThreshold);
 	    mystrcat(tmp);
 	    sprintf(tmp,"PllDacLowPass:%d\n",(int) mstat.PllDacLowPassValue);
@@ -1646,14 +1646,14 @@ TimLibTime tlt;
 
    if (ctr == 0)      return TimLibErrorINIT;
    if (stats == NULL) return TimLibErrorNOMEM;
-   if (ioctl(ctr,CtrDrvrSET_MODULE, &module) < 0) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlSET_MODULE, &module) < 0) return TimLibErrorIO;
 
    bzero((void *) stats, sizeof(TimLibModuleStats));
    CtrLibGetTime(module, &tlt);
 
    stats->Module = module;
 
-   if (ioctl(ctr,CtrDrvrGET_PLL,&plb) >= 0) {
+   if (ioctl(ctr,CtrIoctlGET_PLL,&plb) >= 0) {
       stats->Pll.Valid      = 1;
       stats->Pll.Error      = plb.Error;
       stats->Pll.Integrator = plb.Integrator;
@@ -1664,12 +1664,12 @@ TimLibTime tlt;
       stats->Pll.NumAverage = plb.NumAverage;
       stats->Pll.Phase      = plb.Phase;
 
-      if (ioctl(ctr,CtrDrvrGET_PLL_ASYNC_PERIOD,&aspn) >= 0) {
+      if (ioctl(ctr,CtrIoctlGET_PLL_ASYNC_PERIOD,&aspn) >= 0) {
 	 stats->Pll.AsPrdNs    = aspn;
       }
    }
 
-   if (ioctl(ctr,CtrDrvrGET_RECEPTION_ERRORS,&rers) >= 0) {
+   if (ioctl(ctr,CtrIoctlGET_RECEPTION_ERRORS,&rers) >= 0) {
       stats->Rec.Valid    = 1;
       stats->Rec.PrtyErrs = rers.PartityErrs;
       stats->Rec.SyncErrs = rers.SyncErrs;
@@ -1681,18 +1681,18 @@ TimLibTime tlt;
       stats->Rec.LastRset.Machine = tlt.Machine;
    }
 
-   if (ioctl(ctr,CtrDrvrGET_IO_STATUS,&stat) >= 0) {
+   if (ioctl(ctr,CtrIoctlGET_IO_STATUS,&stat) >= 0) {
       stats->Cst.Valid = 1;
       stats->Cst.Stat  = stat;
       if (stat & CtrDrvrIOStatusIDOkP) {
-	 if (ioctl(ctr,CtrDrvrGET_IDENTITY,&brid) >= 0) {
+	 if (ioctl(ctr,CtrIoctlGET_IDENTITY,&brid) >= 0) {
 	    stats->Cst.IdMSL = brid.IdMSL;
 	    stats->Cst.IdLSL = brid.IdLSL;
 	 }
       }
 
       if (stat & CtrDrvrIOStatusExtendedMemory) {
-	 if (ioctl(ctr,CtrDrvrGET_MODULE_STATS,&mstat) >= 0) {
+	 if (ioctl(ctr,CtrIoctlGET_MODULE_STATS,&mstat) >= 0) {
 	    stats->Ext.Valid         = 1;
 	    stats->Ext.PllErrThresh  = mstat.PllErrorThreshold;
 	    stats->Ext.PllDacLowPass = mstat.PllDacLowPassValue;
@@ -1737,9 +1737,9 @@ TimLibError CtrLibSetPllLocking(unsigned long module,
 				unsigned long lockflag) { /* 1=> Brutal, else Slow */
 
    if (ctr == 0) return TimLibErrorINIT;
-   if (ioctl(ctr,CtrDrvrSET_MODULE, &module) < 0) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlSET_MODULE, &module) < 0) return TimLibErrorIO;
 
-   if (ioctl(ctr,CtrDrvrSET_BRUTAL_PLL,&lockflag) < 0) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlSET_BRUTAL_PLL,&lockflag) < 0) return TimLibErrorIO;
 
    return TimLibErrorSUCCESS;
 }
