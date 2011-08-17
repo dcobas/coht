@@ -1396,8 +1396,9 @@ char *yr, *ti, *md, *mn, *dy;
     bzero((void *) tmp,  32);
 
     if (t->Second) {
+	time_t second = t->Second;
 
-	ctime_r(&t->Second,tmp); /* Day Mon DD HH:MM:SS YYYY\n\0 */
+	ctime_r(&second, tmp); /* Day Mon DD HH:MM:SS YYYY\n\0 */
 
         tmp[3] = 0;
         dy = &(tmp[0]);
