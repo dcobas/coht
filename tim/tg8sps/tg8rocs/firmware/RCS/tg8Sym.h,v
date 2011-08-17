@@ -1,0 +1,31 @@
+head	1.1;
+access;
+symbols;
+locks
+	lewis:1.1; strict;
+comment	@ * @;
+
+
+1.1
+date	2005.06.14.13.08.38;	author lewis;	state Exp;
+branches;
+next	;
+
+
+desc
+@New Version Tg8 firmware for SL FESA
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#define CONVERTOR 1     /*1=use convertor (pars) to obtain symbols table */
+
+#include "tg8.h"
+#include "tg8Priv.h"
+
+/*EOF -tg8sym.h- */
+@

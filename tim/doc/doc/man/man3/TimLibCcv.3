@@ -1,0 +1,100 @@
+.TH "TimLibCcv" 3 "12 Nov 2008" "Low Level Timing Library" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+TimLibCcv \- 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Public Attributes"
+
+.in +1c
+.ti -1c
+.RI "\fBTimLibEnable\fP \fBEnable\fP"
+.br
+.ti -1c
+.RI "\fBTimLibStart\fP \fBStart\fP"
+.br
+.ti -1c
+.RI "\fBTimLibMode\fP \fBMode\fP"
+.br
+.ti -1c
+.RI "\fBTimLibClock\fP \fBClock\fP"
+.br
+.ti -1c
+.RI "unsigned long \fBPulsWidth\fP"
+.br
+.ti -1c
+.RI "unsigned long \fBDelay\fP"
+.br
+.ti -1c
+.RI "\fBTimLibOutput\fP \fBOutputMask\fP"
+.br
+.ti -1c
+.RI "\fBTimLibPolarity\fP \fBPolarity\fP"
+.br
+.ti -1c
+.RI "unsigned long \fBCtim\fP"
+.br
+.ti -1c
+.RI "unsigned long \fBPayload\fP"
+.br
+.ti -1c
+.RI "TgmMachine \fBMachine\fP"
+.br
+.ti -1c
+.RI "unsigned long \fBGrNum\fP"
+.br
+.ti -1c
+.RI "unsigned long \fBGrVal\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+This structurs contains all the fields needed to set up a counter 
+.PP
+.SH "Member Data Documentation"
+.PP 
+.SS "\fBTimLibClock\fP \fBTimLibCcv::Clock\fP"
+.PP
+Clock specification. 
+.SS "unsigned long \fBTimLibCcv::Ctim\fP"
+.PP
+CTIM triggering event of this action 
+.SS "unsigned long \fBTimLibCcv::Delay\fP"
+.PP
+32 bit delay to load into counter. 
+.SS "\fBTimLibEnable\fP \fBTimLibCcv::Enable\fP"
+.PP
+Enable = 1, Disable = 0 
+.SS "unsigned long \fBTimLibCcv::GrNum\fP"
+.PP
+Telegram's group number 
+.SS "unsigned long \fBTimLibCcv::GrVal\fP"
+.PP
+Telegram's group value 
+.SS "TgmMachine \fBTimLibCcv::Machine\fP"
+.PP
+Tgm machine of telegram 
+.SS "\fBTimLibMode\fP \fBTimLibCcv::Mode\fP"
+.PP
+The counters operating mode. 
+.SS "\fBTimLibOutput\fP \fBTimLibCcv::OutputMask\fP"
+.PP
+Output lemo connectors mask 
+.SS "unsigned long \fBTimLibCcv::Payload\fP"
+.PP
+Payload part of the trigger 
+.SS "\fBTimLibPolarity\fP \fBTimLibCcv::Polarity\fP"
+.PP
+Output lemo polarity TTL or TTL_BAR 
+.SS "unsigned long \fBTimLibCcv::PulsWidth\fP"
+.PP
+Number of 40MHz ticks, 0 = as fast as possible. 
+.SS "\fBTimLibStart\fP \fBTimLibCcv::Start\fP"
+.PP
+The counters start. 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Low Level Timing Library from the source code.

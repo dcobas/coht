@@ -1,0 +1,1643 @@
+.TH "TimLib.doxygen" 3 "12 Nov 2008" "Low Level Timing Library" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+TimLib.doxygen \- 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Classes"
+
+.in +1c
+.ti -1c
+.RI "struct \fBTimLibTime\fP"
+.br
+.ti -1c
+.RI "struct \fBTimLibCcv\fP"
+.br
+.ti -1c
+.RI "struct \fBTimLibModuleStats\fP"
+.br
+.ti -1c
+.RI "struct \fBTimLibPllBlock\fP"
+.br
+.ti -1c
+.RI "struct \fBTimLibRecBlock\fP"
+.br
+.ti -1c
+.RI "struct \fBTimLibCstBlock\fP"
+.br
+.ti -1c
+.RI "struct \fBTimLibExtBlock\fP"
+.br
+.in -1c
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBTimLibErrorSTRING_SIZE\fP   64"
+.br
+.ti -1c
+.RI "#define \fBTimLibStatusBITS\fP   0x1F"
+.br
+.ti -1c
+.RI "#define \fBTimLibHardwareBITS\fP   0x3FFF"
+.br
+.ti -1c
+.RI "#define \fBTimLibOutputBITS\fP   0xFFF"
+.br
+.ti -1c
+.RI "#define \fBTimLibRemoteBITS\fP   0x1F"
+.br
+.ti -1c
+.RI "#define \fBTimLibCcvMaskBITS\fP   0x1FFF"
+.br
+.ti -1c
+.RI "#define \fBTimLibCcvDEFAULT_ENABLE\fP   0"
+.br
+.ti -1c
+.RI "#define \fBTimLibCcvDEFAULT_START\fP   TimLibStartNORMAL"
+.br
+.ti -1c
+.RI "#define \fBTimLibCcvDEFAULT_MODE\fP   TimLibModeNORMAL"
+.br
+.ti -1c
+.RI "#define \fBTimLibCcvDEFAULT_CLOCK\fP   TimLibClock1KHZ"
+.br
+.ti -1c
+.RI "#define \fBTimLibCcvDEFAULT_PULSE_WIDTH\fP   400"
+.br
+.ti -1c
+.RI "#define \fBTimLibCcvDEFAULT_DELAY\fP   1"
+.br
+.ti -1c
+.RI "#define \fBTimLibCcvDEFAULT_OUTPUT_MASK\fP   0"
+.br
+.ti -1c
+.RI "#define \fBTimLibCcvDEFAULT_POLARITY\fP   TimLibPolarityTTL_BAR"
+.br
+.ti -1c
+.RI "#define \fBTimLibCcvDEFAULT_CTIM\fP   100"
+.br
+.ti -1c
+.RI "#define \fBTimLibCcvDEFAULT_PAYLOAD\fP   0"
+.br
+.ti -1c
+.RI "#define \fBTimLibCcvDEFAULT_MACHINE\fP   TgmCPS"
+.br
+.ti -1c
+.RI "#define \fBTimLibCcvDEFAULT_GRNUM\fP   1"
+.br
+.ti -1c
+.RI "#define \fBTimLibCcvDEFAULT_GRVAL\fP   24"
+.br
+.ti -1c
+.RI "#define \fBTimLibCstSTATAE\fP   21"
+.br
+.in -1c
+.SS "Typedefs"
+
+.in +1c
+.ti -1c
+.RI "typedef void \fBTgmTelegram\fP"
+.br
+.in -1c
+.SS "Enumerations"
+
+.in +1c
+.ti -1c
+.RI "enum \fBTimLibError\fP { \fBTimLibErrorSUCCESS\fP, \fBTimLibErrorHARDWARE\fP, \fBTimLibErrorSTART\fP, \fBTimLibErrorMODE\fP, \fBTimLibErrorCLOCK\fP, \fBTimLibErrorPWIDTH\fP, \fBTimLibErrorDELAY\fP, \fBTimLibErrorNO_REMOTE\fP, \fBTimLibErrorMODULE\fP, \fBTimLibErrorCOUNTER\fP, \fBTimLibErrorPTIM\fP, \fBTimLibErrorCTIM\fP, \fBTimLibErrorBLOCKED\fP, \fBTimLibErrorPPM\fP, \fBTimLibErrorMACHINE\fP, \fBTimLibErrorGROUP\fP, \fBTimLibErrorINIT\fP, \fBTimLibErrorOPEN\fP, \fBTimLibErrorCONNECT\fP, \fBTimLibErrorWAIT\fP, \fBTimLibErrorTIMEOUT\fP, \fBTimLibErrorQFLAG\fP, \fBTimLibErrorIO\fP, \fBTimLibErrorNOT_IMP\fP, \fBTimLibErrorEXISTS\fP, \fBTimLibErrorNOMEM\fP, \fBTimLibErrorNOT_ENAB\fP, \fBTimLibErrorNOT_FOUND\fP, \fBTimLibErrorSTRING\fP, \fBTimLibERRORS\fP }"
+.br
+.ti -1c
+.RI "enum \fBTimLibDevice\fP { \fBTimLibDevice_ANY\fP, \fBTimLibDevice_CTR_PCI\fP, \fBTimLibDevice_CTR_VME\fP, \fBTimLibDevice_TG8_CPS\fP, \fBTimLibDevice_TG8_SPS\fP, \fBTimLibDevice_NETWORK\fP, \fBTimLibDEVICES\fP }"
+.br
+.ti -1c
+.RI "enum \fBTimLibStatus\fP { \fBTimLibStatusGMT_OK\fP =  0x01, \fBTimLibStatusPLL_OK\fP =  0x02, \fBTimLibStatusSELF_OK\fP =  0x04, \fBTimLibStatusENABLED\fP =  0x08, \fBTimLibStatusBUS_OK\fP =  0x10 }"
+.br
+.ti -1c
+.RI "enum \fBTimLibEnable\fP { \fBTimLibEnableNOOUT\fP =  0, \fBTimLibEnableOUT\fP =  1, \fBTimLibEnableBUS\fP =  2, \fBTimLibEnableOUTBUS\fP =  3, \fBTimLibENABLES\fP }"
+.br
+.ti -1c
+.RI "enum \fBTimLibHardware\fP { \fBTimLibHardwareCTIM\fP =  0x01, \fBTimLibHardwareCOUNTER_1\fP =  0x02, \fBTimLibHardwareCOUNTER_2\fP =  0x04, \fBTimLibHardwareCOUNTER_3\fP =  0x08, \fBTimLibHardwareCOUNTER_4\fP =  0x10, \fBTimLibHardwareCOUNTER_5\fP =  0x20, \fBTimLibHardwareCOUNTER_6\fP =  0x40, \fBTimLibHardwareCOUNTER_7\fP =  0x80, \fBTimLibHardwareCOUNTER_8\fP =  0x100, \fBTimLibHardwarePLL_ITERATION\fP =  0x200, \fBTimLibHardwareGMT_EVENT_IN\fP =  0x400, \fBTimLibHardware1HZ\fP =  0x800, \fBTimLibHardware1KHZ\fP =  0x1000, \fBTimLibHardwareMATCHED\fP =  0x2000 }"
+.br
+.ti -1c
+.RI "enum \fBTimLibClass\fP { \fBTimLibClassHARDWARE\fP, \fBTimLibClassCTIM\fP, \fBTimLibClassPTIM\fP }"
+.br
+.ti -1c
+.RI "enum \fBTimLibStart\fP { \fBTimLibStartNORMAL\fP, \fBTimLibStartEXT1\fP, \fBTimLibStartEXT2\fP, \fBTimLibStartCHAINED\fP, \fBTimLibStartSELF\fP, \fBTimLibStartREMOTE\fP, \fBTimLibStartPPS\fP, \fBTimLibStartCHAINED_STOP\fP, \fBTimLibSTARTS\fP }"
+.br
+.ti -1c
+.RI "enum \fBTimLibMode\fP { \fBTimLibModeNORMAL\fP, \fBTimLibModeMULTIPLE\fP, \fBTimLibModeBURST\fP, \fBTimLibModeMULT_BURST\fP, \fBTimLibMODES\fP }"
+.br
+.ti -1c
+.RI "enum \fBTimLibClock\fP { \fBTimLibClock1KHZ\fP, \fBTimLibClock10MHZ\fP, \fBTimLibClock40MHZ\fP, \fBTimLibClockEXT1\fP, \fBTimLibClockEXT2\fP, \fBTimLibClockCHAINED\fP, \fBTimLibCLOCKS\fP }"
+.br
+.ti -1c
+.RI "enum \fBTimLibOutput\fP { \fBTimLibOutputCTIM\fP =  0x01, \fBTimLibOutputCNTR_1\fP =  0x02, \fBTimLibOutputCNTR_2\fP =  0x04, \fBTimLibOutputCNTR_3\fP =  0x08, \fBTimLibOutputCNTR_4\fP =  0x10, \fBTimLibOutputCNTR_5\fP =  0x20, \fBTimLibOutputCNTR_6\fP =  0x40, \fBTimLibOutputCNTR_7\fP =  0x80, \fBTimLibOutputCNTR_8\fP =  0x100, \fBTimLibOutput40MHZ\fP =  0x200, \fBTimLibOutputEXT1\fP =  0x400, \fBTimLibOutputEXT2\fP =  0x800 }"
+.br
+.ti -1c
+.RI "enum \fBTimLibRemote\fP { \fBTimLibRemoteLOAD\fP =  0x01, \fBTimLibRemoteSTOP\fP =  0x02, \fBTimLibRemoteSTART\fP =  0x04, \fBTimLibRemoteOUT\fP =  0x08, \fBTimLibRemoteBUS\fP =  0x10 }"
+.br
+.ti -1c
+.RI "enum \fBTimLibPolarity\fP { \fBTimLibPolarityTTL_BAR\fP =  0x01, \fBTimLibPolarityTTL\fP =  0x02 }"
+.br
+.ti -1c
+.RI "enum \fBTimLibCcvMask\fP { \fBTimLibCcvMaskENABLE\fP =  0x0001, \fBTimLibCcvMaskSTART\fP =  0x0002, \fBTimLibCcvMaskMODE\fP =  0x0004, \fBTimLibCcvMaskCLOCK\fP =  0x0008, \fBTimLibCcvMaskPWIDTH\fP =  0x0010, \fBTimLibCcvMaskDELAY\fP =  0x0020, \fBTimLibCcvMaskOMASK\fP =  0x0040, \fBTimLibCcvMaskPOLARITY\fP =  0x0080, \fBTimLibCcvMaskCTIM\fP =  0x0100, \fBTimLibCcvMaskPAYLOAD\fP =  0x0200, \fBTimLibCcvMaskMACHINE\fP =  0x0400, \fBTimLibCcvMaskGRNUM\fP =  0x0800, \fBTimLibCcvMaskGRVAL\fP =  0x1000 }"
+.br
+.ti -1c
+.RI "enum \fBTimLibLemo\fP { \fBTimLibLemoOUT_1\fP =  0x001, \fBTimLibLemoOUT_2\fP =  0x002, \fBTimLibLemoOUT_3\fP =  0x004, \fBTimLibLemoOUT_4\fP =  0x008, \fBTimLibLemoOUT_5\fP =  0x010, \fBTimLibLemoOUT_6\fP =  0x020, \fBTimLibLemoOUT_7\fP =  0x040, \fBTimLibLemoOUT_8\fP =  0x080, \fBTimLibLemoXST_1\fP =  0x100, \fBTimLibLemoXST_2\fP =  0x200, \fBTimLibLemoXCL_1\fP =  0x400, \fBTimLibLemoXCL_2\fP =  0x800 }"
+.br
+.ti -1c
+.RI "enum \fBTimLibCstStat\fP { \fBTimLibCstStatCTRXE\fP =  0x0001, \fBTimLibCstStatCTRXI\fP =  0x0002, \fBTimLibCstStatV1_PCB\fP =  0x0004, \fBTimLibCstStatV2_PCB\fP =  0x0008, \fBTimLibCstStatS1\fP =  0x0010, \fBTimLibCstStatS2\fP =  0x0020, \fBTimLibCstStatX1\fP =  0x0040, \fBTimLibCstStatX2\fP =  0x0080, \fBTimLibCstStatO1\fP =  0x0100, \fBTimLibCstStatO2\fP =  0x0200, \fBTimLibCstStatO3\fP =  0x0400, \fBTimLibCstStatO4\fP =  0x0800, \fBTimLibCstStatO5\fP =  0x1000, \fBTimLibCstStatO6\fP =  0x2000, \fBTimLibCstStatO7\fP =  0x4000, \fBTimLibCstStatO8\fP =  0x8000, \fBTimLibCstStatIDOkP\fP =  0x10000, \fBTimLibCstStatDebugHistory\fP =  0x20000, \fBTimLibCstStatUtcPllEnabled\fP =  0x40000, \fBTimLibCstStatExtendedMemory\fP =  0x80000, \fBTimLibCstStatTemperatureOk\fP =  0x100000 }"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBTimLibError\fP \fBTimLibInitialize\fP (\fBTimLibDevice\fP device)"
+.br
+.ti -1c
+.RI "\fBTimLibStatus\fP \fBTimLibGetStatus\fP (unsigned long module, \fBTimLibDevice\fP *dev)"
+.br
+.ti -1c
+.RI "\fBTimLibError\fP \fBTimLibConnect\fP (\fBTimLibClass\fP iclss, unsigned long equip, unsigned long module)"
+.br
+.ti -1c
+.RI "\fBTimLibError\fP \fBTimLibQueue\fP (unsigned long qflag, unsigned long tmout)"
+.br
+.ti -1c
+.RI "unsigned long \fBTimLibGetQueueSize\fP ()"
+.br
+.ti -1c
+.RI "\fBTimLibError\fP \fBTimLibWait\fP (\fBTimLibClass\fP *iclss, unsigned long *equip, unsigned long *plnum, \fBTimLibHardware\fP *source, \fBTimLibTime\fP *onzero, \fBTimLibTime\fP *trigger, \fBTimLibTime\fP *start, unsigned long *ctim, unsigned long *payload, unsigned long *module, unsigned long *missed, unsigned long *qsize, TgmMachine *machine)"
+.br
+.ti -1c
+.RI "\fBTimLibError\fP \fBTimLibSet\fP (unsigned long ptim, unsigned long plnum, unsigned long grnum, unsigned long grval, \fBTimLibCcvMask\fP ccvm, \fBTimLibCcv\fP *ccv)"
+.br
+.ti -1c
+.RI "\fBTimLibError\fP \fBTimLibGet\fP (unsigned long ptim, unsigned long plnum, unsigned long grnum, unsigned long grval, \fBTimLibCcvMask\fP *ccvm, \fBTimLibCcv\fP *ccv)"
+.br
+.ti -1c
+.RI "\fBTimLibError\fP \fBTimLibSimulate\fP (\fBTimLibClass\fP iclss, unsigned long equip, unsigned long module, TgmMachine machine, unsigned long grnum, unsigned long grval)"
+.br
+.ti -1c
+.RI "\fBTimLibError\fP \fBTimLibRemoteControl\fP (unsigned long remflg, unsigned long module, unsigned long cntr, \fBTimLibRemote\fP rcmd, \fBTimLibCcvMask\fP ccvm, \fBTimLibCcv\fP *ccv)"
+.br
+.ti -1c
+.RI "\fBTimLibError\fP \fBTimLibGetRemote\fP (unsigned long module, unsigned long cntr, unsigned long *remflg, \fBTimLibCcvMask\fP *ccvm, \fBTimLibCcv\fP *ccv)"
+.br
+.ti -1c
+.RI "\fBTimLibError\fP \fBTimLibGetTime\fP (unsigned long module, \fBTimLibTime\fP *utc)"
+.br
+.ti -1c
+.RI "\fBTimLibError\fP \fBTimLibGetTelegram\fP (unsigned long module, TgmMachine machine, \fBTgmTelegram\fP *telegram)"
+.br
+.ti -1c
+.RI "char * \fBTimLibErrorToString\fP (\fBTimLibError\fP error)"
+.br
+.ti -1c
+.RI "unsigned long \fBTimLibGetInstalledModuleCount\fP ()"
+.br
+.ti -1c
+.RI "\fBTimLibError\fP \fBTimLibGetPtimObject\fP (unsigned long ptim, unsigned long *module, unsigned long *counter, unsigned long *dimension)"
+.br
+.ti -1c
+.RI "\fBTimLibError\fP \fBTimLibGetCtimObject\fP (unsigned long ctim, unsigned long *eventcode)"
+.br
+.ti -1c
+.RI "\fBTimLibError\fP \fBTimLibGetHandle\fP (int *fd)"
+.br
+.ti -1c
+.RI "\fBTimLibError\fP \fBTimLibCreatePtimObject\fP (unsigned long ptim, unsigned long module, unsigned long counter, unsigned long dimension)"
+.br
+.ti -1c
+.RI "\fBTimLibError\fP \fBTimLibCreateCtimObject\fP (unsigned long ctim, unsigned long eventcode)"
+.br
+.ti -1c
+.RI "void \fBTimLibSetDebug\fP (unsigned long level)"
+.br
+.ti -1c
+.RI "\fBTimLibError\fP \fBTimLibGetCableId\fP (unsigned long module, unsigned long *cable)"
+.br
+.ti -1c
+.RI "\fBTimLibError\fP \fBTimLibGetAllPtimObjects\fP (unsigned long *ptimlist, unsigned long *psize, unsigned long size)"
+.br
+.ti -1c
+.RI "\fBTimLibError\fP \fBTimLibGetAllCtimObjects\fP (unsigned long *ctimlist, unsigned long *csize, unsigned long size)"
+.br
+.ti -1c
+.RI "\fBTimLibError\fP \fBTimLibGetTgmInfo\fP (\fBTimLibTime\fP stamp, \fBTimLibTime\fP *cyclestamp, unsigned long *cytag, unsigned long *ncytag)"
+.br
+.ti -1c
+.RI "\fBTimLibError\fP \fBTimLibGetGroupValueFromStamp\fP (\fBTimLibTime\fP stamp, unsigned long gn, unsigned long next, unsigned long *gv)"
+.br
+.ti -1c
+.RI "\fBTimLibError\fP \fBTimLibStringToSlot\fP (char *cyid, unsigned long *slix)"
+.br
+.ti -1c
+.RI "\fBTimLibError\fP \fBTimLibGetIoStatus\fP (\fBTimLibLemo\fP *input)"
+.br
+.ti -1c
+.RI "\fBTimLibError\fP \fBTimLibSetOutputs\fP (\fBTimLibLemo\fP output, \fBTimLibLemo\fP mask)"
+.br
+.ti -1c
+.RI "char * \fBTimLibGetSpecificInfo\fP (unsigned long module)"
+.br
+.ti -1c
+.RI "int \fBTimLibFdInitialize\fP (\fBTimLibDevice\fP device)"
+.br
+.ti -1c
+.RI "\fBTimLibError\fP \fBTimLibFdConnect\fP (int fd, \fBTimLibClass\fP iclss, unsigned long equip, unsigned long module)"
+.br
+.ti -1c
+.RI "\fBTimLibError\fP \fBTimLibFdQueue\fP (int fd, unsigned long qflag, unsigned long tmout)"
+.br
+.ti -1c
+.RI "\fBTimLibError\fP \fBTimLibFdWait\fP (int fd, \fBTimLibClass\fP *iclss, unsigned long *equip, unsigned long *plnum, \fBTimLibHardware\fP *source, \fBTimLibTime\fP *onzero, \fBTimLibTime\fP *trigger, \fBTimLibTime\fP *start, unsigned long *ctim, unsigned long *payload, unsigned long *module, unsigned long *missed, unsigned long *qsize, TgmMachine *machine)"
+.br
+.ti -1c
+.RI "\fBTimLibError\fP \fBTimLibGetModuleStats\fP (unsigned long module, \fBTimLibModuleStats\fP *stats)"
+.br
+.ti -1c
+.RI "\fBTimLibError\fP \fBTimLibSetPllLocking\fP (unsigned long module, unsigned long lockflag)"
+.br
+.ti -1c
+.RI "\fBTimLibError\fP \fBTimLibConnectPayload\fP (unsigned long ctim, unsigned long payload, unsigned long module)"
+.br
+.ti -1c
+.RI "unsigned long \fBTimLibGetModuleForCtim\fP (unsigned long ctim)"
+.br
+.in -1c
+.SH "Define Documentation"
+.PP 
+.SS "#define TimLibCcvDEFAULT_CLOCK   TimLibClock1KHZ"
+.PP
+.SS "#define TimLibCcvDEFAULT_CTIM   100"
+.PP
+.SS "#define TimLibCcvDEFAULT_DELAY   1"
+.PP
+.SS "#define TimLibCcvDEFAULT_ENABLE   0"
+.PP
+Default settings for a CCV after creating a new PTIM OBJECT 
+.SS "#define TimLibCcvDEFAULT_GRNUM   1"
+.PP
+.SS "#define TimLibCcvDEFAULT_GRVAL   24"
+.PP
+.SS "#define TimLibCcvDEFAULT_MACHINE   TgmCPS"
+.PP
+.SS "#define TimLibCcvDEFAULT_MODE   TimLibModeNORMAL"
+.PP
+.SS "#define TimLibCcvDEFAULT_OUTPUT_MASK   0"
+.PP
+.SS "#define TimLibCcvDEFAULT_PAYLOAD   0"
+.PP
+.SS "#define TimLibCcvDEFAULT_POLARITY   TimLibPolarityTTL_BAR"
+.PP
+.SS "#define TimLibCcvDEFAULT_PULSE_WIDTH   400"
+.PP
+.SS "#define TimLibCcvDEFAULT_START   TimLibStartNORMAL"
+.PP
+.SS "#define TimLibCcvMaskBITS   0x1FFF"
+.PP
+All bits/fields used in a Ccv mask 
+.SS "#define TimLibCstSTATAE   21"
+.PP
+Number of extended card status bits 
+.SS "#define TimLibErrorSTRING_SIZE   64"
+.PP
+Size of an error string 
+.SS "#define TimLibHardwareBITS   0x3FFF"
+.PP
+All bits used in hardware mask 
+.SS "#define TimLibOutputBITS   0xFFF"
+.PP
+All bits used in an output mask 
+.SS "#define TimLibRemoteBITS   0x1F"
+.PP
+All bits used in a remote command 
+.SS "#define TimLibStatusBITS   0x1F"
+.PP
+Full set of status bits for masking 
+.SH "Typedef Documentation"
+.PP 
+.SS "typedef void \fBTgmTelegram\fP"
+.PP
+An opeaque structure used by telegram library 
+.SH "Enumeration Type Documentation"
+.PP 
+.SS "enum \fBTimLibCcvMask\fP"
+.PP
+Each PTIM equipment has a set of current control values. The values to be read or written should have their bit set in the CcvMask. 
+.PP
+\fBEnumeration values: \fP
+.in +1c
+.TP
+\fB\fITimLibCcvMaskENABLE \fP\fP
+Enable of Disable output field 
+.TP
+\fB\fITimLibCcvMaskSTART \fP\fP
+Counter Start field 
+.TP
+\fB\fITimLibCcvMaskMODE \fP\fP
+Counter Mode field 
+.TP
+\fB\fITimLibCcvMaskCLOCK \fP\fP
+Counter clock field 
+.TP
+\fB\fITimLibCcvMaskPWIDTH \fP\fP
+Pulse Width in 25ns steps field 
+.TP
+\fB\fITimLibCcvMaskDELAY \fP\fP
+Delay field 
+.TP
+\fB\fITimLibCcvMaskOMASK \fP\fP
+Outputs to Lemo field 
+.TP
+\fB\fITimLibCcvMaskPOLARITY \fP\fP
+Polarity field TTL/TTL_BAR 
+.TP
+\fB\fITimLibCcvMaskCTIM \fP\fP
+CTIM equipment number field 
+.TP
+\fB\fITimLibCcvMaskPAYLOAD \fP\fP
+Payload field 
+.TP
+\fB\fITimLibCcvMaskMACHINE \fP\fP
+Telegram machine field 
+.TP
+\fB\fITimLibCcvMaskGRNUM \fP\fP
+Telegram group number field 
+.TP
+\fB\fITimLibCcvMaskGRVAL \fP\fP
+Telegram group value 
+.SS "enum \fBTimLibClass\fP"
+.PP
+There are 3 classes of interrupt that can be connected to, hardware, PTIM equipment, CTIM equipment or direct hardware. 
+.PP
+\fBEnumeration values: \fP
+.in +1c
+.TP
+\fB\fITimLibClassHARDWARE \fP\fP
+Class is direct hardware connection 
+.TP
+\fB\fITimLibClassCTIM \fP\fP
+A Ctim timing object carried by an event on the cable 
+.TP
+\fB\fITimLibClassPTIM \fP\fP
+A PTIM timing object implemented on a counter 
+.SS "enum \fBTimLibClock\fP"
+.PP
+These clocks on the CTR cards are phase locked on to UTC time with a short term RMS jitter of 100ps. The peak to peak is better than one nano second. On the TG8 the jitter is horrible 500ns, and the many clocks are not available, namley 10, 40MHz, and CHAINED. 
+.PP
+\fBEnumeration values: \fP
+.in +1c
+.TP
+\fB\fITimLibClock1KHZ \fP\fP
+The 1KHZ CTrain clock from the 01 events 
+.TP
+\fB\fITimLibClock10MHZ \fP\fP
+Divided down 40MHZ phase synchronous with 1KHZ 
+.TP
+\fB\fITimLibClock40MHZ \fP\fP
+Recovered 40MHZ by the PLL from the data edges 
+.TP
+\fB\fITimLibClockEXT1 \fP\fP
+External clock one 
+.TP
+\fB\fITimLibClockEXT2 \fP\fP
+External clock two 
+.TP
+\fB\fITimLibClockCHAINED \fP\fP
+The output of the previous counter is the clock 
+.TP
+\fB\fITimLibCLOCKS \fP\fP
+The number of possible clock sources 
+.SS "enum \fBTimLibCstStat\fP"
+.PP
+Full CTR card status bit definitions The CTR card only has a lot of extra status information in a dedicated status block 
+.PP
+\fBEnumeration values: \fP
+.in +1c
+.TP
+\fB\fITimLibCstStatCTRXE \fP\fP
+Beam Energy extension is present (Energy on VME-P2) 
+.TP
+\fB\fITimLibCstStatCTRXI \fP\fP
+IO extension is present (Can use as an IO register 
+.TP
+\fB\fITimLibCstStatV1_PCB \fP\fP
+PCB version 1 (Old hardware: No ID chip: Totempole 
+.TP
+\fB\fITimLibCstStatV2_PCB \fP\fP
+PCB version 2 (ID chip, tristate outputs) 
+.TP
+\fB\fITimLibCstStatS1 \fP\fP
+External start 1 value (If IO extension present) 
+.TP
+\fB\fITimLibCstStatS2 \fP\fP
+External start 2 value (If IO extension present) 
+.TP
+\fB\fITimLibCstStatX1 \fP\fP
+External clock 1 value (If IO extension present) 
+.TP
+\fB\fITimLibCstStatX2 \fP\fP
+External clock 2 value (If IO extension present) 
+.TP
+\fB\fITimLibCstStatO1 \fP\fP
+Lemo output 1 state (If IO extension present) 
+.TP
+\fB\fITimLibCstStatO2 \fP\fP
+Lemo output 2 state (If IO extension present) 
+.TP
+\fB\fITimLibCstStatO3 \fP\fP
+Lemo output 3 state (If IO extension present) 
+.TP
+\fB\fITimLibCstStatO4 \fP\fP
+Lemo output 4 state (If IO extension present) 
+.TP
+\fB\fITimLibCstStatO5 \fP\fP
+Lemo output 5 state (If IO extension present) 
+.TP
+\fB\fITimLibCstStatO6 \fP\fP
+Lemo output 6 state (If IO extension present) 
+.TP
+\fB\fITimLibCstStatO7 \fP\fP
+Lemo output 7 state (If IO extension present) 
+.TP
+\fB\fITimLibCstStatO8 \fP\fP
+Lemo output 8 state (If IO extension present) 
+.TP
+\fB\fITimLibCstStatIDOkP \fP\fP
+PCB ID chip is present 
+.TP
+\fB\fITimLibCstStatDebugHistory \fP\fP
+Debug History Mode switched ON (All events logged) 
+.TP
+\fB\fITimLibCstStatUtcPllEnabled \fP\fP
+Utc Pll enable state (0=Brutal 1=Slow lock) 
+.TP
+\fB\fITimLibCstStatExtendedMemory \fP\fP
+Extended status and diagnostics memory present 
+.TP
+\fB\fITimLibCstStatTemperatureOk \fP\fP
+Temperature Sensor installed 
+.SS "enum \fBTimLibDevice\fP"
+.PP
+There are currently many different devices that can receive events from the timing cable, or the controls netwrok. Each device offers device specific features. The NETWORK device is implemented accross DTM and uses UDP packets, it offers telegram access and restricted event subscriptions for synchronization of application programs. 
+.PP
+\fBEnumeration values: \fP
+.in +1c
+.TP
+\fB\fITimLibDevice_ANY \fP\fP
+Use whatever is available 
+.TP
+\fB\fITimLibDevice_CTR_PCI \fP\fP
+Timing events are comming from a PCI CTR 
+.TP
+\fB\fITimLibDevice_CTR_VME \fP\fP
+Timing events are comming from a VME CTR 
+.TP
+\fB\fITimLibDevice_TG8_CPS \fP\fP
+Timing events are comming from a CPS TG8 
+.TP
+\fB\fITimLibDevice_TG8_SPS \fP\fP
+Timing events are comming from a SPS TG8 
+.TP
+\fB\fITimLibDevice_NETWORK \fP\fP
+Timing events arrive on the netwrok UDP 
+.TP
+\fB\fITimLibDEVICES \fP\fP
+Number of different timing event sources 
+.SS "enum \fBTimLibEnable\fP"
+.PP
+Enable states for counters. When directly controling a counter, its possible to also control the Bus Interrupt behaviour. For PTIM objects the bus interrupt bit is controled by the driver. The enables behave like bits as well as indexes. 
+.PP
+\fBEnumeration values: \fP
+.in +1c
+.TP
+\fB\fITimLibEnableNOOUT \fP\fP
+No bits means do nothing 
+.TP
+\fB\fITimLibEnableOUT \fP\fP
+Bit 0 means out 
+.TP
+\fB\fITimLibEnableBUS \fP\fP
+Bit 1 means bus 
+.TP
+\fB\fITimLibEnableOUTBUS \fP\fP
+Both bits means bus and out 
+.TP
+\fB\fITimLibENABLES \fP\fP
+Number of output states 
+.SS "enum \fBTimLibError\fP"
+.PP
+On some cards like the Tg8, delays are 16 bits, on the CTR they are up to 32 bits.On the Tg8 the PulseWidth is always 1us and can not be modified etc etc etc. This type deals with the errors that can arrise when using the timing library. 
+.PP
+\fBEnumeration values: \fP
+.in +1c
+.TP
+\fB\fITimLibErrorSUCCESS \fP\fP
+All went OK, No error 
+.TP
+\fB\fITimLibErrorHARDWARE \fP\fP
+Invalid TimLibHardware value for this device 
+.TP
+\fB\fITimLibErrorSTART \fP\fP
+Invalid TimLibStart value for this device 
+.TP
+\fB\fITimLibErrorMODE \fP\fP
+Invalid TimLibMode value for this device 
+.TP
+\fB\fITimLibErrorCLOCK \fP\fP
+Invalid TimLibClock value for this device 
+.TP
+\fB\fITimLibErrorPWIDTH \fP\fP
+Invalid PulseWidth value for this device 
+.TP
+\fB\fITimLibErrorDELAY \fP\fP
+Invalid Delay value for this device 
+.TP
+\fB\fITimLibErrorNO_REMOTE \fP\fP
+Invalid remote command value for this device 
+.TP
+\fB\fITimLibErrorMODULE \fP\fP
+Invalid module number, not installed 
+.TP
+\fB\fITimLibErrorCOUNTER \fP\fP
+Invalid counter number for this module 
+.TP
+\fB\fITimLibErrorPTIM \fP\fP
+Invalid PTIM equipment number 
+.TP
+\fB\fITimLibErrorCTIM \fP\fP
+Invalid CTIM equipment number 
+.TP
+\fB\fITimLibErrorBLOCKED \fP\fP
+That operation is blocked, its not permitted 
+.TP
+\fB\fITimLibErrorPPM \fP\fP
+PPM is not supported on this device type 
+.TP
+\fB\fITimLibErrorMACHINE \fP\fP
+Invalid machine for this PTIM object 
+.TP
+\fB\fITimLibErrorGROUP \fP\fP
+Invalid group number/value for PTIM object 
+.TP
+\fB\fITimLibErrorINIT \fP\fP
+Library has not been initialized 
+.TP
+\fB\fITimLibErrorOPEN \fP\fP
+Can't open a driver file handle, fatal 
+.TP
+\fB\fITimLibErrorCONNECT \fP\fP
+Can't connect to that object 
+.TP
+\fB\fITimLibErrorWAIT \fP\fP
+No connections to wait for 
+.TP
+\fB\fITimLibErrorTIMEOUT \fP\fP
+Timeout in wait 
+.TP
+\fB\fITimLibErrorQFLAG \fP\fP
+Queue flag must be set 0, queueing is needed 
+.TP
+\fB\fITimLibErrorIO \fP\fP
+Unspecified IO error 
+.TP
+\fB\fITimLibErrorNOT_IMP \fP\fP
+Not implemented on this device 
+.TP
+\fB\fITimLibErrorEXISTS \fP\fP
+Equipment already exists 
+.TP
+\fB\fITimLibErrorNOMEM \fP\fP
+Out of resource space or memory 
+.TP
+\fB\fITimLibErrorNOT_ENAB \fP\fP
+Module has not been enabled 
+.TP
+\fB\fITimLibErrorNOT_FOUND \fP\fP
+Couldn't find a cycle for that time stamp 
+.TP
+\fB\fITimLibErrorSTRING \fP\fP
+Cycle string did not specify an actual cycle 
+.TP
+\fB\fITimLibERRORS \fP\fP
+Total errors 
+.SS "enum \fBTimLibHardware\fP"
+.PP
+This enumeration describes hardware interrupt sources. This class of connection is useful for a FESA aquisition task which could log the times of any output or incomming CTIM. In addition the 1Hz and 1KHz interrupt connections can be useful. 
+.PP
+\fBEnumeration values: \fP
+.in +1c
+.TP
+\fB\fITimLibHardwareCTIM \fP\fP
+Any connected CTIM interrupt 
+.TP
+\fB\fITimLibHardwareCOUNTER_1 \fP\fP
+Any counter 1 output 
+.TP
+\fB\fITimLibHardwareCOUNTER_2 \fP\fP
+Any counter 2 output 
+.TP
+\fB\fITimLibHardwareCOUNTER_3 \fP\fP
+Any counter 3 output 
+.TP
+\fB\fITimLibHardwareCOUNTER_4 \fP\fP
+Any counter 4 output 
+.TP
+\fB\fITimLibHardwareCOUNTER_5 \fP\fP
+Any counter 5 output 
+.TP
+\fB\fITimLibHardwareCOUNTER_6 \fP\fP
+Any counter 6 output 
+.TP
+\fB\fITimLibHardwareCOUNTER_7 \fP\fP
+Any counter 7 output 
+.TP
+\fB\fITimLibHardwareCOUNTER_8 \fP\fP
+Any counter 8 output 
+.TP
+\fB\fITimLibHardwarePLL_ITERATION \fP\fP
+Phase locked loop iteration 
+.TP
+\fB\fITimLibHardwareGMT_EVENT_IN \fP\fP
+Any incomming timing frame 
+.TP
+\fB\fITimLibHardware1HZ \fP\fP
+Tne one second UTC time pulse 
+.TP
+\fB\fITimLibHardware1KHZ \fP\fP
+One Kilo Hertz 
+.TP
+\fB\fITimLibHardwareMATCHED \fP\fP
+Incomming event trigger matched 
+.SS "enum \fBTimLibLemo\fP"
+.PP
+Counter IO Lemo Connectors 
+.PP
+\fBEnumeration values: \fP
+.in +1c
+.TP
+\fB\fITimLibLemoOUT_1 \fP\fP
+Output: Lemo Counter 1 
+.TP
+\fB\fITimLibLemoOUT_2 \fP\fP
+Output: Lemo Counter 2 
+.TP
+\fB\fITimLibLemoOUT_3 \fP\fP
+Output: Lemo Counter 3 
+.TP
+\fB\fITimLibLemoOUT_4 \fP\fP
+Output: Lemo Counter 4 
+.TP
+\fB\fITimLibLemoOUT_5 \fP\fP
+Output: Lemo Counter 5 
+.TP
+\fB\fITimLibLemoOUT_6 \fP\fP
+Output: Lemo Counter 6 
+.TP
+\fB\fITimLibLemoOUT_7 \fP\fP
+Output: Lemo Counter 7 
+.TP
+\fB\fITimLibLemoOUT_8 \fP\fP
+Output: Lemo Counter 8 
+.TP
+\fB\fITimLibLemoXST_1 \fP\fP
+Input: Lemo External Start 1 
+.TP
+\fB\fITimLibLemoXST_2 \fP\fP
+Input: Lemo External Start 2 
+.TP
+\fB\fITimLibLemoXCL_1 \fP\fP
+Input: Lemo External Clock 1 
+.TP
+\fB\fITimLibLemoXCL_2 \fP\fP
+Input: Lemo External Clock 2 
+.SS "enum \fBTimLibMode\fP"
+.PP
+In burst mode, the stop can be EXT2 start, or the output of the next counter if the start is chained_stop. Multiple start permits many starts for only one load. In Multiple Burst many bursts can be made for a single load. 
+.PP
+\fBEnumeration values: \fP
+.in +1c
+.TP
+\fB\fITimLibModeNORMAL \fP\fP
+One load, one start and one output mode 
+.TP
+\fB\fITimLibModeMULTIPLE \fP\fP
+One load, multiple starts, multiple outputs 
+.TP
+\fB\fITimLibModeBURST \fP\fP
+Like MULTIPLE, but terminated by external start two 
+.TP
+\fB\fITimLibModeMULT_BURST \fP\fP
+Both mode 1 & 2 = Multiple bursts 
+.TP
+\fB\fITimLibMODES \fP\fP
+There are 4 possible counter configuration modes 
+.SS "enum \fBTimLibOutput\fP"
+.PP
+The output routing mask specifies which signals are sent to which of the output connectors. N.B. On some cards (CTRP/I) there are more counters on the card (8) than there are front pannel connectors (4). Each counter 1..8, owns a physical output channel leading to a front pannel connector. The output mask for a given counter selects what signals are assigned to the counters output connector. 
+.PP
+\fBEnumeration values: \fP
+.in +1c
+.TP
+\fB\fITimLibOutputCTIM \fP\fP
+Any connected CTIM interrupt 
+.TP
+\fB\fITimLibOutputCNTR_1 \fP\fP
+Counter 1 output 
+.TP
+\fB\fITimLibOutputCNTR_2 \fP\fP
+Counter 2 output 
+.TP
+\fB\fITimLibOutputCNTR_3 \fP\fP
+Counter 3 output 
+.TP
+\fB\fITimLibOutputCNTR_4 \fP\fP
+Counter 4 output 
+.TP
+\fB\fITimLibOutputCNTR_5 \fP\fP
+Counter 5 output 
+.TP
+\fB\fITimLibOutputCNTR_6 \fP\fP
+Counter 6 output 
+.TP
+\fB\fITimLibOutputCNTR_7 \fP\fP
+Counter 7 output 
+.TP
+\fB\fITimLibOutputCNTR_8 \fP\fP
+Counter 8 output 
+.TP
+\fB\fITimLibOutput40MHZ \fP\fP
+40MHz clock bit 
+.TP
+\fB\fITimLibOutputEXT1 \fP\fP
+Ext-1 clock bit 
+.TP
+\fB\fITimLibOutputEXT2 \fP\fP
+Ext-2 clock bit 
+.SS "enum \fBTimLibPolarity\fP"
+.PP
+The polarity of a counter output. 
+.PP
+\fBEnumeration values: \fP
+.in +1c
+.TP
+\fB\fITimLibPolarityTTL_BAR \fP\fP
+Negative TTL Bar 
+.TP
+\fB\fITimLibPolarityTTL \fP\fP
+Posative TTL 
+.SS "enum \fBTimLibRemote\fP"
+.PP
+Counters can be directly controlled from the RT task. These are the possible remote control commands that can be used in direct control. 
+.PP
+\fBEnumeration values: \fP
+.in +1c
+.TP
+\fB\fITimLibRemoteLOAD \fP\fP
+Load the counter with a new set of control values 
+.TP
+\fB\fITimLibRemoteSTOP \fP\fP
+Kill counter no matter what its state 
+.TP
+\fB\fITimLibRemoteSTART \fP\fP
+Start the counter, the startREMOTE must be set 
+.TP
+\fB\fITimLibRemoteOUT \fP\fP
+Make output on output pin, counter not disturbed 
+.TP
+\fB\fITimLibRemoteBUS \fP\fP
+Make a bus interrupt now, counter not disturbed 
+.SS "enum \fBTimLibStart\fP"
+.PP
+The sources of start in a counter. The chained_stop starts from the output of the previous counter and stops from the output of the next counter. This is sometimes needed when using burst mode. 
+.PP
+\fBEnumeration values: \fP
+.in +1c
+.TP
+\fB\fITimLibStartNORMAL \fP\fP
+The next millisecond tick starts the counter 
+.TP
+\fB\fITimLibStartEXT1 \fP\fP
+The counter uses external start number one 
+.TP
+\fB\fITimLibStartEXT2 \fP\fP
+The counter uses external start number two 
+.TP
+\fB\fITimLibStartCHAINED \fP\fP
+The output of the previous counter is the start 
+.TP
+\fB\fITimLibStartSELF \fP\fP
+The output of this counter is the start (Divide) 
+.TP
+\fB\fITimLibStartREMOTE \fP\fP
+The counter waits for a remote start, see later 
+.TP
+\fB\fITimLibStartPPS \fP\fP
+The counter waits for the PPS 
+.TP
+\fB\fITimLibStartCHAINED_STOP \fP\fP
+The counter is started by previous and stopped by next 
+.TP
+\fB\fITimLibSTARTS \fP\fP
+The number of possible counter starts 
+.SS "enum \fBTimLibStatus\fP"
+.PP
+Status of timing receiver, for Tg8 modules the PLL bit is set OK 
+.PP
+\fBEnumeration values: \fP
+.in +1c
+.TP
+\fB\fITimLibStatusGMT_OK \fP\fP
+Timing being recieved 
+.TP
+\fB\fITimLibStatusPLL_OK \fP\fP
+PLL locked 
+.TP
+\fB\fITimLibStatusSELF_OK \fP\fP
+Self test OK 
+.TP
+\fB\fITimLibStatusENABLED \fP\fP
+Timing Reception enabled 
+.TP
+\fB\fITimLibStatusBUS_OK \fP\fP
+No Bus Errors detected 
+.SH "Function Documentation"
+.PP 
+.SS "\fBTimLibError\fP TimLibConnect (\fBTimLibClass\fP iclss, unsigned long equip, unsigned long module)"
+.PP
+Connect to an interrupt. If you are connecting to either a CTIM interrupt or to a hardware interrupt, you may need to specify on which device the interrupt should be connected. This is achieved by the module parameter. If the module is zero, the system will decide which device to use, otherwise module contains a value between 1 and the number of installed timing receiver cards. For PTIM objects the module parameter must be set to zero or the real module on which the PTIM object is implemented. On PTIM objects the module is implicit. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIiclss\fP Class of interrupt 
+.br
+\fIequip\fP Equipment or hardware mask 
+.br
+\fImodule\fP Module on which to do the connect 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "\fBTimLibError\fP TimLibConnectPayload (unsigned long ctim, unsigned long payload, unsigned long module)"
+.PP
+Connect to a CTIM with a specified payload 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIctim\fP The ctim ID you want to connect to 
+.br
+\fIpayload\fP The 16 bit bayload in a long 
+.br
+\fImodule\fP The module number 1..n of the timing receiver card 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "\fBTimLibError\fP TimLibCreateCtimObject (unsigned long ctim, unsigned long eventcode)"
+.PP
+Create a new CTIM object. If a payload is to be used for this event be sure to set the low 16-Bits to 0xFFFF 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIctim\fP The CTIM equipment number you want to create 
+.br
+\fIeventcode\fP The eventcode like this 0x211c0101 or 0x211CFFFF 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "\fBTimLibError\fP TimLibCreatePtimObject (unsigned long ptim, unsigned long module, unsigned long counter, unsigned long dimension)"
+.PP
+Create a new PTIM object, the CCV settings will be defaulted, see the TimLib.h include file TimLibCcvDEFAULT definitions. The setteings you need can then be modified using the TimLibSet function.
+.PP
+Unfortunately because the SPS TG8 driver uses multiple file descriptors, one per installed module, then in this particular case, this routine will return only that of module 1.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIptim\fP The PTIM equipment number you want to create 
+.br
+\fImodule\fP The module on which to create it 
+.br
+\fIcounter\fP The counter that the PTIM uses 
+.br
+\fIdimension\fP The PPM dimension, usually 1 or 24 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "char* TimLibErrorToString (\fBTimLibError\fP error)"
+.PP
+Convert a TimLibError into a string. The returned char pointer is either NULL if the supplied error is out of range, or it points to a static string contained on the library routines heap. You must copy the string if you need to be sure it is not overwritten. Obviously this routine is therfore not thread safe, but you don't need to free allocated memory thus avoiding potential memory leaks. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIerror\fP The error code whose string you want 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Static pointer to the resulting read only string 
+.RE
+.PP
+
+.SS "\fBTimLibError\fP TimLibFdConnect (int fd, \fBTimLibClass\fP iclss, unsigned long equip, unsigned long module)"
+.PP
+For multi-threaded applications, where each thread needs its own filedesc. This is just like the usual connect except you must supply a fd that is open and was obtained from FdInitialize. Should you supply a fd with a bad value the driver will check if it belongs to your process and if it dose it will use it. This may cause unpredictable results. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIfd\fP File handle 
+.br
+\fIiclss\fP Class of interrupt 
+.br
+\fIequip\fP Equipment or hardware mask 
+.br
+\fImodule\fP Module on which to do the connect 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "int TimLibFdInitialize (\fBTimLibDevice\fP device)"
+.PP
+For multi-threaded applications, each thread needs its own filedesc. This initialize will return a new file descriptor each time it is called. Today the drivers support a maximum of 16 file descriptors so the resource is limited and should be used economically; always call 'close(fd)' when the descriptor is no longer needed. In case of errors, a zero is returned. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIdevice\fP The device for which the library is to initialize 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "\fBTimLibError\fP TimLibFdQueue (int fd, unsigned long qflag, unsigned long tmout)"
+.PP
+For multi-threaded applications, where each thread needs its own filedesc. Set queueing On or Off, and the time out value in micro seconds. A timeout value of zero means no time out, you wait for ever. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIfd\fP File handle 
+.br
+\fIqflag\fP The Queue Flag 0=>Queue, 1=>NoQueue 
+.br
+\fItmout\fP The Timeout in microseconds, 0=> No timeout, waits for ever 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "\fBTimLibError\fP TimLibFdWait (int fd, \fBTimLibClass\fP * iclss, unsigned long * equip, unsigned long * plnum, \fBTimLibHardware\fP * source, \fBTimLibTime\fP * onzero, \fBTimLibTime\fP * trigger, \fBTimLibTime\fP * start, unsigned long * ctim, unsigned long * payload, unsigned long * module, unsigned long * missed, unsigned long * qsize, TgmMachine * machine)"
+.PP
+For multi-threaded applications, where each thread needs its own filedesc. Wait for an interrupt. The parameters are all returned from the call so you can know which interrupt it was that came back. Note, when waiting for a hardware interrupt from either CTIM or from a counter, it is the CTIM or PTIM object that caused the interrupt returned. The telegram will have been read already by the high prioity task get_tgm_tim, be aware of the race condition here, hence payload. This routine is a blocking call, it waits for interrupt or timeout. Any NULL argument is permitted, and no value will be returned. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIfd\fP File handle 
+.br
+\fIiclss\fP The class of the interrupt CTIM, PTIM, or hardware 
+.br
+\fIequip\fP The PTIM, CTIM equipment, or hardware mask 
+.br
+\fIplnum\fP If class is PTIM this is the PLS line number 
+.br
+\fIsource\fP The hardware source of the interrupt 
+.br
+\fIonzero\fP The time of the interrupt 
+.br
+\fItrigger\fP The arrival time of the event that triggered the action 
+.br
+\fIstart\fP The time the start of the counter occured 
+.br
+\fIctim\fP The CTIM equipment number of the triggering event 
+.br
+\fIpayload\fP The payload of the triggering event 
+.br
+\fImodule\fP The module number 1..n of the timing receiver card 
+.br
+\fImissed\fP The number of missed events since the last wait 
+.br
+\fIqsize\fP The number of remaining interrupts on the queue 
+.br
+\fImachine\fP The Tgm machine of the trigger event 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "\fBTimLibError\fP TimLibGet (unsigned long ptim, unsigned long plnum, unsigned long grnum, unsigned long grval, \fBTimLibCcvMask\fP * ccvm, \fBTimLibCcv\fP * ccv)"
+.PP
+Get the Ccv of a PTIM equipment. When reading, the valid fields are determined by the module type. Some modules types, eg Tg8 have missing fields in the ccv structure. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIptim\fP The PTIM equipment number whose parameters you want to get 
+.br
+\fIplnum\fP When this is the Ptim Line number 1..n, else 0 
+.br
+\fIgrnum\fP The telegram group number or zero if no telegram check needed 
+.br
+\fIgrval\fP The telegram group value needed to activate the trigger 
+.br
+\fIccvm\fP Pointer to a mask which will denote which fields are valid 
+.br
+\fIccv\fP Pointer to the CCV structure containing the fields read 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "\fBTimLibError\fP TimLibGetAllCtimObjects (unsigned long * ctimlist, unsigned long * csize, unsigned long size)"
+.PP
+Get the list of all defined CTIM objects 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIctimlist\fP List of ctim equipments 
+.br
+\fIcsize\fP Number of ctims in list 
+.br
+\fIsize\fP Max size of list 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "\fBTimLibError\fP TimLibGetAllPtimObjects (unsigned long * ptimlist, unsigned long * psize, unsigned long size)"
+.PP
+Get the list of all defined PTIM objects 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIptimlist\fP List of ptim equipments 
+.br
+\fIpsize\fP Number of ptims in list 
+.br
+\fIsize\fP Max size of list 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "\fBTimLibError\fP TimLibGetCableId (unsigned long module, unsigned long * cable)"
+.PP
+Get the cable identifier to which a given module is attached so that the correct module can be used to read telegrams. This function will be used by the program get_tgm_tim only; it is of no interest to the majority of clients because calls to ReadTelegram are diverted.
+.PP
+\fBParameters:\fP
+.RS 4
+\fImodule\fP The module you want to know which cable is attached to 
+.br
+\fIcable\fP The resulting cable Id 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "\fBTimLibError\fP TimLibGetCtimObject (unsigned long ctim, unsigned long * eventcode)"
+.PP
+Get the event code corresponding to a given CTIM equipment number. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIctim\fP The CTIM equipment number whose frame you want to get 
+.br
+\fIeventcode\fP Will be filled with the event code for the given CTIM 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "\fBTimLibError\fP TimLibGetGroupValueFromStamp (\fBTimLibTime\fP stamp, unsigned long gn, unsigned long next, unsigned long * gv)"
+.PP
+Get a group value from the telegram for given cycle stamp. Using the cycle stamp returned from GetTgmInfo, this routine gets the value of a group in the cycles telegram, if the next flag is set, the group value is from the next part of the telegram. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIstamp\fP The cycle stamp for the cycle whose telegram you need 
+.br
+\fIgn\fP The Group number in the telegram 
+.br
+\fInext\fP The Next flag 
+.br
+\fIgv\fP The resulting Group value 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "\fBTimLibError\fP TimLibGetHandle (int * fd)"
+.PP
+In some cases when running a GUI under Linux, say, a file handle to put in a 'select' is needed so that one can wait on multiple file handles simultaneously. This routine returns such a handle suitable to check for waiting interrupts. Don not read directly from it, call the wait routine. The queue flag must be on for this to work !! 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIfd\fP Will be filled with the file descriptor for a select 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "unsigned long TimLibGetInstalledModuleCount ()"
+.PP
+Lets you know how many installed modules there are on this host. 
+.PP
+\fBReturns:\fP
+.RS 4
+The number of installed modules or zero on error 
+.RE
+.PP
+
+.SS "\fBTimLibError\fP TimLibGetIoStatus (\fBTimLibLemo\fP * input)"
+.PP
+Special IO routine for CTR only, Get CTR Counter output values and the input states for the external starts and clocks 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinput\fP The address where the Lemo states will be stored 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "unsigned long TimLibGetModuleForCtim (unsigned long ctim)"
+.PP
+Get the module that best suits a given CTIM based on the cable ID 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIctim\fP The ctim ID you want to find a module for 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "\fBTimLibError\fP TimLibGetModuleStats (unsigned long module, \fBTimLibModuleStats\fP * stats)"
+.PP
+Get the module statistics for the given module 
+.PP
+\fBParameters:\fP
+.RS 4
+\fImodule\fP The module number 1..n of the timing receiver card 
+.br
+\fIstats\fP Pointer to a module statistics block for result 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "\fBTimLibError\fP TimLibGetPtimObject (unsigned long ptim, unsigned long * module, unsigned long * counter, unsigned long * dimension)"
+.PP
+Get the description of a given PTIM equipment. The dimension returns the PPM dimension, counter and module are obvious. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIptim\fP The PTIM equipment number for the object you want to get 
+.br
+\fImodule\fP Will be filled with the module number for the given PTIM 
+.br
+\fIcounter\fP Will be filled with the counter used by the PTIM 
+.br
+\fIdimension\fP Will be filled with the PPM dimension of the PTIM 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "unsigned long TimLibGetQueueSize ()"
+.PP
+To know if a call to wait will block, this call returns the Queue size. If the size is greater than zero a call to wait will not block and return without waiting. If the qflag is set to NoQueue, zero is allways returned and all calls to wait will block. 
+.PP
+\fBReturns:\fP
+.RS 4
+number of unread items on the queue 
+.RE
+.PP
+
+.SS "\fBTimLibError\fP TimLibGetRemote (unsigned long module, unsigned long cntr, unsigned long * remflg, \fBTimLibCcvMask\fP * ccvm, \fBTimLibCcv\fP * ccv)"
+.PP
+Get a counters remote configuration 
+.PP
+\fBParameters:\fP
+.RS 4
+\fImodule\fP The module number 1..n or zero selects also module 1 
+.br
+\fIcntr\fP The counter number 1..8 whose configuration you want 
+.br
+\fIremflg\fP Will contain 0 = Normal, 1 = Remote 
+.br
+\fIccvm\fP The CCV Mask containing field bits that can be set 
+.br
+\fIccv\fP Pointer to the CCV structure containing the fields set 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "char* TimLibGetSpecificInfo (unsigned long module)"
+.PP
+Get specific status information string. This routine returns summary text on the internal state of a timing receiver. The CTR and Tg8 modules provide much useful information on their internal functions that can help diagnose a problem. However as the implementation is very different, the text string returned is module specific, and contains data for hardware specialists only. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fImodule\fP The module on which to create it 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+char * Free format text string containing detailed status data 
+.RE
+.PP
+
+.SS "\fBTimLibStatus\fP TimLibGetStatus (unsigned long module, \fBTimLibDevice\fP * dev)"
+.PP
+Get the status of a module and its device type 
+.PP
+\fBParameters:\fP
+.RS 4
+\fImodule\fP Module whose status you want to read 
+.br
+\fIdev\fP Device type will be written here if not null 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibStatus 
+.RE
+.PP
+
+.SS "\fBTimLibError\fP TimLibGetTelegram (unsigned long module, TgmMachine machine, \fBTgmTelegram\fP * telegram)"
+.PP
+Read a machines telegram from a timing receiver. The module can be either zero, in which case the system decides which device to use, or it can be explicitly set between 1 and the number of installed modules. The telegram object returned has an opaque structure and can only be decoded through the Tgm library routine .....
+.PP
+
+.br
+ unsigned long grval 
+.br
+ grval = TgmGetGroupValueFromTelegram(unsigned long grnum, TgmTelegram *tgm)
+.PP
+If this routine is called by a users task, then it will actually call TgmGetTelegram to prevent multiple hardware accesses. By the way, this is much faster than a driver call as there is no PCI IO and no context switch, the telegram is read straight from sharded memory. Only when called by get_tgm_tim will a real hardware access be made. If a user task wants the telegram, the best way is to call tgm directly...
+.PP
+
+.br
+ TgmTelegram telegram; 
+.br
+ if (TgmGetTelegram(machine, index, offset, &telegram) == TgmSUCCESS) { ...
+.PP
+For more information on this function see the Tgm library man pages. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fImodule\fP Module from which you want to read the telegram, or 0 if don't care 
+.br
+\fImachine\fP The machine whose telegram you want to read 
+.br
+\fItelegram\fP Pointer to where the telegram will be stored 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "\fBTimLibError\fP TimLibGetTgmInfo (\fBTimLibTime\fP stamp, \fBTimLibTime\fP * cyclestamp, unsigned long * cytag, unsigned long * ncytag)"
+.PP
+Get telegram information from a time stamp. This routine searches the telegram history for a cycle in which your time stamp occured. It then returns the cycles time stamp in which the time you gave occurd and its present and next tags. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIstamp\fP Time you want telegram information about 
+.br
+\fIcyclestamp\fP Time of cycle for given stamp 
+.br
+\fIcytag\fP Present Cycle tag of cycle (NULL means ignore) 
+.br
+\fIncytag\fP Next Cycle tag (NULL means ignore) 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "\fBTimLibError\fP TimLibGetTime (unsigned long module, \fBTimLibTime\fP * utc)"
+.PP
+Read the instantaneous value of the time in UTC. The module parameter can be set to zero in which case the system decideds which module to read the time from, otherwise it can be set to a value between 1 and the number of installed modules. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fImodule\fP Module number to read from, 0 means any module 
+.br
+\fIutc\fP Pointer to the time structure which will contain the time 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "\fBTimLibError\fP TimLibInitialize (\fBTimLibDevice\fP device)"
+.PP
+This routine could have been hidden from the user of the Timing lib, however, in some circumstances, the initialization can take several minutes to complete. Hence I have decided to make an initialization routine publicly available, and force all applications/users to call it. This routine may perform the following initialization functions... 1) Opens a socket or a connection to a timing driver 2) Checks the Firmware/VHDL version against the latest revision Some EProms/FPGAs may need updating, this takes a while. 3) Load all relavent CTIM and PTIM definitions if needed. The device parameter specifies which type of device the library must use and initialize. If its set to ANY, the library will try to find a device by attempting to open each device driver in turn and in the order of the DEVICE enumeration: CTR_PCI,CTR_VME,TG8_CPS,TG8_SPS and finaly NETWORK. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIdevice\fP The device for which the library is to initialize 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "\fBTimLibError\fP TimLibQueue (unsigned long qflag, unsigned long tmout)"
+.PP
+Set queueing On or Off, and the time out value in micro seconds. A timeout value of zero means no time out, you wait for ever. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIqflag\fP The Queue Flag 0=>Queue, 1=>NoQueue 
+.br
+\fItmout\fP The Timeout in microseconds, 0=> No timeout, waits for ever 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "\fBTimLibError\fP TimLibRemoteControl (unsigned long remflg, unsigned long module, unsigned long cntr, \fBTimLibRemote\fP rcmd, \fBTimLibCcvMask\fP ccvm, \fBTimLibCcv\fP * ccv)"
+.PP
+Set a counter under full remote control (IE under a DSC tasks' control) This feature permits you to do what you like with counters even if there is no timing cable attached. With this you can drive stepper motors, wire scanners or whatever. No PTIM or CTIM is involved, the configuration is loaded directly by the application. Note that when the argument remflg is set to 1, the counter can not be written to by incomming triggers so all PTIM objects using the counter stop overwriting the counter configuration and are effectivley disabled. Setting the remflg 0 permits PTIM triggers to write to the counter configuration, the write block is removed. Also note that in some cases it is useful to perform remote actions, such as remoteSTOP, even if the remflg is set to zero. The remflg simply blocks PTIM overwrites, the counter configuration can still be accessed ! 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIremflg\fP 0 = Normal, 1 = Remote 
+.br
+\fImodule\fP The module number 1..n or zero selects also module 1 
+.br
+\fIcntr\fP The counter number 1..8 you are going to control 
+.br
+\fIrcmd\fP The remote command to execute on the counter 
+.br
+\fIccvm\fP The CCV Mask containing field bits to be set 
+.br
+\fIccv\fP Pointer to the CCV structure containing the fields to be set 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "\fBTimLibError\fP TimLibSet (unsigned long ptim, unsigned long plnum, unsigned long grnum, unsigned long grval, \fBTimLibCcvMask\fP ccvm, \fBTimLibCcv\fP * ccv)"
+.PP
+Set the PTIM actions. When plnum is non zero the triggers can be over written, in this case plnum indexes the PTIM object directly and the trigger is rebuilt using the machine, ctim, grnum, and grval fields in the ccv. The check mode is determind from the group descriptor via calls to the Tgm library. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIptim\fP The PTIM equipment number you are going to set 
+.br
+\fIplnum\fP When modifying the trigger, this is the Ptim Line number 1..n, else 0 
+.br
+\fIgrnum\fP The telegram group number or zero if no telegram check needed 
+.br
+\fIgrval\fP The telegram group value needed to activate the trigger 
+.br
+\fIccvm\fP The CCV Mask containing field bits to be set 
+.br
+\fIccv\fP Pointer to the CCV structure containing the fields to be set 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "void TimLibSetDebug (unsigned long level)"
+.PP
+Set the debug level, and also the behaviour of TimLibInitialize 
+.br
+ Level 0 Normal behaviour, should be used when not debugging 
+.br
+ Level 1 turns on diagnostic printing 
+.br
+ Level 2 forces a re-initialization of the module in TimLibInitialize 
+.br
+ Level 3 wipes out all PTIM and CTIM objects, starts with a clean slate 
+.br
+ Level 4 is used in the SPS TG8s to keep actions created by other software 
+.br
+ Level 5 updates VHDL or firmware
+.PP
+Example 
+.br
+ TimLibSetDebug(3); Wipes out all PTIMS and CTIMS 
+.br
+ err = \fBTimLibInitialize(TimLibDevice_TG8_SPS)\fP; Start with a clean slate 
+.br
+ if (err...
+.PP
+\fBParameters:\fP
+.RS 4
+\fIlevel\fP The debug level 0..5 controling behaviour in initialization 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+void 
+.RE
+.PP
+
+.SS "\fBTimLibError\fP TimLibSetOutputs (\fBTimLibLemo\fP output, \fBTimLibLemo\fP mask)"
+.PP
+Special IO routine for CTR only, Set Counter Output LEMO values. By changing counter polarity you can change the counter outputs to 1 or 0. Counters not set in the supplied mask value do not change their output level. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIoutput\fP The counter output states 
+.br
+\fImask\fP The counters whose output level you want to set 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "\fBTimLibError\fP TimLibSetPllLocking (unsigned long module, unsigned long lockflag)"
+.PP
+Control how the PLL locks after synchronization loss 
+.PP
+\fBParameters:\fP
+.RS 4
+\fImodule\fP The module number 1..n of the timing receiver card 
+.br
+\fIlockflag\fP 1 implies Brutal 0 Slow PLL locking 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "\fBTimLibError\fP TimLibSimulate (\fBTimLibClass\fP iclss, unsigned long equip, unsigned long module, TgmMachine machine, unsigned long grnum, unsigned long grval)"
+.PP
+By writing to the driver this call simulates an interrupt for the connected clients. Also it can be used as a way of synchronizing processes, this is especially important in Linux systems where the schedular is not preemptive. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIiclss\fP Class of interrupt to simulate, PTIM, CTIM or Hardware 
+.br
+\fIequip\fP Equipment number for PTIM or CTIM, hardware mask for Hardware 
+.br
+\fImodule\fP When class is CTIM or Hardware, the module number is used 
+.br
+\fImachine\fP Telegram ID is used for PTIM interrupts if grnum is not zero 
+.br
+\fIgrnum\fP If zero, no telegram checking, else the PTIM triggers group number 
+.br
+\fIgrval\fP The telegram group value for the PTIM trigger 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "\fBTimLibError\fP TimLibStringToSlot (char * cyid, unsigned long * slix)"
+.PP
+Convert a cycle Id string like CPS.USER.SFTPRO into a slot index. No abbreviations are supported, seperators are dots. Strict Syntax. The result is slix, the slot index ranging from [0..(GroupSize-1)]. No change is made to slix on error always check return before using. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcyid\fP The Cycle ID string to parse 
+.br
+\fIslix\fP The Resulting slot index 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SS "\fBTimLibError\fP TimLibWait (\fBTimLibClass\fP * iclss, unsigned long * equip, unsigned long * plnum, \fBTimLibHardware\fP * source, \fBTimLibTime\fP * onzero, \fBTimLibTime\fP * trigger, \fBTimLibTime\fP * start, unsigned long * ctim, unsigned long * payload, unsigned long * module, unsigned long * missed, unsigned long * qsize, TgmMachine * machine)"
+.PP
+Wait for an interrupt. The parameters are all returned from the call so you can know which interrupt it was that came back. Note, when waiting for a hardware interrupt from either CTIM or from a counter, it is the CTIM or PTIM object that caused the interrupt returned. The telegram will have been read already by the high prioity task get_tgm_tim, be aware of the race condition here, hence payload. This routine is a blocking call, it waits for interrupt or timeout. Any NULL argument is permitted, and no value will be returned. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIiclss\fP The class of the interrupt CTIM, PTIM, or hardware 
+.br
+\fIequip\fP The PTIM, CTIM equipment, or hardware mask 
+.br
+\fIplnum\fP If class is PTIM this is the PLS line number 
+.br
+\fIsource\fP The hardware source of the interrupt 
+.br
+\fIonzero\fP The time of the interrupt 
+.br
+\fItrigger\fP The arrival time of the event that triggered the action 
+.br
+\fIstart\fP The time the start of the counter occured 
+.br
+\fIctim\fP The CTIM equipment number of the triggering event 
+.br
+\fIpayload\fP The payload of the triggering event 
+.br
+\fImodule\fP The module number 1..n of the timing receiver card 
+.br
+\fImissed\fP The number of missed events since the last wait 
+.br
+\fIqsize\fP The number of remaining interrupts on the queue /* 
+.br
+\fImachine\fP The Tgm machine of the trigger event 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+TimLibError 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Low Level Timing Library from the source code.

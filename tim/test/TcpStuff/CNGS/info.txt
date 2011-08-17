@@ -1,0 +1,36 @@
+1) Find host name instead of IP address:
+
+[abpc11039] /afs/cern.ch/user/n/nmn > host 192.84.135.95
+95.135.84.192.in-addr.arpa domain name pointer opera.lngs.infn.it.
+
+
+2) Generate an SSH-2 key
+
+ssh-keygen -t dsa
+
+3) Copy publicc key to authorized_keys2 for SSH version 2 protocol:
+
+scp id_dsa.pub cngs@opera.lngs.infn.it:.ssh/authorized_keys2
+
+
+4) From now, you may use:
+
+ssh  cngs@opera.lngs.infn.it
+
+
+or to transfer files: either:
+
+scp local_file cngs@opera.lngs.infn.it:destinationfile
+
+or
+
+sftp cngs@opera.lngs.infn.it
+sftp> lcd localdirectory
+sftp> mkdir destdir
+sftp> cd destdir
+sftp> mput *
+sftp> bye
+
+account: cngs
+passwd: cngsclock
+

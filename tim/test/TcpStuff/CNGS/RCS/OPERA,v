@@ -1,0 +1,70 @@
+head	1.3;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.3
+date	2006.07.18.12.23.32;	author lewis;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2006.06.29.12.31.02;	author lewis;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2006.02.28.14.42.21;	author lewis;	state Exp;
+branches;
+next	;
+
+
+desc
+@Interesting IP addresses
+@
+
+
+1.3
+log
+@*** empty log message ***
+@
+text
+@opera.lngs.infn.it    192.84.135.95   port 1234
+bxmaster.lngs.infn.it 192.135.35.177  port 1235
+lvdaq0.lngs.infn.it  192.135.35.143   port 1236
+
+ABSPS1 172.18.203.173
+PSPC8473 137.138.192.94
+
+account: cngs
+passwd:  cngsclock
+
+SendCNGS ctim 331 port 1234 target 192.84.135.95 &
+SendCNGS ctim 331 port 1235 target 192.135.35.177 &
+SendCNGS ctim 331 port 1236 target 192.135.35.143 &
+SendCNGS ctim 331 port 1237 target 131.154.10.239 &
+
+@
+
+
+1.2
+log
+@*** empty log message ***
+@
+text
+@d10 6
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 4
+a4 1
+OPERA 192.84.135.95
+d7 3
+@

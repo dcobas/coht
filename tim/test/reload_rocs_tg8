@@ -1,0 +1,1 @@
+echo "frl /usr/local/tim/tg8rocs.exe" | /usr/local/bin/tg8test > /dev/null

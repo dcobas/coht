@@ -1,0 +1,64 @@
+.TH "TimLibRecBlock" 3 "12 Nov 2008" "Low Level Timing Library" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+TimLibRecBlock \- 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Public Attributes"
+
+.in +1c
+.ti -1c
+.RI "unsigned long \fBValid\fP"
+.br
+.ti -1c
+.RI "\fBTimLibTime\fP \fBLastRset\fP"
+.br
+.ti -1c
+.RI "unsigned long \fBPrtyErrs\fP"
+.br
+.ti -1c
+.RI "unsigned long \fBSyncErrs\fP"
+.br
+.ti -1c
+.RI "unsigned long \fBCodeErrs\fP"
+.br
+.ti -1c
+.RI "unsigned long \fBQueuErrs\fP"
+.br
+.ti -1c
+.RI "unsigned long \fBTotlErrs\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+Reception error status block 
+.PP
+.SH "Member Data Documentation"
+.PP 
+.SS "unsigned long \fBTimLibRecBlock::CodeErrs\fP"
+.PP
+Number of code violations 
+.SS "\fBTimLibTime\fP \fBTimLibRecBlock::LastRset\fP"
+.PP
+Time when last reset 
+.SS "unsigned long \fBTimLibRecBlock::PrtyErrs\fP"
+.PP
+Number of parity errors 
+.SS "unsigned long \fBTimLibRecBlock::QueuErrs\fP"
+.PP
+Number of queue overflow errors 
+.SS "unsigned long \fBTimLibRecBlock::SyncErrs\fP"
+.PP
+Number of synchronization errors 
+.SS "unsigned long \fBTimLibRecBlock::TotlErrs\fP"
+.PP
+Total error count 
+.SS "unsigned long \fBTimLibRecBlock::Valid\fP"
+.PP
+0 means invalid 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Low Level Timing Library from the source code.

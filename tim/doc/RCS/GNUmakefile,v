@@ -1,0 +1,29 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2004.08.20.09.02.08;	author lewis;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@
+all:
+	echo Make documentation for TimLib
+	rm -f ,*.h
+	rm -rf doc
+	doxygen Doxyfile
+@

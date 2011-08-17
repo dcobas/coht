@@ -1,0 +1,40 @@
+This version of the SL Tg8 firmware can read SPS telegrams and UTC time events
+It has been extesivley modified and is only suitable for dynamic loading,
+it can not be epromed as it modifies itself at initialization time.
+
+To compile it run make in ../CrossFirmware for cross compilation
+
+Fri 10th June Julian Lewis: Modifications as follows...
+ --  Removed statically initialized memory so that program can be
+       downloaded accross the VME bus.
+ --  Added static memory initialization to the SoftInit routine for
+       download capability.
+ --  Implemented SPS telegram support.
+ --  Removed all logic to do with the old date/time formats for the
+       legacy events for tg3, and PS tg8.
+ --  Implemented full UTC time support based on the Tgv events.
+ --  The handling of the SUPER-CYCLE number in the old 0x20 header
+       now returns the 32 bit UTC time instead of the 24 bit payload.
+ --  Some general tidy up of the code, in particular so that the O3
+       optimization can be turned on hardware addresses are declared
+       as volatile. This makes the code much faster.
+ --  Watchdog code has been changed to avoid O3 problem, it is now
+       written in assembler to get over O3 optimization problems.
+ -- Modified logic around SPS 21 and 24 event headers so tyhat the firmware
+       handles telegrams correctly and allows connecting to interrupts
+       for both headers.
+Julian
+
+Fri 29th July:
+ -- Bug in the way in_use array is used for 24 headers corrected in isr.c
+       by not looking at in_use when handling ready-pls events.
+ -- Bug in 24 group restriction corrected.
+       telegrams with more than 24 groups were writing all over memory !!
+ -- Bug in the way headers are checked in isr corrected
+ -- I put the 16-Bit SCcount-Logic in place, this mod needs a driver mod to
+       unscramble little-endien byte order.
+ -- Lots and lots of tidying up done
+       I could suppress at least 50% of the code, but the effort ins't worth
+       the gain. It works, but beware the SL-Tg8 firmware is one of the worst
+       examples of BF I have ever seen. Only experts who know what they are
+       doing should think about touching this code.

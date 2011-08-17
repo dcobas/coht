@@ -1,0 +1,52 @@
+.TH "TimLibModuleStats" 3 "12 Nov 2008" "Low Level Timing Library" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+TimLibModuleStats \- 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Public Attributes"
+
+.in +1c
+.ti -1c
+.RI "unsigned long \fBModule\fP"
+.br
+.ti -1c
+.RI "\fBTimLibPllBlock\fP \fBPll\fP"
+.br
+.ti -1c
+.RI "\fBTimLibRecBlock\fP \fBRec\fP"
+.br
+.ti -1c
+.RI "\fBTimLibCstBlock\fP \fBCst\fP"
+.br
+.ti -1c
+.RI "\fBTimLibExtBlock\fP \fBExt\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+Module statistics and diagnostics This structure contains four blocks of data representing the state of the PLL, the Receiver the Card State and extended diagnostics. 
+.PP
+.SH "Member Data Documentation"
+.PP 
+.SS "\fBTimLibCstBlock\fP \fBTimLibModuleStats::Cst\fP"
+.PP
+Card State block 
+.SS "\fBTimLibExtBlock\fP \fBTimLibModuleStats::Ext\fP"
+.PP
+Extended memory block 
+.SS "unsigned long \fBTimLibModuleStats::Module\fP"
+.PP
+Module number (0 if invalid0 
+.SS "\fBTimLibPllBlock\fP \fBTimLibModuleStats::Pll\fP"
+.PP
+Pll status block 
+.SS "\fBTimLibRecBlock\fP \fBTimLibModuleStats::Rec\fP"
+.PP
+Receiver errors block 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Low Level Timing Library from the source code.

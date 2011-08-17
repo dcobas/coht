@@ -1,0 +1,9 @@
+For linux
+
+setenv CPU Linux
+
+then make the library first
+
+then
+
+gmake -f GNUmakefile.linux clean all install

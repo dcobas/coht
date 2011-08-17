@@ -1,0 +1,9 @@
+Each device has its own subdirectory and the sourced is included here.
+Supported timing devices are
+
+    ctr (Includes all CTR cards PCI/PMC/VME)
+    tg8cps  PS Tg8
+    tg8sps  SPS Tg8
+    dtmtim  Dtm Timing via UDP network packets
+
+To see the doccumentation execute the command "show_doc"

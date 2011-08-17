@@ -1,0 +1,67 @@
+#================================================================
+# Makefile to produce TimLib test program
+#================================================================
+
+include /acc/dsc/src/co/Make.auto
+
+CFLAGS := -g -Wall -I. -I.. -I/acc/local/$(CPU)/include -I/acc/src/dsc/drivers/ctr/src/driver
+LDLIBS := ../libtim.$(CPU).a -ltgm -ldtm -lerr -lerr_dummy -ltgv -lm -lX11 $(XTRALIBS) -lnc
+
+ifeq ($(CPU),ppc4)
+CFLAGS += -fwritable-strings
+LDLIBS += -lnetinet
+endif
+ifeq ($(CPU),Lces)
+LDLIBS += -lXau -lXdmcp -ldl
+endif
+
+ALL  = Main.$(CPU) timtest.$(CPU) TimLookat.$(CPU) TimClock.$(CPU)
+
+SRCS = Main.c TimCmds.c DoCmd.c GetAtoms.c Cmds.c
+
+HDRS = Cmds.h ../TimLib.h
+
+all: $(ALL)
+
+clean:
+	$(RM) *.$(CPU) *.$(CPU).o ,*
+
+# Run on Workstation only
+
+TimLookat.$(CPU).o: TimLookat.c
+
+TimLookat.$(CPU): TimLookat.$(CPU).o
+
+TimClock.$(CPU).o: TimClock.c
+
+TimClock.$(CPU): TimClock.$(CPU).o
+
+timtest.$(CPU): Main.$(CPU)
+	rm -f timtest.$(CPU)
+	cp Main.$(CPU) timtest.$(CPU)
+
+Main.$(CPU).o: $(SRCS) $(HDRS)
+
+Main.$(CPU): Main.$(CPU).o
+
+install: tg8sl.exe tg8leg.exe tg8rocs.exe timtest.$(CPU) reload_sl_tg8 reload_leg_tg8 reload_rocs_tg8 \
+	 timtest.config TimLookat.$(CPU) TimClock.$(CPU) TimClock.$(CPU)
+	@for a in $(ACCS); do \
+		d=/acc/dsc/$$a/$(CPU)/tim;\
+		echo Installing tg8 firmware in $$d; \
+		dsc_install tg8sl.exe $$d;\
+		dsc_install tg8leg.exe $$d; \
+		dsc_install tg8rocs.exe $$d; \
+		echo Installing timtest in $$d;\
+		dsc_install timtest.$(CPU) $$d;\
+		echo Installing reload tg8 shell scripts in $$d;\
+		dsc_install reload_sl_tg8 $$d;\
+		dsc_install reload_leg_tg8 $$d;\
+		dsc_install reload_rocs_tg8 $$d; \
+		echo Installing configuration file; \
+		dsc_install timtest.config $$d;\
+		echo Installing TimLookat.$(CPU) in $$d; \
+		dsc_install TimLookat.$(CPU) $$d; \
+		echo Installing TimClock.$(CPU) in $$d; \
+		dsc_install TimClock.$(CPU) $$d; \
+	done;

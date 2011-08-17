@@ -1,0 +1,2821 @@
+head	1.21;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.21
+date	2007.10.12.09.03.44;	author lewis;	state Exp;
+branches;
+next	1.20;
+
+1.20
+date	2007.08.20.07.42.07;	author lewis;	state Exp;
+branches;
+next	1.19;
+
+1.19
+date	2007.08.17.14.45.00;	author lewis;	state Exp;
+branches;
+next	1.18;
+
+1.18
+date	2007.08.17.12.59.18;	author lewis;	state Exp;
+branches;
+next	1.17;
+
+1.17
+date	2007.08.17.12.06.18;	author lewis;	state Exp;
+branches;
+next	1.16;
+
+1.16
+date	2007.08.17.08.16.32;	author lewis;	state Exp;
+branches;
+next	1.15;
+
+1.15
+date	2007.08.16.14.34.27;	author lewis;	state Exp;
+branches;
+next	1.14;
+
+1.14
+date	2007.08.15.15.06.13;	author lewis;	state Exp;
+branches;
+next	1.13;
+
+1.13
+date	2007.08.15.12.55.35;	author lewis;	state Exp;
+branches;
+next	1.12;
+
+1.12
+date	2007.08.14.11.56.42;	author lewis;	state Exp;
+branches;
+next	1.11;
+
+1.11
+date	2007.08.13.15.53.32;	author lewis;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	2007.07.16.09.13.19;	author lewis;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	2007.07.11.14.22.10;	author lewis;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	2007.07.03.15.45.44;	author lewis;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	2007.07.03.14.20.42;	author lewis;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2007.07.03.08.29.06;	author lewis;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2007.07.02.16.06.07;	author lewis;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2007.06.21.14.48.34;	author lewis;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2007.06.20.12.41.11;	author lewis;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2007.06.13.15.35.34;	author lewis;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2007.06.07.15.28.57;	author lewis;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.21
+log
+@Uped timeout to 2Mins due to long supercycles
+@
+text
+@/* ============================================================================== */
+/* Test program for TimSurvey; Commands part                                      */
+/* Julian Lewis 7th June 2007                                                     */
+/* ============================================================================== */
+
+#include <stdarg.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <netdb.h>
+#include <sys/time.h>
+#include <errno.h>
+#include <strings.h>
+#include <string.h>
+#include <time.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netinet/tcp.h>
+#include <fcntl.h>
+#include <signal.h>
+#include <wait.h>
+#include <unistd.h>
+#include <string.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <errno.h>
+#include <sys/file.h>
+#include <a.out.h>
+#include <ctype.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
+#include <dscrt/dscrtlib.h>
+
+#define SinSIZE (sizeof(struct sockaddr_in))
+
+/* No outgoing packet to TimSurvey can exceed this size */
+
+#define OUT_BUF_SZ 132
+static char out_buf[OUT_BUF_SZ];
+
+/* No incomming packet from TimSurvey will exceed this size */
+
+#define PADDING 16
+#define IN_BUF_SZ 1100
+static char in_buf[IN_BUF_SZ + PADDING];
+
+typedef enum {
+   TsHELP,
+   TsKILL,
+   TsPING,
+   TsLIST,
+   TsSTRINGS,
+   TsSAMPLE,
+   TsGET_STATUS,
+   TsGET_STATIC,
+   TsGET_DYNAMIC,
+   TsDEBUG,
+   TsGET_VERSION,
+   TsRESET,
+   TsCMDS
+ } TsCmd;
+
+static char *TsCmdNames[TsCMDS]  = {
+   "Help",
+   "Kill",
+   "Ping",
+   "List",
+   "Strings",
+   "Sampling",
+   "GetStatus",
+   "GetStatic",
+   "GetDynamic",
+   "Debug",
+   "Version",
+   "Reset"
+ };
+
+static char *TsFileNames[TsCMDS] = {
+   "hlp",
+   "kil",
+   "png",
+   "lst",
+   "str",
+   "smp",
+   "rst",
+   "ccv",
+   "aqn",
+   "dbg",
+   "ver",
+   "xeh"
+ };
+
+/* Handle packet streams simultaneously from multiple DSCs */
+
+#define DSCS 10
+#define DSC_NAME_SZ 31
+#define CMD_NAME_SZ 15
+#define MAX_PKTS    100
+#define MAX_BUFS    10
+
+typedef struct {
+   char DscName[DSC_NAME_SZ +1];
+   char CmdName[CMD_NAME_SZ +1];
+   int  Size;                     /* Total size after getting an EOF */
+   int  Valid;                    /* Number of valid packets recieved */
+   char *Bufs[MAX_PKTS];
+ } BufEntry;
+
+BufEntry bufs[MAX_BUFS];
+
+/* ==================================== */
+/* Open a UDP port for SendSocket data  */
+
+static int domain    = AF_INET;
+static int send_sock = 0;
+
+int OpenSendPort(unsigned short port) {
+
+struct sockaddr_in sin;
+int    s;
+
+   if (!send_sock) {
+      s = socket(domain, SOCK_DGRAM, 0);
+      if (s < 0) {
+	 fprintf(stderr,"tsvytest:OpenSendPort:Error:Cant open sockets\n");
+	 perror("tsvytest:OpenSendPort:errno");
+	 return 0;
+      }
+      send_sock = s;
+
+      bzero((void *) &sin, SinSIZE);
+      sin.sin_family = domain;
+      sin.sin_port = htons(port);
+      sin.sin_addr.s_addr = htonl(INADDR_ANY);
+      if (bind(s,(struct sockaddr *) &sin, SinSIZE) < 0) {
+	 fprintf(stderr,"tsvytest:OpenSendPort:Error:Cant bind port:%d\n",port);
+	 perror("tsvytest:OpenSendPort:errno");
+	 shutdown(send_sock,SHUT_RDWR);
+	 close(send_sock);
+	 send_sock = 0;
+	 return 0;
+      }
+   }
+   return 1;
+}
+
+/* ============================= */
+/* Send packet to a port via UDP */
+
+int SendToPort(char *ip, unsigned short port, char *pkt) {
+
+int    cc;
+struct sockaddr_in sin;
+
+   if (send_sock) {
+      bzero((void *) &sin, SinSIZE);
+      sin.sin_family = domain;
+      sin.sin_port = htons(port);
+      sin.sin_addr.s_addr = inet_addr(ip);
+      cc = sendto(send_sock,
+		  pkt,
+		  strlen(pkt),
+		  0,
+		  (struct sockaddr *) &sin,
+		  SinSIZE);
+
+      if (cc < 0) {
+	 fprintf(stderr,
+		"tsvytest:SendToPort:Error:Cant sendto port:%d at:%s\n",
+		 port,
+		 ip);
+	 perror("tsvytest:SendToPort:errno");
+	 return 0;
+      }
+      return 1;
+   }
+   return 0;
+}
+
+/* ==================================== */
+/* Open a UDP port for RecvSocket data  */
+
+static int recv_sock = 0;
+
+int OpenRecvPort(unsigned short port) {
+
+struct sockaddr_in sin;
+
+int s;
+
+   if (!recv_sock) {
+      s = socket(domain, SOCK_DGRAM, 0);
+      if (s < 0) {
+	 fprintf(stderr,"tsvytest:OpenRecvPort:Error:Cant open sockets\n");
+	 perror("tsvytest:OpenRecvPort:errno");
+	 return 0;
+      }
+      recv_sock = s;
+
+      bzero((void *) &sin, SinSIZE);
+      sin.sin_family = domain;
+      sin.sin_port = htons(port);
+      sin.sin_addr.s_addr = htonl(INADDR_ANY);
+      if (bind(s,(struct sockaddr *) &sin, SinSIZE) < 0) {
+	 fprintf(stderr,"tsvytest:OpenRecvPort:Error:Cant bind port:%d\n",port);
+	 perror("tsvytest:OpenRecvPort:errno");
+	 shutdown(recv_sock,SHUT_RDWR);
+	 close(recv_sock);
+	 recv_sock = 0;
+	 return 0;
+      }
+   }
+   return 1;
+}
+
+/* ============================ */
+/* Receive packets from socket  */
+
+int RecvFromPort(unsigned short port, char *pkt, int len) {
+
+int                cc;
+socklen_t          from;
+struct sockaddr_in sin;
+
+   if (recv_sock) {
+      bzero((void *) &sin, SinSIZE);
+      from = sizeof(sin);
+      cc = recvfrom(recv_sock,
+		    pkt,
+		    len,
+		    0,
+		    (struct sockaddr *) &sin,
+		    &from);
+      if (cc < 0) {
+	 fprintf(stderr,
+		"tsvytest:RecvFromPort:Error:Cant recvfrom port:%d\n",
+		 port);
+	 perror("tsvytest:RecvFromPort:errno");
+	 return 0;
+      }
+      return 1;
+   }
+   return 0;
+}
+
+/* ====================================== */
+/* Get file paths from configuration file */
+
+#define LN 128
+
+static char *defaultconfigpath = "/mcr/tim/tsvytest.config";
+static char *configpath = NULL;
+static char  localconfigpath[LN];
+static char  path[LN];
+
+char *GetFile(char *name) {
+FILE *gpath = NULL;
+char txt[LN];
+int i, j;
+
+   if (configpath) {
+      gpath = fopen(configpath,"r");
+      if (gpath == NULL) {
+	 configpath = NULL;
+      }
+   }
+
+   if (configpath == NULL) {
+      configpath = "./tsvytest.config";
+      gpath = fopen(configpath,"r");
+      if (gpath == NULL) {
+	 configpath = "/dsc/local/data/tsvytest.config";
+	 gpath = fopen(configpath,"r");
+	 if (gpath == NULL) {
+	    configpath = defaultconfigpath;
+	    gpath = fopen(configpath,"r");
+	    if (gpath == NULL) {
+	       configpath = NULL;
+	       sprintf(path,"./%s",name);
+	       return path;
+	    }
+	 }
+      }
+   }
+
+   bzero((void *) path,LN);
+
+   while (1) {
+      if (fgets(txt,LN,gpath) == NULL) break;
+      if (strncmp(name,txt,strlen(name)) == 0) {
+	 for (i=strlen(name); i<strlen(txt); i++) {
+	    if (txt[i] != ' ') break;
+	 }
+	 j= 0;
+	 while ((txt[i] != ' ') && (txt[i] != 0)) {
+	    path[j] = txt[i];
+	    j++; i++;
+	 }
+	 strcat(path,name);
+	 fclose(gpath);
+	 return path;
+      }
+   }
+   fclose(gpath);
+   return NULL;
+}
+
+/* ================================================= */
+/* Get a buffer corresponding to a DSC and a command */
+
+BufEntry *GetBuf(char *dnm, char *cmn) {
+
+BufEntry *bep;
+int i;
+
+   if ((strlen(dnm) + strlen(cmn)) == 0) return NULL;
+
+   for (i=0; i<MAX_BUFS; i++) {
+      bep = &(bufs[i]);
+      if ((strcmp(dnm,bep->DscName) == 0)
+      &&  (strcmp(cmn,bep->CmdName) == 0)) return bep;
+   }
+   return NULL;
+}
+
+/* ============================================= */
+/* Release a buffer and claim back storage space */
+
+void RelBuf(char *dnm, char *cmn) {
+
+BufEntry *bep;
+int i;
+char *cp;
+
+   bep = GetBuf(dnm,cmn);
+   if (bep) {
+      for (i=0; i<bep->Size; i++) {
+	 cp = bep->Bufs[i];
+	 if (cp) free(cp);
+      }
+      bzero((void *) bep, sizeof(BufEntry));
+      return;
+   }
+}
+
+/* =================== */
+/* Release all buffers */
+
+void RelAll() {
+
+BufEntry *bep;
+int i;
+
+   for (i=0; i<MAX_BUFS; i++) {
+      bep = &(bufs[i]);
+      RelBuf(bep->DscName,bep->CmdName);
+   }
+}
+
+/* ======================= */
+/* Get an empty new buffer */
+
+BufEntry *NewBuf(char *dnm, char *cmn) {
+
+BufEntry *bep;
+int i;
+
+   if (GetBuf(dnm,cmn)) return NULL; /* Already exists */
+
+   for (i=0; i<MAX_BUFS; i++) {
+      bep = &(bufs[i]);
+      if ((strlen(bep->DscName) == 0)
+      &&  (strlen(bep->CmdName) == 0)) {
+	 strcpy(bep->DscName,dnm);
+	 strcpy(bep->CmdName,cmn);
+	 return bep;
+      }
+   }
+   return NULL;
+}
+
+/* ======================== */
+/* Print a buffer to stdout */
+
+int PrintBuf(char *dnm, char *cmn) {
+
+BufEntry *bep;
+char *cp;
+int i;
+
+   bep = GetBuf(dnm,cmn);
+   if (bep) {
+      printf("%s.%s [%d.%d]\n",
+	     bep->DscName,
+	     bep->CmdName,
+	     (int) bep->Size,
+	     (int) bep->Valid);
+      for (i=0; i<bep->Size; i++) {
+	 cp = bep->Bufs[i];
+	 if (cp) {
+	    printf("%s",cp);
+	 }
+      }
+      return 1;
+   } else printf("No buffer for:%s.%s\n",dnm,cmn);
+   return 0;
+}
+
+/* ====================================================================== */
+/* Store packets in buffers.                                              */
+/* enp is true when the EOF packet arrives, it should contain pkn packets */
+/* otherwise write buf into memory at position pkn.                       */
+
+int StorePacket(int enp, int pkn, char *dnm, char *cmn, char *buf) {
+
+BufEntry *bep;
+char *cp;
+
+   bep = GetBuf(dnm,cmn);
+   if ((bep == NULL) && (enp == 0)) bep = NewBuf(dnm,cmn);
+   if (bep == NULL) return 0;
+
+   if (enp) {
+      bep->Size = pkn; /* Size it should be */
+      return 1;
+   }
+
+   cp = (char *) malloc(IN_BUF_SZ + PADDING);
+   if (cp) {
+      bzero((void *) cp, IN_BUF_SZ + PADDING);
+      bep->Bufs[pkn -1] = cp;
+      strcpy(bep->Bufs[pkn -1],buf);
+      bep->Valid++;    /* Actual size so far */
+      return 1;
+   }
+   return 0;
+}
+
+/* ======================================================================= */
+/* Poll the recv socket to see if any data is waiting.                     */
+/* If nothing arrives after 1 Second we assume the transfers are finished. */
+
+int PollRecv(int delay) {
+
+fd_set rdset;
+struct timeval tmo;
+int nfds, cc;
+
+   FD_ZERO(&rdset);
+   FD_SET(recv_sock,&rdset);
+   nfds = recv_sock + 1;
+   tmo.tv_sec = delay; tmo.tv_usec = 0;
+   cc = select(nfds,&rdset,NULL,NULL,&tmo);
+   if (cc < 0) {
+      fprintf(stderr,"PollRecv:(Select returned an error)\n");
+      perror("PollRecv");
+      return 0;
+   }
+   if (FD_ISSET(recv_sock,&rdset)) return cc;
+   return 0;
+}
+
+/* ===================================================== */
+/* Get incomming packets and save them in memory buffers */
+/* All incomming packets have a first line like this ... */
+/* PKT:<number>:<dsc name>:<command name>                */
+/* EOF:<number>:<dsc name>:<command name>                */
+/* The PKT: entry denotes the current packet             */
+/* The EOF: entry denotes the total number of packets    */
+/* Packets can arrive in any order                       */
+
+#define FIRST_WAIT 120
+#define THEN_WAIT 1
+
+int GetPackets() {
+
+int i, pkn, enp, res, tmo;
+char c, *cp, *ep;
+char dsc_name[DSC_NAME_SZ + 1];
+char cmd_name[CMD_NAME_SZ + 1];
+
+   res = 0; tmo = FIRST_WAIT;
+
+   while (PollRecv(tmo)) {
+
+      tmo = THEN_WAIT;
+
+      bzero((void *) in_buf, IN_BUF_SZ + PADDING);
+      RecvFromPort(RECV_PORT, in_buf, IN_BUF_SZ);
+
+      enp = -1;
+      if (strncmp("PKT:",in_buf,4) == 0) enp = 0;
+      if (strncmp("EOF:",in_buf,4) == 0) enp = 1;
+      if (enp == -1) continue;
+
+      cp = &(in_buf[4]);
+      pkn = strtoul(cp,&ep,0);
+      if ((pkn == 0) || (cp == ep)) continue;
+
+      cp = ep +1;
+      bzero((void *) dsc_name, sizeof(dsc_name));
+      for (i=0; i<DSC_NAME_SZ; i++) {
+	 c = *cp++; if ((c == ':') || (c == '\n') || (c == 0)) break;
+	 dsc_name[i] = c;
+      }
+      if (strlen(dsc_name) == 0) continue;
+
+      bzero((void *) cmd_name, sizeof(cmd_name));
+      if (c == ':') {
+	 for (i=0; i<CMD_NAME_SZ; i++) {
+	    c = *cp++; if ((c == ':') || (c == '\n') || (c == 0)) break;
+	    cmd_name[i] = c;
+	 }
+      }
+      if (strlen(cmd_name) == 0) continue;
+
+      res += StorePacket(enp,pkn,dsc_name,cmd_name,cp);
+   }
+
+   if (res) return res;
+
+   fprintf(stderr,"GetPackets:(Nothing received)\n");
+   return 0;
+}
+
+/* ========================= */
+/* Save packets to disc file */
+
+int FWritePackets(char *dnm, char *cmn, char *fpath) {
+
+FILE *fp;
+BufEntry *bep;
+int i, cnt;
+char *cp;
+
+   bep = GetBuf(dnm,cmn);
+   if (bep == NULL) return 0;
+
+   umask(0);
+   unlink(fpath);
+   fp = fopen(fpath,"w");
+   if (fp == NULL) {
+      printf("SavePackets: Can't open output file: %s for write\n",fpath);
+      perror("SavePackets");
+      return 0;
+   }
+
+   for (i=0, cnt=0; i<bep->Size; i++) {
+      cp = bep->Bufs[i];
+      if (cp) {
+	 if (fwrite(cp,strlen(cp),1,fp) != 1) break;
+	 cnt++;
+      }
+   }
+   fclose(fp);
+   return cnt;
+}
+
+/* ============================== */
+/* Restore packets from disc file */
+
+int FReadPackets(char *dnm, char *cmn, char *fpath) {
+
+FILE *fp;
+BufEntry *bep;
+int i, cc, cnt, enp;
+char tmp[IN_BUF_SZ];
+
+   bep = NewBuf(dnm,cmn);
+   if (bep == NULL) return 0;
+
+   fp = fopen(fpath,"r");
+   if (fp == NULL) {
+      printf("RestPackets: Can't open input file: %s for read\n",fpath);
+      perror("RestPackets");
+      return 0;
+   }
+
+   enp = 0;
+   for (i=0, cnt=0; i<MAX_PKTS; i++) {
+      bzero((void *) tmp, IN_BUF_SZ);
+      cc = fread(tmp, IN_BUF_SZ, 1, fp); cnt++;
+      if (StorePacket(enp,i+1,dnm,cmn,tmp) == 0) break;
+      if (cc <= 0) break;
+   }
+   enp = 1;
+   fclose(fp);
+   return StorePacket(enp,cnt,dnm,cmn,tmp);
+}
+
+/* ========================== */
+/* Print out any program news */
+
+static char *editor = "e";
+
+int News(int arg) {
+
+char sys[LN], npt[LN];
+
+   arg++;
+
+   if (GetFile("tsvy_news")) {
+      strcpy(npt,path);
+      sprintf(sys,"%s %s",GetFile(editor),npt);
+      printf("\n%s\n",sys);
+      system(sys);
+      printf("\n");
+   }
+   return(arg);
+}
+
+/* ================================ */
+/* Yes or No question asker routine */
+
+static int yesno=1;
+
+static int YesNo(char *question, char *name) {
+int yn, c;
+
+   if (yesno == 0) return 1;
+
+   printf("%s: %s\n",question,name);
+   printf("Continue (Y/N):"); yn = getchar(); c = getchar();
+   if ((yn != (int) 'y') && (yn != 'Y')) return 0;
+   return 1;
+}
+
+/* ============= */
+/* Launch a task */
+
+static void Launch(char *txt) {
+pid_t child;
+
+   if ((child = fork()) == 0) {
+      if ((child = fork()) == 0) {
+	 close(send_sock);
+	 close(recv_sock);
+	 system(txt);
+	 exit(127);
+      }
+      exit (0);
+   }
+   while(waitpid(-1, NULL, WNOHANG) > 0);
+}
+
+/* ================================= */
+/* Commands used in the test program */
+
+int ChangeEditor(int arg) {
+static int eflg = 0;
+
+   arg++;
+   if (eflg++ > 4) eflg = 1;
+
+   if      (eflg == 1) editor = "e";
+   else if (eflg == 2) editor = "emacs";
+   else if (eflg == 3) editor = "nedit";
+   else if (eflg == 4) editor = "vi";
+
+   printf("Editor: %s\n",GetFile(editor));
+   return arg;
+}
+
+/* =================================================== */
+/* Change location of, or edit, the configuration file */
+
+int ChangeDirectory(int arg) {
+ArgVal   *v;
+AtomType  at;
+char txt[LN], fname[LN], *cp;
+int n, earg;
+
+   arg++;
+   for (earg=arg; earg<pcnt; earg++) {
+      v = &(vals[earg]);
+      if ((v->Type == Close)
+      ||  (v->Type == Terminator)) break;
+   }
+
+   v = &(vals[arg]);
+   at = v->Type;
+   if ((v->Type != Close)
+   &&  (v->Type != Terminator)) {
+
+      bzero((void *) fname, LN);
+
+      n = 0;
+      cp = &(cmdbuf[v->Pos]);
+      do {
+	 at = atomhash[(int) (*cp)];
+	 if ((at != Seperator)
+	 &&  (at != Close)
+	 &&  (at != Terminator))
+	    fname[n++] = *cp;
+	 fname[n] = 0;
+	 cp++;
+      } while ((at != Close) && (at != Terminator));
+
+      strcpy(localconfigpath,fname);
+      strcat(localconfigpath,"/timtest.config");
+      if (YesNo("Change timtest config to:",localconfigpath))
+	 configpath = localconfigpath;
+      else
+	 configpath = NULL;
+   }
+
+   sprintf(txt,"%s %s",GetFile(editor),configpath);
+   printf("\n%s\n",txt);
+   system(txt);
+   printf("\n");
+   return(arg);
+}
+
+/* ======================== */
+/* Add a dsc to the dsclist */
+
+static char dscname[DSC_NAME_SZ];
+static char dscipad[DSC_NAME_SZ];
+
+static int  dscs = 0;
+static char dscnames[DSCS][DSC_NAME_SZ];
+static char dscipads[DSCS][DSC_NAME_SZ];
+
+int AddDsc(char *dnm, char *ipa, int flag) {
+
+int i;
+
+   if (strlen(dnm) && strlen(ipa)) {
+      for (i=0; i<dscs; i++) {
+	 if (strcmp(dnm,dscnames[i]) == 0) {
+	    return 0;
+	 }
+      }
+
+      if (dscs >= DSCS) {
+	 printf("DSC: List is full\n");
+	 return 0;
+      }
+
+      strcpy(dscnames[dscs],dnm);
+      strcpy(dscipads[dscs],ipa);
+      dscs++;
+   }
+
+   if (flag) {
+      for (i=0; i<dscs; i++) {
+	 printf("%2d:%s:%s",i+1,dscnames[i],dscipads[i]);
+	 if (strcmp(dscname,dscnames[i]) == 0) printf(" <==");
+	 printf("\n");
+      }
+   }
+   return dscs;
+}
+
+/* ========================= */
+/* Remove a DSC from program */
+
+int RemoveDsc(char *dnm, int flag) {
+
+int i, j;
+
+   if (strlen(dnm)) {
+      for (i=0; i<dscs; i++) {
+	 if (strcmp(dnm,dscnames[i]) == 0) {
+	    for (j=i; j<dscs; j++) {
+	       strcpy(dscnames[j],dscnames[j+1]);
+	       strcpy(dscipads[j],dscipads[j+1]);
+	    }
+	    dscs--;
+	    bzero((void *) dscipads[dscs], DSC_NAME_SZ);
+	    bzero((void *) dscnames[dscs], DSC_NAME_SZ);
+	    break;
+	 }
+      }
+   }
+   strcpy(dscname,dscnames[0]);
+   strcpy(dscipad,dscipads[0]);
+
+   if (flag) {
+      for (i=0; i<dscs; i++) {
+	 printf("%2d:%s:%s",i+1,dscnames[i],dscipads[i]);
+	 if (strcmp(dscname,dscnames[i]) == 0) printf(" <==");
+	 printf("\n");
+      }
+   }
+   return dscs;
+}
+
+/* ============================== */
+/* Launch TimSurvey on target DSC */
+
+int LaunchSurvey(char *name) {
+
+char txt[LN];
+
+   sprintf(out_buf,"Ping");
+   SendToPort(dscipad, SEND_PORT, out_buf);
+   while (PollRecv(1)) {
+      bzero((void *) in_buf, IN_BUF_SZ + PADDING);
+      RecvFromPort(RECV_PORT, in_buf, IN_BUF_SZ);
+      sprintf(txt,"EOF:0:%s:Ping\n",dscname);
+      if (strcmp(txt,in_buf) == 0) return 1;
+   }
+
+   sprintf(txt,"ssh -x -k -f %s \"prio 20 /usr/local/bin/TimSurvey&\"& exit",name);
+   Launch(txt);
+   sleep(1);
+   return 1;
+}
+
+/* ============================= */
+/* Send commands out to dsc list */
+
+int SendCommand() {
+
+int i;
+
+   for (i=0; i<dscs; i++) {
+      if (SendToPort(dscipads[i], SEND_PORT, out_buf) == 0) return 0;
+   }
+   return 1;
+}
+
+/* =========================== */
+/* Set the working DSC by name */
+
+int GetSetDsc(int arg) {
+
+ArgVal   *v;
+AtomType  at;
+int i, n, earg;
+
+struct hostent *hp;
+
+char *cp, **cpp, tmp[DSC_NAME_SZ], txt[DSC_NAME_SZ];
+
+   arg++;
+   for (earg=arg; earg<pcnt; earg++) {
+      v = &(vals[earg]);
+      if ((v->Type == Close)
+      ||  (v->Type == Terminator)) break;
+   }
+
+   bzero((void *) tmp, DSC_NAME_SZ);
+
+   v = &(vals[arg]);
+   at = v->Type;
+   if ((v->Type != Close)
+   &&  (v->Type != Terminator)) {
+      n = 0;
+      cp = &(cmdbuf[v->Pos]);
+      do {
+	 at = atomhash[(int) (*cp)];
+	 if ((at != Seperator)
+	 &&  (at != Close)
+	 &&  (at != Terminator)) tmp[n++] = *cp;
+	 tmp[n] = 0;
+	 cp++;
+      } while ((at != Close) && (at != Terminator));
+   }
+
+   if (strlen(tmp)) {
+      hp = gethostbyname(tmp);
+      if (hp == NULL) {
+	 printf("Can't find ip address for host:%s\n",tmp);
+	 return earg;
+      }
+      for (cpp=hp->h_aliases; *cpp; cpp++) printf("Alias:%s\n",*cpp);
+      for (cpp=hp->h_addr_list; *cpp; cpp++) {
+	 cp = (char *) inet_ntop(hp->h_addrtype,
+				 (const void *) *cpp,
+				 txt,
+				 (socklen_t) sizeof(txt));
+	 strcpy(dscname,hp->h_name);
+	 strcpy(dscipad,cp);
+	 break;
+      }
+      for (i=0; i<strlen(dscname); i++) {
+	 if (dscname[i] == '.') {
+	    dscname[i] = 0;
+	    break;
+	 }
+      }
+      AddDsc(dscname,dscipad,1);
+      LaunchSurvey(dscname);
+      return earg;
+   }
+   AddDsc("","",1);
+   return earg;
+}
+
+/* ============================= */
+/* Select the next DSC           */
+
+int NextDsc(int arg) {
+
+int i;
+
+   arg++;
+
+   if (dscs) {
+      for (i=0; i<dscs; i++) {
+	 if (strcmp(dscname,dscnames[i]) == 0) break;
+      }
+      if (++i >= dscs) i = 0;
+      strcpy(dscname,dscnames[i]);
+      strcpy(dscipad,dscipads[i]);
+   }
+   AddDsc("","",0);
+   return arg;
+}
+
+/* =============== */
+/* Get the version */
+
+int GetVersion(int arg) {
+int i;
+
+   arg++;
+
+   printf("tsvytest: Compiled: %s %s %s\n", "timtest", __DATE__, __TIME__);
+
+   if (dscs) {
+      sprintf(out_buf,"%s",TsCmdNames[TsGET_VERSION]);
+      if (SendCommand()) {
+	 if (GetPackets() == 0) return arg;
+	 for (i=0; i<dscs; i++) {
+	    if (PrintBuf(dscnames[i],TsCmdNames[TsGET_VERSION])) {
+	       RelBuf(dscnames[i],TsCmdNames[TsGET_VERSION]);
+	    }
+	 }
+      }
+   }
+   return arg;
+}
+
+/* ============================= */
+
+int RemGetVersion(int arg) {
+
+char fname[LN];
+int i;
+
+   arg++;
+
+   if (dscs) {
+      sprintf(out_buf,"%s",TsCmdNames[TsGET_VERSION]);
+      if (SendCommand()) {
+	 if (GetPackets() == 0) return arg;
+	 for (i=0; i<dscs; i++) {
+	    sprintf(fname,"/tmp/%s.%s",TsFileNames[TsGET_VERSION],dscnames[i]);
+	    if (FWritePackets(dscnames[i],TsCmdNames[TsGET_VERSION],fname)) {
+	       RelBuf(dscnames[i],TsCmdNames[TsGET_VERSION]);
+	    }
+	 }
+      }
+   }
+   return arg;
+}
+
+/* ============================= */
+
+int KillSurvey(int arg) {
+
+   arg++;
+
+   sprintf(out_buf,"%s",TsCmdNames[TsKILL]);
+   SendToPort(dscipad, SEND_PORT, out_buf);
+   while (PollRecv(1)) {
+      bzero((void *) in_buf, IN_BUF_SZ + PADDING);
+      RecvFromPort(RECV_PORT, in_buf, IN_BUF_SZ);
+      printf("%s",in_buf);
+   }
+   return arg;
+}
+
+/* ============================= */
+
+int ResetSurvey(int arg) {
+
+   arg++;
+
+   sprintf(out_buf,"%s",TsCmdNames[TsRESET]);
+   SendToPort(dscipad, SEND_PORT, out_buf);
+   while (PollRecv(1)) {
+      bzero((void *) in_buf, IN_BUF_SZ + PADDING);
+      RecvFromPort(RECV_PORT, in_buf, IN_BUF_SZ);
+      printf("%s",in_buf);
+   }
+   return arg;
+}
+
+/* ============================================= */
+/* Ping a DSC to see if TimSurvey daemon running */
+
+int PingSurvey(int arg) {
+
+char txt[LN], ok[DSCS];
+int i, j;
+
+   arg++;
+
+   bzero((void *) ok, DSCS);
+
+   for (i=0; i<dscs; i++) {
+      sprintf(out_buf,"Ping");
+      SendToPort(dscipads[i], SEND_PORT, out_buf);
+      while (PollRecv(1)) {
+	 bzero((void *) in_buf, IN_BUF_SZ + PADDING);
+	 RecvFromPort(RECV_PORT, in_buf, IN_BUF_SZ);
+
+	 for (j=0; j<=i; j++) {
+	    sprintf(txt,"EOF:0:%s:Ping\n",dscnames[j]);
+	    if (strcmp(txt,in_buf) == 0) {
+	       printf("TimSurvey daemon alive on:%s\n",dscnames[j]);
+	       ok[j] = 1;
+	       break;
+	    }
+	 }
+      }
+   }
+   for (i=0; i<dscs; i++) {
+      if (ok[i] == 0) {
+	 printf("No response from:%s\n",dscnames[i]);
+	 continue;
+      }
+   }
+   return arg;
+}
+
+/* =============================== */
+/* Restart TimSurvey daemon on DSC */
+
+int StartSurvey(int arg) {
+
+   arg++;
+
+   LaunchSurvey(dscname);
+   printf("Started TimSurvey on:%s\n",dscname);
+   return arg;
+}
+
+/* ============================= */
+
+int GetStatus(int arg) {
+
+int i;
+
+   arg++;
+
+   if (dscs) {
+      sprintf(out_buf,"%s",TsCmdNames[TsGET_STATUS]);
+      if (SendCommand()) {
+	 if (GetPackets() == 0) return arg;
+	 for (i=0; i<dscs; i++) {
+	    if (PrintBuf(dscnames[i],TsCmdNames[TsGET_STATUS])) {
+	       RelBuf(dscnames[i],TsCmdNames[TsGET_STATUS]);
+	    }
+	 }
+      }
+   }
+   return arg;
+}
+
+/* ============================= */
+
+int RemGetStatus(int arg) {
+
+char fname[LN];
+int i;
+
+   arg++;
+
+   if (dscs) {
+      sprintf(out_buf,"%s",TsCmdNames[TsGET_STATUS]);
+      if (SendCommand()) {
+	 if (GetPackets() == 0) return arg;
+	 for (i=0; i<dscs; i++) {
+	    sprintf(fname,"/tmp/%s.%s",TsFileNames[TsGET_STATUS],dscnames[i]);
+	    if (FWritePackets(dscnames[i],TsCmdNames[TsGET_STATUS],fname)) {
+	       RelBuf(dscnames[i],TsCmdNames[TsGET_STATUS]);
+	    }
+	 }
+      }
+   }
+   return arg;
+}
+
+/* ============================= */
+
+unsigned long ccvmsk = 0;
+
+int GetCcv(int arg) {
+
+ArgVal   *v;
+AtomType  at;
+
+char fname[LN], cmtxt[LN];
+int i;
+
+   arg++;
+   v = &(vals[arg]);
+   at = v->Type;
+
+   if (at == Numeric) {
+      ccvmsk = v->Number;
+      arg++;
+   }
+
+   if (dscs) {
+      sprintf(out_buf,"%s:%d",TsCmdNames[TsGET_STATIC],(int) ccvmsk);
+      if (SendCommand()) {
+	 if (GetPackets() == 0) return arg;
+	 for (i=0; i<dscs; i++) {
+	    sprintf(fname,"/tmp/%s.%s",TsFileNames[TsGET_STATIC],dscnames[i]);
+	    if (FWritePackets(dscnames[i],TsCmdNames[TsGET_STATIC],fname)) {
+	       RelBuf(dscnames[i],TsCmdNames[TsGET_STATIC]);
+	    }
+	    sprintf(cmtxt,"xterm 2>/dev/null -e %s %s",GetFile(editor),fname);
+	    Launch(cmtxt);
+	 }
+      }
+   }
+   return arg;
+}
+
+/* ============================= */
+
+int RemGetCcv(int arg) {
+
+char fname[LN];
+
+ArgVal   *v;
+AtomType  at;
+
+int i;
+
+   arg++;
+   v = &(vals[arg]);
+   at = v->Type;
+
+   if (at == Numeric) {
+      ccvmsk = v->Number;
+      arg++;
+   }
+
+   if (dscs) {
+      sprintf(out_buf,"%s:%d",TsCmdNames[TsGET_STATIC],(int) ccvmsk);
+      if (SendCommand()) {
+	 if (GetPackets() == 0) return arg;
+	 for (i=0; i<dscs; i++) {
+	    sprintf(fname,"/tmp/%s.%s",TsFileNames[TsGET_STATIC],dscnames[i]);
+	    if (FWritePackets(dscnames[i],TsCmdNames[TsGET_STATIC],fname)) {
+	       RelBuf(dscnames[i],TsCmdNames[TsGET_STATIC]);
+	    }
+	 }
+      }
+   }
+   return arg;
+}
+
+/* ============================= */
+
+int GetAqn(int arg) {
+
+char fname[LN], fsort[LN*4], cmtxt[LN];
+int i;
+
+   arg++;
+
+   if (dscs) {
+      sprintf(fsort,"/bin/sort -n ");
+      sprintf(out_buf,"%s",TsCmdNames[TsGET_DYNAMIC]);
+      if (SendCommand()) {
+	 if (GetPackets() == 0) return arg;
+	 for (i=0; i<dscs; i++) {
+	    sprintf(fname,"/tmp/%s.%s",TsFileNames[TsGET_DYNAMIC],dscnames[i]);
+	    if (FWritePackets(dscnames[i],TsCmdNames[TsGET_DYNAMIC],fname)) {
+	       RelBuf(dscnames[i],TsCmdNames[TsGET_DYNAMIC]);
+	       strcat(fsort,fname); strcat(fsort," ");
+	    }
+	    sprintf(cmtxt,"xterm 2>/dev/null -e %s %s",GetFile(editor),fname);
+	    Launch(cmtxt);
+	 }
+	 if (dscs > 1) {
+	    strcat(fsort,"> /tmp/aqn.sort");
+	    printf("execute:%s\n",fsort);
+	    system(fsort);
+	    sprintf(fsort,"xterm 2>/dev/null -e %s /tmp/aqn.sort",GetFile(editor));
+	    Launch(fsort);
+	 }
+      }
+   }
+   return arg;
+}
+
+/* ============================= */
+
+int RemGetAqn(int arg) {
+
+char fname[LN], fsort[LN];
+int i;
+
+   arg++;
+
+   if (dscs) {
+      sprintf(fsort,"/bin/sort -n ");
+      sprintf(out_buf,"%s",TsCmdNames[TsGET_DYNAMIC]);
+      if (SendCommand()) {
+	 if (GetPackets() == 0) return arg;
+	 for (i=0; i<dscs; i++) {
+	    sprintf(fname,"/tmp/%s.%s",TsFileNames[TsGET_DYNAMIC],dscnames[i]);
+	    if (FWritePackets(dscnames[i],TsCmdNames[TsGET_DYNAMIC],fname)) {
+	       RelBuf(dscnames[i],TsCmdNames[TsGET_DYNAMIC]);
+	       strcat(fsort,fname); strcat(fsort," ");
+	    }
+	 }
+      }
+      strcat(fsort,"> /tmp/aqn.sort");
+      system(fsort);
+   }
+   return arg;
+}
+
+/* ============================= */
+
+int GetLsp(int arg) {
+
+int i;
+
+   arg++;
+
+   if (dscs) {
+      sprintf(out_buf,"%s",TsCmdNames[TsLIST]);
+      if (SendCommand()) {
+	 if (GetPackets() == 0) return arg;
+	 for (i=0; i<dscs; i++) {
+	    if (PrintBuf(dscnames[i],TsCmdNames[TsLIST])) {
+	       RelBuf(dscnames[i],TsCmdNames[TsLIST]);
+	    }
+	 }
+      }
+   }
+   return arg;
+}
+
+/* ============================= */
+
+int RemGetLsp(int arg) {
+
+char fname[LN];
+int i;
+
+   arg++;
+
+   if (dscs) {
+      sprintf(out_buf,"%s",TsCmdNames[TsLIST]);
+      if (SendCommand()) {
+	 if (GetPackets() == 0) return arg;
+	 for (i=0; i<dscs; i++) {
+	    sprintf(fname,"/tmp/%s.%s",TsFileNames[TsLIST],dscnames[i]);
+	    if (FWritePackets(dscnames[i],TsCmdNames[TsLIST],fname)) {
+	       RelBuf(dscnames[i],TsCmdNames[TsLIST]);
+	    }
+	 }
+      }
+   }
+   return arg;
+}
+
+/* ============================= */
+
+int GetHelp(int arg) {
+
+int i;
+
+   arg++;
+
+   if (dscs) {
+      sprintf(out_buf,"%s",TsCmdNames[TsHELP]);
+      if (SendCommand()) {
+	 if (GetPackets() == 0) return arg;
+	 for (i=0; i<dscs; i++) {
+	    if (PrintBuf(dscnames[i],TsCmdNames[TsHELP])) {
+	       RelBuf(dscnames[i],TsCmdNames[TsHELP]);
+	    }
+	 }
+      }
+   }
+   return arg;
+}
+
+/* ============================= */
+
+static unsigned long txton = 1;
+
+int GetSetTxt(int arg) {
+
+ArgVal   *v;
+AtomType  at;
+int i;
+
+   arg++;
+   v = &(vals[arg]);
+   at = v->Type;
+
+   txton = 1;
+   if (at == Numeric) {
+      if (v->Number) txton = 1;
+      else           txton = 0;
+   }
+
+   if (dscs) {
+      sprintf(out_buf,"%s:%d",TsCmdNames[TsSTRINGS],(int) txton);
+      if (SendCommand()) {
+	 if (GetPackets() == 0) return arg;
+	 for (i=0; i<dscs; i++) {
+	    if (PrintBuf(dscnames[i],TsCmdNames[TsSTRINGS])) {
+	       RelBuf(dscnames[i],TsCmdNames[TsSTRINGS]);
+	    }
+	 }
+      }
+   }
+   return arg;
+}
+
+/* ============================= */
+
+static unsigned long rdebug = 0;
+
+int GetSetDebug(int arg) {
+
+ArgVal   *v;
+AtomType  at;
+int i;
+
+   arg++;
+   v = &(vals[arg]);
+   at = v->Type;
+
+   rdebug = 0;
+   if (at == Numeric) {
+      if (v->Number) rdebug = 1;
+      else           rdebug = 0;
+   }
+
+   if (dscs) {
+      sprintf(out_buf,"%s:%d",TsCmdNames[TsDEBUG],(int) rdebug);
+      if (SendCommand()) {
+	 if (GetPackets() == 0) return arg;
+	 for (i=0; i<dscs; i++) {
+	    if (PrintBuf(dscnames[i],TsCmdNames[TsDEBUG])) {
+	       RelBuf(dscnames[i],TsCmdNames[TsDEBUG]);
+	    }
+	 }
+      }
+   }
+   return arg;
+}
+
+/* ============================= */
+
+static unsigned long smpmsk[DSCS];
+
+int GetSetSampling(int arg) {
+
+ArgVal   *v;
+AtomType  at;
+int i, dsci;
+
+   arg++;
+   v = &(vals[arg]);
+   at = v->Type;
+
+   dsci = -1;
+   if (at == Numeric) {
+      arg++;
+
+      for (i=0; i<dscs; i++) {
+	 if (strcmp(dscnames[i],dscname) == 0) {
+	    dsci = i;
+	    smpmsk[dsci] = v->Number;
+	 }
+      }
+   }
+
+   if (dscs) {
+      if (dsci >= 0) {
+	 sprintf(out_buf,"%s:%d",TsCmdNames[TsSAMPLE],(int) smpmsk[dsci]);
+	 if (SendToPort(dscipads[dsci], SEND_PORT,out_buf)) {
+	    if (GetPackets() == 0) return arg;
+	    if (PrintBuf(dscnames[dsci],TsCmdNames[TsSAMPLE])) {
+	       RelBuf(dscnames[dsci],TsCmdNames[TsSAMPLE]);
+	    }
+	 }
+      }
+
+      printf("DSC Sampling Masks:\n");
+      for (i=0; i<dscs; i++) {
+	 printf("%s:0x%04X\n",dscnames[i],(int) smpmsk[i]);
+      }
+   } else
+      printf("No DSCs are defined\n");
+
+   return arg;
+}
+
+/* ============================= */
+
+int SaveAqn(int arg) {
+
+char sname[LN], dname[LN];
+
+   arg++;
+
+   sprintf(sname,"/tmp/%s.%s",TsFileNames[TsGET_DYNAMIC],dscname);
+   sprintf(dname,"/ps/dsc/mcr/data/tim/%s.%s",TsFileNames[TsGET_DYNAMIC],dscname);
+
+   if (FReadPackets(dscname,TsCmdNames[TsGET_DYNAMIC],sname)) {
+      printf("Read:%s OK\n",sname);
+      if (FWritePackets(dscname,TsCmdNames[TsGET_DYNAMIC],dname)) {
+	 printf("Written:%s OK\n",dname);
+      }
+   }
+   RelBuf(dscname,TsCmdNames[TsGET_DYNAMIC]);
+
+   return arg;
+}
+
+/* ============================= */
+
+int RestAqn(int arg) {
+
+char sname[LN], dname[LN];
+
+   arg++;
+
+   sprintf(dname,"/tmp/%s.%s",TsFileNames[TsGET_DYNAMIC],dscname);
+   sprintf(sname,"/ps/dsc/mcr/data/tim/%s.%s",TsFileNames[TsGET_DYNAMIC],dscname);
+
+   if (FReadPackets(dscname,TsCmdNames[TsGET_DYNAMIC],sname)) {
+      printf("Read:%s OK\n",sname);
+      if (FWritePackets(dscname,TsCmdNames[TsGET_DYNAMIC],dname)) {
+	 printf("Written:%s OK\n",dname);
+      }
+   }
+   RelBuf(dscname,TsCmdNames[TsGET_DYNAMIC]);
+   sprintf(sname,"xterm 2>/dev/null -e %s %s",GetFile(editor),dname);
+   Launch(sname);
+
+   return arg;
+}
+
+/* ============================= */
+
+int SaveCcv(int arg) {
+
+char sname[LN], dname[LN];
+
+   arg++;
+
+   sprintf(sname,"/tmp/%s.%s",TsFileNames[TsGET_STATIC],dscname);
+   sprintf(dname,"/ps/dsc/mcr/data/tim/%s.%s",TsFileNames[TsGET_STATIC],dscname);
+
+   if (FReadPackets(dscname,TsCmdNames[TsGET_STATIC],sname)) {
+      printf("Read:%s OK\n",sname);
+      if (FWritePackets(dscname,TsCmdNames[TsGET_STATIC],dname)) {
+	 printf("Written:%s OK\n",dname);
+      }
+   }
+   RelBuf(dscname,TsCmdNames[TsGET_STATIC]);
+
+   return arg;
+}
+
+/* ============================= */
+
+int RestCcv(int arg) {
+
+char sname[LN], dname[LN];
+
+   arg++;
+
+   sprintf(dname,"/tmp/%s.%s",TsFileNames[TsGET_STATIC],dscname);
+   sprintf(sname,"/ps/dsc/mcr/data/tim/%s.%s",TsFileNames[TsGET_STATIC],dscname);
+
+   if (FReadPackets(dscname,TsCmdNames[TsGET_STATIC],sname)) {
+      printf("Read:%s OK\n",sname);
+      if (FWritePackets(dscname,TsCmdNames[TsGET_STATIC],dname)) {
+	 printf("Written:%s OK\n",dname);
+      }
+   }
+   RelBuf(dscname,TsCmdNames[TsGET_STATIC]);
+   sprintf(sname,"xterm 2>/dev/null -e %s %s",GetFile(editor),dname);
+   Launch(sname);
+
+   return arg;
+}
+
+/* ============================= */
+
+int CompareAqn(int arg) {
+
+char sname[LN], dname[LN], cmtxt[LN];
+
+   arg++;
+
+   sprintf(dname,"/tmp/%s.%s",TsFileNames[TsGET_DYNAMIC],dscname);
+   sprintf(sname,"/ps/dsc/mcr/data/tim/%s.%s",TsFileNames[TsGET_DYNAMIC],dscname);
+   printf("Compare AQN:%s Against Reference:%s\n",dname,sname);
+   sprintf(cmtxt,"diff -abBi %s %s",sname,dname);
+   printf("Execute:%s\n",cmtxt);
+   system(cmtxt);
+   return arg;
+}
+
+/* ============================= */
+
+int CompareCcv(int arg) {
+
+char sname[LN], dname[LN], cmtxt[LN];
+
+   arg++;
+
+   sprintf(dname,"/tmp/%s.%s",TsFileNames[TsGET_STATIC],dscname);
+   sprintf(sname,"/ps/dsc/mcr/data/tim/%s.%s",TsFileNames[TsGET_STATIC],dscname);
+   printf("Compare CCV:%s Against Reference:%s\n",dname,sname);
+   sprintf(cmtxt,"diff -abBi %s %s",sname,dname);
+   printf("Execute:%s\n",cmtxt);
+   system(cmtxt);
+   return arg;
+}
+
+/* ============================= */
+
+int List(int arg) {
+
+char cmtxt[LN];
+
+   arg++;
+
+   printf("\nTemp files Static: CCV\n");
+   sprintf(cmtxt,"ls -l /tmp/ccv.*");
+   system(cmtxt);
+   printf("Temp files Dynamic: AQN\n");
+   sprintf(cmtxt,"ls -l /tmp/aqn.*");
+   system(cmtxt);
+   printf("Temp files Status: RST\n");
+   sprintf(cmtxt,"ls -l /tmp/rst.*");
+   system(cmtxt);
+   printf("Temp files Version: VER\n");
+   sprintf(cmtxt,"ls -l /tmp/ver.*");
+   system(cmtxt);
+
+   printf("\nRefernce files Static: CCV\n");
+   sprintf(cmtxt,"ls -l /ps/dsc/mcr/data/tim/ccv.*");
+   system(cmtxt);
+   printf("Reference files Dynamic: AQN\n");
+   sprintf(cmtxt,"ls -l /ps/dsc/mcr/data/tim/aqn.*");
+   system(cmtxt);
+
+   return arg;
+}
+
+/* ============================= */
+
+int Clean(int arg) {
+
+char cmtxt[LN];
+
+   printf("Cleaning ccv, aqn, rst, ver files from /tmp\n");
+
+   sprintf(cmtxt,"rm -f /tmp/ccv.*");
+   system(cmtxt);
+   sprintf(cmtxt,"rm -f /tmp/aqn.*");
+   system(cmtxt);
+   sprintf(cmtxt,"rm -f /tmp/rst.*");
+   system(cmtxt);
+   sprintf(cmtxt,"rm -f /tmp/ver.*");
+   system(cmtxt);
+   return List(arg);
+}
+
+/* ======================= */
+/* Save DSC list in a file */
+
+int SaveDscList(int arg) {
+
+ArgVal   *v;
+AtomType  at;
+int i, n, earg;
+
+char *cp, fpath[LN], txt[LN];
+
+FILE *fp;
+
+   arg++;
+   for (earg=arg; earg<pcnt; earg++) {
+      v = &(vals[earg]);
+      if ((v->Type == Close)
+      ||  (v->Type == Terminator)) break;
+   }
+
+   bzero((void *) fpath, LN);
+
+   v = &(vals[arg]);
+   at = v->Type;
+   if ((v->Type != Close)
+   &&  (v->Type != Terminator)) {
+      n = 0;
+      cp = &(cmdbuf[v->Pos]);
+      do {
+	 at = atomhash[(int) (*cp)];
+	 if ((at != Seperator)
+	 &&  (at != Close)
+	 &&  (at != Terminator)) fpath[n++] = *cp;
+	 fpath[n] = 0;
+	 cp++;
+      } while ((at != Close) && (at != Terminator));
+   }
+   if (strlen(fpath) == 0) strcpy(fpath,"/tmp/dsc.lst");
+
+   umask(0);
+   unlink(fpath);
+   fp = fopen(fpath,"w");
+   if (fp == NULL) {
+      printf("Can't open:%s for write\n",fpath);
+      perror("Err");
+      return earg;
+   }
+   sprintf(txt,"%d\n",dscs);
+   if (fwrite(txt,strlen(txt),1,fp) != 1) {
+      printf("Can't write to file:%s\n",fpath);
+      perror("Err");
+      fclose(fp);
+      return earg;
+   }
+   for (i=0; i<dscs; i++) {
+      sprintf(txt,"%s %s\n",dscnames[i],dscipads[i]);
+      if (fwrite(txt,strlen(txt),1,fp) != 1) {
+	 printf("Unexpected EOF when writing:%s\n",fpath);
+	 perror("Err");
+	 break;
+      }
+   }
+   fclose(fp);
+   return earg;
+}
+
+/* =========================== */
+/* Load a DSC list from a file */
+
+int LoadDscList(int arg) {
+
+ArgVal   *v;
+AtomType  at;
+int i, j, n, earg, ndscs;
+
+char *cp, *ep, fpath[LN], txt[LN];
+
+FILE *fp;
+
+   arg++;
+   for (earg=arg; earg<pcnt; earg++) {
+      v = &(vals[earg]);
+      if ((v->Type == Close)
+      ||  (v->Type == Terminator)) break;
+   }
+
+   bzero((void *) fpath, LN);
+
+   v = &(vals[arg]);
+   at = v->Type;
+   if ((v->Type != Close)
+   &&  (v->Type != Terminator)) {
+      n = 0;
+      cp = &(cmdbuf[v->Pos]);
+      do {
+	 at = atomhash[(int) (*cp)];
+	 if ((at != Seperator)
+	 &&  (at != Close)
+	 &&  (at != Terminator)) fpath[n++] = *cp;
+	 fpath[n] = 0;
+	 cp++;
+      } while ((at != Close) && (at != Terminator));
+   }
+   if (strlen(fpath) == 0) strcpy(fpath,"/tmp/dsc.lst");
+
+   fp = fopen(fpath,"r");
+   if (fp == NULL) {
+      printf("Can't open:%s for read\n",fpath);
+      perror("Err");
+      return earg;
+   }
+
+   if (fgets(txt, LN, fp)) {
+      cp = txt; ep = NULL;
+      ndscs = strtoul(cp, &ep, 0);
+   } else {
+      printf("Can't read file:%s\n",fpath);
+      perror("Err");
+      fclose(fp);
+      return earg;
+   }
+
+   for (i=0; i<ndscs; i++) {
+      if (fgets(txt, LN, fp)) {
+	 if (strlen(txt)) txt[strlen(txt) -1] = 0;
+	 for (j=0; j<strlen(txt); j++) {
+	    if (txt[j] == ' ') {
+
+	       txt[j] = 0;
+	       strcpy(dscname,&txt[0]);
+	       strcpy(dscipad,&txt[j+1]);
+
+	       AddDsc(dscname,dscipad,0);
+	       break;
+	    }
+	 }
+      } else {
+	 printf("Unexpected EOF in:%s\n",fpath);
+	 perror("Err");
+	 break;
+      }
+   }
+   fclose(fp);
+   AddDsc("","",1);
+   return earg;
+}
+
+/* =============================== */
+/* Clear current DSC from the list */
+
+int ClearDsc(int arg) {
+
+   arg++;
+
+   RemoveDsc(dscname,1);
+
+   return arg;
+}
+
+/* ============================ */
+/* Clear all dscs from the list */
+
+int ClearAllDscs(int arg) {
+
+int i;
+
+   arg++;
+
+   for (i=0; i<DSCS; i++) {
+      bzero((void *) dscipads[i], DSC_NAME_SZ);
+      bzero((void *) dscnames[i], DSC_NAME_SZ);
+   }
+   bzero((void *) dscname, DSC_NAME_SZ);
+   bzero((void *) dscipad, DSC_NAME_SZ);
+
+   dscs = 0;
+   return arg;
+}
+@
+
+
+1.20
+log
+@Finished, and tested. The END.
+@
+text
+@d476 1
+a476 1
+#define FIRST_WAIT 40
+@
+
+
+1.19
+log
+@Added Reset command
+@
+text
+@d1756 3
+a1758 2
+   for (i=0; i<dscs; i++) {
+      RemoveDsc(dscnames[i],0);
+d1760 2
+d1763 1
+@
+
+
+1.18
+log
+@Changed how kill works
+@
+text
+@d54 1
+d63 1
+d70 1
+d78 2
+a79 1
+   "Version"
+d85 1
+d93 2
+a94 1
+   "ver"
+d969 15
+a983 1
+int i;
+d987 1
+a987 1
+   sprintf(out_buf,"%s",TsCmdNames[TsKILL]);
+d992 1
+a992 1
+      printf("%s\n",in_buf);
+@
+
+
+1.17
+log
+@Added sdscl xdscl xdsc ldscl commands
+@
+text
+@d722 1
+a722 1
+int AddDsc(char *dnm, char *ipa) {
+d743 6
+a748 4
+   for (i=0; i<dscs; i++) {
+      printf("%2d:%s:%s",i+1,dscnames[i],dscipads[i]);
+      if (strcmp(dscname,dscnames[i]) == 0) printf(" <==");
+      printf("\n");
+d882 1
+a882 1
+      AddDsc(dscname,dscipad);
+d886 1
+a886 1
+   AddDsc("","");
+d907 1
+a907 1
+   AddDsc("","");
+d967 6
+a972 10
+   if (dscs) {
+      sprintf(out_buf,"%s",TsCmdNames[TsKILL]);
+      if (SendCommand()) {
+	 if (GetPackets() == 0) return arg;
+	 for (i=0; i<dscs; i++) {
+	    if (PrintBuf(dscnames[i],TsCmdNames[TsKILL])) {
+	       RelBuf(dscnames[i],TsCmdNames[TsKILL]);
+	    }
+	 }
+      }
+d982 2
+a983 1
+char txt[LN];
+d987 23
+a1009 9
+   sprintf(out_buf,"Ping");
+   SendToPort(dscipad, SEND_PORT, out_buf);
+   while (PollRecv(1)) {
+      bzero((void *) in_buf, IN_BUF_SZ + PADDING);
+      RecvFromPort(RECV_PORT, in_buf, IN_BUF_SZ);
+      sprintf(txt,"EOF:0:%s:Ping\n",dscname);
+      if (strcmp(txt,in_buf) == 0) {
+	 printf("TimSurvey daemon alive on:%s\n",dscname);
+	 return arg;
+a1011 1
+   printf("No response from:%s\n",dscname);
+d1700 1
+a1700 1
+	       AddDsc(dscname,dscipad);
+d1711 1
+@
+
+
+1.16
+log
+@Added Ping and Start
+@
+text
+@d751 34
+d1555 174
+@
+
+
+1.15
+log
+@*** empty log message ***
+@
+text
+@d945 36
+d1104 1
+a1104 1
+char fname[LN], fsort[LN], cmtxt[LN];
+@
+
+
+1.14
+log
+@*** empty log message ***
+@
+text
+@d33 2
+d249 1
+a249 1
+static char *defaultconfigpath = "/dsc/bin/tim/tsvytest.config";
+d537 2
+d758 9
+d1453 3
+d1466 19
+@
+
+
+1.13
+log
+@Added Remote Get Version
+@
+text
+@d756 1
+@
+
+
+1.12
+log
+@Added Kill
+@
+text
+@d469 1
+a469 1
+#define THEN_WAIT 4
+d887 24
+@
+
+
+1.11
+log
+@Autolaunch
+@
+text
+@d51 1
+d65 1
+d78 1
+a634 1
+      while(waitpid(-1, NULL, WNOHANG) > 0);
+d637 1
+d754 1
+a754 1
+   sprintf(txt,"ssh -x -f %s \"prio 20 /usr/local/bin/TimSurvey&\"& exit",name);
+d887 22
+@
+
+
+1.10
+log
+@*** empty log message ***
+@
+text
+@d34 2
+d627 2
+d630 1
+a630 1
+	 exit (127);
+d632 1
+d744 12
+d830 1
+@
+
+
+1.9
+log
+@*** empty log message ***
+@
+text
+@d1369 3
+@
+
+
+1.8
+log
+@*** empty log message ***
+@
+text
+@a839 40
+/* ============================= */
+/* Set the working module number */
+
+#define MAX_MODULE 16
+static unsigned long module = 0;
+
+int GetSetMod(int arg) {
+
+ArgVal   *v;
+AtomType  at;
+
+   arg++;
+   v = &(vals[arg]);
+   at = v->Type;
+   if (at == Numeric) module = v->Number;
+   printf("Module:%d Selected\n",(int) module);
+
+   return arg;
+}
+
+/* ============================= */
+/* Next module                   */
+
+int NextMod(int arg) {
+   arg++;
+   module++;
+   if (module > MAX_MODULE) module = 1;
+   return arg;
+}
+
+/* ============================= */
+/* Previous module               */
+
+int PrevMod(int arg) {
+   arg++;
+   module--;
+   if (module < 1) module = MAX_MODULE;
+   return arg;
+}
+
+d851 1
+a851 1
+      sprintf(out_buf,"%s:%d",TsCmdNames[TsGET_VERSION],(int) module);
+d873 1
+a873 1
+      sprintf(out_buf,"%s:%d",TsCmdNames[TsGET_STATUS],(int) module);
+d896 1
+a896 1
+      sprintf(out_buf,"%s:%d",TsCmdNames[TsGET_STATUS],(int) module);
+d912 2
+d916 3
+d923 7
+d932 1
+a932 1
+      sprintf(out_buf,"%s:%d",TsCmdNames[TsGET_STATIC],(int) module);
+d953 4
+d960 7
+d969 1
+a969 1
+      sprintf(out_buf,"%s:%d",TsCmdNames[TsGET_STATIC],(int) module);
+d994 1
+a994 1
+      sprintf(out_buf,"%s:%d",TsCmdNames[TsGET_DYNAMIC],(int) module);
+d1029 1
+a1029 1
+      sprintf(out_buf,"%s:%d",TsCmdNames[TsGET_DYNAMIC],(int) module);
+d1184 1
+a1184 1
+static int smpon = 0;
+d1190 1
+a1190 1
+int i;
+d1196 1
+a1196 1
+   smpon = 0;
+d1198 8
+a1205 2
+      if (v->Number) smpon = 1;
+      else           smpon = 0;
+d1209 6
+a1214 6
+      sprintf(out_buf,"%s:%d",TsCmdNames[TsSAMPLE],(int) smpon);
+      if (SendCommand()) {
+	 if (GetPackets() == 0) return arg;
+	 for (i=0; i<dscs; i++) {
+	    if (PrintBuf(dscnames[i],TsCmdNames[TsSAMPLE])) {
+	       RelBuf(dscnames[i],TsCmdNames[TsSAMPLE]);
+d1218 8
+a1225 1
+   }
+d1354 25
+@
+
+
+1.7
+log
+@*** empty log message ***
+@
+text
+@d47 36
+a82 4
+typedef enum { TsHELP, TsLIST, TsSTRINGS, TsSAMPLE, TsGET_STATUS, TsGET_STATIC, TsGET_DYNAMIC, TsDEBUG, TsCMDS } TsCmd;
+
+static char *TsCmdNames[TsCMDS]  = {"Help", "List", "Strings", "Sampling" ,"GetStatus", "GetStatic", "GetDynamic", "Debug" };
+static char *TsFileNames[TsCMDS] = {"hlp" , "lst" , "str"    , "smp"      ,"rst"      , "ccv"      , "aqn"       , "dbg"   };
+a101 1
+
+a699 12
+/* =============== */
+/* Get the version */
+
+int GetVersion(int arg) {
+
+   arg++;
+
+   printf("tsvytest: Compiled: %s %s %s\n", "timtest", __DATE__, __TIME__);
+
+   return arg;
+}
+
+d880 24
+d911 9
+a919 6
+   sprintf(out_buf,"%s:%d",TsCmdNames[TsGET_STATUS],(int) module);
+   if (SendCommand()) {
+      if (GetPackets() == 0) return arg;
+      for (i=0; i<dscs; i++) {
+	 if (PrintBuf(dscnames[i],TsCmdNames[TsGET_STATUS])) {
+	    RelBuf(dscnames[i],TsCmdNames[TsGET_STATUS]);
+a922 1
+
+d935 9
+a943 7
+   sprintf(out_buf,"%s:%d",TsCmdNames[TsGET_STATUS],(int) module);
+   if (SendCommand()) {
+      if (GetPackets() == 0) return arg;
+      for (i=0; i<dscs; i++) {
+	 sprintf(fname,"/tmp/%s.%s",TsFileNames[TsGET_STATUS],dscnames[i]);
+	 if (FWritePackets(dscnames[i],TsCmdNames[TsGET_STATUS],fname)) {
+	    RelBuf(dscnames[i],TsCmdNames[TsGET_STATUS]);
+a946 1
+
+d959 11
+a969 7
+   sprintf(out_buf,"%s:%d",TsCmdNames[TsGET_STATIC],(int) module);
+   if (SendCommand()) {
+      if (GetPackets() == 0) return arg;
+      for (i=0; i<dscs; i++) {
+	 sprintf(fname,"/tmp/%s.%s",TsFileNames[TsGET_STATIC],dscnames[i]);
+	 if (FWritePackets(dscnames[i],TsCmdNames[TsGET_STATIC],fname)) {
+	    RelBuf(dscnames[i],TsCmdNames[TsGET_STATIC]);
+a970 2
+	 sprintf(cmtxt,"xterm 2>/dev/null -e %s %s",GetFile(editor),fname);
+	 Launch(cmtxt);
+a972 1
+
+d985 9
+a993 7
+   sprintf(out_buf,"%s:%d",TsCmdNames[TsGET_STATIC],(int) module);
+   if (SendCommand()) {
+      if (GetPackets() == 0) return arg;
+      for (i=0; i<dscs; i++) {
+	 sprintf(fname,"/tmp/%s.%s",TsFileNames[TsGET_STATIC],dscnames[i]);
+	 if (FWritePackets(dscnames[i],TsCmdNames[TsGET_STATIC],fname)) {
+	    RelBuf(dscnames[i],TsCmdNames[TsGET_STATIC]);
+a996 1
+
+d1009 21
+a1029 19
+   sprintf(fsort,"/bin/sort -n ");
+   sprintf(out_buf,"%s:%d",TsCmdNames[TsGET_DYNAMIC],(int) module);
+   if (SendCommand()) {
+      if (GetPackets() == 0) return arg;
+      for (i=0; i<dscs; i++) {
+	 sprintf(fname,"/tmp/%s.%s",TsFileNames[TsGET_DYNAMIC],dscnames[i]);
+	 if (FWritePackets(dscnames[i],TsCmdNames[TsGET_DYNAMIC],fname)) {
+	    RelBuf(dscnames[i],TsCmdNames[TsGET_DYNAMIC]);
+	    strcat(fsort,fname); strcat(fsort," ");
+	 }
+	 sprintf(cmtxt,"xterm 2>/dev/null -e %s %s",GetFile(editor),fname);
+	 Launch(cmtxt);
+      }
+      if (dscs > 1) {
+	 strcat(fsort,"> /tmp/aqn.sort");
+	 printf("execute:%s\n",fsort);
+	 system(fsort);
+	 sprintf(fsort,"xterm 2>/dev/null -e %s /tmp/aqn.sort",GetFile(editor));
+	 Launch(fsort);
+a1031 1
+
+d1044 11
+a1054 9
+   sprintf(fsort,"/bin/sort -n ");
+   sprintf(out_buf,"%s:%d",TsCmdNames[TsGET_DYNAMIC],(int) module);
+   if (SendCommand()) {
+      if (GetPackets() == 0) return arg;
+      for (i=0; i<dscs; i++) {
+	 sprintf(fname,"/tmp/%s.%s",TsFileNames[TsGET_DYNAMIC],dscnames[i]);
+	 if (FWritePackets(dscnames[i],TsCmdNames[TsGET_DYNAMIC],fname)) {
+	    RelBuf(dscnames[i],TsCmdNames[TsGET_DYNAMIC]);
+	    strcat(fsort,fname); strcat(fsort," ");
+d1057 2
+a1059 3
+   strcat(fsort,"> /tmp/aqn.sort");
+   system(fsort);
+
+d1071 8
+a1078 6
+   sprintf(out_buf,"%s",TsCmdNames[TsLIST]);
+   if (SendCommand()) {
+      if (GetPackets() == 0) return arg;
+      for (i=0; i<dscs; i++) {
+	 if (PrintBuf(dscnames[i],TsCmdNames[TsLIST])) {
+	    RelBuf(dscnames[i],TsCmdNames[TsLIST]);
+a1081 1
+
+d1094 9
+a1102 7
+   sprintf(out_buf,"%s",TsCmdNames[TsLIST]);
+   if (SendCommand()) {
+      if (GetPackets() == 0) return arg;
+      for (i=0; i<dscs; i++) {
+	 sprintf(fname,"/tmp/%s.%s",TsFileNames[TsLIST],dscnames[i]);
+	 if (FWritePackets(dscnames[i],TsCmdNames[TsLIST],fname)) {
+	    RelBuf(dscnames[i],TsCmdNames[TsLIST]);
+a1105 1
+
+d1117 8
+a1124 6
+   sprintf(out_buf,"%s",TsCmdNames[TsHELP]);
+   if (SendCommand()) {
+      if (GetPackets() == 0) return arg;
+      for (i=0; i<dscs; i++) {
+	 if (PrintBuf(dscnames[i],TsCmdNames[TsHELP])) {
+	    RelBuf(dscnames[i],TsCmdNames[TsHELP]);
+a1127 1
+
+d1151 8
+a1158 6
+   sprintf(out_buf,"%s:%d",TsCmdNames[TsSTRINGS],(int) txton);
+   if (SendCommand()) {
+      if (GetPackets() == 0) return arg;
+      for (i=0; i<dscs; i++) {
+	 if (PrintBuf(dscnames[i],TsCmdNames[TsSTRINGS])) {
+	    RelBuf(dscnames[i],TsCmdNames[TsSTRINGS]);
+d1185 8
+a1192 6
+   sprintf(out_buf,"%s:%d",TsCmdNames[TsDEBUG],(int) rdebug);
+   if (SendCommand()) {
+      if (GetPackets() == 0) return arg;
+      for (i=0; i<dscs; i++) {
+	 if (PrintBuf(dscnames[i],TsCmdNames[TsDEBUG])) {
+	    RelBuf(dscnames[i],TsCmdNames[TsDEBUG]);
+d1213 1
+a1213 1
+   smpon = 1;
+d1219 8
+a1226 6
+   sprintf(out_buf,"%s:%d",TsCmdNames[TsSAMPLE],(int) smpon);
+   if (SendCommand()) {
+      if (GetPackets() == 0) return arg;
+      for (i=0; i<dscs; i++) {
+	 if (PrintBuf(dscnames[i],TsCmdNames[TsSAMPLE])) {
+	    RelBuf(dscnames[i],TsCmdNames[TsSAMPLE]);
+@
+
+
+1.6
+log
+@*** empty log message ***
+@
+text
+@d47 1
+a47 1
+typedef enum { TsHELP, TsLIST, TsSTRINGS, TsSAMPLE, TsGET_STATUS, TsGET_STATIC, TsGET_DYNAMIC, TsCMDS } TsCmd;
+d49 2
+a50 2
+static char *TsCmdNames[TsCMDS]  = {"Help", "List", "Strings", "Sampling" ,"GetStatus", "GetStatic", "GetDynamic" };
+static char *TsFileNames[TsCMDS] = {"hlp" , "lst" , "str"    , "smp"      ,"rst"      , "ccv"      , "aqn"        };
+d974 7
+a980 5
+      strcat(fsort,"> /tmp/aqn.sort");
+      printf("execute:%s\n",fsort);
+      system(fsort);
+      sprintf(fsort,"xterm 2>/dev/null -e %s /tmp/aqn.sort",GetFile(editor));
+      Launch(fsort);
+d1112 32
+@
+
+
+1.5
+log
+@*** empty log message ***
+@
+text
+@d1057 21
+@
+
+
+1.4
+log
+@*** empty log message ***
+@
+text
+@d43 1
+d45 1
+a45 1
+static char in_buf[IN_BUF_SZ];
+d47 1
+a47 1
+typedef enum { TsHELP, TsLIST, TsSTRINGS, TsGET_STATUS, TsGET_STATIC, TsGET_DYNAMIC, TsCMDS } TsCmd;
+d49 2
+a50 2
+static char *TsCmdNames[TsCMDS]  = {"Help", "List", "Strings", "GetStatus", "GetStatic", "GetDynamic" };
+static char *TsFileNames[TsCMDS] = {"hlp" , "lst" , "str"    , "rst"      , "ccv"      , "aqn"        };
+d388 1
+a388 1
+   cp = (char *) malloc(IN_BUF_SZ);
+d390 1
+d403 1
+a403 1
+int PollRecv() {
+d412 1
+a412 1
+   tmo.tv_sec = 1; tmo.tv_usec = 0;
+d432 3
+d437 1
+a437 1
+int i, pkn, enp, res;
+d442 3
+a444 1
+   res = 0;
+d446 1
+a446 1
+   while (PollRecv()) {
+d448 1
+a448 1
+      bzero((void *) in_buf, IN_BUF_SZ);
+d479 5
+a483 1
+   return res;
+d684 3
+d713 3
+a715 1
+      printf("%2d:%s:%s\n",i+1,dscnames[i],dscipads[i]);
+a735 3
+static char dscname[DSC_NAME_SZ];
+static char dscipad[DSC_NAME_SZ];
+
+d779 4
+a782 1
+	 cp = inet_ntop(hp->h_addrtype,*cpp,txt,sizeof(txt));
+d801 21
+d908 1
+a908 1
+char fname[LN];
+d917 3
+a919 5
+	 if (PrintBuf(dscnames[i],TsCmdNames[TsGET_STATIC])) {
+	    sprintf(fname,"/tmp/%s.%s",TsFileNames[TsGET_STATIC],dscnames[i]);
+	    if (FWritePackets(dscnames[i],TsCmdNames[TsGET_STATIC],fname)) {
+	       RelBuf(dscnames[i],TsCmdNames[TsGET_STATIC]);
+	    }
+d921 2
+d956 1
+a956 1
+char fname[LN], fsort[LN];
+d961 1
+a961 1
+   sprintf(fsort,"/bin/sort ");
+d966 4
+a969 6
+	 if (PrintBuf(dscnames[i],TsCmdNames[TsGET_DYNAMIC])) {
+	    sprintf(fname,"/tmp/%s.%s",TsFileNames[TsGET_DYNAMIC],dscnames[i]);
+	    if (FWritePackets(dscnames[i],TsCmdNames[TsGET_DYNAMIC],fname)) {
+	       RelBuf(dscnames[i],TsCmdNames[TsGET_DYNAMIC]);
+	       strcat(fsort,fname); strcat(fsort," ");
+	    }
+d971 2
+d988 1
+a988 1
+char fname[LN];
+d993 1
+d1001 1
+d1005 2
+d1089 32
+d1143 24
+d1189 24
+d1215 2
+d1219 6
+a1224 1
+
+d1232 2
+d1236 6
+a1241 1
+
+@
+
+
+1.3
+log
+@*** empty log message ***
+@
+text
+@d49 1
+a49 1
+static char *TsFileNames[TsCMDS] = {"", "", "", "", "ccv", "aqn" };
+d53 1
+d513 1
+a513 1
+int i, cnt, enp;
+d529 1
+a529 1
+      if (fread(tmp, IN_BUF_SZ, 1, fp) != 1) break;
+d531 1
+a531 1
+      cnt++;
+d670 47
+a763 1
+      printf("Found host:%s\n",hp->h_name);
+a766 1
+	 printf("IP Address:%s\n",cp);
+d777 2
+d780 1
+d828 2
+d832 7
+a838 3
+   if (strlen(dscipad) == 0) {
+      printf("DSC IP address is invalid\n");
+      return arg;
+d841 14
+a854 1
+   if (SendToPort(dscipad, SEND_PORT, out_buf)) {
+d856 6
+a861 1
+      if (PrintBuf(dscname,TsCmdNames[TsGET_STATUS])) RelBuf(dscname,TsCmdNames[TsGET_STATUS]);
+d872 1
+d875 1
+d877 10
+a886 3
+   if (strlen(dscipad) == 0) {
+      printf("DSC IP address is invalid\n");
+      return arg;
+d889 14
+a902 1
+   if (SendToPort(dscipad, SEND_PORT, out_buf)) {
+d904 4
+a907 4
+      if (PrintBuf(dscname,TsCmdNames[TsGET_STATIC])) {
+	 sprintf(fname,"/tmp/%s.%s.%s",TsFileNames[TsGET_STATIC],dscname,TsCmdNames[TsGET_STATIC]);
+	 if (FWritePackets(dscname,TsCmdNames[TsGET_STATIC],fname)) {
+	    RelBuf(dscname,TsCmdNames[TsGET_STATIC]);
+d919 2
+a920 1
+char fname[LN];
+d923 2
+d926 16
+a941 3
+   if (strlen(dscipad) == 0) {
+      printf("DSC IP address is invalid\n");
+      return arg;
+d944 14
+a957 1
+   if (SendToPort(dscipad, SEND_PORT, out_buf)) {
+d959 4
+a962 4
+      if (PrintBuf(dscname,TsCmdNames[TsGET_DYNAMIC])) {
+	 sprintf(fname,"/tmp/%s.%s.%s",TsFileNames[TsGET_DYNAMIC],dscname,TsCmdNames[TsGET_DYNAMIC]);
+	 if (FWritePackets(dscname,TsCmdNames[TsGET_DYNAMIC],fname)) {
+	    RelBuf(dscname,TsCmdNames[TsGET_DYNAMIC]);
+d974 2
+d977 1
+d979 7
+a985 3
+   if (strlen(dscipad) == 0) {
+      printf("DSC IP address is invalid\n");
+      return arg;
+d988 14
+a1001 1
+   if (SendToPort(dscipad, SEND_PORT, out_buf)) {
+d1003 6
+a1008 1
+      if (PrintBuf(dscname,TsCmdNames[TsLIST])) RelBuf(dscname,TsCmdNames[TsLIST]);
+d1022 1
+d1035 1
+a1035 6
+   if (strlen(dscipad) == 0) {
+      printf("DSC IP address is invalid\n");
+      return arg;
+   }
+
+   if (SendToPort(dscipad, SEND_PORT, out_buf)) {
+d1037 5
+a1041 1
+      if (PrintBuf(dscname,TsCmdNames[TsSTRINGS])) RelBuf(dscname,TsCmdNames[TsSTRINGS]);
+a1042 3
+
+   printf("String Format:%d\n",(int) txton);
+
+d1048 4
+a1051 1
+int PlotAqn(int arg) {
+d1053 12
+d1070 4
+a1073 1
+int EditFilt(int arg) {
+d1075 12
+d1092 2
+a1093 1
+int WriteCcv(int arg) {
+d1095 2
+d1103 1
+d1105 2
+@
+
+
+1.2
+log
+@*** empty log message ***
+@
+text
+@d46 23
+d96 2
+a97 1
+	 close(s);
+d165 1
+d266 2
+a267 2
+/* =========================================== */
+/* Get incomming packets and save them to disc */
+d269 204
+a472 1
+typedef enum { TsHELP, TsLIST, TsSTRINGS, TsGET_STATUS, TsGET_STATIC, TsGET_DYNAMIC, TsCMDS } TsCmd;
+d474 2
+a475 1
+static char *TsFiles[TsCMDS] = {"Help", "List", "Strings", "GetStatus", "GetStatic", "GetDynamic" };
+d477 1
+a477 1
+int GetPackets(TsCmd tc) {
+d480 6
+a485 2
+int scn, rcn;
+char *ep;
+d487 1
+a487 2
+   if (GetFile(TsFiles[(int) tc]) == NULL) return 0;
+   fp = fopen(path,"w");
+d489 2
+a490 2
+      printf("GetPackets: Can't open output file: %s for write\n",path);
+      perror("GetPackets");
+d494 30
+a523 10
+   rcn = 0;
+   do {
+      bzero((void *) in_buf, IN_BUF_SZ);
+      if (RecvFromPort(RECV_PORT, in_buf, IN_BUF_SZ) == 0) break;
+      if (fwrite(in_buf,strlen(in_buf),1,fp) != 1) break;
+      rcn++;
+   } while (strncmp(in_buf,"EOF:",4) != 0);
+   scn = strtoul(&(in_buf[4]),&ep,0);
+   if (scn > rcn) printf("Packets missed: Received:%d Sent:%d\n",scn,rcn);
+   else           printf("Received:%d packets OK\n",rcn);
+d525 10
+a534 2
+   fclose(fp); fp = NULL;
+   return 1;
+a671 1
+#define DSC_NAME_SZ 32
+d679 1
+a679 1
+int n, earg;
+d725 6
+a778 2
+char fnam[LN], sysh[LN];
+
+d780 1
+a780 1
+   sprintf(out_buf,"%s:%d",TsFiles[TsGET_STATUS],(int) module);
+d787 2
+a788 6
+      if (GetPackets(TsGET_STATUS) == 0) return arg;
+      strcpy(fnam,path);
+      sprintf(sysh,"%s %s",GetFile(editor),fnam);
+      printf("\n%s\n",sysh);
+      system(sysh);
+      printf("\n");
+d798 1
+a798 1
+char fnam[LN], sysh[LN];
+d801 1
+a801 1
+   sprintf(out_buf,"%s:%d",TsFiles[TsGET_STATIC],(int) module);
+d808 7
+a814 6
+      if (GetPackets(TsGET_STATIC) == 0) return arg;
+      strcpy(fnam,path);
+      sprintf(sysh,"%s %s",GetFile(editor),fnam);
+      printf("\n%s\n",sysh);
+      system(sysh);
+      printf("\n");
+d824 1
+a824 1
+char fnam[LN], sysh[LN];
+d827 1
+a827 1
+   sprintf(out_buf,"%s:%d",TsFiles[TsGET_DYNAMIC],(int) module);
+d834 7
+a840 6
+      if (GetPackets(TsGET_DYNAMIC) == 0) return arg;
+      strcpy(fnam,path);
+      sprintf(sysh,"%s %s",GetFile(editor),fnam);
+      printf("\n%s\n",sysh);
+      system(sysh);
+      printf("\n");
+a849 2
+char fnam[LN], sysh[LN];
+
+d851 1
+a851 1
+   sprintf(out_buf,"%s",TsFiles[TsLIST]);
+d858 2
+a859 6
+      if (GetPackets(TsLIST) == 0) return arg;
+      strcpy(fnam,path);
+      sprintf(sysh,"%s %s",GetFile(editor),fnam);
+      printf("\n%s\n",sysh);
+      system(sysh);
+      printf("\n");
+d884 1
+a884 1
+   sprintf(out_buf,"%s:%d",TsFiles[TsSTRINGS],(int) txton);
+d891 2
+a892 1
+      if (GetPackets(TsSTRINGS) == 0) return arg;
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d36 10
+d152 1
+a152 1
+int RecvFromPort(unsigned short source_port, char *pkt, int len) {
+d170 1
+a170 1
+		 source_port);
+d182 6
+a187 4
+char        *defaultconfigpath = "/dsc/bin/tim/tsvytest.config";
+char        *configpath = NULL;
+char         localconfigpath[128];
+static char  path[128];
+d191 1
+a191 1
+char txt[128];
+d202 1
+a202 1
+      configpath = "./timtest.config";
+d205 1
+a205 1
+	 configpath = "/dsc/local/data/timtest.config";
+d219 1
+a219 1
+   bzero((void *) path,128);
+d222 1
+a222 1
+      if (fgets(txt,128,gpath) == NULL) break;
+d241 36
+d284 1
+a284 1
+char sys[128], npt[128];
+d353 1
+a353 1
+char txt[128], fname[128], *cp;
+d368 1
+a368 1
+      bzero((void *) fname, 128);
+d409 7
+d417 9
+d427 41
+a467 1
+   return arg;
+d470 6
+d477 4
+d482 5
+d490 3
+d495 2
+d500 3
+d505 2
+d510 2
+d513 3
+d517 15
+d535 2
+d538 3
+d542 15
+d560 2
+d563 3
+d567 15
+d585 2
+d588 3
+d592 15
+d610 4
+d615 4
+d620 21
+d644 2
+d651 2
+d658 2
+d665 2
+@

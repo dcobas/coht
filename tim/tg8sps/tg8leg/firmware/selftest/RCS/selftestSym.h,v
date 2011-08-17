@@ -1,0 +1,30 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.1
+date	2005.06.14.13.37.57;	author lewis;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#define CONVERTOR 1     /*1=use convertor (pars) to obtain symbols table */
+
+#include <tg8Pub.h>
+#include "tg8Hardw.h"
+#include "selftest.h"
+
+/*EOF selftestSym.h */
+@

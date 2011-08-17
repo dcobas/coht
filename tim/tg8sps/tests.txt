@@ -1,0 +1,4 @@
+egrep "^#%.*tg8drvr" */transfer.ref | wc -l
+
+
+for i in /dev/Tg8.*;do echo === $i;cat $i;done

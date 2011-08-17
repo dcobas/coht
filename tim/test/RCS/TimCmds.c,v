@@ -1,0 +1,5879 @@
+head	1.65;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.65
+date	2008.11.12.13.51.59;	author lewis;	state Exp;
+branches;
+next	1.64;
+
+1.64
+date	2008.04.30.19.05.24;	author lewis;	state Exp;
+branches;
+next	1.63;
+
+1.63
+date	2008.03.27.16.44.46;	author lewis;	state Exp;
+branches;
+next	1.62;
+
+1.62
+date	2008.01.11.15.15.59;	author lewis;	state Exp;
+branches;
+next	1.61;
+
+1.61
+date	2007.11.30.14.24.40;	author lewis;	state Exp;
+branches;
+next	1.60;
+
+1.60
+date	2007.08.29.16.44.29;	author lewis;	state Exp;
+branches;
+next	1.59;
+
+1.59
+date	2007.08.14.15.52.58;	author lewis;	state Exp;
+branches;
+next	1.58;
+
+1.58
+date	2007.06.12.09.35.24;	author lewis;	state Exp;
+branches;
+next	1.57;
+
+1.57
+date	2007.02.12.17.57.33;	author lewis;	state Exp;
+branches;
+next	1.56;
+
+1.56
+date	2007.01.22.17.25.06;	author lewis;	state Exp;
+branches;
+next	1.55;
+
+1.55
+date	2006.08.01.14.38.05;	author lewis;	state Exp;
+branches;
+next	1.54;
+
+1.54
+date	2006.08.01.10.24.43;	author lewis;	state Exp;
+branches;
+next	1.53;
+
+1.53
+date	2006.06.22.13.00.06;	author lewis;	state Exp;
+branches;
+next	1.52;
+
+1.52
+date	2006.06.20.12.56.53;	author lewis;	state Exp;
+branches;
+next	1.51;
+
+1.51
+date	2006.06.20.12.08.40;	author lewis;	state Exp;
+branches;
+next	1.50;
+
+1.50
+date	2006.03.17.10.35.54;	author lewis;	state Exp;
+branches;
+next	1.49;
+
+1.49
+date	2006.03.01.16.41.20;	author lewis;	state Exp;
+branches;
+next	1.48;
+
+1.48
+date	2006.03.01.14.11.43;	author lewis;	state Exp;
+branches;
+next	1.47;
+
+1.47
+date	2006.02.20.16.43.22;	author lewis;	state Exp;
+branches;
+next	1.46;
+
+1.46
+date	2006.02.16.09.22.00;	author lewis;	state Exp;
+branches;
+next	1.45;
+
+1.45
+date	2006.02.15.17.40.29;	author lewis;	state Exp;
+branches;
+next	1.44;
+
+1.44
+date	2006.02.15.15.38.37;	author lewis;	state Exp;
+branches;
+next	1.43;
+
+1.43
+date	2006.01.27.14.59.47;	author lewis;	state Exp;
+branches;
+next	1.42;
+
+1.42
+date	2006.01.27.14.44.57;	author lewis;	state Exp;
+branches;
+next	1.41;
+
+1.41
+date	2005.12.16.10.37.23;	author lewis;	state Exp;
+branches;
+next	1.40;
+
+1.40
+date	2005.11.29.14.31.31;	author lewis;	state Exp;
+branches;
+next	1.39;
+
+1.39
+date	2005.11.10.09.53.43;	author lewis;	state Exp;
+branches;
+next	1.38;
+
+1.38
+date	2005.10.21.16.01.06;	author lewis;	state Exp;
+branches;
+next	1.37;
+
+1.37
+date	2005.10.21.12.28.20;	author lewis;	state Exp;
+branches;
+next	1.36;
+
+1.36
+date	2005.10.20.16.33.15;	author lewis;	state Exp;
+branches;
+next	1.35;
+
+1.35
+date	2005.08.29.12.29.27;	author lewis;	state Exp;
+branches;
+next	1.34;
+
+1.34
+date	2005.08.29.09.14.42;	author lewis;	state Exp;
+branches;
+next	1.33;
+
+1.33
+date	2005.08.24.15.36.34;	author lewis;	state Exp;
+branches;
+next	1.32;
+
+1.32
+date	2005.08.23.15.31.38;	author lewis;	state Exp;
+branches;
+next	1.31;
+
+1.31
+date	2005.08.18.15.28.46;	author lewis;	state Exp;
+branches;
+next	1.30;
+
+1.30
+date	2005.08.09.17.11.31;	author lewis;	state Exp;
+branches;
+next	1.29;
+
+1.29
+date	2005.08.09.12.58.08;	author lewis;	state Exp;
+branches;
+next	1.28;
+
+1.28
+date	2005.08.01.09.20.26;	author lewis;	state Exp;
+branches;
+next	1.27;
+
+1.27
+date	2005.08.01.09.15.26;	author lewis;	state Exp;
+branches;
+next	1.26;
+
+1.26
+date	2005.07.11.08.36.57;	author lewis;	state Exp;
+branches;
+next	1.25;
+
+1.25
+date	2005.06.30.05.55.44;	author lewis;	state Exp;
+branches;
+next	1.24;
+
+1.24
+date	2005.06.21.14.52.41;	author lewis;	state Exp;
+branches;
+next	1.23;
+
+1.23
+date	2005.06.21.12.37.27;	author lewis;	state Exp;
+branches;
+next	1.22;
+
+1.22
+date	2005.06.21.09.58.07;	author lewis;	state Exp;
+branches;
+next	1.21;
+
+1.21
+date	2005.06.20.16.38.48;	author lewis;	state Exp;
+branches;
+next	1.20;
+
+1.20
+date	2005.06.20.13.32.48;	author lewis;	state Exp;
+branches;
+next	1.19;
+
+1.19
+date	2005.06.17.07.57.07;	author baujc;	state Exp;
+branches;
+next	1.18;
+
+1.18
+date	2005.06.13.12.19.52;	author lewis;	state Exp;
+branches;
+next	1.17;
+
+1.17
+date	2005.05.20.14.34.02;	author lewis;	state Exp;
+branches;
+next	1.16;
+
+1.16
+date	2005.05.13.09.40.21;	author lewis;	state Exp;
+branches;
+next	1.15;
+
+1.15
+date	2005.05.12.08.34.10;	author lewis;	state Exp;
+branches;
+next	1.14;
+
+1.14
+date	2005.05.12.07.06.55;	author lewis;	state Exp;
+branches;
+next	1.13;
+
+1.13
+date	2005.05.09.14.46.04;	author lewis;	state Exp;
+branches;
+next	1.12;
+
+1.12
+date	2005.05.09.14.04.33;	author lewis;	state Exp;
+branches;
+next	1.11;
+
+1.11
+date	2005.05.09.12.52.04;	author lewis;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	2005.05.04.13.37.09;	author lewis;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	2005.05.04.08.51.22;	author lewis;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	2005.05.03.15.26.27;	author lewis;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	2005.05.03.14.01.09;	author lewis;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2005.05.03.13.11.23;	author lewis;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2005.05.03.09.44.14;	author lewis;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2005.05.02.09.31.50;	author lewis;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2005.04.28.09.31.12;	author lewis;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2005.04.26.16.56.51;	author lewis;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2005.04.26.13.48.38;	author lewis;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.65
+log
+@Added CC Connect to C event
+@
+text
+@/* ****************************************************************************** */
+/* TimLib test program                                                            */
+/* Defining PS_VER (PS Version) causes the program to use the Tgm and Tgv libs    */
+/* for proper telegram decoding and name space handling.                          */
+/* Julian Lewis Mon 25th April 2005                                               */
+/* ****************************************************************************** */
+
+#include <tgm/tgm.h>
+#include <tgv/tgv.h>
+#include <ctrdrvr.h>
+
+#include <time.h>   /* ctime */
+
+/**************************************************************************/
+
+static TgmMachine tmch = TgmCPS;
+
+static int counter = 1;
+static int module = 1;
+static char *editor = "e";
+
+typedef struct {
+   unsigned long Eqp;
+   char Name[32];
+   char Comment[64];
+   unsigned long Flg;
+ } PtmNames;
+
+static PtmNames ptm_names[128];
+static char ptm_name_txt[32];
+static char ptm_comment_txt[64];
+static int ptm_names_size = 0;
+
+
+/**************************************************************************/
+
+char *defaultconfigpath = "/dsc/bin/tim/timtest.config";
+
+char *configpath = NULL;
+char localconfigpath[128];  /* After a CD */
+
+/**************************************************************************/
+
+static char path[128];
+
+char *GetFile(char *name) {
+FILE *gpath = NULL;
+char txt[128];
+int i, j;
+
+   if (configpath) {
+      gpath = fopen(configpath,"r");
+      if (gpath == NULL) {
+	 configpath = NULL;
+      }
+   }
+
+   if (configpath == NULL) {
+      configpath = "./timtest.config";
+      gpath = fopen(configpath,"r");
+      if (gpath == NULL) {
+	 configpath = "/dsc/local/data/timtest.config";
+	 gpath = fopen(configpath,"r");
+	 if (gpath == NULL) {
+	    configpath = defaultconfigpath;
+	    gpath = fopen(configpath,"r");
+	    if (gpath == NULL) {
+	       configpath = NULL;
+	       sprintf(path,"./%s",name);
+	       return path;
+	    }
+	 }
+      }
+   }
+
+   bzero((void *) path,128);
+
+   while (1) {
+      if (fgets(txt,128,gpath) == NULL) break;
+      if (strncmp(name,txt,strlen(name)) == 0) {
+	 for (i=strlen(name); i<strlen(txt); i++) {
+	    if (txt[i] != ' ') break;
+	 }
+	 j= 0;
+	 while ((txt[i] != ' ') && (txt[i] != 0)) {
+	    path[j] = txt[i];
+	    j++; i++;
+	 }
+	 strcat(path,name);
+	 fclose(gpath);
+	 return path;
+      }
+   }
+   fclose(gpath);
+   return NULL;
+}
+
+/*****************************************************************/
+/* News                                                          */
+
+int News(int arg) {
+
+char sys[128], npt[128];
+
+   arg++;
+
+   if (GetFile("tim_news")) {
+      strcpy(npt,path);
+      sprintf(sys,"%s %s",GetFile(editor),npt);
+      printf("\n%s\n",sys);
+      system(sys);
+      printf("\n");
+   }
+   return(arg);
+}
+
+/**************************************************************************/
+
+static int yesno=1;
+
+static int YesNo(char *question, char *name) {
+int yn, c;
+
+   if (yesno == 0) return 1;
+
+   printf("%s: %s\n",question,name);
+   printf("Continue (Y/N):"); yn = getchar(); c = getchar();
+   if ((yn != (int) 'y') && (yn != 'Y')) return 0;
+   return 1;
+}
+
+/**************************************************************************/
+/* Launch a task                                                          */
+
+static void Launch(char *txt) {
+pid_t child;
+
+   if ((child = fork()) == 0) {
+      if ((child = fork()) == 0) {
+	 system(txt);
+	 exit (127);
+      }
+      exit (0);
+   }
+}
+
+/**************************************************************************/
+/* Check error codes                                                      */
+
+int CheckErr(TimLibError err) {
+   if (err == TimLibErrorSUCCESS) return 1;
+   if (err < TimLibERRORS) {
+      fprintf(stderr,"timtest:Error:%s\n",TimLibErrorToString(err));
+      if (err == TimLibErrorIO) perror("TimLib:errno");
+      return 0;
+   }
+   fprintf(stderr,"timtest:Error:Illegal error number:%d\n",(int) err);
+   return 0;
+}
+
+/**************************************************************************/
+/* Convert a TimLib time in milliseconds to a string routine.             */
+/* Result is a pointer to a static string representing the time.          */
+/*    the format is: Thu-18/Jan/2001 08:25:14.967                         */
+/*                   day-dd/mon/yyyy hh:mm:ss.ddd                         */
+
+volatile char *TimeToStr(TimLibTime *t) {
+
+static char tbuf[128];
+
+char tmp[128];
+char *yr, *ti, *md, *mn, *dy;
+
+   bzero((void *) tbuf, 128);
+   bzero((void *) tmp, 128);
+
+   if (t->Second) {
+#ifdef __68k__
+      ctime_r(&t->Second, tmp, 128);
+#else
+      ctime_r(&t->Second, tmp);
+#endif
+      tmp[3] = 0;
+      dy = &(tmp[0]);
+      tmp[7] = 0;
+      mn = &(tmp[4]);
+      tmp[10] = 0;
+      md = &(tmp[8]);
+      if (md[0] == ' ') md[0] = '0';
+      tmp[19] = 0;
+      ti = &(tmp[11]);
+      tmp[24] = 0;
+      yr = &(tmp[20]);
+      sprintf (tbuf, "%s-%s/%s/%s %s"  , dy, md, mn, yr, ti);
+      if (t->Nano) {
+      	  sprintf(&tbuf[strlen(tbuf)],".%09lu",t->Nano);
+      }
+
+   } else sprintf (tbuf, "--- Zero ---");
+
+   
+   if ((t->Machine != TgmMACHINE_NONE) && (t->CTrain > 0)) {
+      strcat(tbuf," ");
+      strcat(tbuf,TgmGetMachineName(t->Machine));
+      strcat(tbuf," C:");
+      sprintf(tmp,"%d",(int) t->CTrain);
+      strcat(tbuf,tmp);
+   }
+   return (tbuf);
+}
+
+/**************************************************************************/
+/* If its a CPS TG8 we can get the names from the tg8infofile             */
+
+char *GetTg8PtmName(unsigned long eqp) {
+
+char *cp, *ep;
+int i, j, nf, gf;
+FILE *inp;
+char txt[128];
+
+   if (ptm_names_size == 0) {
+      inp = fopen("/tmp/tg8infofile","r");
+      if (inp) {
+	 gf = 0;
+	 while (fgets(txt,128,inp) != NULL) {
+	    nf = 0;
+	    for (i=0; i<strlen(txt); i++) {
+	       if (txt[i] == '=') {
+		  gf = nf = 1;
+	       }
+	       if ((nf) && (txt[i] != '=') && (txt[i] != ' ')) {
+		  cp = &(txt[i]);
+		  for (j=0; j<strlen(cp); j++) {
+		     if (cp[j] == ' ') {
+			cp[j] = 0;
+			break;
+		     }
+		  }
+		  strcpy(ptm_names[ptm_names_size].Name,cp);
+		  break;
+	       }
+	    }
+	    if (gf) {
+	       cp = txt;
+	       if (strncmp("   MEMBER{",cp,10) == 0) {
+		  cp += 10;
+		  ptm_names[ptm_names_size].Eqp = strtoul(cp,&ep,0);
+		  ptm_names_size++;
+	       }
+	    }
+	    if (ptm_names_size >= 128) break;
+	 }
+	 fclose(inp);
+      }
+   }
+
+   for (i=0; i<ptm_names_size; i++) {
+      if (ptm_names[i].Eqp == eqp) {
+	 sprintf(ptm_name_txt,"%04d:%s",(int) eqp,ptm_names[i].Name);
+	 return ptm_name_txt;
+      }
+   }
+
+   sprintf(ptm_name_txt,"%04d",(int) eqp);
+   return ptm_name_txt;
+}
+
+/**************************************************************************/
+/* Convert a ptim to its name                                             */
+
+char *GetPtmName(unsigned long eqp, int pfl) {
+
+char *cp, *ep;
+int i;
+FILE *inp;
+
+   if (ptm_names_size == 0) {
+
+      bzero((void *) &ptm_names, sizeof(ptm_names));
+
+      GetFile("ltim.obnames");
+      inp = fopen(path,"r");
+      if (inp) {
+	 while (fgets(ptm_name_txt,128,inp) != NULL) {
+	    cp = ep = ptm_name_txt;
+	    ptm_names[ptm_names_size].Eqp = strtoul(cp,&ep,0);
+	    if (cp == ep) continue;
+	    if ((*ep != 0) && (*ep != '\n')) cp = ep +1;
+	    ptm_names[ptm_names_size].Flg = strtoul(cp,&ep,0);
+	    if (cp != ep) ep++;
+
+	    cp = index(ep,':');
+	    if (cp) { *cp = '\0'; cp++; }
+
+	    if (cp) {
+	       for (i=strlen(cp); i>=0; i--) {
+		  if (cp[i] == '\n') {
+		     cp[i] = 0;
+		     break;
+		  }
+	       }
+	       if (strcmp(cp,"It's a SPS device") == 0) strcpy(ptm_names[ptm_names_size].Comment,"-");
+	       else                                     strcpy(ptm_names[ptm_names_size].Comment,cp);
+	    }
+	    if (ep) {
+	       for (i=strlen(ep); i>=0; i--) {
+		  if (ep[i] == '\n') {
+		     ep[i] = 0;
+		     break;
+		  }
+	       }
+	       strcpy(ptm_names[ptm_names_size].Name,ep);
+	    }
+
+	    if (++ptm_names_size >= 128) break;
+	 }
+	 fclose(inp);
+      } else if (Dev == TimLibDevice_TG8_CPS) return GetTg8PtmName(eqp);
+   }
+
+   bzero((void *) ptm_name_txt, 32);
+   bzero((void *) ptm_comment_txt, 64);
+
+   for (i=0; i<ptm_names_size; i++) {
+      if (ptm_names[i].Eqp == eqp) {
+	 sprintf(ptm_comment_txt,"%s",ptm_names[i].Comment);
+	 if (pfl) {
+	    sprintf(ptm_name_txt,"%s",ptm_names[i].Name);
+	 } else {
+	    if (ptm_names[i].Flg) {
+	       sprintf(ptm_name_txt,"%04d:RtAqn:%s",
+				    (int) eqp,
+					  ptm_names[i].Name);
+	    } else {
+	       sprintf(ptm_name_txt,"%04d:%s",
+				    (int) eqp,
+					  ptm_names[i].Name);
+	    }
+	 }
+	 return ptm_name_txt;
+      }
+   }
+
+   sprintf(ptm_name_txt,"%04d",(int) eqp);
+   return ptm_name_txt;
+}
+
+/**************************************************************************/
+/* Status To String                                                       */
+
+#define STATAE 5
+
+static char *StatusOn[STATAE] = { "GmtOk", "PllOk", "SlfOk", "EnbOk", "BusOk"  };
+static char *StatusOf[STATAE] = { "***GmtErr***","***PllErr***","***SlfErr***","***EnbErr***","***BusErr***" };
+
+#define ST_STR_SZ 48
+static char StsStr[ST_STR_SZ];
+
+char *StatusToStr(TimLibStatus sts) {
+int i;
+unsigned long msk;
+
+   bzero((void *) StsStr,ST_STR_SZ);
+   for (i=0; i<STATAE; i++) {
+      msk = 1 << i;
+      if (msk & TimLibStatusBITS) {
+	 if (msk & sts) strcat(StsStr,StatusOn[i]);
+	 else           strcat(StsStr,StatusOf[i]);
+	 strcat(StsStr,":");
+      } else break;
+   }
+   return StsStr;
+}
+
+/**************************************************************************/
+
+static char *MStatOn[TimLibCstSTATAE] = {
+   "CTRXE", "CTRXI", "V1_PCB", "V2_PCB ",
+   "S1", "S2", "X1", "X2",
+   "O1", "O2", "O3", "O4",
+   "O5", "O6", "O7", "O8",
+   "IDOK", "DEBHIS", "SOFTPLL", "XMEM", "TEMPOK" };
+
+#define MS_STR_SZ 80
+static char MStatStr[MS_STR_SZ];
+
+char * MStatToStr(TimLibCstStat mstat) {
+int i;
+unsigned long msk;
+
+   bzero((void *) MStatStr,MS_STR_SZ);
+   for (i=0; i<TimLibCstSTATAE; i++) {
+      msk = 1 << i;
+      if (msk & mstat) {
+	 strcat(MStatStr,MStatOn[i]);
+	 strcat(MStatStr,":");
+      }
+   }
+   return MStatStr;
+}
+
+/**************************************************************************/
+/* Hardware Interrupt to String                                           */
+
+#define SOURCES 14
+static char *HardNames[SOURCES] =
+   {"Cntr0","Cntr1","Cntr2","Cntr3","Cntr4","Cntr5","Cntr6","Cntr7","Cntr8",
+    "PllIt","GmtEv","OneHz","OneKHz","Match" };
+
+#define HD_STR_SZ 80
+static char HrdStr[HD_STR_SZ];
+
+char *HardToStr(TimLibHardware hrd) {
+int i;
+unsigned long msk;
+
+   bzero((void *) HrdStr,HD_STR_SZ);
+   for (i=0; i<SOURCES; i++) {
+      msk = 1 << i;
+      if (msk & TimLibHardwareBITS) {
+	 if (msk & hrd) {
+	    strcat(HrdStr,HardNames[i]);
+	    strcat(HrdStr,":");
+	 }
+      } else break;
+   }
+   return HrdStr;
+}
+
+/*****************************************************************/
+/* Output Mask to String                                         */
+
+#define OUT_MASKS  12
+static char *OtmNames[OUT_MASKS] = {"Ctim","Cntr1","Cntr2","Cntr3","Cntr4","Cntr5","Cntr6","Cntr7","Cntr8",
+				    "40Mh","ExCk1","ExCk2" };
+
+#define OTM_STR_SZ 80
+static char OtmStr[OTM_STR_SZ];
+
+char *OtmToStr(TimLibOutput otm) {
+int i;
+unsigned long msk;
+
+   bzero((void *) OtmStr,OTM_STR_SZ);
+   if (otm == 0) {
+      strcat(OtmStr,"NotSet");
+      return OtmStr;
+   }
+   for (i=0; i<OUT_MASKS; i++) {
+      msk = 1 << i;
+      if (msk & TimLibOutputBITS) {
+	 if (msk & otm) {
+	    strcat(OtmStr,OtmNames[i]);
+	    strcat(OtmStr,":");
+	 }
+      } else break;
+   }
+   return OtmStr;
+}
+
+/*****************************************************************/
+
+#define CCV_FIELDS 13
+#define POLARATIES 3
+
+static char *CounterStart [TimLibSTARTS]  = {"Nor", "Ext1", "Ext2", "Chnd", "Self", "Remt", "Pps", "Chnd+Stop"};
+static char *CounterMode  [TimLibMODES]   = {"Once", "Mult", "Brst", "Mult+Brst"};
+static char *CounterClock [TimLibCLOCKS]  = {"1KHz", "10MHz", "40MHz", "Ext1", "Ext2", "Chnd" };
+static char *Polarity     [POLARATIES]    = {"TTL","BAR","TTL"};
+static char *Enable       [TimLibENABLES] = {"NoOut","Out","Bus","OutBus"};
+
+#define CCV_STR_SZ 128
+static char CcvStr[CCV_STR_SZ];
+
+char * CcvToStr(TimLibCcvMask ccm, TimLibCcv *ccv, int pln) {
+
+int i, w;
+unsigned long msk;
+TgmGroupDescriptor desc;
+char tmp[CCV_STR_SZ];
+TgvName tname;
+char *cp;
+
+   bzero((void *) CcvStr,CCV_STR_SZ);
+   bzero((void *) tmp   ,CCV_STR_SZ);
+
+   if (pln) sprintf(CcvStr,"%02d:",pln);
+
+   for (i=0; i<CCV_FIELDS; i++) {
+      msk = 1 << i;
+      if (msk & TimLibCcvMaskBITS) {
+	 if (msk & ccm) {
+	    switch (msk) {
+	       case TimLibCcvMaskENABLE:
+		  if (ccv->Enable < TimLibENABLES)
+		     sprintf(tmp,"%s ",Enable[ccv->Enable]);
+		  else
+		     sprintf(tmp,"En:?[%d] ",(int) ccv->Enable);
+	       break;
+
+	       case TimLibCcvMaskSTART:
+		  if (ccv->Start < TimLibSTARTS)
+		     sprintf(tmp,"St%s:",CounterStart[ccv->Start]);
+		  else
+		     sprintf(tmp,"St?[%d]:",(int) ccv->Start);
+	       break;
+
+	       case TimLibCcvMaskMODE:
+		  if (ccv->Mode < TimLibMODES)
+		     sprintf(tmp,"%s:",CounterMode[ccv->Mode]);
+		  else
+		     sprintf(tmp,"Md?[%d]:",(int) ccv->Mode);
+	       break;
+
+	       case TimLibCcvMaskCLOCK:
+		  if (ccv->Clock < TimLibCLOCKS)
+		     sprintf(tmp,"Ck%s ",CounterClock[ccv->Clock]);
+		  else
+		     sprintf(tmp,"Ck?[%d] ",ccv->Clock);
+	       break;
+
+	       case TimLibCcvMaskPWIDTH:
+		  w = ccv->PulsWidth * 25;
+		  if      (w >= 1000000) { w = w/1000000; cp = "ms"; }
+		  else if (w >= 1000   ) { w = w/1000;    cp = "us"; }
+		  else                   {                cp = "ns"; }
+		  sprintf(tmp,"%d[%d%s]",(int) ccv->PulsWidth, w, cp);
+	       break;
+
+	       case TimLibCcvMaskDELAY:
+		  sprintf(tmp,"%d>",(int) ccv->Delay);
+	       break;
+
+	       case TimLibCcvMaskOMASK:
+		  sprintf(tmp,"%s",OtmToStr(ccv->OutputMask));
+	       break;
+
+	       case TimLibCcvMaskPOLARITY:
+		  if ((ccv->Polarity == TimLibPolarityTTL_BAR)
+		  ||  (ccv->Polarity == TimLibPolarityTTL)
+		  ||  (ccv->Polarity == 0))
+		     sprintf(tmp,"%s ",Polarity[ccv->Polarity]);
+		  else
+		     sprintf(tmp,"Vp:?[%d] ",(int) ccv->Polarity);
+	       break;
+
+	       case TimLibCcvMaskCTIM:
+		  if (TgvGetNameForMember(ccv->Ctim,&tname) == NULL) sprintf(tname,"BadCtim");
+		  sprintf(tmp,"%d-%s ",(int) ccv->Ctim,(char *) tname);
+	       break;
+
+	       case TimLibCcvMaskPAYLOAD:
+		  if (ccv->Payload == 0) break;
+		  sprintf(tmp,"Py:0x%04X ",(int) ccv->Payload);
+	       break;
+
+	       case TimLibCcvMaskMACHINE:
+		  if (ccv->GrNum == 0) break;
+		  cp = TgmGetMachineName(ccv->Machine);
+		  if (cp) sprintf(tmp,"%s.",TgmGetMachineName(ccv->Machine));
+		  else    sprintf(tmp,"???[%d].",(int) ccv->Machine);
+	       break;
+
+	       case TimLibCcvMaskGRNUM:
+		  if (ccv->GrNum == 0) break;
+		  if (TgmGetGroupDescriptor(ccv->Machine,ccv->GrNum,&desc) == TgmSUCCESS) {
+		     sprintf(tmp,"%s",desc.Name);
+		     if (desc.Type == TgmBIT_PATTERN) strcat(tmp,"&");
+		     else                             strcat(tmp,"=");
+		  } else sprintf(tmp,"???[%d]*",(int) ccv->GrNum);
+	       break;
+
+	       case TimLibCcvMaskGRVAL:
+		  if (ccv->GrNum == 0) break;
+		  if (TgmGetGroupDescriptor(ccv->Machine,ccv->GrNum,&desc) == TgmSUCCESS) {
+		     if (desc.Type == TgmEXCLUSIVE) sprintf(tmp,"%s",(char *) TgmGetLineName(ccv->Machine,desc.Name,ccv->GrVal));
+		     else                           sprintf(tmp,"%d",(int) ccv->GrVal);
+		  } else sprintf(tmp,"%d",(int) ccv->GrVal);
+	       break;
+
+	       default:
+	       break;
+	    }
+	    strcat(CcvStr,tmp);
+	    bzero((void *) tmp,CCV_STR_SZ);
+	 }
+      }
+   }
+   return CcvStr;
+}
+
+/*****************************************************************/
+/* Commands used in the test program.                            */
+/*****************************************************************/
+
+int ChangeEditor(int arg) {
+static int eflg = 0;
+
+   arg++;
+   if (eflg++ > 4) eflg = 1;
+
+   if      (eflg == 1) editor = "e";
+   else if (eflg == 2) editor = "emacs";
+   else if (eflg == 3) editor = "nedit";
+   else if (eflg == 4) editor = "vi";
+
+   printf("Editor: %s\n",GetFile(editor));
+   return arg;
+}
+
+/*****************************************************************/
+
+int ChangeDirectory(int arg) {
+ArgVal   *v;
+AtomType  at;
+char txt[128], fname[128], *cp;
+int n, earg;
+
+   arg++;
+   for (earg=arg; earg<pcnt; earg++) {
+      v = &(vals[earg]);
+      if ((v->Type == Close)
+      ||  (v->Type == Terminator)) break;
+   }
+
+   v = &(vals[arg]);
+   at = v->Type;
+   if ((v->Type != Close)
+   &&  (v->Type != Terminator)) {
+
+      bzero((void *) fname, 128);
+
+      n = 0;
+      cp = &(cmdbuf[v->Pos]);
+      do {
+	 at = atomhash[(int) (*cp)];
+	 if ((at != Seperator)
+	 &&  (at != Close)
+	 &&  (at != Terminator))
+	    fname[n++] = *cp;
+	 fname[n] = 0;
+	 cp++;
+      } while ((at != Close) && (at != Terminator));
+
+      strcpy(localconfigpath,fname);
+      strcat(localconfigpath,"/timtest.config");
+      if (YesNo("Change timtest config to:",localconfigpath))
+	 configpath = localconfigpath;
+      else
+	 configpath = NULL;
+   }
+
+   sprintf(txt,"%s %s",GetFile(editor),configpath);
+   printf("\n%s\n",txt);
+   system(txt);
+   printf("\n");
+   return(arg);
+}
+
+/*****************************************************************/
+
+int NextCounter(int arg) {
+
+   arg++;
+   counter++;
+   if (counter > 8) counter = 1;
+   return arg;
+}
+
+/*****************************************************************/
+
+int NextModule(int arg) {
+int mcnt;
+
+   arg++;
+   mcnt = TimLibGetInstalledModuleCount();
+   module++;
+   if (module > mcnt) module = 1;
+   return arg;
+}
+
+/*****************************************************************/
+
+int GetStatus(int arg) {
+
+TimLibDevice dev;
+TimLibStatus sts;
+char *cp;
+
+   arg++;
+   sts = TimLibGetStatus(module,&dev);
+   printf("Mod:%d Dev:%d[%s] Status:0x%04X[%s]\n",
+	  module,
+	  dev,
+	  DevNames[(int) dev],
+	  sts,
+	  StatusToStr(sts));
+
+   cp = TimLibGetSpecificInfo(module);
+   if (cp) printf("%s\n",cp);
+   return arg;
+}
+
+/*****************************************************************/
+
+int GetSetCounter(int arg) {
+ArgVal   *v;
+AtomType  at;
+
+unsigned long cnt;
+
+   arg++;
+
+   v = &(vals[arg]);
+   at = v->Type;
+   if (at == Numeric) {
+      arg++;
+      cnt = v->Number;
+      if ((cnt>0) && (cnt<=8)) counter = cnt;
+   }
+   printf("Cntr:%d Selected\n",counter);
+   return arg;
+}
+
+/*****************************************************************/
+
+int GetSetModule(int arg) {
+ArgVal   *v;
+AtomType  at;
+
+unsigned long mod, mcnt, cbl;
+TgvName cblnam;
+TgmMachine mch;
+TgmNetworkId nid;
+
+   arg++;
+   mcnt = TimLibGetInstalledModuleCount();
+
+   v = &(vals[arg]);
+   at = v->Type;
+   if (at == Numeric) {
+      arg++;
+      mod = v->Number;
+      if (mod <= mcnt) module = mod;
+   }
+
+   for (mod=1; mod<=mcnt; mod++) {
+      if (CheckErr(TimLibGetCableId(mod,&cbl))) {
+	 printf("Mod:%d ",(int) mod);
+	 if (TgvGetCableName(cbl,&cblnam)) {
+	    mch = TgvTgvToTgmMachine(TgvFirstMachineForCableId(cbl));
+	    printf("Cable:%s Tgm:%s",cblnam,TgmGetMachineName(mch));
+	 } else {
+	    printf("WARNING: Incorrect cable:%d connected to module:%d\n",(int) cbl, (int) module);
+	    printf("WARNING: This DSC is NOT configured to handle cable:%d ",(int) cbl);
+	 }
+	 if (mod == module) printf(" <<==");
+	 printf("\n");
+      }
+   }
+   if (mod == 0) printf("Mod:0 No module selected: Auto\n");
+   else          printf("Mod:%d Selected\n",module);
+   nid = TgmGetDefaultNetworkId();
+   printf("DSC Configuration: TGM_NETWORK@@%s:%s\n",
+	  (char *) TgmGetNetworkPath(),
+	  (char *) TgmNetworkIdToName(nid));
+   return arg;
+}
+
+/*****************************************************************/
+
+static unsigned long TimDebug = 0;
+
+int SwDeb(int arg) {
+ArgVal   *v;
+AtomType  at;
+
+   arg++;
+   v = &(vals[arg]);
+   at = v->Type;
+   if (at == Numeric) {
+      arg++;
+      if (v->Number) TimDebug = v->Number;
+      else           TimDebug = 0;
+      TimLibSetDebug(TimDebug);
+   }
+   if (TimDebug != 0)
+      printf("TimLibDebug: Level:[0x%02X] Enabled\n",(int) TimDebug);
+   else
+      printf("TimLibDebug: Level:[0] Disabled\n");
+
+   return arg;
+}
+
+/*****************************************************************/
+
+static unsigned long QFlag = 0;
+static unsigned long TmOut = 2000;
+
+int GetSetTmo(int arg) { /* Arg=0 => Timeouts disabled, else Arg = Timeout */
+ArgVal   *v;
+AtomType  at;
+
+   arg++;
+   v = &(vals[arg]);
+   at = v->Type;
+   if (at == Numeric) {
+      arg++;
+      TmOut = v->Number;
+      CheckErr(TimLibQueue(QFlag,TmOut));
+   }
+   if (TmOut > 0) printf("Timeout: [%d] Enabled\n",(int) TmOut);
+   else           printf("Timeout: [Zero] Disabled\n");
+
+   return arg;
+}
+
+/*****************************************************************/
+
+int GetSetQue(int arg) { /* Arg=Flag */
+ArgVal   *v;
+AtomType  at;
+
+   arg++;
+
+   v = &(vals[arg]);
+   at = v->Type;
+   if (at == Numeric) {
+      arg++;
+      QFlag = v->Number;
+      CheckErr(TimLibQueue(QFlag,TmOut));
+   }
+   if (QFlag) printf("QueueFlag: Set,   Queuing is Off\n");
+   else       printf("QueueFlag: ReSet, Queuing is On\n");
+   return arg;
+}
+
+/*****************************************************************/
+
+static char *mtyp[TimLibModuleTYPES] = {"???","CTRI","CTRP","CTRV",
+					"CPS_TG8", "SPS_TG8" };
+
+int GetVersion(int arg) {
+
+TimLibModuleVersion tver;
+TimLibTime t;
+int i;
+
+   arg++;
+
+   printf("TimLib:  Compiled: %s\n",TimLibGetVersion());
+   printf("timtest: Compiled: %s %s %s\n", "timtest", __DATE__, __TIME__);
+
+   if (TimLibGetModuleVersion(&tver) == TimLibErrorSUCCESS) {
+
+      bzero((void *) &t, sizeof(TimLibTime));
+      t.Machine = TgmMACHINE_NONE;
+      t.Second = tver.DrvVer;
+      printf("Drv: Ver:[%d] %s\n",(int) t.Second, TimeToStr(&t));
+      t.Second = tver.CorVer;
+      printf("Cor:%s Ver:[%d] %s\n",
+	      mtyp[(int) tver.ModTyp],
+	      (int) t.Second,
+	      TimeToStr(&t));
+
+      for (i=0; i<TimLibMODULES; i++) {
+	 if (tver.ModVer[i]) {
+	    t.Second  = tver.ModVer[i];
+	    printf("Mod:%d Ver:[%d] %s\n",
+		   i+1,
+		   (int) t.Second,
+		   TimeToStr(&t));
+	 }
+      }
+   }
+   return arg;
+}
+
+/*****************************************************************/
+
+extern int timlib_real_utc;
+
+int GetUtc(int arg) {
+ArgVal   *v;
+AtomType  at;
+
+TimLibTime ct;
+
+   arg++;
+   v = &(vals[arg]);
+   at = v->Type;
+   if (at == Alpha) {
+      if ((v->Text[0] == 'A') || (v->Text[0] == 'a')) {
+	 timlib_real_utc = 0;
+	 arg++;
+	 if (Dev == TimLibDevice_NETWORK) {
+	    printf("Adjust UTC Time: Not implemented for NETWORK devices\n");
+	    return arg;
+	 }
+
+	 printf("Adjusted/Legacy UTC ON (Real +2ms)\n");
+	 return arg;
+      }
+      if ((v->Text[0] == 'R') || (v->Text[0] == 'r')) {
+	 timlib_real_utc = 1;
+	 arg++;
+	 if (Dev == TimLibDevice_TG8_CPS) {
+	    printf("Real UTC Time: Not implemented for TG8-CPS devices, (-2ms)\n");
+	    return arg;
+	 }
+	 if (Dev == TimLibDevice_TG8_SPS) {
+	    printf("Real UTC Time: SPS-TG8 modules are erratic, usually (-1ms)\n");
+	    return arg;
+	 }
+	 printf("Real UTC ON\n");
+	 return arg;
+      }
+   }
+   if (at == Operator) {
+      if (v->OId == OprNOOP) {
+	 arg++;
+	 printf("A: Adjust UTC time by +2ms to legacy TG8 module time\n");
+	 printf("R: Use real non adjusted UTC time\n");
+	 return arg;
+      }
+   }
+
+   if (CheckErr(TimLibGetTime(module,&ct))) {
+      printf("Mod:%d UTC:%s\n",
+	     module,
+	     TimeToStr(&ct));
+   }
+   return arg;
+}
+
+/*****************************************************************/
+
+static int connected = 0;
+static char *class_names[3] = {"Hard","Ctim","Ptim"};
+
+int WaitInterrupt(int arg) { /* msk */
+ArgVal   *v;
+AtomType  at;
+
+int i, msk;
+
+TimLibClass    iclss, xclss;
+unsigned long  equip, xquip, usr, gn;
+unsigned long  plnum;
+TimLibHardware source;
+TimLibTime     onzero;
+TimLibTime     trigger;
+TimLibTime     start;
+TimLibTime     cstamp;
+unsigned long  ctim;
+unsigned long  payload;
+unsigned long  mod;
+unsigned long  missed;
+unsigned long  qsize;
+unsigned long  cytag;
+unsigned long  ncytag;
+unsigned long  tin;
+TgmMachine     mch;
+TgmGroupDescriptor gdesc;
+TgvName tname;
+
+   arg++;
+   v = &(vals[arg]);
+   at = v->Type;
+
+   if (at == Operator) {
+      if (v->OId == OprNOOP) {
+	 arg++;
+	 v = &(vals[arg]);
+	 at = v->Type;
+
+	 for (i=0; i<16; i++) {
+	    msk = 1 << i;
+	    if (msk & TimLibHardwareBITS) {
+	       printf("%s 0x%04X ",HardToStr(msk),msk);
+	       if ((i%4) == 0)  printf("\n");
+	    } else break;
+	 }
+	 printf("\nP<ptim object> C<ctim object> CM<ctim object on current module>\n");
+	 return arg;
+      }
+   }
+
+   xquip = 0;
+   xclss = TimLibClassHARDWARE;
+
+   if (at == Numeric) {                 /* Hardware mask ? */
+      arg++;
+
+      if (v->Number) {
+	 equip = v->Number;
+	 if (CheckErr(TimLibConnect(TimLibClassHARDWARE,equip,module))) connected++;
+      } else {
+	 if (CheckErr(TimLibConnect(TimLibClassHARDWARE,0,0))) {
+	    connected = 0;
+	    printf("Disconnected from all interrupts\n");
+	 }
+	 return arg;
+      }
+   }
+
+   if (at == Alpha) {
+      if ((v->Text[0] == 'P') || (v->Text[0] == 'p')) { /* Ptim equipment ? */
+	 arg++;
+	 v = &(vals[arg]);
+	 at = v->Type;
+	 if (at == Numeric) {
+	    equip = v->Number;
+	    arg++;
+	    v = &(vals[arg]);
+	    at = v->Type;
+	    if (CheckErr(TimLibConnect(TimLibClassPTIM,equip,0))) {
+	       xclss = TimLibClassPTIM;
+	       xquip = equip;
+	       connected++;
+	    }
+	 }
+      } else if ((v->Text[0] == 'C') || (v->Text[0] == 'c')) { /* Ctim equipment ? */
+
+	 if ((v->Text[1] == 'M') || (v->Text[1] == 'm')) mod = module;
+	 else                                            mod = 0;
+
+	 arg++;
+	 v = &(vals[arg]);
+	 at = v->Type;
+	 if (at == Numeric) {
+	    equip = v->Number;
+	    arg++;
+	    v = &(vals[arg]);
+	    at = v->Type;
+	    if (CheckErr(TimLibConnect(TimLibClassCTIM,equip,mod))) {
+	       xclss = TimLibClassCTIM;
+	       xquip = equip;
+	       connected++;
+	    }
+	 }
+      }
+   }
+
+   tin = 0;
+   if (at == Alpha) {
+      if ((v->Text[0] == 'T') || (v->Text[0] == 't')) { /* Tgm Info ? */
+	 arg++;
+	 v = &(vals[arg]);
+	 at = v->Type;
+	 tin = 1;
+      }
+   }
+
+   if (connected == 0) {
+      fprintf(stderr,"timtest:Error:WaitInterrupt:No connections to wait for\n");
+      return arg;
+   }
+
+   while(1) {
+      CheckErr(TimLibWait(&iclss,    /* Class of interrupt */
+			  &equip,    /* PTIM CTIM or hardware mask */
+			  &plnum,    /* Ptim line number 1..n or 0 */
+			  &source,   /* Hardware source of interrupt */
+			  &onzero,   /* Time of interrupt/output */
+			  &trigger,  /* Time of counters load */
+			  &start,    /* Time of counters start */
+			  &ctim,     /* CTIM trigger equipment ID */
+			  &payload,  /* Payload of trigger event */
+			  &mod,      /* Module that interrupted */
+			  &missed,   /* Number of missed interrupts */
+			  &qsize,    /* Remaining interrupts on queue */
+			  &mch));    /* Corresponding TgmMachine */
+
+      if (xquip == 0) break;         /* Any event will do */
+
+      if ((iclss == xclss) && (xquip == equip)) break;
+   }
+
+   if (module)          printf("Mod:%d ",(int) mod);
+			printf("Cls:%s ",class_names[iclss]);
+   if (equip) {
+      if (iclss == TimLibClassPTIM)
+	 printf("Eqp:%s ",GetPtmName(equip,0));
+      else {
+	 if (TgvGetNameForMember(equip,&tname) == NULL)
+	    printf("Eqp:0x%04X[%d] ",(int) equip,(int) equip);
+	 else
+	    printf("Eqp:0x%04X:%s ",(int) equip,tname);
+      }
+   }
+   if (plnum)           printf("Lnm:%d ",(int) plnum);
+   if (source)          printf("Src:%d[%s] ",(int) source,HardToStr(1 << source));
+   if (onzero.Second)   printf("\nOzr:%s ",TimeToStr(&onzero));
+   if (trigger.Second)  printf("\nTrg:%s ",TimeToStr(&trigger));
+   if (start.Second)    printf("\nStm:%s ",TimeToStr(&start));
+
+   if (ctim) {
+      if (TgvGetNameForMember(ctim,&tname) == NULL) sprintf(tname,"BadCtim");
+      printf("\nCtm:%d[%s] ",(int) ctim,(char *) tname);
+   }
+
+   if (mch != -1)       printf("Mch:%d[%s] ",mch,TgmGetMachineName(mch));
+   if (payload)         printf("Pay:0x%4X ",(int) payload);
+   if (qsize)           printf("\nQsz:%d ",(int) qsize);
+   if (missed)          printf("Qms:%d ",(int) missed);
+
+   if (tin) {
+      onzero.Machine = mch;
+
+      if (CheckErr(TimLibGetTgmInfo(onzero,&cstamp,&cytag,&ncytag))) {
+	 printf("\nTgm:%s Tag:0x%X:0x%X",
+		TimeToStr(&cstamp),
+		(int) cytag,
+		(int) ncytag);
+      }
+      gn = TgmGetGroupNumber(mch,"USER");
+      if (TgmGetGroupDescriptor(mch,gn,&gdesc) == TgmSUCCESS) {
+	 if (CheckErr(TimLibGetGroupValueFromStamp(cstamp,gn,0,&usr))) {
+	    printf(" %s:%s",
+		   gdesc.Name,
+		   (char *) TgmGetLineName(mch,gdesc.Name,usr));
+	 }
+      }
+      gn = TgmGetNextGroupNumber(mch,gn);
+      if (TgmGetGroupDescriptor(mch,gn,&gdesc) == TgmSUCCESS) {
+	 if (CheckErr(TimLibGetGroupValueFromStamp(cstamp,1,1,&usr))) {
+	    printf(":%s",
+		   (char *) TgmGetLineName(mch,gdesc.Name,usr));
+	 }
+      }
+      printf("\n");
+   }
+   printf("\n------------\n");
+
+   return arg;
+}
+
+/*****************************************************************/
+
+int SimulateInterrupt(int arg) { /* msk */
+ArgVal   *v;
+AtomType  at;
+
+int i;
+unsigned long msk, eqp, pld;
+
+   arg++;
+   v = &(vals[arg]);
+   at = v->Type;
+
+   if (at == Operator) {
+      if (v->OId == OprNOOP) {
+	 arg++;
+	 v = &(vals[arg]);
+	 at = v->Type;
+
+	 for (i=0; i<SOURCES; i++) {
+	    msk = 1 << i;
+	    if (msk & TimLibHardwareBITS) {
+	       printf("0x%04X %s\t",(int) msk,HardToStr(msk));
+	       if (((i+ 1) % 4) == 0) printf("\n");
+	    }
+	 }
+	 printf("P<ptim object> C<ctim object>\n");
+	 return arg;
+      }
+   }
+
+   if (at == Numeric) {                 /* Hardware mask ? */
+      arg++;
+      CheckErr(TimLibSimulate(TimLibClassHARDWARE,v->Number,module,0,0,0));
+      return arg;
+
+   }
+
+   if (at == Alpha) {
+      if ((v->Text[0] == 'P') || (v->Text[0] == 'p')) { /* Ptim equipment ? */
+	 arg++;
+	 v = &(vals[arg]);
+	 at = v->Type;
+	 if (at == Numeric) {
+	    CheckErr(TimLibSimulate(TimLibClassPTIM,v->Number,0,0,0,0));
+	    return arg;
+	 }
+      }
+
+      if ((v->Text[0] == 'C') || (v->Text[0] == 'c')) { /* Ctim equipment ? */
+	 arg++;
+	 v = &(vals[arg]);
+	 at = v->Type;
+	 if (at == Numeric) {
+	    eqp = v->Number;
+	    pld = 0;
+
+	    arg++;
+	    v = &(vals[arg]);
+	    at = v->Type;
+	    if (at == Numeric) pld = v->Number; /* Payload */
+
+	    CheckErr(TimLibSimulate(TimLibClassCTIM,eqp,module,0,0,pld));
+	    return arg;
+	 }
+      }
+   }
+   fprintf(stderr,"timtest:Error:Bad interrupt spec\n");
+   return arg;
+}
+
+/*****************************************************************/
+
+static char *eccv_help =
+
+"<CrLf>                 Next action           \n"
+"/<Action Number>       Open action for edit  \n"
+"?                      Print this help text  \n"
+".                      Exit from the editor  \n"
+"i<CTIM>                Change CTIM trigger number  CTIM                                           \n"
+"f<Frame>               Change frame                Frame                                          \n"
+"m<Trigger Machine>     Change trigger machine      0/CPS,1/PSB,2/LEI,3/ADE,4/SPS,5/LHC,6/SCT,7/FCT\n"
+"n<Trigger Group>       Change trigger group number Group Number                                   \n"
+"g<Trigger group value> Change trigger group value  Group Value                                    \n"
+"s<Start>               Change Start                1KHz/Ext1/Ext2/Chnd/Self/Remt/Pps/Chnd+Stop    \n"
+"k<Clock>               Change Clock                1KHz/10MHz/40MHz/Ext1/Ext2/Chnd                \n"
+"o<Mode>                Change Mode                 Once/Mult/Brst/Mult+Brst                       \n"
+"w<Pulse Width>         Change Pulse Width          Pulse Width                                    \n"
+"v<Delay>               Change Delay                Delay                                          \n"
+"e<enable>              Change OnZero behaviour     NoOut/Bus/Out/OutBus                           \n"
+"p<polarity>            Change polarity             TTL/TTL_BAR/TTL                                \n"
+"q<outmask>             Change output mask          1<<cntr 0x200/40MHz 0x400/ExCk1 0x800/ExCk2    \n";
+
+#define TXT_SZ 128
+
+void EditCcvs(unsigned long ptm) {
+
+unsigned long mod, cnt, dim;
+unsigned long pln, grn, grv;
+TimLibCcvMask ccm;
+TimLibCcv ccv;
+
+int i, n;
+char c, *cp, *ep, *cnm;
+TgvName tname;
+char txt[TXT_SZ];
+unsigned long eqp, frm, mch, str, clk, mde, plw, dly, enb, pol, oms;
+
+   if (CheckErr(TimLibGetPtimObject(ptm,&mod,&cnt,&dim))) {
+
+      pln = 1;
+
+      while (1) {
+	 if (CheckErr(TimLibGet(ptm,pln,grn,grv,&ccm,&ccv))) {
+	    grn = 0; grv = 0;
+	    if (ccm & TimLibCcvMaskGRNUM) {
+	       grn = ccv.GrNum;
+	       grv = ccv.GrVal;
+	    }
+	    if (CcvToStr(ccm,&ccv,pln)) {
+	       printf("%s : ",CcvStr);
+	       fflush(stdout);
+	    } else return;
+
+	    bzero((void *) txt, TXT_SZ); n = 0; c = 0;
+	    cp = ep = txt;
+	    while ((c != '\n') && (n < TXT_SZ -1)) c = txt[n++] = (char) getchar();
+
+	    ccm = 0;
+	    while (*cp != 0) {
+	       switch (*cp++) {
+
+		  case '\n':
+		     if (ccm) if (!CheckErr(TimLibSet(ptm,pln,grn,grv,ccm,&ccv))) return;
+		     if (n==1) {
+			pln++;
+			if (pln > dim) {
+			   pln = 1;
+			   printf("\n");
+			}
+		     }
+		  break;
+
+		  case '/':
+		     i = strtoul(cp,&ep,0);
+		     if (cp != ep) {
+			cp = ep;
+			if (i<=dim) pln = i;
+		     }
+		  break;
+
+		  case '?':
+		     printf("%s\n",eccv_help);
+		  break;
+
+		  case '.': return;
+
+		  case 'i':
+		     eqp = strtoul(cp,&ep,0); cp = ep;
+		     if (eqp) {
+			cnm = (char *) TgvGetNameForMember(eqp,&tname);
+			if (cnm) {
+			   ccv.Ctim = eqp;
+			   ccm |= TimLibCcvMaskCTIM;
+			   break;
+			}
+		     }
+		     fprintf(stderr,"timtest:Error:No such CTIM equipment: %d\n",(int) eqp);
+		  break;
+
+		  case 'f':
+		     frm = strtoul(cp,&ep,0); cp = ep;
+		     if (frm) {
+			eqp = TgvGetMemberForFrame(frm);
+			if (eqp) {
+			   ccv.Ctim = eqp;
+			   ccv.Payload = frm & 0xFFFF;
+			   ccm |= TimLibCcvMaskCTIM | TimLibCcvMaskPAYLOAD;
+			   break;
+			}
+		     }
+		     fprintf(stderr,"timtest:Error:No such CTIM frame: 0x%X\n",(int) frm);
+		  break;
+
+		  case 'm':
+		     mch = strtoul(cp,&ep,0); cp = ep;
+		     if (mch < TgmMACHINES) {
+			ccv.Machine = mch;
+			ccm |= TimLibCcvMaskMACHINE;
+			break;
+		     }
+		     fprintf(stderr,"timtest:Error:No such CTIM machine: %d\n",(int) mch);
+		  break;
+
+		  case 'n':
+		     grn = strtoul(cp,&ep,0); cp = ep;
+		     ccv.GrNum = grn;
+		     ccm |= TimLibCcvMaskGRNUM;
+		  break;
+
+		  case 'g':
+		     grv = strtoul(cp,&ep,0); cp = ep;
+		     ccv.GrVal = grv;
+		     ccm |= TimLibCcvMaskGRVAL;
+		  break;
+
+		  case 's':
+		     str = strtoul(cp,&ep,0); cp = ep;
+		     if (str < TimLibSTARTS) {
+			ccv.Start = str;
+			ccm |= TimLibCcvMaskSTART;
+			break;
+		     }
+		     fprintf(stderr,"timtest:Error:No such start: %d\n",(int) str);
+		  break;
+
+		  case 'k':
+		     clk = strtoul(cp,&ep,0); cp = ep;
+		     if (clk < TimLibCLOCKS) {
+			ccv.Clock = clk;
+			ccm |= TimLibCcvMaskCLOCK;
+			break;
+		     }
+		     fprintf(stderr,"timtest:Error:No such counter Clock: %d\n",(int) clk);
+		  break;
+
+		  case 'o':
+		     mde = strtoul(cp,&ep,0); cp = ep;
+		     if (mde < TimLibMODES) {
+			ccv.Mode = mde;
+			ccm |= TimLibCcvMaskMODE;
+			break;
+		     }
+		     fprintf(stderr,"timtest:Error:No such counter Mode: %d\n",(int) mde);
+		  break;
+
+		  case 'w':
+		     plw = strtoul(cp,&ep,0); cp = ep;
+		     ccv.PulsWidth = plw;
+		     ccm |= TimLibCcvMaskPWIDTH;
+		  break;
+
+		  case 'v':
+		     dly = strtoul(cp,&ep,0); cp = ep;
+		     ccv.Delay = dly;
+		     ccm |= TimLibCcvMaskDELAY;
+		  break;
+
+		  case 'e':
+		     enb = strtoul(cp,&ep,0); cp = ep;
+		     ccv.Enable = enb;
+		     ccm |= TimLibCcvMaskENABLE;
+		  break;
+
+		  case 'p':
+		     pol = strtoul(cp,&ep,0); cp = ep;
+		     if (pol == 1) ccv.Polarity = TimLibPolarityTTL_BAR;
+		     else          ccv.Polarity = TimLibPolarityTTL;
+		     ccm |= TimLibCcvMaskPOLARITY;
+		  break;
+
+		  case 'q':
+		     oms = strtoul(cp,&ep,0);
+		     if (cp == ep) oms = 1 << cnt;
+		     cp = ep;
+		     ccv.OutputMask = oms & 0xFFF;
+		     ccm |= TimLibCcvMaskOMASK;
+		  break;
+
+		  default: break;
+	       }
+	    }
+	 }
+      }
+   }
+}
+
+/*****************************************************************/
+
+static char *eptim_help =
+
+"<CrLf>                   Next PTIM equipment   \n"
+"/<Id>                    Go to entry PTIM=Id   \n"
+"?                        Print this help text  \n"
+".                        Exit from the editor  \n"
+"a                        Edit actions          \n"
+"y<Id>,<Mod><Cntr>,<Size> Create PTIM equipment \n";
+
+#define PSIZE 256
+
+void EditPtim(int id) {
+
+unsigned long ptimlist[PSIZE];
+int i, n, ix;
+unsigned long psize, mod, cnt, dim, nid;
+char str[128], c, *cp, *ep;
+TimLibCcv ccv;
+TimLibCcvMask ccm;
+
+   bzero((void *) &ccv, sizeof(TimLibCcv));
+   ccm = 0;
+   psize = 0;
+
+   if (CheckErr(TimLibGetAllPtimObjects(ptimlist,&psize,PSIZE))) {
+
+      if (id == 0) {
+	 ix = 0;
+	 id = ptimlist[ix];
+      } else {
+	 for (ix=0; ix<psize; ix++) {
+	    if (id == ptimlist[ix]) break;
+	 }
+	 if (ix >= psize) {
+	    printf("No such PTIM: %d\n",id);
+	    return;
+	 }
+      }
+      while (1) {
+
+	 if (psize == 0) printf(">>>Ptm:None defined : ");
+	 else {
+	    if (CheckErr(TimLibGetPtimObject(id,&mod,&cnt,&dim)) == 0) {
+	       printf("Error:%d:Ptm:%d Mo:%d Ch:%d Sz:%d : ",
+		      ix+1,id,(int) mod,(int) cnt,(int) dim);
+	       printf("\n");
+	       return;
+	    }
+	    printf("%02d:Ptm:%d:%s [%s] Mo:%d Ch:%d Sz:%d : ",
+		   ix+1,
+		   id,
+		   GetPtmName(id,1),
+		   ptm_comment_txt,
+		   (int) mod,
+		   (int) cnt,
+		   (int) dim);
+	    fflush(stdout);
+	 }
+
+	 bzero((void *) str, 128); n = 0; c = 0;
+	 cp = ep = str;
+	 while ((c != '\n') && (n < 128)) c = str[n++] = (char) getchar();
+
+	 while (*cp != 0) {
+
+	    switch (*cp++) {
+
+	       case '\n':
+		  ix++;
+		  if (ix>=psize) {
+		     ix = 0;
+		     printf("\n");
+		  }
+		  id = ptimlist[ix];
+	       break;
+
+	       case '/':
+		  nid = strtoul(cp,&ep,0);
+		  for (i=0; i<psize; i++) {
+		     if (ptimlist[i] == nid) {
+			ix = i;
+			id = nid;
+			break;
+		     }
+		  }
+		  if (cp != ep) {
+		     cp = ep; *cp = 0;
+		  }
+	       break;
+
+	       case '.': return;
+
+	       case '?':
+		  printf("%s\n",eptim_help);
+	       break;
+
+	       case 'a':
+		  EditCcvs(id);
+	       break;
+
+
+	       case 'y':
+		  nid = strtoul(cp,&ep,0);
+		  if (cp == ep) {
+		     fprintf(stderr,"timtest:Error:No PTIM ID defined\n");
+		     break;
+		  }
+		  cp = ep;
+
+		  mod = strtoul(cp,&ep,0);
+		  if (cp == ep) {
+		     fprintf(stderr,"timtest:Error:No Mod defined\n");
+		     break;
+		  }
+		  cp = ep;
+		  if (mod == 0) mod = module;
+
+		  cnt = strtoul(cp,&ep,0);
+		  if (cp == ep) {
+		     fprintf(stderr,"timtest:Error:No Cntr defined\n");
+		     break;
+		  }
+		  cp = ep;
+
+		  dim = strtoul(cp,&ep,0);
+		  if (cp == ep) dim = 1;
+		  cp = ep;
+
+		  for (i=0; i<psize; i++) {
+		     if (nid == ptimlist[i]) {
+			fprintf(stderr,"timtest:Error:That PTIM:%d already exists\n",(int) nid);
+			return;
+		     }
+		  }
+
+		  if (CheckErr(TimLibCreatePtimObject(nid,mod,cnt,dim))) {
+		     printf(">>>Ptm:%d Mo:%d Ch:%d Sz:%d Created\n",
+			    (int) nid,(int) mod,(int) cnt,(int) dim);
+		     ptimlist[psize] = nid;
+		     psize++;
+		     ix++;
+		     id = ptimlist[ix];
+
+		     CheckErr(TimLibGet(nid,1,0,0,&ccm,&ccv));
+		     ccv.Enable     = TimLibCcvDEFAULT_ENABLE;
+		     ccv.Start      = TimLibCcvDEFAULT_START;
+		     ccv.Mode       = TimLibCcvDEFAULT_MODE;
+		     ccv.Clock      = TimLibCcvDEFAULT_CLOCK;
+		     ccv.PulsWidth  = TimLibCcvDEFAULT_PULSE_WIDTH;
+		     ccv.Delay      = TimLibCcvDEFAULT_DELAY;
+		     ccv.OutputMask = 1<<cnt;
+		     ccv.Polarity   = TimLibCcvDEFAULT_POLARITY;
+		     ccv.Ctim       = 0;
+		     ccv.Payload    = TimLibCcvDEFAULT_PAYLOAD;
+
+		     ccv.Machine    = TimLibCcvDEFAULT_MACHINE;
+		     ccv.GrNum      = 0;
+		     ccv.GrVal      = TimLibCcvDEFAULT_GRVAL;
+
+		     for (i=0; i<dim; i++) {
+			if (CheckErr(TimLibSet(nid,i+1,0,0,ccm,&ccv))) {
+			   ccv.GrVal++;
+			} else {
+			   fprintf(stderr,"timtest:Error:Can't set ccv for PTIM:%d Line%d\n",(int) nid,i+1);
+			   break;
+			}
+		     }
+		  } else {
+		     fprintf(stderr,"timtest:Error:Cant create PTIM:%d\n",(int) nid);
+		     return;
+		  }
+	       break;
+
+	       default: ;
+	    }
+	 }
+      }
+   }
+}
+
+/*****************************************************************/
+
+static char *erem_help =
+
+"<CrLf>                 Next remote counter   \n"
+"/<Counter Number>      Open counter for edit  \n"
+"?                      Print this help text  \n"
+".                      Exit from the editor  \n"
+"s<Start>               Change Start                1KHz/Ext1/Ext2/Chnd/Self/Remt/Pps/Chnd+Stop \n"
+"k<Clock>               Change Clock                1KHz/10MHz/40MHz/Ext1/Ext2/Chnd             \n"
+"o<Mode>                Change Mode                 Once/Mult/Brst/Mult+Brst                    \n"
+"w<Pulse Width>         Change Pulse Width          Pulse Width                                 \n"
+"v<Delay>               Change Delay                Delay                                       \n"
+"e<enable>              Change OnZero behaviour     NoOut/Bus/Out/OutBus                        \n"
+"p<polarity>            Change polarity             TTL/TTL_BAR/TTL                             \n"
+"q<outmask>             Change output mask          1<<cntr 0x200/40MHz 0x400/ExCk1 0x800/ExCk2 \n";
+
+static void EditRemote(unsigned long mod, unsigned long cnt) {
+
+TimLibCcvMask ccm;
+TimLibCcv ccv;
+
+int i, n;
+char c, *cp, *ep;
+char txt[TXT_SZ];
+unsigned long str, clk, mde, plw, dly, enb, pol, oms, rfl;
+
+   while (1) {
+      if (CheckErr(TimLibGetRemote(mod,cnt,&rfl,&ccm,&ccv))) {
+	 if (rfl) {
+	    if (CcvToStr(ccm,&ccv,0)) {
+	       printf("Cntr:%d %s : ",(int) cnt, CcvStr);
+	       fflush(stdout);
+	    } else return;
+	 } else {
+	    printf("Cntr:%d Mod:%d Under CTR-Trigger control\n",(int) cnt,(int) module);
+	    cnt++;
+	    if (cnt>8) return;
+	    continue;
+	 }
+
+	 bzero((void *) txt, TXT_SZ); n = 0; c = 0;
+	 cp = ep = txt;
+	 while ((c != '\n') && (n < TXT_SZ -1)) c = txt[n++] = (char) getchar();
+
+	 ccm = 0;
+	 while (*cp != 0) {
+	    switch (*cp++) {
+
+	       case '\n':
+		  if (ccm) if (!CheckErr(TimLibRemoteControl(rfl,mod,cnt,0,ccm,&ccv))) return;
+		  if (n==1) {
+		     cnt++;
+		     if (cnt > 8) {
+			cnt = 1;
+			printf("\n");
+		     }
+		  }
+	       break;
+
+	       case '/':
+		  i = strtoul(cp,&ep,0);
+		  if (cp != ep) {
+		     cp = ep;
+		     if ((i>0) && (i<=8)) cnt = i;
+		  }
+	       break;
+
+	       case '?':
+		  printf("%s\n",erem_help);
+	       break;
+
+	       case '.': return;
+
+	       case 's':
+		  str = strtoul(cp,&ep,0); cp = ep;
+		  if (str < TimLibSTARTS) {
+		     ccv.Start = str;
+		     ccm |= TimLibCcvMaskSTART;
+		     break;
+		  }
+	       break;
+
+	       case 'k':
+		  clk = strtoul(cp,&ep,0); cp = ep;
+		  if (clk < TimLibCLOCKS) {
+		     ccv.Clock = clk;
+		     ccm |= TimLibCcvMaskCLOCK;
+		     break;
+		  }
+	       break;
+
+	       case 'o':
+		  mde = strtoul(cp,&ep,0); cp = ep;
+		  if (mde < TimLibMODES) {
+		     ccv.Mode = mde;
+		     ccm |= TimLibCcvMaskMODE;
+		     break;
+		  }
+	       break;
+
+	       case 'w':
+		  plw = strtoul(cp,&ep,0); cp = ep;
+		  ccv.PulsWidth = plw;
+		  ccm |= TimLibCcvMaskPWIDTH;
+	       break;
+
+	       case 'v':
+		  dly = strtoul(cp,&ep,0); cp = ep;
+		  ccv.Delay = dly;
+		  ccm |= TimLibCcvMaskDELAY;
+	       break;
+
+	       case 'e':
+		  enb = strtoul(cp,&ep,0); cp = ep;
+		  ccv.Enable = enb;
+		  ccm |= TimLibCcvMaskENABLE;
+	       break;
+
+	       case 'p':
+		  pol = strtoul(cp,&ep,0); cp = ep;
+		  if (pol == 1) ccv.Polarity = TimLibPolarityTTL_BAR;
+		  else          ccv.Polarity = TimLibPolarityTTL;
+		  ccm |= TimLibCcvMaskPOLARITY;
+	       break;
+
+	       case 'q':
+		  oms = strtoul(cp,&ep,0);
+		  if (cp == ep) oms = 1 << cnt;
+		  cp = ep;
+		  ccv.OutputMask = oms & 0xFFF;
+		  ccm |= TimLibCcvMaskOMASK;
+	       break;
+
+	       default: break;
+	    }
+	 }
+      } else break;
+   }
+}
+
+/*****************************************************************/
+
+int Config(int arg) { /* Remote flag */
+
+   arg++;
+
+   EditRemote(module,counter);
+   return arg;
+}
+
+/*****************************************************************/
+
+int GetSetRemote(int arg) { /* Remote flag */
+ArgVal   *v;
+AtomType  at;
+
+unsigned long rfl;
+
+   arg++;
+   v = &(vals[arg]);
+   at = v->Type;
+
+   if (at == Operator) {
+      if (v->OId == OprNOOP) {
+	 arg++;
+	 v = &(vals[arg]);
+	 at = v->Type;
+	 printf("[<Flag:0/CTR-Trigger 1/Remote>]\n");
+      }
+      return arg;
+   }
+
+   if (at == Numeric) {
+      arg++;
+      rfl = v->Number;
+      CheckErr(TimLibRemoteControl(rfl,module,counter,0,0,NULL));
+   }
+
+   if (CheckErr(TimLibGetRemote(module,counter,&rfl,NULL,NULL))) {
+      if (rfl == 0) printf("Cntr:%d Mod:%d Under CTR-Trigger control\n",(int) counter,(int) module);
+      else          printf("Cntr:%d Mod:%d Under Remote control\n",(int) counter,(int) module);
+      return arg;
+   }
+   return arg;
+}
+
+/*****************************************************************/
+
+#define REM_CMDS 5
+static char *RemNames[REM_CMDS] = {"Load","Stop","Start","OutNow","BusNow"};
+
+int SetRemoteCmd(int arg) { /* Remote flag */
+ArgVal   *v;
+AtomType  at;
+
+int i;
+unsigned long msk, rcm, rfl;
+
+   arg++;
+   v = &(vals[arg]);
+   at = v->Type;
+
+   if (at == Operator) {
+      if (v->OId == OprNOOP) {
+	 arg++;
+	 v = &(vals[arg]);
+	 at = v->Type;
+
+	 printf("Cmd:\n");
+	 for (i=0; i<REM_CMDS; i++) {
+	    msk = 1 << i;
+	    if (msk & TimLibRemoteBITS) {
+	       printf("0x%02X %s\n",(int) msk,RemNames[i]);
+	    } else break;
+	 }
+      }
+      return arg;
+   }
+
+   rcm = 0;
+   if (at == Numeric) {
+      rcm = v->Number & TimLibRemoteBITS;
+      arg++;
+      v = &(vals[arg]);
+      at = v->Type;
+   }
+
+   if (CheckErr(TimLibGetRemote(module,counter,&rfl,NULL,NULL))) {
+      if (rfl) {
+	 if (CheckErr(TimLibRemoteControl(rfl,module,counter,rcm,0,NULL))) {
+	    printf("Send:Cntr:%d Mod:%d Cmd:0x%02X OK\n",(int) counter,(int) module,(int) rcm);
+	    return arg;
+	 }
+      } else fprintf(stderr,"timtest:Error:Cntr:%d Mod:%d Not in REMOTE\n",(int) counter,(int) module);
+   }
+   return arg;
+}
+
+/*****************************************************************/
+
+#define C_EVENT 911
+
+int ConnectCTime(int arg) { /* C-Time */
+ArgVal   *v;
+AtomType  at;
+
+int ctime;
+
+   arg++;
+   v = &(vals[arg]);
+   at = v->Type;
+
+   ctime = 0;
+   if (at == Numeric) {
+      arg++;
+      ctime = v->Number;
+   }
+   if (CheckErr(TimLibConnectPayload(C_EVENT,ctime,module))) {
+      connected++;
+      printf("Connected to C-%d\n",ctime);
+   }
+
+   return arg;
+}
+
+/*****************************************************************/
+
+int GetSetPtim(int arg) { /* PTIM ID */
+ArgVal   *v;
+AtomType  at;
+
+int ptim;
+
+   arg++;
+   v = &(vals[arg]);
+   at = v->Type;
+
+   ptim = 0;
+   if (at == Numeric) {
+      arg++;
+      ptim = v->Number;
+   }
+   EditPtim(ptim);
+   return arg;
+}
+
+/*****************************************************************/
+
+#define CSIZE 1024
+unsigned long ctimlist[CSIZE], csize;
+
+static char *ectim_help =
+
+"<CrLf>        Next CTIM equipment    \n"
+"/<Index>      Go to entry Index      \n"
+"?             Print this help text   \n"
+".             Exit from the editor   \n"
+"f<Frame>      Change  CTIM Frame     \n"
+"x             Disable CTIM equipment \n"
+"y<Id>,<Frame> Create  CTIM equipment \n";
+
+void EditCtim(int id) {
+
+char c, *cp, *ep, str[128];
+int n, i, ix, nadr;
+unsigned long eqp, frm, xfrm;
+char comment[128];
+
+   if (!CheckErr(TimLibGetAllCtimObjects(ctimlist,&csize,CSIZE))) {
+       printf("Error: Can't get CTIM list\n");
+       return;
+   }
+
+   if (id) {
+      ix = -1;
+      for (i=0; i<csize; i++) {
+	 if (id == ctimlist[i]) {
+	    ix = i;
+	    break;
+	 }
+      }
+      if (ix < 0) {
+	 printf("Error: No such CTIM equipment: %d\n",id);
+	 return;
+      }
+   } else ix = 0;
+
+   i = ix;
+
+   while (1) {
+
+      if (!CheckErr(TimLibGetAllCtimObjects(ctimlist,&csize,CSIZE))) {
+	  printf("Error: Can't get CTIM list\n");
+	  return;
+      }
+
+      if (csize) {
+
+	 eqp = ctimlist[i];
+	 if (!CheckErr(TimLibGetCtimObject(eqp,&frm))) {
+	    printf("Error: Cant get CTIM Object: %d\n",(int) eqp);
+	    return;
+	 }
+
+	 bzero((void *) comment,128);
+	 if ((frm & 0xFFFF0000) == 0x01000000) {
+	    strcpy(comment,"Millisecond C-Event");
+	 } else {
+	    if (frm == 0) strcpy(comment,"Disabled");
+	    else if ((xfrm = TgvGetFrameForMember(eqp))) {
+	       if (frm == xfrm) TgvFrameExplanation(frm,comment);
+	       else {
+		  sprintf(comment,
+			  "%s: Modified",
+			  TgvFrameExplanation(xfrm,str));
+	       }
+	    } else {
+	       strcpy(comment,"Locally Defined");
+	    }
+	 }
+	 printf("[%d]Ctm:%d Fr:0x%08X ;%s\t: ",
+		      i,
+		(int) eqp,
+		(int) frm,
+		      comment);
+
+      } else
+	 printf(">>>Ctm:None defined : ");
+
+      fflush(stdout);
+
+      bzero((void *) str, 128); n = 0; c = 0;
+      cp = ep = str;
+      while ((c != '\n') && (n < 128)) c = str[n++] = (char) getchar();
+
+      while (*cp != 0) {
+
+	 switch (*cp++) {
+
+	    case '\n':
+	       if (n<=1) {
+		  i++;
+		  if (i>=csize) {
+		     i = ix;
+		     printf("\n------------\n");
+		  }
+	       }
+	    break;
+
+	    case '/':
+	       i = ix;
+	       nadr = strtoul(cp,&ep,0);
+	       if (cp != ep) {
+		  if (nadr < csize) i = nadr;
+		  cp = ep;
+	       }
+	    break;
+
+	    case '.': return;
+
+	    case '?':
+	       printf("%s\n",ectim_help);
+	    break;
+
+	    case 'f':
+	       frm = strtoul(cp,&ep,0);
+	       if (cp == ep) break;
+	       cp = ep;
+	       if (!CheckErr(TimLibCreateCtimObject(eqp,frm))) {
+		  printf("Error: Cant create/modify CTIM object: %d\n",(int) eqp);
+		  return;
+	       }
+	       printf(">>>Ctm:%d Fr:0x%08X : Frame changed\n",
+		      (int) eqp,
+		      (int) frm);
+	    break;
+
+	    case 'x':
+	       if (!CheckErr(TimLibCreateCtimObject(eqp,0))) {
+		  printf("Error: Cant disable CTIM object: %d\n",(int) eqp);
+		  return;
+	       }
+	       printf(">>>Ctm:%d Fr:0x%08X : Disabled\n",
+		      (int) eqp,
+		      (int) frm);
+	       if (ix>=(csize-1)) ix=0;
+	       i = ix;
+	    break;
+
+	    case 'y':
+	       eqp = strtoul(cp,&ep,0);
+	       if (cp == ep) break;
+	       cp = ep;
+	       frm = strtoul(cp,&ep,0);
+	       if (cp == ep) break;
+	       cp = ep;
+	       if (!CheckErr(TimLibCreateCtimObject(eqp,frm))) {
+		  printf("Error: Cant create CTIM object: %d\n",(int) eqp);
+		  return;
+	       }
+	       printf(">>>Ctm:%d Fr:0x%08X : Created\n",
+		      (int) eqp,
+		      (int) frm);
+	       i = csize;
+	    break;
+
+	    default: ;
+	 }
+      }
+   }
+}
+
+/*****************************************************************/
+
+int GetSetCtim(int arg) { /* CTIM ID */
+ArgVal   *v;
+AtomType  at;
+
+unsigned long ctim;
+
+   arg++;
+   v = &(vals[arg]);
+   at = v->Type;
+
+   ctim = 0;
+   if (at == Numeric) {
+      arg++;
+      ctim = v->Number;
+   }
+
+   EditCtim(ctim);
+
+   return arg;
+}
+
+/*****************************************************************/
+
+int LineNames(int arg) {
+ArgVal   *v;
+AtomType  at;
+
+int gn, m, j, msk;
+TgmGroupDescriptor desc;
+TgmLineNameTable ltab;
+
+   arg++;
+   v = &(vals[arg]);
+   at = v->Type;
+
+   if (at == Operator) {
+      if (v->OId == OprNOOP) {
+	 arg++;
+	 v = &(vals[arg]);
+	 at = v->Type;
+	 for (m=0; m<TgmMACHINES; m++) {
+	    printf("%d/%s ",(int) m,(char *) TgmGetMachineName(m));
+	 }
+	 printf("\n");
+      }
+      return arg;
+   }
+
+   m = (int) tmch;
+
+   v = &(vals[arg]);
+   at = v->Type;
+   if (at == Numeric) {
+      arg++;
+      m = v->Number;
+   }
+   if (at == Alpha) {
+      for (m=0; m<TgmMACHINES; m++) {
+	 if (strcmp(TgmGetMachineName(m),v->Text) == 0) {
+	    arg++;
+	    break;
+	 }
+      }
+   }
+
+   if ((m >=0 ) && (m <= TgmMACHINES)) {
+      tmch = (TgmMachine) m;
+      TgmAttach(m,TgmTELEGRAM | TgmLINE_NAMES);
+      printf("\n%s Telegram Layout:\n",TgmGetMachineName(m));
+      for (gn=1; gn<=TgmLastGroupNumber(m); gn++) {
+	 TgmGetGroupDescriptor(m,gn,&desc);
+	 printf("Group:%02d:%8s:",gn,desc.Name);
+	 if (desc.Type == TgmNUMERIC_VALUE) {
+	    printf("Numeric:[%d..%05d]Default:%d\t#%s",
+		   desc.Minimum,
+		   desc.Maximum,
+		   desc.Default,
+		   desc.Comment);
+	    if (desc.Name[0] == 'N') printf(" {NEXT}");
+	    printf("\n");
+	 } else if (desc.Type == TgmBIT_PATTERN) {
+	    TgmGetLineNameTable(m,desc.Name,&ltab);
+	    printf("BitPatn:[%d..%05d]Default:%d\t#%s",
+		   desc.Minimum,
+		   desc.Maximum,
+		   desc.Default,
+		   desc.Comment);
+	    if (desc.Name[0] == 'N') printf(" {NEXT}\n");
+	    else {
+	       printf("\n");
+	       for (j=0; j<ltab.Size; j++) {
+		  msk = 1 << j;
+		  printf("   0x%04X) AND %8s\t#%s\n",
+			 msk,
+			 ltab.Table[j].Name,
+			 ltab.Table[j].Comment);
+	       }
+	       printf("\n");
+	    }
+	 } else {
+	    TgmGetLineNameTable(m,desc.Name,&ltab);
+	    printf("Exclusv:[%d..%05d]Default:%d\t#%s",
+		   desc.Minimum,
+		   desc.Maximum,
+		   desc.Default,
+		   desc.Comment);
+	    if (desc.Name[0] == 'N') printf(" {NEXT}\n");
+	    else {
+	       printf("\n");
+	       for (j=0; j<ltab.Size; j++) {
+		  printf("   %02d) EQU %8s\t#%s\n",
+			 j+1,
+			 ltab.Table[j].Name,
+			 ltab.Table[j].Comment);
+	       }
+	       printf("\n");
+	    }
+	 }
+      }
+      return arg;
+   }
+
+   printf("No such TGM machine\n");
+   return arg;
+}
+
+/*****************************************************************/
+
+int WaitTelegram(int arg) {
+ArgVal   *v;
+AtomType  at;
+
+int m;
+
+   arg++;
+   v = &(vals[arg]);
+   at = v->Type;
+
+   if (at == Operator) {
+      if (v->OId == OprNOOP) {
+	 arg++;
+	 v = &(vals[arg]);
+	 at = v->Type;
+	 for (m=0; m<TgmMACHINES; m++) {
+	    printf("%d/%s ",(int) m,(char *) TgmGetMachineName(m));
+	 }
+	 printf("\n");
+      }
+      return arg;
+   }
+
+   m = (int) tmch;
+
+   v = &(vals[arg]);
+   at = v->Type;
+   if (at == Numeric) {
+      arg++;
+      m = v->Number;
+   }
+   if (at == Alpha) {
+      for (m=0; m<TgmMACHINES; m++) {
+	 if (strcmp(TgmGetMachineName(m),v->Text) == 0) {
+	    arg++;
+	    break;
+	 }
+      }
+   }
+
+   if ((m >=0 ) && (m <= TgmMACHINES)) {
+      tmch = (TgmMachine) m;
+      TgmAttach(m,TgmTELEGRAM | TgmLINE_NAMES);
+      if (TgmWaitForNextTelegram(m) == TgmSUCCESS) {
+	 printf("Wait:%s OK\n",(char *) TgmGetMachineName(m));
+	 return arg;
+      }
+   }
+
+   printf("No such TGM machine\n");
+   return arg;
+}
+
+/*****************************************************************/
+
+int GetTelegram(int arg) {
+ArgVal   *v;
+AtomType  at;
+
+int i, j, m, msk;
+TgmTelegram tgm;
+TgmGroupDescriptor desc;
+TgmLineNameTable ltab;
+unsigned long gv;
+char gvs[256];
+
+   arg++;
+   v = &(vals[arg]);
+   at = v->Type;
+
+   if (at == Operator) {
+      if (v->OId == OprNOOP) {
+	 arg++;
+	 v = &(vals[arg]);
+	 at = v->Type;
+	 for (m=0; m<TgmMACHINES; m++) {
+	    printf("%d/%s ",(int) m,(char *) TgmGetMachineName(m));
+	 }
+	 printf("\n");
+      }
+      return arg;
+   }
+
+   m = (int) tmch;
+
+   v = &(vals[arg]);
+   at = v->Type;
+   if (at == Numeric) {
+      arg++;
+      m = v->Number;
+   }
+   if (at == Alpha) {
+      for (m=0; m<TgmMACHINES; m++) {
+	 if (strcmp(TgmGetMachineName(m),v->Text) == 0) {
+	    arg++;
+	    break;
+	 }
+      }
+   }
+
+   if ((m >=0 ) && (m <= TgmMACHINES)) {
+      tmch = (TgmMachine) m;
+      printf("%d/%s Telegram\n",(int) m,(char *) TgmGetMachineName(m));
+      if (CheckErr(TimLibGetTelegram(0,m,&tgm))) {
+	 for (i=0; i<TgmLastGroupNumber(m); i++) {
+	    bzero((void *) gvs,256);
+	    gv = TgmGetGroupValueFromTelegram(i+1,&tgm);
+	    TgmGetGroupDescriptor(m,i+1,&desc);
+	    if (desc.Type == TgmNUMERIC_VALUE) {
+	       strcat(gvs,":");
+	    } else if (desc.Type == TgmBIT_PATTERN) {
+	       TgmGetLineNameTable(m,desc.Name,&ltab);
+	       for (j=0; j<ltab.Size; j++) {
+		  msk = 1 << j;
+		  if (msk & gv) {
+		     strcat(gvs,":");
+		     strcat(gvs,ltab.Table[j].Name);
+		  }
+	       }
+	    } else {
+	       TgmGetLineNameTable(m,desc.Name,&ltab);
+	       strcat(gvs,":");
+	       strcat(gvs,ltab.Table[gv-1].Name);
+	    }
+	    printf("Gn:%02d[%8s] Gv:%05d:0x%04X[%s]\n",
+		   i+1,
+		   desc.Name,
+		   (int) gv,
+		   (int) gv,
+		   gvs);
+	 }
+      }
+   }
+   return arg;
+}
+
+/******************************************************/
+
+int ShowUserMat(int arg) {
+ArgVal   *v;
+AtomType  at;
+
+int i, j, m, gn;
+char *cp, lnam[16];
+TgmGroupDescriptor desc;
+TgmLineNameTable ltab;
+TgmGroupBinding *gbnd;
+TgmUserMatrix umat;
+
+   arg++;
+   v = &(vals[arg]);
+   at = v->Type;
+
+   if (at == Operator) {
+      if (v->OId == OprNOOP) {
+	 arg++;
+	 v = &(vals[arg]);
+	 at = v->Type;
+	 for (m=0; m<TgmMACHINES; m++) {
+	    printf("%d/%s ",(int) m,(char *) TgmGetMachineName(m));
+	 }
+	 printf("\n");
+      }
+      return arg;
+   }
+
+   m = (int) tmch;
+
+   v = &(vals[arg]);
+   at = v->Type;
+   if (at == Numeric) {
+      arg++;
+      m = v->Number;
+   }
+   if (at == Alpha) {
+      for (m=0; m<TgmMACHINES; m++) {
+	 if (strcmp(TgmGetMachineName(m),v->Text) == 0) {
+	    arg++;
+	    break;
+	 }
+      }
+   }
+
+   if ((m >=0 ) && (m <= TgmMACHINES)) {
+      tmch = (TgmMachine) m;
+      TgmAttach(m,TgmTELEGRAM | TgmUSER_MATRIX | TgmLINE_NAMES);
+      printf("\n%d/%s User Matrix\n",(int) m,(char *) TgmGetMachineName(m));
+      printf("-------------\n");
+
+      gn = TgmGetGroupNumber(m,"USER");
+      TgmGetGroupDescriptor(m,gn,&desc);
+      TgmGetLineNameTable(m,desc.Name,&ltab);
+
+      for (i=0; i<ltab.Size; i++) {
+	 TgmGetUserMatrix(m,ltab.Table[i].Name,&umat);
+	 if (umat.Width) {
+	    printf("\nUser:%d:%s\tWidth:%d (BP)\n",i+1,ltab.Table[i].Name,umat.Width);
+	    for (j=0; j<umat.Size; j++) {
+	       gbnd = &(umat.Table[j]);
+	       gn = TgmGetGroupNumber(m,gbnd->Name);
+	       TgmGetGroupDescriptor(m,gn,&desc);
+	       strcpy(lnam,"---");
+	       if (desc.Type == TgmEXCLUSIVE) {
+		  cp = (char *) TgmGetLineName(m,gbnd->Name,gbnd->Value);
+		  if (cp) {
+		     strcpy(lnam,cp);
+		     free(cp);
+		  }
+	       }
+	       printf("Group:%d:%s\tValue:%d:%s\n",gn,gbnd->Name,gbnd->Value,lnam);
+	    }
+	    printf("-------------\n");
+	 }
+      }
+   }
+   return arg;
+}
+
+/******************************************************/
+
+int Video(int arg) {
+ArgVal   *v;
+AtomType  at;
+
+int m;
+unsigned long cbl;
+char txt[128];
+TgvName cblnam;
+
+   arg++;
+   v = &(vals[arg]);
+   at = v->Type;
+
+   if (at == Operator) {
+      if (v->OId == OprNOOP) {
+	 arg++;
+	 v = &(vals[arg]);
+	 at = v->Type;
+	 for (m=0; m<TgmMACHINES; m++) {
+	    printf("%d/%s ",(int) m,(char *) TgmGetMachineName(m));
+	 }
+	 printf("\n");
+      }
+      return arg;
+   }
+
+   v = &(vals[arg]);
+   at = v->Type;
+   if (at == Numeric) {
+      arg++;
+      m = v->Number;
+   }
+
+   TimLibGetCableId(module,&cbl);
+   if (at == Alpha) {
+      for (m=0; m<TgmMACHINES; m++) {
+	 if (strcmp(TgmGetMachineName(m),v->Text) == 0) {
+	    arg++;
+	    break;
+	 }
+      }
+   } else m = (int) TgvTgvToTgmMachine(TgvFirstMachineForCableId(cbl));
+
+   sprintf(txt,"%s %s",GetFile("video"),(char *) TgmGetMachineName(m));
+   if (TgvGetCableName(cbl,&cblnam)) {
+      printf("Launching:%s\n",txt);
+      Launch(txt);
+   } else {
+      fprintf(stderr,"Can't launch: %s\n",txt);
+      printf("This DSC is not correctly configured for machine:%s\n",TgmGetMachineName(m));
+   }
+   return arg;
+}
+
+/*****************************************************************/
+
+int CtimRead(int arg) {
+
+int ccnt, cfal;
+unsigned long equip, frame;
+TgvName eqname;
+
+   arg++;
+
+   ccnt = 0; cfal = 0; equip = TgvFirstGMember();
+   while (equip) {
+      TgvGetNameForMember(equip,&eqname);
+      frame = TgvGetFrameForMember(equip);
+      if (CheckErr(TimLibCreateCtimObject(equip,frame))) {
+	 printf("Created: CTIM: %s (%04d) 0x%08X OK\n",eqname,(int) equip, (int) frame);
+	 ccnt++;
+      } else {
+	 printf("Already exists: %s\n",eqname);
+	 cfal++;
+      }
+      equip = TgvNextGMember();
+   }
+   if (ccnt) printf("Created: %d CTIM equipments OK\n",ccnt);
+   if (cfal) printf("Existed: %d CTIM equipments\n"   ,cfal);
+
+   return arg;
+}
+
+/*****************************************************************/
+
+#ifndef CERN_VENDOR_ID
+#define CERN_VENDOR_ID 0x10DC
+#endif
+
+#ifndef CTRP_DEVICE_ID
+#define CTRP_DEVICE_ID 0x0300
+#endif
+
+int LaunchHwTest(int arg) {
+
+int ctr;
+char txt[128];
+unsigned long moad[8];
+
+   arg++;
+
+   switch (Dev) {
+
+      case TimLibDevice_CTR:
+	 TimLibGetHandle(&ctr);
+	 ioctl(ctr,CtrDrvrGET_MODULE_DESCRIPTOR,&moad);
+	 if ((moad[3] == CTRP_DEVICE_ID)
+	 &&  (moad[4] == CERN_VENDOR_ID))
+	    sprintf(txt,"xterm 2>/dev/null -e %s",GetFile("ctrtest"));
+	 else
+	    sprintf(txt,"xterm 2>/dev/null -e %s",GetFile("ctrvtest"));
+	 printf("Launching:%s\n",txt);
+	 Launch(txt);
+      break;
+
+      case TimLibDevice_TG8_CPS:
+	 sprintf(txt,"xterm 2>/dev/null -e %s",GetFile("tg8test"));
+	 printf("Launching:%s\n",txt);
+	 Launch(txt);
+      break;
+
+      case TimLibDevice_TG8_SPS:
+	 sprintf(txt,"xterm 2>/dev/null -e %s",GetFile("tg8test-sl"));
+	 printf("Launching:%s\n",txt);
+	 Launch(txt);
+      break;
+
+      default:
+	 printf("No network test diagnostic tool available for device: %s\n",DevNames[(int) Dev]);
+   }
+   return arg;
+}
+
+/*****************************************************************/
+
+int LaunchLookat(int arg) {
+ArgVal   *v;
+AtomType  at;
+
+char txt[128], eqn[16];
+int xquip;
+TimLibClass xclss;
+
+   arg++;
+   v = &(vals[arg]);
+   at = v->Type;
+
+   xquip = -1;
+   xclss = TimLibClassPTIM;
+
+   sprintf(txt,"%s %d ",GetFile("TimLookat"),(int) module);
+
+   if (at == Numeric) {
+
+      xquip = v->Number;
+      sprintf(eqn,"P %d",(int) xquip);
+
+      arg++;
+      v = &(vals[arg]);
+      at = v->Type;
+   } else
+
+   if (at == Alpha) {
+      if ((v->Text[0] == 'P') || (v->Text[0] == 'p')) { /* Ptim equipment ? */
+	 arg++;
+	 v = &(vals[arg]);
+	 at = v->Type;
+
+	 xclss = TimLibClassPTIM;
+
+	 if (at == Numeric) xquip = v->Number;
+	 sprintf(eqn,"P %d",(int) xquip);
+
+      } else if ((v->Text[0] == 'C') || (v->Text[0] == 'c')) { /* Ctim equipment ? */
+	 arg++;
+	 v = &(vals[arg]);
+	 at = v->Type;
+
+	 xclss = TimLibClassCTIM;
+
+	 if (at == Numeric) xquip= v->Number;
+	 sprintf(eqn,"C %d",(int) xquip);
+
+      } else if ((v->Text[0] == 'H') || (v->Text[0] == 'h')) { /* Hardware equipment ? */
+	 arg++;
+	 v = &(vals[arg]);
+	 at = v->Type;
+
+	 xclss = TimLibClassHARDWARE;
+
+	 if (at == Numeric) xquip= v->Number;
+	 sprintf(eqn,"H 0x%X",(int) xquip);
+
+      }
+   }
+   if (xquip != -1) {
+      strcat(txt,eqn);
+      strcat(txt," ");
+      strcat(txt,DevNames[Dev]);
+      printf("Launching:%s\n",txt);
+      Launch(txt);
+      return arg;
+   }
+
+   printf("Command syntax for LKM: lkm P|C|H <eqn>\n");
+
+   return arg;
+}
+
+/*****************************************************************/
+
+int LaunchClock(int arg) {
+ArgVal   *v;
+AtomType  at;
+
+char txt[128];
+int mod;
+
+
+   arg++;
+   v = &(vals[arg]);
+   at = v->Type;
+
+   mod = module;
+   if (at == Numeric) {
+      mod = v->Number;
+
+      arg++;
+      v = &(vals[arg]);
+      at = v->Type;
+   }
+
+   sprintf(txt,"%s %d %s",GetFile("TimClock"), mod, DevNames[Dev]);
+
+   printf("Launching:%s\n",txt);
+   Launch(txt);
+   return arg;
+}
+
+/*****************************************************************/
+
+int ParseCycleString(int arg) {
+ArgVal   *v;
+AtomType  at;
+char cstr[128], *cp;
+int n, earg;
+unsigned long slix;
+TimLibError err;
+
+   arg++;
+   for (earg=arg; earg<pcnt; earg++) {
+      v = &(vals[earg]);
+      if ((v->Type == Close)
+      ||  (v->Type == Terminator)) break;
+   }
+
+   v = &(vals[arg]);
+   at = v->Type;
+   if ((v->Type != Close)
+   &&  (v->Type != Terminator)) {
+
+      bzero((void *) cstr, 128);
+
+      n = 0;
+      cp = &(cmdbuf[v->Pos]);
+      do {
+	 at = atomhash[(int) (*cp)];
+	 if ((at != Seperator)
+	 &&  (at != Close)
+	 &&  (at != Terminator))
+	    cstr[n++] = *cp;
+	 cstr[n] = 0;
+	 cp++;
+      } while ((at != Close) && (at != Terminator));
+   }
+
+   err = TimLibStringToSlot(cstr,&slix);
+   if (err != TimLibErrorSUCCESS) {
+      printf("Error:%s; Can't parse:%s\n",TimLibErrorToString(err),cstr);
+      return earg;
+   }
+   printf("%s Converts to Slot:%d\n",cstr,(int) slix);
+   return earg;
+}
+
+/*****************************************************************/
+
+static char *LemoName[] = {"CH1","CH2","CH3","CH4","CH5","CH6","CH7","CH8","ST1","ST2","CK1","CK2"};
+
+int DoIo(int arg) {
+ArgVal   *v;
+AtomType  at;
+
+unsigned long lemos, lmask;
+TimLibError err;
+int i;
+char txt[128];
+
+   arg++;
+   v = &(vals[arg]);
+   at = v->Type;
+
+   lemos = 0; lmask = 0;
+
+   if (at == Numeric) {
+      lemos = (TimLibLemo) v->Number;
+
+      arg++;
+      v = &(vals[arg]);
+      at = v->Type;
+
+      if (at == Numeric) {
+	 lmask = (TimLibLemo) v->Number;
+
+	 arg++;
+	 v = &(vals[arg]);
+	 at = v->Type;
+
+	 sprintf(txt,"Lemos:0x%X Mask:0x%X",(int) lemos, (int) lmask);
+	 if (YesNo("WARNING:Set CTR Output polarities:",txt)) {
+	    err = TimLibSetOutputs(module,lemos,lmask);
+	    if (err != TimLibErrorSUCCESS) {
+	       printf("Error:%s; Can't Set CTR Outputs:%s\n",TimLibErrorToString(err),txt);
+	       return arg;
+	    }
+	 }
+      }
+   }
+
+   err = TimLibGetIoStatus(module,(TimLibLemo *) &lemos);
+   if (err != TimLibErrorSUCCESS) {
+      printf("Error:%s; Can't get CTR Inputs\n",TimLibErrorToString(err));
+      return arg;
+   }
+
+   printf("CtrLemo Logic Levels are:0x%03x\n",(int) lemos);
+   for (i=0; i<12; i++) {
+      lmask = 1 << i;
+      if (lmask & lemos) printf("%s:5V ",LemoName[i]);
+      else               printf("%s:0V ",LemoName[i]);
+   }
+   printf("\n");
+   return arg;
+}
+
+/*****************************************************************/
+
+int GetSetPll(int arg) {
+ArgVal   *v;
+AtomType  at;
+unsigned long pllflag;
+TimLibModuleStats stats;
+TimLibError ter;
+
+   arg++;
+   v = &(vals[arg]);
+   at = v->Type;
+
+   if (at == Operator) {
+      if (v->OId == OprNOOP) {
+	 arg++;
+	 v = &(vals[arg]);
+	 at = v->Type;
+	 printf("PLL Locking: 0=>SLOW, 1=>BRUTAL\n");
+      }
+      return arg;
+   }
+
+   if (at == Numeric) {
+      pllflag = v->Number;
+
+      arg++;
+      v = &(vals[arg]);
+      at = v->Type;
+
+      if ((pllflag != 0) && (pllflag != 1)) {
+	 printf("Error:Illegal PLL method[0..1]:%d\n",(int) pllflag);
+	 return arg;
+      }
+
+      ter = TimLibSetPllLocking(module,pllflag);
+      if (ter != TimLibErrorSUCCESS) {
+	 printf("Error:%s; Can't set PLL locking\n",TimLibErrorToString(ter));
+	 return arg;
+      }
+   }
+
+   ter = TimLibGetModuleStats(module,&stats);
+   if (ter != TimLibErrorSUCCESS) {
+      printf("Error:%s; Can't read module ststistice\n",TimLibErrorToString(ter));
+      return arg;
+   }
+
+   if (stats.Cst.Valid == 0) {
+      printf("Error:Pll lock control not available on module\n");
+      return arg;
+   }
+
+   printf("Cst.Stat:0x%X %s\n",
+	  (int) stats.Cst.Stat,
+	  MStatToStr(stats.Cst.Stat));
+
+   if (stats.Cst.Stat & TimLibCstStatUtcPllEnabled)
+      printf("PLL Slow locking\n");
+   else
+      printf("PLL Brutal locking\n");
+
+   return arg;
+}
+@
+
+
+1.64
+log
+@*** empty log message ***
+@
+text
+@d1840 27
+@
+
+
+1.63
+log
+@PLL Lock control added
+@
+text
+@d2695 1
+a2695 1
+	    err = TimLibSetOutputs(lemos,lmask);
+d2704 1
+a2704 1
+   err = TimLibGetIoStatus((TimLibLemo *) &lemos);
+@
+
+
+1.62
+log
+@Allow payloads to be specified for CTIM interrupt simulation
+@
+text
+@d377 27
+d2719 65
+@
+
+
+1.61
+log
+@Logic chooses best module to connect to or read telegram from
+Can force a connect to current module with "wi CM ..."
+@
+text
+@d1120 1
+a1120 1
+unsigned long msk;
+d1167 9
+a1175 1
+	    CheckErr(TimLibSimulate(TimLibClassCTIM,v->Number,module,0,0,0));
+@
+
+
+1.60
+log
+@Added specific info to read status
+@
+text
+@d958 1
+a958 1
+	 printf("\nP<ptim object> C<ctim object>\n");
+d998 4
+d1010 1
+a1010 1
+	    if (CheckErr(TimLibConnect(TimLibClassCTIM,equip,module))) {
+d2223 1
+a2223 1
+      if (CheckErr(TimLibGetTelegram(module,m,&tgm))) {
+@
+
+
+1.59
+log
+@Added GetModuleVersion
+@
+text
+@d662 1
+d672 3
+@
+
+
+1.58
+log
+@GetTgm bug, use ltab.Size instead of 16
+@
+text
+@d810 3
+d815 4
+d824 22
+@
+
+
+1.57
+log
+@Added IO command
+@
+text
+@d2195 1
+a2195 1
+	       for (j=0; j<16; j++) {
+@
+
+
+1.56
+log
+@Dont attach to the User Mat unless needed
+@
+text
+@d2587 60
+@
+
+
+1.55
+log
+@*** empty log message ***
+@
+text
+@d2022 1
+a2022 1
+      TgmAttach(m,0xF);
+d2125 1
+a2125 1
+      TgmAttach(m,0xF);
+d2268 1
+a2268 1
+      TgmAttach(m,0xF);
+@
+
+
+1.54
+log
+@Added UserMatrix printout
+@
+text
+@d2022 1
+d2125 1
+d2268 1
+@
+
+
+1.53
+log
+@*** empty log message ***
+@
+text
+@d2219 81
+@
+
+
+1.52
+log
+@*** empty log message ***
+@
+text
+@d294 1
+a294 1
+	    if (cp) *cp = '\0'; cp++;
+@
+
+
+1.51
+log
+@*** empty log message ***
+@
+text
+@d22 13
+a212 52
+/* Convert a ptim to its name                                             */
+
+typedef struct {
+   unsigned long Eqp;
+   char Name[32];
+ } PtmNames;
+
+PtmNames ptm_names[128];
+static char ptm_name_txt[128];
+int ptm_names_size = 0;
+
+char *GetTg8PtmName();
+
+char *GetPtmName(unsigned long eqp) {
+
+char *cp, *ep;
+int i;
+FILE *inp;
+
+   if (ptm_names_size == 0) {
+      GetFile("ltim.obnames");
+      inp = fopen(path,"r");
+      if (inp) {
+	 while (fgets(ptm_name_txt,128,inp) != NULL) {
+	    cp = ep = ptm_name_txt;
+	    ptm_names[ptm_names_size].Eqp = strtoul(cp,&ep,0);
+	    if (cp == ep) continue;
+	    for (i=strlen(ep); i>=0; i--) {
+	       if (ep[i] == '\n') {
+		  ep[i] = 0;
+		  break;
+	       }
+	    }
+	    strcpy(ptm_names[ptm_names_size++].Name,++ep);
+	    if (ptm_names_size >= 128) break;
+	 }
+	 fclose(inp);
+      } else if (Dev == TimLibDevice_TG8_CPS) return GetTg8PtmName(eqp);
+   }
+
+   for (i=0; i<ptm_names_size; i++) {
+      if (ptm_names[i].Eqp == eqp) {
+	 sprintf(ptm_name_txt,"%04d:%s",(int) eqp,ptm_names[i].Name);
+	 return ptm_name_txt;
+      }
+   }
+
+   sprintf(ptm_name_txt,"%04d",(int) eqp);
+   return ptm_name_txt;
+}
+
+/**************************************************************************/
+d270 80
+d1021 1
+a1021 1
+	 printf("Eqp:%s ",GetPtmName(equip));
+d1350 1
+a1350 1
+"/<Index>                 Go to entry Index     \n"
+d1362 1
+a1362 1
+unsigned long psize, mod, cnt, dim, nid, nad;
+d1395 1
+a1395 1
+	    printf("%02d:Ptm:%s Mo:%d Ch:%d Sz:%d : ",
+d1397 3
+a1399 1
+		   GetPtmName(id),
+d1424 8
+a1431 1
+		  nad = strtoul(cp,&ep,0);
+a1432 2
+		     if (nad < psize) ix = nad -1;
+		     id = ptimlist[ix];
+@
+
+
+1.50
+log
+@UTC R/A
+@
+text
+@d1106 13
+a1118 13
+"i<CTIM>                Change CTIM trigger number  CTIM                                        \n"
+"f<Frame>               Change frame                Frame                                       \n"
+"m<Trigger Machine>     Change trigger machine      LHC/SPS/CPS/PSB/LEI/ADE                     \n"
+"n<Trigger Group>       Change trigger group number Group Number                                \n"
+"g<Trigger group value> Change trigger group value  Group Value                                 \n"
+"s<Start>               Change Start                1KHz/Ext1/Ext2/Chnd/Self/Remt/Pps/Chnd+Stop \n"
+"k<Clock>               Change Clock                1KHz/10MHz/40MHz/Ext1/Ext2/Chnd             \n"
+"o<Mode>                Change Mode                 Once/Mult/Brst/Mult+Brst                    \n"
+"w<Pulse Width>         Change Pulse Width          Pulse Width                                 \n"
+"v<Delay>               Change Delay                Delay                                       \n"
+"e<enable>              Change OnZero behaviour     NoOut/Bus/Out/OutBus                        \n"
+"p<polarity>            Change polarity             TTL/TTL_BAR/TTL                             \n"
+"q<outmask>             Change output mask          1<<cntr 0x200/40MHz 0x400/ExCk1 0x800/ExCk2 \n";
+@
+
+
+1.49
+log
+@In wait handel the TGM machine from the event, not that of the cable
+@
+text
+@d796 7
+d807 18
+d827 1
+@
+
+
+1.48
+log
+@Added real UTC capabilities
+@
+text
+@d979 2
+d987 2
+a988 2
+      gn = TgmGetGroupNumber(cstamp.Machine,"USER");
+      if (TgmGetGroupDescriptor(cstamp.Machine,gn,&gdesc) == TgmSUCCESS) {
+d992 1
+a992 1
+		   (char *) TgmGetLineName(cstamp.Machine,gdesc.Name,usr));
+d995 2
+a996 2
+      gn = TgmGetNextGroupNumber(cstamp.Machine,gn);
+      if (TgmGetGroupDescriptor(cstamp.Machine,gn,&gdesc) == TgmSUCCESS) {
+d999 1
+a999 1
+		   (char *) TgmGetLineName(cstamp.Machine,gdesc.Name,usr));
+d2143 1
+a2143 1
+/*****************************************************************/
+@
+
+
+1.47
+log
+@Print telegram layout added
+@
+text
+@d781 2
+d784 2
+d790 12
+a801 1
+
+@
+
+
+1.46
+log
+@Added WaitTgm
+@
+text
+@d16 2
+d1887 103
+a1989 1
+static TgmMachine tmch = TgmCPS;
+@
+
+
+1.45
+log
+@Bug in GetTelegram fixed in BitPattern print out
+@
+text
+@d1885 56
+d1969 2
+d1987 1
+@
+
+
+1.44
+log
+@Pretty telegram printout
+@
+text
+@d1894 1
+a1894 1
+char gvs[64];
+d1932 1
+a1932 1
+	    bzero((void *) gvs,64);
+d1939 1
+a1939 1
+	       for (j=0; j<TgmLINES_IN_GROUP; j++) {
+@
+
+
+1.43
+log
+@Only use tg8infofile if the ltim file is not available
+@
+text
+@d1889 1
+a1889 1
+int i, m;
+d1891 2
+d1894 1
+d1932 1
+d1934 23
+a1956 1
+	    printf("Gn:%02d Gv:%05d [0x%04X]\n",i,(int) gv,(int) gv);
+@
+
+
+1.42
+log
+@Added tg8infofile parser to get ptim names
+@
+text
+@a217 3
+
+      if (Dev == TimLibDevice_TG8_CPS) return GetTg8PtmName(eqp);
+
+d235 1
+a235 1
+      }
+@
+
+
+1.41
+log
+@*** empty log message ***
+@
+text
+@d209 2
+d218 3
+d253 57
+d1331 4
+a1334 1
+		  if (ix>=psize) ix = 0;
+@
+
+
+1.40
+log
+@Added 68k support
+@
+text
+@d2115 46
+@
+
+
+1.39
+log
+@*** empty log message ***
+@
+text
+@d163 3
+d167 1
+@
+
+
+1.38
+log
+@*** empty log message ***
+@
+text
+@d1724 4
+a1727 1
+		  if (i>=csize) i = ix;
+@
+
+
+1.37
+log
+@Added test for GetGroupValueFromStamp
+@
+text
+@d900 1
+a900 1
+	 printf("\nTgm: Stmp:%s PTag:0x%X NTag:0x%X",
+d916 1
+a916 2
+	    printf(" %s:%s",
+		   gdesc.Name,
+@
+
+
+1.36
+log
+@Tgm info in WaitInterrupt with t option
+@
+text
+@a0 1
+
+d742 1
+a742 1
+unsigned long  equip, xquip;
+d758 1
+d900 1
+a900 1
+	 printf("\nTgm: Cyc:%s TagP:0x%X TagN:0x%X\n",
+d905 17
+@
+
+
+1.35
+log
+@*** empty log message ***
+@
+text
+@d749 1
+d755 3
+d808 3
+d823 3
+d835 10
+d897 9
+@
+
+
+1.34
+log
+@Dynamic calculation of CTIM size for TG8 CPS
+@
+text
+@d344 1
+a344 1
+char * CcvToStr(TimLibCcvMask ccm, TimLibCcv *ccv) {
+d356 2
+d993 1
+a993 1
+	    if (CcvToStr(ccm,&ccv)) {
+d1201 1
+a1201 1
+	    printf("%d:Ptm:%s Mo:%d Ch:%d Sz:%d : ",
+d1353 1
+a1353 1
+	    if (CcvToStr(ccm,&ccv)) {
+d1679 1
+a1679 4
+		  if (i>=csize) {
+		     i = ix;
+		     printf("\n");
+		  }
+@
+
+
+1.33
+log
+@GetSetCtim allows editing ctim frames
+@
+text
+@d300 1
+a300 1
+/* Output Maks to String                                         */
+@
+
+
+1.32
+log
+@Handle devices
+@
+text
+@a1150 17
+void ShowCtims(int id) {
+
+unsigned long equip, frame;
+TgvName eqname;
+
+   equip = TgvFirstGMember();
+   while (equip) {
+      TgvGetNameForMember(equip,&eqname);
+      frame = TgvGetFrameForMember(equip);
+      if ((id == equip) || (id == 0))
+	 printf("CTIM:%03d Fr:0x%08X %s\n",(int) equip,(int) frame,(char *) eqname);
+      equip = TgvNextGMember();
+   }
+}
+
+/*****************************************************************/
+
+d1583 167
+a1749 1
+int GetCtim(int arg) { /* CTIM ID */
+d1753 1
+a1753 1
+int ctim;
+d1764 3
+a1766 1
+   ShowCtims(ctim);
+@
+
+
+1.31
+log
+@*** empty log message ***
+@
+text
+@d1872 2
+d1907 1
+a1907 1
+   sprintf(txt,"%s %d ",GetFile("TimClock"), mod);
+@
+
+
+1.30
+log
+@*** empty log message ***
+@
+text
+@d1881 30
+@
+
+
+1.29
+log
+@*** empty log message ***
+@
+text
+@d1708 1
+d1716 1
+a1716 1
+   }
+a1717 1
+   TimLibGetCableId(module,&cbl);
+d1823 1
+a1823 1
+   xclss = TimLibClassHARDWARE;
+d1827 1
+a1827 1
+   if (at == Numeric) {                 /* Hardware mask ? */
+d1830 1
+a1830 1
+      sprintf(eqn,"H 0x%X",(int) xquip);
+@
+
+
+1.28
+log
+@Clear psize
+@
+text
+@d1807 74
+@
+
+
+1.27
+log
+@PTIM OB names printed
+@
+text
+@d1190 1
+@
+
+
+1.26
+log
+@*** empty log message ***
+@
+text
+@d195 50
+d850 10
+a859 1
+   if (equip)           printf("Eqp:0x%04X[%d] ",(int) equip,(int) equip);
+d1210 2
+a1211 1
+	       printf("%d:Ptm:%d Mo:%d Ch:%d Sz:%d : ",ix+1,id,(int) mod,(int) cnt,(int) dim);
+d1215 6
+a1220 1
+	    printf("%d:Ptm:%d Mo:%d Ch:%d Sz:%d : ",ix+1,id,(int) mod,(int) cnt,(int) dim);
+@
+
+
+1.25
+log
+@*** empty log message ***
+@
+text
+@d399 1
+@
+
+
+1.24
+log
+@Bug in HWT for CERN_VENDOR_ID detection
+@
+text
+@d689 2
+a690 2
+TimLibClass    iclss;
+unsigned long  equip;
+d725 4
+d751 5
+a755 1
+	    if (CheckErr(TimLibConnect(TimLibClassPTIM,equip,0))) connected++;
+d763 5
+a767 1
+	    if (CheckErr(TimLibConnect(TimLibClassCTIM,equip,module))) connected++;
+d777 39
+a815 34
+   if (CheckErr(TimLibWait(&iclss,    /* Class of interrupt */
+			   &equip,    /* PTIM CTIM or hardware mask */
+			   &plnum,    /* Ptim line number 1..n or 0 */
+			   &source,   /* Hardware source of interrupt */
+			   &onzero,   /* Time of interrupt/output */
+			   &trigger,  /* Time of counters load */
+			   &start,    /* Time of counters start */
+			   &ctim,     /* CTIM trigger equipment ID */
+			   &payload,  /* Payload of trigger event */
+			   &mod,      /* Module that interrupted */
+			   &missed,   /* Number of missed interrupts */
+			   &qsize,    /* Remaining interrupts on queue */
+			   &mch))) {  /* Corresponding TgmMachine */
+
+      if (module)          printf("Mod:%d ",(int) mod);
+			   printf("Cls:%s ",class_names[iclss]);
+      if (equip)           printf("Eqp:0x%04X[%d] ",(int) equip,(int) equip);
+      if (plnum)           printf("Lnm:%d ",(int) plnum);
+      if (source)          printf("Src:%d[%s] ",(int) source,HardToStr(1 << source));
+      if (onzero.Second)   printf("\nOzr:%s ",TimeToStr(&onzero));
+      if (trigger.Second)  printf("\nTrg:%s ",TimeToStr(&trigger));
+      if (start.Second)    printf("\nStm:%s ",TimeToStr(&start));
+
+      if (ctim) {
+	 if (TgvGetNameForMember(ctim,&tname) == NULL) sprintf(tname,"BadCtim");
+	 printf("\nCtm:%d[%s] ",(int) ctim,(char *) tname);
+      }
+
+      if (mch != -1)       printf("Mch:%d[%s] ",mch,TgmGetMachineName(mch));
+      if (payload)         printf("Pay:0x%4X ",(int) payload);
+      if (qsize)           printf("\nQsz:%d ",(int) qsize);
+      if (missed)          printf("Qms:%d ",(int) missed);
+      printf("\n------------\n");
+   }
+@
+
+
+1.23
+log
+@Tidied up the hwt so that uses a seperate window
+@
+text
+@d1698 1
+a1698 1
+	 &&  (moad[4] == CTRP_DEVICE_ID))
+@
+
+
+1.22
+log
+@Added hwt command
+@
+text
+@d1699 1
+a1699 1
+	    sprintf(txt,"%s",GetFile("ctrtest"));
+d1701 1
+a1701 1
+	    sprintf(txt,"%s",GetFile("ctrvtest"));
+d1703 1
+a1703 1
+	 system(txt);
+d1707 1
+a1707 1
+	 sprintf(txt,"%s",GetFile("tg8test"));
+d1709 1
+a1709 1
+	 system(txt);
+d1713 1
+a1713 1
+	 sprintf(txt,"%s",GetFile("tg8test-sl"));
+d1715 1
+a1715 1
+	 system(txt);
+@
+
+
+1.21
+log
+@Bugs in EditPtim indexing and error handling corrected.
+@
+text
+@d11 1
+d200 1
+a200 1
+static char *StatusOf[STATAE] = { "GmtErr","PllErr","SlfErr","EnbErr","BusErr" };
+d1673 50
+@
+
+
+1.20
+log
+@Added launch parameters to select device type and debug level.
+@
+text
+@d1131 1
+a1131 2
+
+	    if (CheckErr(TimLibGetPtimObject(id,&mod,&cnt,&dim)))
+d1133 5
+a1137 1
+	    else return;
+a1138 1
+	 fflush(stdout);
+d1157 3
+a1159 2
+		     if (nad < psize) ix = nad;
+		     cp = ep;
+@
+
+
+1.19
+log
+@Print nano seconds in TimeToStr function.
+@
+text
+@d796 1
+a796 1
+      printf("\n");
+@
+
+
+1.18
+log
+@*** empty log message ***
+@
+text
+@d176 3
+d182 1
+@
+
+
+1.17
+log
+@Tested on all module types, works correctly
+Julian
+@
+text
+@d1 1
+@
+
+
+1.16
+log
+@*** empty log message ***
+@
+text
+@d138 1
+a544 2
+   TimLibClient = 1;
+
+a660 1
+unsigned long cbl;
+a664 4
+
+      TimLibGetCableId(module,&cbl);
+      ct.Machine = TgvTgvToTgmMachine(TgvFirstMachineForCableId(cbl));
+
+a1552 2
+   TimLibClient = 1;
+
+@
+
+
+1.15
+log
+@*** empty log message ***
+@
+text
+@d15 1
+d281 1
+a281 1
+static char *Polarity     [POLARATIES]    = {"TTL","TTL_BAR","TTL"};
+d289 1
+a289 1
+int i;
+d294 1
+d306 1
+a306 1
+		     sprintf(tmp,"En:%s ",Enable[ccv->Enable]);
+d313 1
+a313 1
+		     sprintf(tmp,"St:%s ",CounterStart[ccv->Start]);
+d315 1
+a315 1
+		     sprintf(tmp,"St:?[%d] ",(int) ccv->Start);
+d320 1
+a320 1
+		     sprintf(tmp,"Md:%s ",CounterMode[ccv->Mode]);
+d322 1
+a322 1
+		     sprintf(tmp,"Md:?[%d] ",(int) ccv->Mode);
+d327 1
+a327 1
+		     sprintf(tmp,"Ck:%s ",CounterClock[ccv->Clock]);
+d329 1
+a329 1
+		     sprintf(tmp,"Ck:?[%d] ",ccv->Clock);
+d333 5
+a337 1
+		  sprintf(tmp,"Pw:%d[%dns] ",(int) ccv->PulsWidth,(int) ccv->PulsWidth * 25);
+d341 1
+a341 1
+		  sprintf(tmp,"Dl:%d ",(int) ccv->Delay);
+d345 1
+a345 1
+		  sprintf(tmp,"Ot:%s ",OtmToStr(ccv->OutputMask));
+d352 1
+a352 1
+		     sprintf(tmp,"Vp:%s ",Polarity[ccv->Polarity]);
+d359 1
+a359 1
+		  sprintf(tmp,"Ct:%d[%s] ",(int) ccv->Ctim,(char *) tname);
+d369 3
+a371 1
+		  sprintf(tmp,"Tg:%d[%s] ",ccv->Machine,TgmGetMachineName(ccv->Machine));
+d377 1
+a377 1
+		     sprintf(tmp,"Gr:%d[%s]",(int) ccv->GrNum, desc.Name);
+d380 1
+a380 1
+		  }
+d388 1
+a388 1
+		  }
+d471 10
+d482 1
+a482 1
+int cnt;
+d485 1
+a485 1
+   cnt = TimLibGetInstalledModuleCount();
+d487 1
+a487 1
+   if (module > cnt) module = 1;
+d511 21
+d536 1
+a536 1
+unsigned long mod, cnt, cbl;
+d542 1
+a542 1
+   cnt = TimLibGetInstalledModuleCount();
+d551 1
+a551 1
+      if (mod <= cnt) module = mod;
+d554 1
+a554 1
+   for (mod=1; mod<=cnt; mod++) {
+d1282 1
+a1282 1
+	       printf("%s : ",CcvStr);
+d1286 4
+a1289 2
+	    printf("Cntr:%d Not in remote\n",(int) cnt);
+	    return;
+d1394 10
+d1408 1
+a1408 1
+unsigned long cnt, rfl;
+d1419 1
+a1419 1
+	 printf("<Cntr:1..8>[<Flag:0/1>]\n");
+a1423 1
+   cnt = 0;
+a1424 1
+      cnt = v->Number;
+d1426 2
+a1427 2
+      v = &(vals[arg]);
+      at = v->Type;
+d1429 4
+a1432 2
+   if ((cnt < 1) || (cnt > 8)) {
+      fprintf(stderr,"timtest:Error:Cntr:%d Out of range 1..8\n",(int) cnt);
+a1434 14
+
+   if (at == Numeric) {
+      rfl = v->Number;
+      arg++;
+      v = &(vals[arg]);
+      at = v->Type;
+   } else {
+      if (CheckErr(TimLibGetRemote(module,cnt,&rfl,NULL,NULL))) {
+	 if (rfl == 0) printf("Cntr:%d Mod:%d Under Local control\n",(int) cnt,(int) module);
+	 else          printf("Cntr:%d Mod:%d Under Remote control\n",(int) cnt,(int) module);
+	 return arg;
+      }
+   }
+   if (CheckErr(TimLibRemoteControl(rfl,module,cnt,0,0,NULL))) EditRemote(module,cnt);
+d1437 1
+d1448 1
+a1448 1
+unsigned long msk, cnt, rcm, rfl;
+d1460 1
+a1460 1
+	 printf("<Cntr><Cmd>\n");
+a1470 12
+   cnt = 0;
+   if (at == Numeric) {
+      cnt = v->Number;
+      arg++;
+      v = &(vals[arg]);
+      at = v->Type;
+   }
+   if ((cnt < 1) || (cnt > 8)) {
+      fprintf(stderr,"timtest:Error:Cntr:%d Out of range 1..8\n",(int) cnt);
+      return arg;
+   }
+
+d1479 1
+a1479 1
+   if (CheckErr(TimLibGetRemote(module,cnt,&rfl,NULL,NULL))) {
+d1481 2
+a1482 2
+	 if (CheckErr(TimLibRemoteControl(rfl,module,cnt,rcm,0,NULL))) {
+	    printf("Send:Cntr:%d Mod:%d Cmd:0x%02X OK\n",(int) cnt,(int) module,(int) rcm);
+d1485 1
+a1485 1
+      } else fprintf(stderr,"timtest:Error:Cntr:%d Mod:%d Not in REMOTE\n",(int) cnt,(int) module);
+d1566 16
+a1581 7
+      if ((m >=0 ) && (m <= TgmMACHINES)) {
+	 printf("%d/%s Telegram\n",(int) m,(char *) TgmGetMachineName(m));
+	 if (CheckErr(TimLibGetTelegram(module,m,&tgm))) {
+	    for (i=0; i<TgmLastGroupNumber(m); i++) {
+	       gv = TgmGetGroupValueFromTelegram(i+1,&tgm);
+	       printf("Gn:%02d Gv:%05d [0x%04X]\n",i,(int) gv,(int) gv);
+	    }
+d1595 1
+d1597 1
+d1623 10
+d1634 7
+a1640 2
+   Launch(txt);
+
+d1648 1
+a1648 1
+int cnt, fal;
+d1654 1
+a1654 1
+   cnt = 0; fal = 0; equip = TgvFirstGMember();
+d1660 1
+a1660 1
+	 cnt++;
+d1663 1
+a1663 1
+	 fal++;
+d1667 2
+a1668 2
+   if (cnt) printf("Created: %d CTIM equipments OK\n",cnt);
+   if (fal) printf("Existed: %d CTIM equipments\n"   ,fal);
+@
+
+
+1.14
+log
+@*** empty log message ***
+@
+text
+@d1357 1
+a1357 1
+unsigned long cnt, mod, rfl;
+d1368 1
+a1368 1
+	 printf("<Flag:0/1> <Mod:0/1..n> <Cntr:1..8>\n");
+a1372 17
+   rfl = 0;
+   if (at == Numeric) {
+      rfl = v->Number;
+      arg++;
+      v = &(vals[arg]);
+      at = v->Type;
+   }
+
+   mod = 0;
+   if (at == Numeric) {
+      mod = v->Number;
+      arg++;
+      v = &(vals[arg]);
+      at = v->Type;
+   }
+   if (mod == 0) mod = module;
+
+d1385 11
+a1395 3
+   if (CheckErr(TimLibRemoteControl(rfl,mod,cnt,0,0,NULL))) {
+      if (rfl) EditRemote(mod,cnt);
+      else printf("Cntr:%d Mod:%d Under Local control\n",(int) cnt,(int) mod);
+d1397 1
+a1397 1
+
+d1410 1
+a1410 1
+unsigned long msk, cnt, mod, rcm, rfl;
+d1422 1
+a1422 1
+	 printf("<Cmd> [<Mod>|0] <Cntr>\n");
+d1433 1
+a1433 1
+   rcm = 0;
+d1435 1
+a1435 1
+      rcm = v->Number & TimLibRemoteBITS;
+d1440 3
+a1442 7
+
+   mod = 0;
+   if (at == Numeric) {
+      mod = v->Number;
+      arg++;
+      v = &(vals[arg]);
+      at = v->Type;
+a1443 1
+   if (mod == 0) mod = module;
+d1445 1
+a1445 1
+   cnt = 0;
+d1447 1
+a1447 1
+      cnt = v->Number;
+a1451 4
+   if ((cnt < 1) || (cnt > 8)) {
+      fprintf(stderr,"timtest:Error:Cntr:%d Out of range 1..8\n",(int) cnt);
+      return arg;
+   }
+d1453 1
+a1453 1
+   if (CheckErr(TimLibGetRemote(mod,cnt,&rfl,NULL,NULL))) {
+d1455 2
+a1456 2
+	 if (CheckErr(TimLibRemoteControl(rfl,mod,cnt,rcm,0,NULL))) {
+	    printf("Send:Cntr:%d Mod:%d Cmd:0x%02X OK\n",(int) cnt,(int) mod,(int) rcm);
+d1459 1
+a1459 1
+      } else fprintf(stderr,"timtest:Error:Cntr:%d Mod:%d Not in REMOTE\n",(int) cnt,(int) mod);
+d1555 39
+@
+
+
+1.13
+log
+@*** empty log message ***
+@
+text
+@d45 1
+a45 1
+	 configpath = "/tmp/timtest.config";
+a275 1
+#define ENABLES 4
+d277 5
+a281 5
+static char *CounterStart [TimLibSTARTS] = {"Nor", "Ext1", "Ext2", "Chnd", "Self", "Remt", "Pps", "Chnd+Stop"};
+static char *CounterMode  [TimLibMODES]  = {"Once", "Mult", "Brst", "Mult+Brst"};
+static char *CounterClock [TimLibCLOCKS] = {"1KHz", "10MHz", "40MHz", "Ext1", "Ext2", "Chnd" };
+static char *Polarity     [POLARATIES]   = {"TTL","TTL_BAR","TTL"};
+static char *Enable       [ENABLES]      = {"NoOut","Bus","Out","OutBus"};
+d303 1
+a303 1
+		  if (ccv->Enable < ENABLES)
+d352 2
+a353 1
+		  sprintf(tmp,"Ct:%d[%s] ",(int) ccv->Ctim,(char *) TgvGetNameForMember(ccv->Ctim,&tname));
+d744 1
+a744 1
+      if (source)          printf("Src:0x%04X[%s] ",(int) source,HardToStr(source));
+d748 10
+a757 5
+      if (ctim)            printf("\nCtm:%d[%s] ",(int) ctim,(char *) TgvGetNameForMember(ctim,&tname));
+			   printf("Mch:%d[%s] ",mch,TgmGetMachineName(mch));
+      if (payload)         printf("Pld:0x%4X ",(int) payload);
+      if (missed)          printf("\nQms:%d ",(int) missed);
+      if (qsize)           printf("Qsz:%d ",(int) qsize);
+@
+
+
+1.12
+log
+@*** empty log message ***
+@
+text
+@d659 1
+a659 1
+unsigned long  module;
+d735 1
+a735 1
+			   &module,   /* Module that interrupted */
+d740 1
+a740 1
+      if (module)          printf("Mod:%d ",(int) module);
+@
+
+
+1.11
+log
+@*** empty log message ***
+@
+text
+@d500 1
+d521 4
+a524 1
+	 } else printf("Cable: Unknown (%d)",(int) cbl);
+d531 4
+d623 1
+d628 4
+@
+
+
+1.10
+log
+@Works correctly on CTR
+@
+text
+@d20 1
+a20 1
+char *defaultconfigpath = "/dsc/data/tim/timtest.config";
+@
+
+
+1.9
+log
+@*** empty log message ***
+@
+text
+@d276 1
+d282 1
+d304 4
+a307 2
+		  if (ccv->Enable) sprintf(tmp,"En:Out ");
+		  else             sprintf(tmp,"En:Dis ");
+d827 1
+a827 1
+"e<enable>              Enable or Disable output    1=Enable/0=Disable                          \n"
+d988 1
+a988 2
+		     if (enb) ccv.Enable = 1;
+		     else     ccv.Enable = 0;
+d1207 1
+a1207 1
+"e<enable>              Enable or Disable output    1=Enable/0=Disable                          \n"
+d1228 4
+a1231 1
+	 } else printf("Cntr:%d Not in remote\n",(int) cnt);
+d1307 1
+a1307 2
+		  if (enb) ccv.Enable = 1;
+		  else     ccv.Enable = 0;
+d1329 1
+a1329 1
+      }
+@
+
+
+1.8
+log
+@Works OK
+@
+text
+@d521 2
+a522 2
+   if (mod == 0) printf("Module:0 No module selected: Auto\n");
+   else          printf("Module:%d Selected\n",module);
+d1122 1
+a1122 1
+		     fprintf(stderr,"timtest:Error:No Module defined\n");
+d1130 1
+a1130 1
+		     fprintf(stderr,"timtest:Error:No Counter defined\n");
+d1193 15
+d1210 35
+a1244 1
+   fprintf(stderr,"timtest:Error:Not implemented\n");
+d1246 80
+d1340 10
+d1352 1
+a1355 2
+
+      rfl = v->Number;
+d1360 1
+a1363 2
+
+      mod = v->Number;
+d1369 1
+a1372 2
+
+      cnt = v->Number;
+d1375 1
+a1375 1
+      fprintf(stderr,"timtest:Error:Counter:%d Out of range 1..8\n",(int) cnt);
+d1379 36
+a1414 4
+   if (rfl == 0) {
+      if (CheckErr(TimLibRemoteControl(0,mod,cnt,TimLibRemoteSTOP,0,NULL))) {
+	 printf("Counter:%d Module:%d Under CTR trigger control\n",(int) cnt,(int) mod);
+	 return arg;
+d1416 1
+d1419 7
+a1425 1
+   EditRemote(mod,cnt);
+d1427 29
+@
+
+
+1.7
+log
+@*** empty log message ***
+@
+text
+@d1308 15
+d1332 1
+@
+
+
+1.6
+log
+@*** empty log message ***
+@
+text
+@d824 2
+a825 2
+"p<polarity>            Change polarity             TTL_BAR/TTL                                 \n";
+
+d840 1
+a840 1
+unsigned long eqp, frm, mch, str, clk, mde, plw, dly, enb, pol;
+d996 7
+@
+
+
+1.5
+log
+@Starting to work
+@
+text
+@d280 1
+a280 1
+static char *Polarity     [POLARATIES]   = {"NotSet","TTL_BAR","TTL"};
+d341 2
+a342 1
+		  ||  (ccv->Polarity == TimLibPolarityTTL))
+d1017 1
+a1017 1
+	 printf("CTIM:%d\tFr:0x%08X %s\n",(int) equip,(int) frame,(char *) eqname);
+@
+
+
+1.4
+log
+@Compiles OK, starting to do tests
+@
+text
+@d255 5
+a259 1
+   bzero((void *) HrdStr,HD_STR_SZ);
+d280 1
+a280 1
+static char *Polarity     [POLARATIES]   = {"---","TTL_BAR","TTL"};
+d291 1
+d307 4
+a310 1
+		  sprintf(tmp,"St:%s ",CounterStart[ccv->Start]);
+d314 4
+a317 1
+		  sprintf(tmp,"Md:%d ",(int) CounterMode[ccv->Mode]);
+d321 4
+a324 1
+		  sprintf(tmp,"Ck:%s ",CounterClock[ccv->Clock]);
+d340 5
+a344 1
+		  sprintf(tmp,"Vp:%s ",Polarity[ccv->Polarity]);
+d348 1
+a348 1
+		  sprintf(tmp,"Ct:%d[%s] ",(int) ccv->Ctim,(char *) TgvGetNameForMember(ccv->Ctim,NULL));
+d352 1
+d357 1
+d362 1
+d371 1
+d477 1
+a477 1
+   printf("Mod:%d Dev:%d[%s] Status:0x%04X[%s]",
+d499 2
+d614 1
+a614 1
+      printf("Mod:%d UTC:%s",
+d645 1
+d708 29
+a736 31
+   do {
+      if (CheckErr(TimLibWait(&iclss,    /* Class of interrupt */
+			      &equip,    /* PTIM CTIM or hardware mask */
+			      &plnum,    /* Ptim line number 1..n or 0 */
+			      &source,   /* Hardware source of interrupt */
+			      &onzero,   /* Time of interrupt/output */
+			      &trigger,  /* Time of counters load */
+			      &start,    /* Time of counters start */
+			      &ctim,     /* CTIM trigger equipment ID */
+			      &payload,  /* Payload of trigger event */
+			      &module,   /* Module that interrupted */
+			      &missed,   /* Number of missed interrupts */
+			      &qsize,    /* Remaining interrupts on queue */
+			      &mch))) {  /* Corresponding TgmMachine */
+
+	 if (module)          printf("Mod:%d ",(int) module);
+			      printf("Cls:%s ",class_names[iclss]);
+	 if (equip)           printf("Eqp:0x%04X[%d] ",(int) equip,(int) equip);
+	 if (plnum)           printf("Lnm:%d ",(int) plnum);
+	 if (source)          printf("Src:0x%04X[%s] ",(int) source,HardToStr(source));
+	 if (onzero.Second)   printf("Ozr:%s ",TimeToStr(&onzero));
+	 if (trigger.Second)  printf("Trg:%s ",TimeToStr(&trigger));
+	 if (start.Second)    printf("Stm:%s ",TimeToStr(&start));
+	 if (ctim)            printf("Ctm:%d[%s] ",(int) ctim,(char *) TgvGetNameForMember(ctim,NULL));
+			      printf("Mch:%d[%s] ",mch,TgmGetMachineName(mch));
+	 if (payload)         printf("Pld:0x%4X ",(int) payload);
+	 if (missed)          printf("Qms:%d ",(int) missed);
+	 if (qsize)           printf("Qsz:%d ",(int) qsize);
+	 printf("\n");
+      }
+   } while (True);
+d1106 4
+a1109 1
+		  if (cp == ep) break;
+d1113 4
+a1116 1
+		  if (cp == ep) break;
+d1121 4
+a1124 1
+		  if (cp == ep) break;
+d1128 1
+a1128 1
+		  if (cp == ep) break;
+d1146 1
+a1146 1
+		     CheckErr(TimLibGet(nid,i+1,0,0,&ccm,&ccv));
+d1155 1
+a1155 1
+		     ccv.Ctim       = TimLibCcvDEFAULT_CTIM;
+d1159 1
+a1159 1
+		     ccv.GrNum      = TimLibCcvDEFAULT_GRNUM;
+d1301 2
+@
+
+
+1.3
+log
+@*** empty log message ***
+@
+text
+@d13 2
+a15 1
+
+a17 3
+static char *mbits                [12]                      = {"????","Cnt1","Cnt2","Cnt3","Cnt4","Cnt5","Cnt6","Cnt7","Cnt8","40Mz","Ext1","Ext2"};
+static char *rmbits               [TimLibREMOTES]           = {"Load","Stop","Start","Out","Bus" };
+
+a122 1
+	 close(tim);
+d134 1
+a134 1
+   if (err = TimLibErrorSUCCESS) return 1;
+d136 1
+a136 1
+      printf("TimLibError: %s\n",TimLibErrorToString(err));
+d139 1
+a139 1
+   printf("TimLibError: Illegal error number:%d\n",(int) err);
+a154 2
+double ms;
+double fms;
+d160 1
+a160 2
+      ctime_r (&t->Second, tmp);  /* Day Mon DD HH:MM:SS YYYY\n\0 */
+
+d173 4
+a176 4
+   } else {
+      sprintf (tbuf, "--- Zero ---");
+   }
+   if (t->Machine != TgmMACHINE_NONE) && (t->CTrain > 0) {
+d180 2
+a181 2
+      sprintf(tmp,"%d",t->CTrain);
+      strcat(tbuf,tmp);"
+d190 3
+a192 2
+static char *StatusOn[STATAE] = {"GmtOk", "PllOk", "SlfOk", "EnbOk", "BusOk" };
+static char *StatusOf[STATAE] = {"GmtErr","PllErr","SlfErr","EnbErr","BusErr" };
+d201 1
+a201 1
+   bzero((void *) StsStr,STS_STR_SZ);
+d214 1
+a214 1
+/* Hardware Interrupt to String
+d246 1
+a246 1
+				    "40Mh","ExCk1",ExCk2" };
+a271 1
+#define ON_ZEROS   4
+a275 1
+static char *CounterOnZero[ON_ZEROS]     = {"NoOut", "Bus", "Out", "BusOut" };
+d306 1
+a306 1
+		  sprintf(tmp,"Md:%d ",CounterMode[ccv->Mode]);
+d311 1
+a311 1
+	       break:
+d314 1
+a314 1
+		  sprintf(tmp,"Pw:%d[%dns] ",ccv->PulsWidth,ccv->PulsWidth * 25);
+d318 1
+a318 1
+		  sprintf(tmp,"Dl:%d ",ccv->Delay);
+d322 1
+a322 1
+		  sprintf(tmp,"Ot:%s "OutMaskToStr(ccv->OutputMask));
+d330 1
+a330 1
+		  sprintf(tmp,"Ct:%d[%s] ",ccv->Ctim,TgvGetNameForMember(ccv->Ctim,NULL));
+d334 1
+a334 1
+		  sprintf(tmp,"Py:0x%04X ",ccv->Payload);
+d343 1
+a343 1
+		     sprintf(tmp,"Gr:%d[%s]",desc.Name);
+d351 2
+a352 2
+		     if (desc.Type == TgmEXCLUSIVE) sprintf(tmp,"%s",TgmGetLineName(ccv->Machine,desc.Name,ccv->GrVal));
+		     else                           sprintf(tmp,"%d",ccv->GrVal);
+d470 1
+a470 1
+int mod, cnt, cbl;
+d487 1
+a487 1
+	 printf("Mod:%s:%d ",(int) mod);
+d491 1
+a491 1
+	 } else printf("Cable: Unknown (%d)",cbl);
+a507 1
+int debug;
+d519 1
+a519 1
+      printf("TimLibDebug: Level:[0x%02X] Enabled\n",TimDebug);
+d543 2
+a544 2
+   if (TmOut > 0) printf("Timeout: [%d] Enabled\n",TmOut);
+   else           printf("Timeout: [%d] Disabled\n",TmOut);
+d564 1
+a564 1
+   if (qflag) printf("QueueFlag: Set,   Queuing is Off\n");
+a571 1
+TimLibTime version;
+d576 1
+a576 1
+   printf("timtest: Compiled: %s %s\n", "timtest", __DATE__, __TIME__);
+d585 1
+a585 5
+time_t tim;
+TimLibCTime ct;
+TimLibTime  *t;
+
+   t = &ct.Time;
+d590 1
+a590 1
+      printf("Mod:%d UTC:\n",
+d600 1
+a642 1
+   interrupt = 0;
+d647 2
+a648 2
+	 interrupt    = v->Number;
+	 if (CheckErr(TimLibConnect(TimLibClassHARD,interrupt,module))) connected++;
+d650 1
+a650 1
+	 if (CheckErr(TimLibConnect(TimLibClassHARD,interrupt,0))) {
+d664 2
+a665 2
+	    interrupt = v->Number;
+	    if (CheckErr(TimLibConnect(TimLibClassPTIM,interrupt,0))) connected++;
+d672 2
+a673 2
+	    interrupt    = v->Number;
+	    if (CheckErr(TimLibConnect(TimLibClassCTIM,interrupt,module))) connected++;
+d679 1
+a679 1
+      printf("WaitInterrupt: Error: No connections to wait for\n");
+d698 1
+a698 1
+	 if (module)          printf("Mod:%d ",module);
+d700 7
+a706 7
+	 if (equip)           printf("Eqp:0x%04X[%d] ",equip,equip);
+	 if (plnum)           printf("Lnm:%d ",plnum);
+	 if (source)          printf("Src:0x%04X[%s] ",HardToStr(source));
+	 if (onzero->Second)  printf("Ozr:%s ",TimeToStr(onzero));
+	 if (trigger->Second) printf("Trg:%s ",TimeToStr(trigger));
+	 if (start->Second)   printf("Stm:%s ",TimeToStr(start));
+	 if (ctim)            printf("Ctm:%d[%s] ",ctim,TgvGetNameForMember(ctim,NULL));
+d708 3
+a710 3
+	 if (payload)         printf("Pld:0x%4X ",payload);
+	 if (missed)          printf("Qms:%d ",missed);
+	 if (qsize)           printf("Qsz:%d ",qsize);
+d724 3
+d740 1
+a740 1
+	       printf("0x%04X %s\t",msk,HardToStr(msk));
+d777 1
+a777 1
+   printf("Error: Bad interrupt spec\n");
+d800 1
+a800 1
+"p<polarity>            Change polarity             TTL_BAR/TTL                                 \n"
+d814 1
+d818 1
+a818 1
+   if (CheckErr(TimLibGetPtimObject(ptm,&mod,&cnt,&dim)) {
+d826 2
+a827 2
+	       grn = ccv->GrNum;
+	       grv = ccv->GrVal;
+d829 1
+a829 1
+	    if (CcvToStr(ccm,ccv)) {
+d835 1
+a835 1
+	    wbk = 0; cp = ep = txt;
+d843 1
+a843 1
+		     if (ccm) if (!CheckErr(TimLibSet(ptim,pln,grn,grv,ccm,&ccv))) return;
+d870 1
+a870 1
+			cnm = TgvGetNameForMember(eqp);
+d877 1
+a877 1
+		     printf("Error: No such CTIM equipment: %d\n",(int) eqp);
+d891 1
+a891 1
+		     printf("Error: No such CTIM frame: 0x%X\n",(int) frm);
+d901 1
+a901 1
+		     printf("Error: No such CTIM machine: %d\n",(int) mch);
+d923 1
+a923 1
+		     printf("Error: No such start: %d\n",(int) str);
+d933 1
+a933 1
+		     printf("Error: No such counter Clock: %d\n",(int) clk);
+d943 1
+a943 1
+		     printf("Error: No such counter Mode: %d\n",(int) mde);
+d983 1
+a983 1
+static char *ectim_help =
+d985 12
+a996 31
+"<CrLf>        Next CTIM equipment   \n"
+"/<Index>      Go to entry Index     \n"
+"?             Print this help text  \n"
+".             Exit from the editor  \n"
+"f<Frame>      Change CTIM Frame     \n"
+"x             Delete CTIM equipment \n"
+"y<Id>,<Frame> Create CTIM equipment \n";
+
+void EditCtim(int id) {
+
+TimLibCtimBinding ob;
+char c, *cp, *ep, str[128];
+int n, i, ix, nadr;
+
+#ifdef PS_VER
+char comment[128];
+#endif
+
+   if (id) {
+      ix = -1;
+      for (i=0; i<ctimo.Size; i++) {
+	 if (id == ctimo.Objects[i].EqpNum) {
+	    ix = i;
+	    break;
+	 }
+      }
+      if (ix < 0) {
+	 printf("Error: No such CTIM equipment: %d\n",id);
+	 return;
+      }
+   } else ix = 0;
+d998 1
+a998 1
+   i = ix;
+d1000 1
+a1000 1
+   while (1) {
+d1002 6
+a1007 6
+      bzero((void *) &ctimo, sizeof(TimLibCtimObjects));
+      if (ioctl(tim,TimLibLIST_CTIM_OBJECTS,&ctimo) < 0) {
+	 printf("Error: Cant get CTIM Object Bindings\n");
+	 IErr("LIST_CTIM_OBJECTS",NULL);
+	 return;
+      }
+d1009 1
+a1009 1
+      if (ctimo.Size) {
+d1011 1
+a1011 37
+#ifdef PS_VER
+	 bzero((void *) comment,128);
+	 if (ctimo.Objects[i].Frame.Long == 0x0100FFFF)
+	    strcpy(comment,"Millisecond C-Event with wildcard");
+	 else
+	    TgvFrameExplanation(ctimo.Objects[i].Frame.Long,comment);
+	 printf("[%d]Ctm:%d Fr:0x%08X ;%s\t: ",i,
+		(int) ctimo.Objects[i].EqpNum,
+		(int) ctimo.Objects[i].Frame.Long,
+		      comment);
+#else
+	 printf("[%d]Ctm:%d Fr:0x%08X : ",i,
+		(int) ctimo.Objects[i].EqpNum,
+		(int) ctimo.Objects[i].Frame.Long);
+#endif
+
+      } else
+	 printf(">>>Ctm:None defined : ");
+      fflush(stdout);
+
+      bzero((void *) str, 128); n = 0; c = 0;
+      cp = ep = str;
+      while ((c != '\n') && (n < 128)) c = str[n++] = (char) getchar();
+
+      while (*cp != 0) {
+
+	 switch (*cp++) {
+
+	    case '\n':
+	       if (n<=1) {
+		  i++;
+		  if (i>=ctimo.Size) {
+		     i = ix;
+		     printf("\n");
+		  }
+	       }
+	    break;
+d1013 6
+a1018 8
+	    case '/':
+	       i = ix;
+	       nadr = strtoul(cp,&ep,0);
+	       if (cp != ep) {
+		  if (nadr < ctimo.Size) i = nadr;
+		  cp = ep;
+	       }
+	    break;
+d1020 2
+a1021 1
+	    case '.': return;
+d1023 1
+a1023 49
+	    case '?':
+	       printf("%s\n",ectim_help);
+	    break;
+
+	    case 'f':
+	       ob.EqpNum = ctimo.Objects[i].EqpNum;
+	       ob.Frame.Long = strtoul(cp,&ep,0);
+	       if (cp == ep) break;
+	       cp = ep;
+	       if (ioctl(tim,TimLibCHANGE_CTIM_FRAME,&(ob)) < 0) {
+		  printf("Error: Cant create CTIM object: %d\n",(int) ob.EqpNum);
+		  IErr("CHANGE_CTIM_FRAME",NULL);
+		  return;
+	       }
+	       printf(">>>Ctm:%d Fr:0x%08X : Frame changed\n",
+		      (int) ob.EqpNum,
+		      (int) ob.Frame.Long);
+	    break;
+
+	    case 'x':
+	       if (ioctl(tim,TimLibDESTROY_CTIM_OBJECT,&(ctimo.Objects[i])) < 0) {
+		  printf("Error: Cant destroy CTIM object: %d\n",(int) ctimo.Objects[i].EqpNum);
+		  IErr("DESTROY_CTIM_OBJECT",NULL);
+		  return;
+	       }
+	       printf(">>>Ctm:%d Fr:0x%08X : Destroyed\n",
+		      (int) ctimo.Objects[i].EqpNum,
+		      (int) ctimo.Objects[i].Frame.Long);
+	       if (ix>=(ctimo.Size-1)) ix=0;
+	       i = ix;
+	    break;
+
+	    case 'y':
+	       ob.EqpNum = strtoul(cp,&ep,0);
+	       if (cp == ep) break;
+	       cp = ep;
+	       ob.Frame.Long = strtoul(cp,&ep,0);
+	       if (cp == ep) break;
+	       cp = ep;
+	       if (ioctl(tim,TimLibCREATE_CTIM_OBJECT,&(ob)) < 0) {
+		  printf("Error: Cant create CTIM object: %d\n",(int) ob.EqpNum);
+		  IErr("CREATE_CTIM_OBJECT",NULL);
+		  return;
+	       }
+	       printf(">>>Ctm:%d Fr:0x%08X : Created\n",
+		      (int) ob.EqpNum,
+		      (int) ob.Frame.Long);
+	       i = ctimo.Size;
+	    break;
+d1025 10
+a1034 1
+	    default: ;
+d1037 4
+a1040 2
+   }
+}
+d1042 5
+a1046 1
+/*****************************************************************/
+d1048 3
+a1050 1
+static char *eptim_help =
+d1052 1
+a1052 7
+"<CrLf>              Next PTIM equipment   \n"
+"/<Index>            Go to entry Index     \n"
+"?                   Print this help text  \n"
+".                   Exit from the editor  \n"
+"a                   Edit actions          \n"
+"x                   Delete PTIM equipment \n"
+"y<Id>,<Cntr>,<Size> Create PTIM equipment \n";
+d1054 1
+a1054 1
+void EditPtim(int id) {
+d1056 5
+a1060 21
+TimLibPtimObjects ptimo;
+TimLibPtimBinding ob;
+TimLibTrigger *trg;
+TimLibCounterConfiguration *cnf;
+
+char c, *cp, *ep, str[128];
+int n, i, j, ix, nadr;
+
+   if (id) {
+      ix = -1;
+      for (i=0; i<ptimo.Size; i++) {
+	 if (id == ptimo.Objects[i].EqpNum) {
+	    ix = i;
+	    break;
+	 }
+      }
+      if (ix < 0) {
+	 printf("Error: No such PTIM object: %d\n",id);
+	 return;
+      }
+   } else ix = 0;
+d1062 7
+a1068 1
+   i = ix;
+d1070 1
+a1070 1
+   while (1) {
+d1072 3
+a1074 6
+      bzero((void *) &ptimo, sizeof(TimLibPtimObjects));
+      if (ioctl(tim,TimLibLIST_PTIM_OBJECTS,&ptimo) < 0) {
+	 printf("Error: Cant get PTIM Object Bindings\n");
+	 IErr("LIST_PTIM_OBJECTS",NULL);
+	 return;
+      }
+d1076 3
+a1078 11
+      if (ptimo.Size)
+	 printf("[%d]Ptm:%d Mo:%d Ch:%d Sz:%d St:%d : ",
+		      i+1,
+		(int) ptimo.Objects[i].EqpNum,
+		(int) ptimo.Objects[i].ModuleIndex +1,
+		(int) ptimo.Objects[i].Counter,
+		(int) ptimo.Objects[i].Size,
+		(int) ptimo.Objects[i].StartIndex  +1);
+      else
+	 printf(">>>Ptm:None defined : ");
+      fflush(stdout);
+a1079 12
+      bzero((void *) str, 128); n = 0; c = 0;
+      cp = ep = str;
+      while ((c != '\n') && (n < 128)) c = str[n++] = (char) getchar();
+
+      while (*cp != 0) {
+
+	 bzero((void *) &ptimo, sizeof(TimLibPtimObjects));
+	 if (ioctl(tim,TimLibLIST_PTIM_OBJECTS,&ptimo) < 0) {
+	    printf("Error: Cant get PTIM Object Bindings\n");
+	    IErr("LIST_PTIM_OBJECTS",NULL);
+	    return;
+	 }
+d1081 4
+a1084 1
+	 switch (*cp++) {
+d1086 4
+a1089 9
+	    case '\n':
+	       if (n<=1) {
+		  i++;
+		  if (i>=ptimo.Size) {
+		     i = ix;
+		     printf("\n");
+		  }
+	       }
+	    break;
+d1091 2
+a1092 5
+	    case '/':
+	       i = ix;
+	       nadr = strtoul(cp,&ep,0);
+	       if (cp != ep) {
+		  if (nadr < ptimo.Size) i = nadr;
+a1093 2
+	       }
+	    break;
+d1095 3
+a1097 1
+	    case '.': return;
+d1099 6
+a1104 17
+	    case '?':
+	       printf("%s\n",eptim_help);
+	    break;
+
+	    case 'a':
+	       ob.EqpNum = ptimo.Objects[i].EqpNum;
+	       ob.ModuleIndex = 0;
+	       ob.StartIndex = 0;
+	       ob.Counter = 0;
+	       ob.Size = 0;
+	       if (ioctl(tim,TimLibGET_PTIM_BINDING,&ob) < 0) {
+		  printf("Error: Cant get Binding for PTIM object: %d\n",(int) ob.EqpNum);
+		  IErr("GET_PTIM_BINDING",NULL);
+		  return;
+	       }
+	       EditActions(ob.StartIndex+1,ob.Size,ptimo.Objects[i].ModuleIndex+1);
+	    break;
+d1106 34
+a1139 78
+	    case 'x':
+	       ob.EqpNum = ptimo.Objects[i].EqpNum;
+	       ob.ModuleIndex = module-1;
+	       ob.StartIndex = 0;
+	       ob.Counter = 0;
+	       ob.Size = 0;
+	       if (ioctl(tim,TimLibGET_PTIM_BINDING,&ob) < 0) {
+		  printf("Error: Cant get Binding for PTIM object: %d\n",(int) ob.EqpNum);
+		  IErr("GET_PTIM_BINDING",NULL);
+		  return;
+	       }
+	       if (ioctl(tim,TimLibDESTROY_PTIM_OBJECT,&(ob)) < 0) {
+		  printf("Error: Cant destroy PTIM object: %d\n",(int) ptimo.Objects[i].EqpNum);
+		  IErr("DESTROY_PTIM_OBJECT",NULL);
+		  return;
+	       }
+	       printf(">>>Ptm:%d Destroyed\n",
+		      (int) ptimo.Objects[i].EqpNum);
+	       if (ix>=(ptimo.Size-1)) ix=0;
+	       i = ix;
+	    break;
+
+	    case 'y':
+	       ob.ModuleIndex = module-1;
+	       ob.StartIndex = 0;
+	       ob.EqpNum = strtoul(cp,&ep,0);
+	       if (cp == ep) break;
+	       cp = ep;
+	       ob.Counter = strtoul(cp,&ep,0);
+	       if (cp == ep) break;
+	       cp = ep;
+	       ob.Size = strtoul(cp,&ep,0);
+	       if (cp == ep) break;
+	       cp = ep;
+
+	       if (ioctl(tim,TimLibCREATE_PTIM_OBJECT,&(ob)) < 0) {
+		  printf("Error: Cant create PTIM object: %d\n",(int) ob.EqpNum);
+		  IErr("CREATE_PTIM_OBJECT",NULL);
+		  return;
+	       }
+	       if (ioctl(tim,TimLibGET_PTIM_BINDING,&(ob)) < 0) {
+		  printf("Error: Cant read PTIM object: %d\n",(int) ob.EqpNum);
+		  IErr("GET_PTIM_BINDING",NULL);
+		  return;
+	       }
+	       printf(">>>Ptm:%d Mo:%d Ch:%d Sz:%d St:%d Created\n",
+		      (int) ob.EqpNum,
+		      (int) ob.ModuleIndex +1,
+		      (int) ob.Counter,
+		      (int) ob.Size,
+		      (int) ob.StartIndex  +1);
+
+	       trg = &(act.Trigger);
+	       cnf = &(act.Config);
+
+	       act.EqpClass = TimLibConnectionClassPTIM;
+	       act.EqpNum = ob.EqpNum;
+
+	       trg->Counter = ob.Counter;
+	       trg->Ctim = 107;
+	       trg->Frame.Long = 0x34070000;
+	       trg->TriggerCondition = TimLibTriggerConditionNO_CHECK;
+	       trg->Machine = TimLibMachineCPS;
+	       trg->Group.GroupNumber = 1;
+	       trg->Group.GroupValue = 24;
+
+	       cnf->Start = TimLibCounterStartNORMAL;
+	       cnf->Mode = TimLibCounterModeNORMAL;
+	       cnf->Clock = TimLibCounterClock1KHZ;
+	       cnf->Delay = 1;
+	       cnf->PulsWidth = 400;
+	       cnf->OnZero = TimLibCounterOnZeroOUT;
+
+	       for (j=ob.StartIndex; j<ob.StartIndex+ob.Size; j++) {
+		  act.TriggerNumber = j+1;
+		  if (ioctl(tim,TimLibSET_ACTION,&act) < 0) {
+		     printf("Error: Cant initialize PTIM object\n");
+		     IErr("SET_ACTION",&i);
+d1142 1
+a1142 2
+	       }
+	    break;
+d1144 2
+a1145 1
+	    default: ;
+d1153 8
+d1165 1
+a1165 5
+TimdrvrRemoteCommandBuf crmb;
+unsigned long cntr, rflg;
+
+   cntr = channel;
+   crmb.Counter = cntr;
+a1167 1
+
+d1170 2
+d1174 4
+a1177 15
+      rflg = v->Number;
+      if (rflg) crmb.Remote = 1;
+      else      crmb.Remote = 0;
+      if (ioctl(tim,TimLibSET_REMOTE,&crmb) < 0) {
+	 printf("Error: Cant set Counter: %d to Remote state: %d\n",
+		(int) crmb.Counter,
+		(int) crmb.Remote);
+	 IErr("SET_REMOTE",NULL);
+	 return arg;
+      }
+   }
+   if (ioctl(tim,TimLibGET_REMOTE,&crmb) < 0) {
+      printf("Error: Cant Get Remote state for Counter: %d\n",(int) crmb.Counter);
+      IErr("GET_REMOTE",NULL);
+      return arg;
+a1178 4
+   if (crmb.Remote)
+      printf("Counter: %d Remote controlled from host\n",(int) crmb.Counter);
+   else
+      printf("Counter: %d Local control from CTR card\n",(int) crmb.Counter);
+d1180 5
+a1184 2
+   return arg;
+}
+d1186 3
+a1188 1
+/*****************************************************************/
+d1190 5
+a1194 1
+char *RemoteToString(unsigned long rem) {
+d1196 5
+a1200 9
+static char res[32];
+
+int i, msk;
+
+   bzero((void *) res,32);
+   for (i=0; i<TimLibREMOTES; i++) {
+      msk = 1 << i;
+      if (msk & rem) { strcat(res,rmbits[i]); strcat(res," "); }
+      else             strcat(res,".. ");
+a1201 2
+   return res;
+}
+d1203 4
+a1206 25
+/*****************************************************************/
+
+int SetRemoteCmd(int arg) { /* Counter, Remote command */
+ArgVal   *v;
+AtomType  at;
+
+TimdrvrRemoteCommandBuf crmb;
+unsigned long cntr, rcmd;
+int i ,msk;
+
+   arg++;
+   v = &(vals[arg]);
+   at = v->Type;
+
+   if (at == Operator) {
+      if (v->OId == OprNOOP) {
+	 arg++;
+	 v = &(vals[arg]);
+	 at = v->Type;
+	 printf("Remote bits: ");
+	 for (i=0; i<TimLibREMOTES; i++) {
+	    msk = 1 << i;
+	    printf("0x%02x=%s ",msk,rmbits[i]);
+	 }
+	 printf("\n");
+a1207 1
+      return arg;
+d1210 1
+a1210 7
+   cntr = channel;
+   crmb.Counter = cntr;
+   if (ioctl(tim,TimLibGET_REMOTE,&crmb) < 0) {
+      printf("Error: Cant Get Remote state for Counter: %d\n",(int) crmb.Counter);
+      IErr("GET_REMOTE",NULL);
+      return arg;
+   }
+a1211 26
+   if (crmb.Remote) {
+      v = &(vals[arg]);
+      at = v->Type;
+      if (at == Numeric) {
+	 arg++;
+	 rcmd = v->Number;
+	 if (rcmd) {
+	    crmb.Remote = rcmd;
+	    if (ioctl(tim,TimLibREMOTE,&crmb) < 0) {
+	       printf("Error: Cant send: 0x%X to Counter: %d\n",
+		      (int) crmb.Remote,
+		      (int) crmb.Counter);
+	       IErr("REMOTE",NULL);
+	       return arg;
+	    }
+	    printf("Send: ");
+	    for (i=0; i<TimLibREMOTES; i++) {
+	       msk = 1 << i;
+	       if (rcmd & msk) printf("%s ",rmbits[i]);
+	       else            printf("..");
+	     }
+	    printf(" : To counter: %d :Done\n", (int) crmb.Counter);
+	    return arg;
+	 } else printf("Error: Zero command value\n");
+      } else printf("Error: No command field\n");
+   } else printf("Error: Counter: %d Not under Remote host control\n",(int) crmb.Counter);
+d1238 1
+a1238 1
+int GetSetCtim(int arg) { /* CTIM ID */
+d1253 1
+a1253 1
+   EditCtim(ctim);
+d1262 1
+a1262 1
+TimLibTgmBuf tgmb;
+d1264 2
+a1265 5
+#ifdef PS_VER
+int tm;
+TgmGroupDescriptor desc;
+TgmLineNameTable   ltab;
+#endif
+d1274 5
+a1278 40
+      if ((m > TimLibMachineNONE) && (m <= TimLibMachineMACHINES)) {
+	 tgmb.Machine = m;
+	 if (ioctl(tim,TimLibREAD_TELEGRAM,&tgmb) < 0) {
+	    printf("Error: Cant read telegram for machine: %s Module: %d\n",MachineNames[m],(int) module);
+	    IErr("READ_TELEGRAM",NULL);
+	    return arg;
+	 }
+	 printf("Telegram for: %s Module: %d\n",MachineNames[m],(int) module);
+
+#ifdef PS_VER
+	 tm = TgvTgvToTgmMachine(m);
+	 for (i=0; i<TgmLastGroupNumber(tm); i++) {
+	    if (TgmGetGroupDescriptor(tm,i+1,&desc)) {
+	       if (desc.Type == TgmEXCLUSIVE) {
+		  if (TgmGetLineNameTable(tm,desc.Name,&ltab)) {
+		     if ((tgmb.Telegram[i] > 0) && (tgmb.Telegram[i] <= ltab.Size)) {
+			printf("%8s:%8s ",
+			       desc.Name,
+			       ltab.Table[tgmb.Telegram[i]-1].Name);
+		     } else {
+			printf("%8s: ??%05d ",
+			       desc.Name,
+			       tgmb.Telegram[i]);
+		     }
+		  } else {
+		     printf("%8s:    %05d ",
+			    desc.Name,
+			    tgmb.Telegram[i]);
+		  }
+	       } else if (desc.Type == TgmBIT_PATTERN) {
+		  printf("%8s:  0x%04X ",
+			    desc.Name,
+			    tgmb.Telegram[i]);
+	       } else {
+		  printf("%8s:   %05d ",
+			    desc.Name,
+			    tgmb.Telegram[i]);
+	       }
+	    } else {
+	       printf("<Gn:%02d Gv:0x%04X %5d>",i+1,(int) tgmb.Telegram[i],(int) tgmb.Telegram[i]);
+a1279 1
+	    if ((i+1)%4 == 0) printf("\n");
+d1281 2
+a1282 10
+#else
+	 for (i=0; i<TimLibTgmGROUP_VALUES; i++) {
+	    printf("<Gn:%02d Gv:0x%04X %5d>",i+1,(int) tgmb.Telegram[i],(int) tgmb.Telegram[i]);
+	    if ((i+1)%4 == 0) printf("\n");
+	 }
+#endif
+
+	 printf("\n");
+      } else printf("Error: Telegram ID: %d out of range\n",m);
+   } else printf("Error: No Telegram ID supplied\n");
+a1287 14
+#define OB_NAME_LENGTH 17
+#define OB_COMMENT_LENGTH 64
+#define MACHINE_NAME_LENGTH 4
+
+typedef struct {
+   char           Name[OB_NAME_LENGTH];
+   char           Comment[OB_COMMENT_LENGTH];
+   unsigned long  EqpNum;
+   unsigned long  Frame;
+   TimLibMachine Machine;
+ } CtimMtgBinding;
+
+/*=======================*/
+
+a1291 1
+TimLibCtimBinding ob;
+d1300 5
+a1304 3
+      ob.EqpNum = equip;
+      ob.Frame.Long = frame;
+      if (ioctl(tim,TimLibCREATE_CTIM_OBJECT,&(ob)) < 0) {
+a1305 4
+	 if (arg) printf("Already exists: %s\n",eqname);
+      } else {
+	 cnt++;
+	 printf("Created: CTIM: %s (%04d) 0x%08X OK\n",eqname,(int) equip, (int) frame);
+a1313 143
+
+/*****************************************************************/
+
+int PtimReadFile(int arg) {
+ArgVal   *v;
+AtomType  at;
+char txt[128], fname[128], *cp;
+int n, earg;
+
+   arg++;
+   for (earg=arg; earg<pcnt; earg++) {
+      v = &(vals[earg]);
+      if ((v->Type == Close)
+      ||  (v->Type == Terminator)) break;
+   }
+
+   v = &(vals[arg]);
+   at = v->Type;
+   if ((v->Type == Close)
+   ||  (v->Type == Terminator)) {
+
+      GetFile("Tim.info");
+      strcpy(fname,path);
+
+   } else {
+
+      bzero((void *) fname, 128);
+
+      n = 0;
+      cp = &(cmdbuf[v->Pos]);
+      do {
+	 at = atomhash[(int) (*cp)];
+	 if ((at != Seperator)
+	 &&  (at != Close)
+	 &&  (at != Terminator))
+	    fname[n++] = *cp;
+	 fname[n] = 0;
+	 cp++;
+      } while ((at != Close) && (at != Terminator));
+   }
+
+   if (YesNo("PtimReadFile: Read from: ",fname) == 0)
+      return earg;
+
+   sprintf(txt,"%s %s",GetFile("TimReadInfo"),fname);
+   printf("Launching: %s\n\n",txt);
+   system(txt);
+   printf("\n");
+   return earg;
+}
+
+/*****************************************************************/
+
+int PtimWriteFile(int arg) {
+ArgVal   *v;
+AtomType  at;
+char txt[128], fname[128], *cp;
+int n, earg;
+
+   arg++;
+   for (earg=arg; earg<pcnt; earg++) {
+      v = &(vals[earg]);
+      if ((v->Type == Close)
+      ||  (v->Type == Terminator)) break;
+   }
+
+   v = &(vals[arg]);
+   at = v->Type;
+   if ((v->Type == Close)
+   ||  (v->Type == Terminator)) {
+
+      GetFile("Tim.info");
+      strcpy(fname,path);
+
+   } else {
+
+      bzero((void *) fname, 128);
+
+      n = 0;
+      cp = &(cmdbuf[v->Pos]);
+      do {
+	 at = atomhash[(int) (*cp)];
+	 if ((at != Seperator)
+	 &&  (at != Close)
+	 &&  (at != Terminator))
+	    fname[n++] = *cp;
+	 fname[n] = 0;
+	 cp++;
+      } while ((at != Close) && (at != Terminator));
+   }
+
+   if (YesNo("PtimWriteFile: Write to: ",fname) == 0)
+      return earg;
+
+   sprintf(txt,"%s %s",GetFile("TimWriteInfo"),fname);
+   printf("Launching: %s\n\n",txt);
+   system(txt);
+   sprintf(txt,"%s %s",GetFile(editor),fname);
+   system(txt);
+   printf("\n");
+   return earg;
+}
+
+/*****************************************************************/
+
+int LaunchVideo(int arg) {
+ArgVal   *v;
+AtomType  at;
+
+char txt[128];
+static int m;
+
+   arg++;
+   v = &(vals[arg]);
+   at = v->Type;
+
+   if (at == Numeric) {
+      arg++;
+      m = v->Number;
+      v = &(vals[arg]);
+      at = v->Type;
+   }
+   if (at == Alpha) {
+      arg++;
+      for (m=1; m<TimLibMachineMACHINES; m++) {
+	 if (strcmp(MachineNames[m],v->Text) == 0) {
+	    break;
+	 }
+      }
+      v = &(vals[arg]);
+      at = v->Type;
+   }
+   if ((m < 1) || (m >= TimLibMachineMACHINES)) {
+      printf("LaunchVideo: Bad machine name/number\n");
+      return arg;
+   }
+   GetFile("video");
+   sprintf(txt,"%s %s",path,MachineNames[m]);
+   printf("Launching: %s\n\n",txt);
+   Launch(txt);
+
+   return arg;
+}
+@
+
+
+1.2
+log
+@*** empty log message ***
+@
+text
+@d815 1
+a815 1
+void EditPtm(unsigned long ptm) {
+a991 30
+int GetSetActions(int arg) { /* action num, number of actions */
+ArgVal   *v;
+AtomType  at;
+
+int anum, asze;
+
+   arg++;
+   v = &(vals[arg]);
+   at = v->Type;
+
+   anum = 1;
+   asze = TimLibRamTableSIZE;
+
+   if (at == Numeric) {
+      arg++;
+      anum = v->Number;
+
+      v = &(vals[arg]);
+      at = v->Type;
+      if (at == Numeric) {
+	 arg++;
+	 asze = v->Number;
+      }
+   }
+   EditActions(anum,asze,0);
+   return arg;
+}
+
+/*****************************************************************/
+
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d221 2
+a222 1
+static char *HardNames[TimLibInterruptSOURCES] =
+d234 1
+a234 1
+   for (i=0; i<TimLibInterruptSOURCES; i++) {
+a736 5
+TimLibConnection con;
+TimLibWriteBuf wbf;
+TimLibPtimBinding ob;
+int i, cc, trignum;
+
+d747 6
+a752 3
+	 for (i=0; i<TimLibInterruptSOURCES; i++) {
+	    printf("%s: 0x%04X ",int_names[i],(1<<i));
+	    if ((i%4) == 0)  printf("\n");
+d754 1
+a754 1
+	 printf("\nT<trig number> P<ptim object> C<ctim object>\n");
+a758 2
+   trignum = 0;
+
+d761 2
+d764 3
+a766 6
+      if (v->Number) {
+	 con.Module   = module;
+	 con.EqpNum   = v->Number;
+	 con.EqpClass = TimLibConnectionClassHARD;
+      }
+   } else if (at == Alpha) {
+d772 2
+a773 13
+	    ob.EqpNum = v->Number;
+	    ob.ModuleIndex = 0;
+	    ob.StartIndex = 0;
+	    ob.Counter = 0;
+	    ob.Size = 0;
+	    if (ioctl(tim,TimLibGET_PTIM_BINDING,&ob) < 0) {
+	       printf("Error: Cant get Binding for PTIM object: %d\n",(int) ob.EqpNum);
+	       IErr("GET_PTIM_BINDING",NULL);
+	       return arg;
+	    }
+	    con.Module   = ob.ModuleIndex + 1;
+	    con.EqpNum   = ob.EqpNum;
+	    con.EqpClass = TimLibConnectionClassPTIM;
+d775 3
+a777 1
+      } else if ((v->Text[0] == 'C') || (v->Text[0] == 'c')) { /* Ctim equipment ? */
+d782 2
+a783 28
+	    con.Module   = 1;
+	    con.EqpNum   = v->Number;
+	    con.EqpClass = TimLibConnectionClassCTIM;
+	 }
+      } else if ((v->Text[0] == 'T') || (v->Text[0] == 't')) { /* Trigger number */
+	 arg++;
+	 v = &(vals[arg]);
+	 at = v->Type;
+	 if (at == Numeric) {
+	    trignum    = v->Number;
+	    act.TriggerNumber = trignum;
+	    if (ioctl(tim,TimLibGET_ACTION,&act) < 0) {
+	       IErr("GET_ACTION",&trignum);
+	       return arg;
+	    }
+	    ob.EqpNum = act.EqpNum;
+	    ob.ModuleIndex = 0;
+	    ob.StartIndex = 0;
+	    ob.Counter = 0;
+	    ob.Size = 0;
+	    if (ioctl(tim,TimLibGET_PTIM_BINDING,&ob) < 0) {
+	       printf("Error: Cant get Binding for PTIM object: %d\n",(int) ob.EqpNum);
+	       IErr("GET_PTIM_BINDING",NULL);
+	       return arg;
+	    }
+	    con.Module   = ob.ModuleIndex + 1;
+	    con.EqpNum   = act.EqpNum;
+	    con.EqpClass = act.EqpClass;
+d787 1
+a787 3
+   wbf.TriggerNumber = trignum;
+   wbf.Connection = con;
+   cc = write(tim,&wbf,sizeof(TimLibReadBuf));
+d793 1
+a793 1
+static char *eact_help =
+a800 1
+"t<Trigger Condition>   Change trigger condition    */=/&                                       \n"
+d809 2
+a810 1
+"e<enable>              Enable or Disable output    1=Enable/0=Disable                          \n";
+a811 1
+static TimLibCtimObjects ctimo;
+d813 1
+a813 1
+void EditActions(int start, int size, int mod) {
+d815 1
+a815 3
+TimLibTrigger              *trg;
+TimLibCounterConfiguration *cnf;
+TimLibTgmGroup             *grp;
+d817 4
+a820 19
+char c, *cp, *ep, txt[128];
+int i, n, wbk, ok;
+unsigned long nadr, anum;
+unsigned long eqp, frm, grn, grv, plw, dly, trc, mch, str, clk, mde, enb;
+
+   if (mod) ioctl(tim,TimLibSET_MODULE,&mod);
+
+   anum = start;
+
+   act.TriggerNumber = anum;
+   trg = &(act.Trigger);
+   cnf = &(act.Config);
+   grp = &(trg->Group);
+
+   if (ioctl(tim,TimLibLIST_CTIM_OBJECTS,&ctimo) < 0) {
+      IErr("LIST_CTIM_OBJECTS",NULL);
+      if (mod) ioctl(tim,TimLibSET_MODULE,&module);
+      return;
+   }
+d822 4
+a825 3
+   while (1) {
+      if (ActionToStr(anum)) {
+	 printf("%s : ",act_str); fflush(stdout);
+d827 1
+a827 23
+	 bzero((void *) txt, 128); n = 0; c = 0;
+	 cp = ep = txt; wbk = 0;
+	 while ((c != '\n') && (n < 128)) c = txt[n++] = (char) getchar();
+
+	 while (*cp != 0) {
+	    switch (*cp++) {
+
+	       case '\n':
+		  if (wbk || err_in_act) {
+		     wbk = 0; err_in_act = 0;
+		     if (ioctl(tim,TimLibSET_ACTION,&act) < 0) {
+			IErr("SET_ACTION",(int *) &anum);
+			if (mod) ioctl(tim,TimLibSET_MODULE,&module);
+			return;
+		     }
+		  } else if (n==1) {
+		     anum++;
+		     if (anum >= start+size) {
+			anum = start;
+			printf("\n");
+		     }
+		  }
+	       break;
+d829 1
+a829 6
+	       case '/':
+		  nadr = strtoul(cp,&ep,0);
+		  if (cp != ep) cp = ep;
+		  if ((nadr<start) || (nadr>=start+size)) nadr = start;
+		  anum = nadr;
+	       break;
+d831 30
+a860 3
+	       case '?':
+		  printf("%s\n",eact_help);
+	       break;
+d862 7
+a868 3
+	       case '.':
+		  if (mod) ioctl(tim,TimLibSET_MODULE,&module);
+		  return;
+d870 13
+a882 9
+	       case 'i':
+		  eqp = strtoul(cp,&ep,0); cp = ep;
+		  if (eqp) {
+		     ok = 0;
+		     for (i=0; i<ctimo.Size; i++) {
+			if (eqp == ctimo.Objects[i].EqpNum) {
+			   trg->Ctim  = eqp;
+			   trg->Frame = ctimo.Objects[i].Frame;
+			   wbk = ok = 1;
+d886 2
+a887 5
+		     if (ok) break;
+		  }
+		  printf("Error: No such CTIM equipment: %d\n",(int) eqp);
+		  if (mod) ioctl(tim,TimLibSET_MODULE,&module);
+		  return;
+d889 8
+a896 9
+	       case 'f':
+		  frm = strtoul(cp,&ep,0); cp = ep;
+		  if (frm) {
+		     ok = 0;
+		     for (i=0; i<ctimo.Size; i++) {
+			if ((frm & 0xFFFF0000) == (ctimo.Objects[i].Frame.Long & 0xFFFF0000)) {
+			   trg->Ctim  = ctimo.Objects[i].EqpNum;
+			   trg->Frame.Long = frm;
+			   wbk = ok = 1;
+d900 2
+a901 5
+		     if (ok) break;
+		  }
+		  printf("Error: No CTIM equipment has Frame: %d\n",(int) frm);
+		  if (mod) ioctl(tim,TimLibSET_MODULE,&module);
+		  return;
+d903 1
+a903 13
+	       case 't':
+		  trc = strtoul(cp,&ep,0); cp = ep;
+		  if (trc < TimLibTriggerCONDITIONS) {
+		     trg->TriggerCondition = trc;
+		     wbk = 1;
+		     break;
+		  }
+		  printf("Error: No such Trigger Condition: %d\n",(int) trc);
+		  if (mod) ioctl(tim,TimLibSET_MODULE,&module);
+		  return;
+
+	       case 'm':
+		  if (trg->TriggerCondition != TimLibTriggerConditionNO_CHECK) {
+d905 3
+a907 3
+		     if (mch < TimLibMachineMACHINES) {
+			trg->Machine = mch;
+			wbk = 1;
+d910 2
+a911 7
+		     printf("Error: No such Machine: %d\n",(int) mch);
+		     if (mod) ioctl(tim,TimLibSET_MODULE,&module);
+		     return;
+		  }
+		  printf("Error: Telegram checking is Off\n");
+		  if (mod) ioctl(tim,TimLibSET_MODULE,&module);
+		  return;
+d913 1
+a913 2
+	       case 'n':
+		  if (trg->TriggerCondition != TimLibTriggerConditionNO_CHECK) {
+d915 15
+a929 3
+		     if ((grn > 0) && (grn <= TimLibTgmGROUP_VALUES)) {
+			grp->GroupNumber = grn;
+			wbk = 1;
+d932 2
+a933 7
+		     printf("Error: Group Number: %d Out of Range\n",(int) grn);
+		     if (mod) ioctl(tim,TimLibSET_MODULE,&module);
+		     return;
+		  }
+		  printf("Error: Telegram checking is Off\n");
+		  if (mod) ioctl(tim,TimLibSET_MODULE,&module);
+		  return;
+d935 9
+a943 10
+	       case 'g':
+		  if (trg->TriggerCondition != TimLibTriggerConditionNO_CHECK) {
+		     grv = strtoul(cp,&ep,0); cp = ep;
+		     grp->GroupValue = grv;
+		     wbk = 1;
+		     break;
+		  }
+		  printf("Error: Telegram checking is Off\n");
+		  if (mod) ioctl(tim,TimLibSET_MODULE,&module);
+		  return;
+d945 9
+a953 10
+	       case 's':
+		  str = strtoul(cp,&ep,0); cp = ep;
+		  if (str < TimLibCounterSTARTS) {
+		     cnf->Start = str;
+		     wbk = 1;
+		     break;
+		  }
+		  printf("Error: No such counter Start: %d\n",(int) str);
+		  if (mod) ioctl(tim,TimLibSET_MODULE,&module);
+		  return;
+d955 25
+a979 10
+	       case 'k':
+		  clk = strtoul(cp,&ep,0); cp = ep;
+		  if (clk<=TimLibCounterCLOCKS) {
+		     cnf->Clock = clk;
+		     wbk = 1;
+		     break;
+		  }
+		  printf("Error: No such counter Clock: %d\n",(int) clk);
+		  if (mod) ioctl(tim,TimLibSET_MODULE,&module);
+		  return;
+a980 10
+	       case 'o':
+		  mde = strtoul(cp,&ep,0); cp = ep;
+		  if (mde<=TimLibCounterMODES) {
+		     cnf->Mode = mde;
+		     wbk = 1;
+		     break;
+		  }
+		  printf("Error: No such counter Mode: %d\n",(int) mde);
+		  if (mod) ioctl(tim,TimLibSET_MODULE,&module);
+		  return;
+d982 2
+a983 20
+	       case 'w':
+		  plw = strtoul(cp,&ep,0); cp = ep;
+		  cnf->PulsWidth = plw;
+		  wbk = 1;
+	       break;
+
+	       case 'v':
+		  dly = strtoul(cp,&ep,0); cp = ep;
+		  cnf->Delay = dly;
+		  wbk = 1;
+	       break;
+
+	       case 'e':
+		  enb = strtoul(cp,&ep,0); cp = ep;
+		  if (enb) cnf->OnZero |=  TimLibCounterOnZeroOUT;
+		  else     cnf->OnZero &= ~TimLibCounterOnZeroOUT;
+		  wbk = 1;
+	       break;
+
+	       default: break;
+d986 1
+a986 1
+      } else break;
+@

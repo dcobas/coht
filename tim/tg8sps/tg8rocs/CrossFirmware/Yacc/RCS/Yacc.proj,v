@@ -1,0 +1,100 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2001.10.01.13.59.59;	author baujc;	state Exp;
+branches;
+next	;
+
+
+desc
+@empty description
+@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@//Any:AnyPrettyIO 
+ProjectAttributes (
+	DependenciesFile           : "dependencies.incl",
+	FileCount                  : 7,
+	FileSet                    : array (
+		"Makefile",
+		"conv.tab.c",
+		"convP.c",
+		"yacc.c",
+		"convP.h",
+		"yacc.h",
+		"Yacc.proj"
+	),
+	FileTypes                  : struct (
+		Header              : File_Types_Info (
+			Icon                     : "$SNIFF_DIR/config/icons/FT_header.gif",
+			"Is Default File Type"     : true,
+			Name                     : "Header",
+			Parser                   : "SNiFF-C++",
+			"Retriever Priority"       : "1",
+			Signatures               : "*.h:*.H:*.hh:*.HH:*.hpp:*.HPP:*.hxx:*.HXX:*.ci",
+			"Tool Names"               : "Edit:Set Writable:Set Read Only:Properties",
+			Tools                    : "SniffEdit:SniffSetWritable:SniffSetReadOnly:ls -l %f",
+			Type                     : "Header"
+		),
+		Implementation      : File_Types_Info (
+			"General Makefile"         : "$SNIFF_DIR/make_support/general.c.mk",
+			Icon                     : "$SNIFF_DIR/config/icons/FT_source.gif",
+			"Is Default File Type"     : true,
+			Name                     : "Implementation",
+			Parser                   : "SNiFF-C++",
+			"Retriever Priority"       : "2",
+			Signatures               : "*.c:*.C:*.cc:*.CC:*.cpp:*.CPP:*.cxx:*.CXX:*.err",
+			"Tool Names"               : "Edit:Set Writable:Set Read Only:Properties",
+			Tools                    : "SniffEdit:SniffSetWritable:SniffSetReadOnly:ls -l %f",
+			Type                     : "Implementation"
+		),
+		Make                : File_Types_Info (
+			"Create Symbolic Link"     : true,
+			Icon                     : "$SNIFF_DIR/config/icons/FT_make.gif",
+			"Is Default File Type"     : true,
+			Name                     : "Make",
+			"Retriever Priority"       : "6",
+			Signatures               : "Makefile:GNUmakefile.*",
+			"Tool Names"               : "Edit:Set Writable:Set Read Only:Properties",
+			Tools                    : "SniffEdit:SniffSetWritable:SniffSetReadOnly:ls -l %f",
+			Type                     : "Make"
+		),
+		"Project Description" : File_Types_Info (
+			Icon                     : "$SNIFF_DIR/config/icons/FT_pdf.gif",
+			"Is Default File Type"     : true,
+			Name                     : "Project Description",
+			"Retriever Priority"       : "8",
+			Signatures               : "*.proj:*.shared",
+			"Tool Names"               : "Open Project:Edit PDF:Set Writable:Set Read Only:Properties",
+			Tools                    : "SniffOpen:SniffEdit:SniffSetWritable:SniffSetReadOnly:ls -l %f",
+			Type                     : "Project"
+		)
+	),
+	GenerateDir                : ".sniffdir",
+	HelpTarget                 : "all:all DEBUG=1:rebuild:rebuild DEBUG=1:clean:install",
+	IncludeFilesFile           : "include.incl",
+	IncludeMacro               : array ( ),
+	JavaGenerateDir            : "../..",
+	JavaSourceDir              : "../..",
+	MacrosFile                 : "macros.incl",
+	MakeCommand                : "gmake",
+	ObjectFilesFile            : "ofiles.incl",
+	PreprocessorSwitch         : array ( ),
+	ProjectDir                 : "/dsrc/drivers/ctf_tg8V3/CrossFirmware/Yacc",
+	Release                    : "V3.0",
+	SubProj                    : array ( ),
+	TabLength                  : 4,
+	VCSystem                   : "RCS",
+	VPathFile                  : "vpath.incl"
+)
+@

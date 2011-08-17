@@ -1,0 +1,203 @@
+head	1.8;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.8
+date	2007.08.16.08.10.09;	author lewis;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	2007.08.15.12.56.32;	author lewis;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2007.08.14.16.11.14;	author lewis;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2007.08.13.15.54.00;	author lewis;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2007.07.09.09.39.10;	author lewis;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2007.05.31.09.23.48;	author lewis;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2007.05.25.15.01.51;	author lewis;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2007.05.22.09.16.51;	author lewis;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.8
+log
+@Added SUID root
+@
+text
+@#================================================================
+# Makefile to produce TimLib test program
+#================================================================
+
+include /ps/dsc/src/co/Make.auto
+
+ACCS=oper lab
+
+TIMLIB = /dsrc/co/lib/tim
+
+COMPILE_TIME:=$(shell ./gettime)
+
+CFLAGS := -g -Wall -I. -I$(TIMLIB) -I/ps/local/$(CPU)/include -I/ps/src/dsc/drivers/ctr/src/driver \
+	  -DCOMPILE_TIME=$(COMPILE_TIME)
+LDLIBS := $(TIMLIB)/libtim.$(CPU).a -ldscrt -ltgm -lerr -lerr_dummy -ltgv -lm -lX11 $(XTRALIBS) -lnetinet -lnc
+
+ifneq ($(CPU),L864)
+LDLIBS += -mthreads
+else
+LDLIBS += -lpthread
+endif
+
+ALL  = TimSurvey.$(CPU)
+
+SRCS = TimSurvey.c
+
+HDRS = $(TIMLIB)/TimLib.h
+
+all: $(ALL)
+
+clean:
+	$(RM) *.$(CPU) *.$(CPU).o ,*
+
+# Run on Workstation only
+
+TimSurvey.$(CPU).o: TimSurvey.c
+
+TimSurvey.$(CPU): TimSurvey.$(CPU).o
+
+install: TimSurvey.$(CPU)
+	@@for a in $(ACCS); do \
+		d=/acc/dsc/$$a/$(CPU)/tim;\
+		echo Installing TimSurvey.$(CPU) in $$d; \
+		sudo dsc_install TimSurvey.$(CPU) $$d; \
+		sudo chmod +s $$d/TimSurvey; \
+		sudo chown root $$d/TimSurvey; \
+	done;
+@
+
+
+1.7
+log
+@*** empty log message ***
+@
+text
+@d44 3
+a46 1
+		dsc_install TimSurvey.$(CPU) $$d; \
+@
+
+
+1.6
+log
+@Added install
+@
+text
+@d11 4
+a14 1
+CFLAGS := -g -Wall -I. -I$(TIMLIB) -I/ps/local/$(CPU)/include -I/ps/src/dsc/drivers/ctr/src/driver
+@
+
+
+1.5
+log
+@Autolaunch
+@
+text
+@d7 1
+a7 1
+ACCS=
+d36 7
+@
+
+
+1.4
+log
+@*** empty log message ***
+@
+text
+@d12 1
+a12 1
+LDLIBS := $(TIMLIB)/libtim.$(CPU).a -ltgm -lerr -lerr_dummy -ltgv -lm -lX11 $(XTRALIBS) -lnetinet -lnc
+@
+
+
+1.3
+log
+@*** empty log message ***
+@
+text
+@d20 1
+a20 1
+ALL  = TimSurvey.$(CPU) TestTimSurvey.$(CPU)
+d22 1
+a22 1
+SRCS = TimSurvey.c TestTimSurvey.c
+@
+
+
+1.2
+log
+@*** empty log message ***
+@
+text
+@d14 5
+a18 5
+# ifneq ($(CPU),Lces)
+# CFLAGS += -fwritable-strings
+# else
+# LDLIBS += -lXau -lXdmcp -ldl
+# endif
+d20 1
+a20 1
+ALL  = TimSurvey.$(CPU)
+d22 1
+a22 1
+SRCS = TimSurvey.c
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d7 1
+a7 1
+ACCS=lab oper
+d14 5
+a18 5
+ifneq ($(CPU),Lces)
+CFLAGS += -fwritable-strings
+else
+LDLIBS += -lXau -lXdmcp -ldl
+endif
+@

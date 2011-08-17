@@ -1,0 +1,113 @@
+head	1.4;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.4
+date	2008.02.18.16.03.32;	author nmn;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2006.07.18.12.24.17;	author lewis;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2006.02.28.14.37.49;	author lewis;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2006.02.28.09.15.01;	author lewis;	state Exp;
+branches;
+next	;
+
+
+desc
+@Makefile to build CNGS utilities
+@
+
+
+1.4
+log
+@*** empty log message ***
+@
+text
+@#================================================================
+# Makefile to produce TimLib test program
+#================================================================
+
+include /ps/dsc/src/co/Make.auto
+
+CFLAGS = -g -Wall -fwritable-strings -I. -I.. -I/dsrc/co/lib/tim -I/ps/local/$(CPU)/include -I/dsrc/drivers/ctr/src/driver
+
+LDLIBS = ../../../libtim.$(CPU).a -ltgm -lerr -lerr_dummy -ltgv -lm -lX11 -ldtm -lerr -lnc
+
+ALL  = SendCNGS.$(CPU) RecvCNGS.$(CPU)
+
+SRCS = SendCNGS.c RecvCNGS.c
+
+HDRS = CNGS.h
+
+all: $(ALL)
+
+clean:
+	$(RM) *.$(CPU) *.$(CPU).o ,*
+
+# Run on Workstation only
+
+SendCNGS.$(CPU).o: SendCNGS.c
+
+RecvCNGS.$(CPU).o: RecvCNGS.c
+
+install: SendCNGS.$(CPU) RecvCNGS.$(CPU)
+	@@for a in $(ACCS); do \
+		d=/ps/dsc/$$a/$(CPU)/tim;\
+		echo Installing SendCNGS in $$d;\
+		dsc_install SendCNGS.$(CPU) $$d;\
+		echo Installing RecvCNGS in $$d;\
+		dsc_install RecvCNGS.$(CPU) $$d;\
+		echo Installing SendCngs.bat $$d; \
+		dsc_install SendCngs.bat $$d; \
+	done;
+@
+
+
+1.3
+log
+@*** empty log message ***
+@
+text
+@a6 2
+ACCS=tst mcr
+
+@
+
+
+1.2
+log
+@*** empty log message ***
+@
+text
+@d11 1
+a11 1
+LDLIBS = ../../libtim.$(CPU).a -ltgm -lerr -lerr_dummy -ltgv -lm -lX11 -ldtm -lerr -lnc
+d37 2
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d11 1
+a11 1
+LDLIBS = ../../libtim.$(CPU).a -ltgm -lerr -lerr_dummy -ltgv -lm -lX11 -llynx -lnetinet -lnc
+d30 1
+a30 1
+install: SendCNGS.$(CPU)
+@

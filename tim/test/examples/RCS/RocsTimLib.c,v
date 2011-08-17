@@ -1,0 +1,810 @@
+head	1.17;
+access;
+symbols;
+locks
+	lewis:1.17; strict;
+comment	@ * @;
+
+
+1.17
+date	2008.06.05.16.45.40;	author lewis;	state Exp;
+branches;
+next	1.16;
+
+1.16
+date	2008.06.05.16.41.13;	author lewis;	state Exp;
+branches;
+next	1.15;
+
+1.15
+date	2008.05.21.15.42.00;	author lewis;	state Exp;
+branches;
+next	1.14;
+
+1.14
+date	2008.04.23.15.20.36;	author lewis;	state Exp;
+branches;
+next	1.13;
+
+1.13
+date	2008.04.23.07.27.11;	author lewis;	state Exp;
+branches;
+next	1.12;
+
+1.12
+date	2008.04.22.09.46.24;	author lewis;	state Exp;
+branches;
+next	1.11;
+
+1.11
+date	2008.04.14.08.33.24;	author lewis;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	2008.04.07.12.13.02;	author lewis;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	2008.03.27.16.46.57;	author lewis;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	2008.03.12.11.36.32;	author lewis;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	2008.03.04.13.26.59;	author lewis;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2008.03.03.15.53.29;	author lewis;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2008.02.25.17.53.43;	author lewis;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2008.02.21.10.03.36;	author lewis;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2008.02.21.09.44.27;	author lewis;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2008.02.21.09.38.17;	author lewis;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2008.02.21.09.28.00;	author lewis;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.17
+log
+@*** empty log message ***
+@
+text
+@/* ========================================== */
+/* Replace Tg8 functionality on ROCS by a CTR */
+/* Julian Thu 21/Feb/07                       */
+
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <sys/types.h>
+#include <errno.h>        /* Error numbers */
+#include <sys/file.h>
+#include <a.out.h>
+
+#include <err/err.h>      /* Error handling */
+#include <tgm/tgm.h>      /* Telegram definitions for application programs */
+#include <tgv/tgv.h>
+#include <TimLib.h>
+#include "/dsrc/drivers/ctr/src/driver/ctrdrvr.h"
+
+#include <errno.h>
+
+/* ----------------------------------------------- */
+/* This crap is to avoid type definition conflicts */
+/* between the TG8 firmware and the TGM libraries  */
+
+#define TG8_TYPES
+typedef unsigned char  Uchar;
+typedef unsigned short Ushort;
+typedef unsigned int   Uint;
+typedef unsigned int   DWord;
+#include <tg8Pub.h>
+
+/* ----------------------------------------------- */
+
+#include <RocsTimLib.h>
+
+extern int errno;
+extern CtrDrvrDevice ctr_device;
+
+/* Make TimLib allow the use of old headers */
+
+extern int timlib_allow_old;
+
+/* For each Tg8 action I create one of these to emulate */
+/* the action as a PTIM on the CTR. */
+
+typedef struct {
+   unsigned long  Frame;    /* Raw event frame, like 0x211C0102 */
+   unsigned short Control;  /* Tg8 control word */
+   unsigned short Delay;    /* Counter delay */
+   unsigned short Data;     /* Action data word */
+   unsigned short Ctim;     /* Ctim corresponding to the Frame */
+   unsigned long  Ptim;     /* The Ptim on which setting implemented */
+ } RocsTimLibSetting;
+
+#define RocsTimLibSETTINGS 256
+
+typedef struct {
+   unsigned int      Size;
+   RocsTimLibSetting Setting[RocsTimLibSETTINGS];
+ } RocsTimLibSettings;
+
+static RocsTimLibSettings settings;
+static unsigned int initialized = 0;
+
+#define OX_SSC_CT 386
+#define OX_SSC_FR 0x2000FFFF
+
+static TimLibTime ssctm;  /* Start of SSC time */
+
+static unsigned int gn_scnum = 0;
+
+/* ----------------------------------------------------- */
+/* Local routine to subtract one time stamp from another */
+/* Result is in milli-seconds                            */
+
+static unsigned long SubtractStamps(TimLibTime *left, TimLibTime *right) {
+
+long      secs, mscs;
+long long l, r, t;
+
+   l = left->Second; r = right->Second; t = (l - r);
+   secs = t;
+   l = left->Nano;   r = right->Nano;   t = (l/1000000) - (r/1000000);
+   mscs = t;
+
+   while (mscs < 0) {
+      mscs += 1000;
+      secs -= 1;
+   }
+   if (secs < 0) return 0;
+   return (unsigned long) (secs * 1000) + mscs;
+}
+
+/* ==================================================== */
+/* Explicit initialize of the library.                  */
+/* Attaches to the SPS telegram and initializes         */
+/* settings and TimLib (with old style events allowed!) */
+/* We need a standard AB/CO Front end and get_tgm_tim   */
+/* must be running.                                     */
+
+RocsTimLibError RocsTimLibInit() {
+TimLibError ter;
+TgmCompletion tcc;
+
+   if (initialized) return RocsTimLibErrorOK;
+
+   bzero((void *) &settings, sizeof(RocsTimLibSettings));
+   bzero((void *) &ssctm   , sizeof(TimLibTime));
+
+   tcc = TgmAttach(TgmSPS,TgmTELEGRAM);
+   if (tcc != TgmSUCCESS) {
+      fprintf(stderr,"RocsTimLib: Can't attach to the SPS telegram\n");
+      return RocsTimLibErrorFAILED;
+   }
+
+   timlib_allow_old = 1;
+   ctr_device = TimLibDevice_ANY;
+
+   gn_scnum = TgmGetGroupNumber(TgmSPS,"SCNUM");
+
+   ter = TimLibInitialize(TimLibDevice_CTR);
+   if (ter != TimLibErrorSUCCESS) {
+      fprintf(stderr,"RocsTimLib: Can't initialize TimLib:%s\n",TimLibErrorToString(ter));
+      return RocsTimLibErrorFAILED;
+   }
+
+   ter = TimLibQueue(0,0); /* Queueing ON timeouts OFF */
+
+   initialized = 1;
+   return RocsTimLibErrorOK;
+}
+
+/* ================================================================ */
+/* Emulate setting up a TG8 action accross TimLib.                  */
+/* The "data" word is bound to the "config" and will be returned by */
+/* the wait routine should the config produce an interrupt.         */
+/* If "config->uControl" is zero, we connect to a cable event, else */
+/* I create a PTIM ID uControl to emulate the TG8 action.           */
+
+RocsTimLibError RocsTimLibSet(Tg8User *config, unsigned short data) {
+TimLibError ter;
+TimLibCcv ccv;
+TimLibCcvMask ccm;
+unsigned long ctm, frm, ptm, mod, chn, dim, tmp;
+int i, connect;
+
+   if (initialized) {
+
+      if (settings.Size >= RocsTimLibSETTINGS) {
+	 fprintf(stderr,"RocsTimLib: No memory space for setting\n");
+	 return RocsTimLibErrorFAILED;
+      }
+
+      for (i=0; i<settings.Size; i++) {
+	 if ((settings.Setting[i].Frame   == config->uEvent.Long) &&
+	     (settings.Setting[i].Control == config->uControl)) {
+	    fprintf(stderr,
+		    "RocsTimLib: Can't create the same action twice: Fr:0x%08X Cw:0x%04X\n",
+		    (int) config->uEvent.Long,
+		    (int) config->uControl);
+	    return RocsTimLibErrorFAILED;
+	 }
+      }
+
+      frm = config->uEvent.Long | 0xFFFF;
+      ctm = TgvGetMemberForFrame(frm);
+      if (ctm == 0) {
+	 fprintf(stderr,
+		 "RocsTimLib: Can't get CTIM for frame:0x%08X\n",
+		 (int) frm);
+	 return RocsTimLibErrorFAILED;
+      }
+
+      if (config->uControl == 0) {
+
+	 /* Connect to a CTIM event */
+
+	 ter = TimLibConnect(TimLibClassCTIM,ctm,0);
+	 if (ter != TimLibErrorSUCCESS) {
+	    fprintf(stderr,"RocsTimLib: Can't connect to CTIM:%d:%s\n",(int) ctm,TimLibErrorToString(ter));
+	    return RocsTimLibErrorFAILED;
+	 }
+	 settings.Setting[settings.Size].Ptim = 0;
+
+      } else {
+
+	 /* Set up a PTIM. First check if its already created (relaunch of callers program) */
+
+	 ptm = config->uControl + config->uEvent.Long;
+	 ter = TimLibGetPtimObject(ptm,&mod,&chn,&dim);
+	 if (ter == TimLibErrorPTIM) {
+
+	    chn = (config->uControl >> Tg8CW_CNT_BITN) & Tg8CW_CNT_BITM;
+	    if (chn == 0) chn = 8;
+	    mod = 1; dim = 1;
+
+	    ter = TimLibCreatePtimObject(ptm,mod,chn,dim);
+	    if (ter != TimLibErrorSUCCESS) {
+	       fprintf(stderr,"RocsTimLib: Can't create PTIM:%d\n",(int) ptm);
+	       return RocsTimLibErrorFAILED;
+	    }
+	 }
+
+	 if (ter != TimLibErrorSUCCESS) {
+	    fprintf(stderr,"RocsTimLib: Can't get PTIM:%d:%s\n",(int) ptm, TimLibErrorToString(ter));
+	    return RocsTimLibErrorFAILED;
+	 }
+
+	 /* Set up the ptim control values */
+
+	 bzero((void *) &ccv, sizeof(TimLibCcv));
+
+	 tmp = (config->uControl >> Tg8CW_INT_BITN) & Tg8CW_INT_BITM;
+	 if (tmp == 0) {
+	    fprintf(stderr,"RocsTimLib: Bad control word, No interrupt and no Output\n");
+	    return RocsTimLibErrorFAILED;
+	 }
+
+	 /* Will connect to PTIM later if needed */
+
+	 connect = 0;
+	 if (tmp & Tg8DO_OUTPUT)    ccv.Enable = TimLibEnableOUT;
+	 if (tmp & Tg8DO_INTERRUPT) connect = 1;
+
+	 tmp = (config->uControl >> Tg8CW_START_BITN) & Tg8CW_START_BITM;
+	 if      (tmp == Tg8CM_NORMAL)   ccv.Start = TimLibStartNORMAL;
+	 else if (tmp == Tg8CM_CHAINED)  ccv.Start = TimLibStartCHAINED;
+	 else if (tmp == Tg8CM_EXTERNAL) ccv.Start = TimLibStartEXT1;
+	 else {
+	    fprintf(stderr,"RocsTimLib: Bad control word, Illegal Start\n");
+	    return RocsTimLibErrorFAILED;
+	 }
+
+	 tmp = (config->uControl >> Tg8CW_CLOCK_BITN) & Tg8CW_CLOCK_BITM;
+	 if      (tmp == Tg8CLK_MILLISECOND) ccv.Clock = TimLibClock1KHZ;
+	 else if (tmp == Tg8CLK_X1)          ccv.Clock = TimLibClockEXT1;
+	 else if (tmp == Tg8CLK_X2)          ccv.Clock = TimLibClockEXT2;
+	 else {
+	    fprintf(stderr,"RocsTimLib: Bad control word, Illegal Clock\n");
+	    return RocsTimLibErrorFAILED;
+	 }
+
+	 ccm = TimLibCcvMaskENABLE
+	     | TimLibCcvMaskSTART
+	     | TimLibCcvMaskMODE
+	     | TimLibCcvMaskCLOCK
+	     | TimLibCcvMaskPWIDTH
+	     | TimLibCcvMaskDELAY
+	     | TimLibCcvMaskPOLARITY
+	     | TimLibCcvMaskCTIM
+	     | TimLibCcvMaskPAYLOAD;
+
+	 ccv.Mode = TimLibModeNORMAL;
+	 ccv.PulsWidth = 399;
+	 ccv.Delay = config->uDelay;
+	 ccv.Polarity = TimLibPolarityTTL_BAR; /* Shit ! I hope there are no wired ORs The CTR is totem pole */
+	 ccv.Ctim = ctm;
+	 ccv.Payload = config->uEvent.Long & 0xFFFF;
+
+	 ter = TimLibSet(ptm,0,0,0,ccm,&ccv);
+	 if (ter != TimLibErrorSUCCESS) {
+	    fprintf(stderr,
+		    "RocsTimLib: Can't set PTIM:%d:%s\n",
+		    (int) ptm,
+		    TimLibErrorToString(ter));
+	    return RocsTimLibErrorFAILED;
+	 }
+
+	 if (connect) {
+	    ter = TimLibConnect(TimLibClassPTIM,ptm,mod);
+	    if (ter != TimLibErrorSUCCESS) {
+	       fprintf(stderr,
+		       "RocsTimLib: Can't Connect PTIM:%d:%s\n",
+		       (int) ptm,
+		       TimLibErrorToString(ter));
+	       return RocsTimLibErrorFAILED;
+	    }
+	 }
+
+	 settings.Setting[settings.Size].Ptim = ptm;
+      }
+
+      settings.Setting[settings.Size].Frame   = config->uEvent.Long;
+      settings.Setting[settings.Size].Control = config->uControl;
+      settings.Setting[settings.Size].Delay   = config->uDelay;
+      settings.Setting[settings.Size].Data    = data;
+      settings.Setting[settings.Size].Ctim    = ctm;
+      settings.Size++;
+
+      return RocsTimLibErrorOK;
+   }
+
+   fprintf(stderr,"RocsTimLib: Library has not been initialized\n");
+   return RocsTimLibErrorFAILED;
+}
+
+/* ===================================================== */
+/* Wait for a PTIM or a CTIM arriving from settings made */
+
+RocsTimLibError RocsTimLibWait(unsigned long      *frame,      /* Full 32-bit event frame and payload */
+			       unsigned short     *scnum,      /* Super-cycle number */
+			       unsigned long      *msinsc,     /* Current milli-second in Super-cycle */
+			       unsigned long      *sclenms,    /* Super-cycle length in milli-seconds */
+			       unsigned short     *data,       /* Setting data */
+			       unsigned long long *cystamp) {  /* Cycle stamp in nano-seconds */
+
+TimLibClass    iclss;
+unsigned long  equip;
+TimLibTime     onzero;
+TimLibTime     trigger;
+unsigned long  ctim;
+unsigned long  payload;
+
+TimLibError ter;
+int i, gv_scnum;
+
+
+   if (initialized && settings.Size) {
+
+      ter = TimLibWait(&iclss,   /* Class of interrupt */
+		       &equip,   /* PTIM CTIM or hardware mask */
+		       NULL,     /* Ptim line number 1..n or 0 */
+		       NULL,     /* Hardware source of interrupt */
+		       &onzero,  /* Time of interrupt/output */
+		       &trigger, /* Time of counters load */
+		       NULL,     /* Time of counters start */
+		       &ctim,    /* CTIM trigger equipment ID */
+		       &payload, /* Payload of trigger event */
+		       NULL,     /* Module that interrupted */
+		       NULL,     /* Number of missed interrupts */
+		       NULL,     /* Remaining interrupts on queue */
+		       NULL);    /* Corresponding TgmMachine */
+
+      if (ter != TimLibErrorSUCCESS) {
+	 fprintf(stderr,"RocsTimLib: Error in Wait:%s\n",TimLibErrorToString(ter));
+	 return RocsTimLibErrorFAILED;
+      }
+
+      *cystamp = TgmGetLastTelegramTimeStamp(TgmSPS) * 1000000;
+
+      if (TgmGetGroupValue(TgmSPS,TgmCURRENT,0,gn_scnum,&gv_scnum) != TgmSUCCESS) {
+	 fprintf(stderr,"RocsTimLib: Error: Cant get SCNUM value\n");
+	 return RocsTimLibErrorFAILED;
+      }
+      *scnum = (unsigned short) gv_scnum;
+
+      if (ctim == OX_SSC_CT) {
+	 bcopy((void *) &trigger,(void *) &ssctm,sizeof(TimLibTime));
+	 ssctm.Nano += 1000000;
+      }
+
+      if (iclss == TimLibClassCTIM) {
+	 for (i=0; i<settings.Size; i++) {
+	    if ((settings.Setting[i].Ctim == equip)
+	    &&  (settings.Setting[i].Ptim == 0    )) {
+
+	       if (((settings.Setting[i].Frame & 0xFFFF) == 0xFFFF)
+	       ||  ((settings.Setting[i].Frame & 0xFFFF) == payload)) {
+
+		  *frame = (settings.Setting[i].Frame & 0xFFFF0000) | (payload & 0x0000FFFF);
+		  *data  = settings.Setting[i].Data;
+		  if (ssctm.Second == 0) *msinsc = 0;
+		  else                   *msinsc = SubtractStamps(&onzero,&ssctm);
+		  *sclenms = TgmGetSCLengthBPs(TgmSPS) * TgmGetBPWidth();
+		  return RocsTimLibErrorOK;
+	       }
+	    }
+	 }
+      }
+
+      if (iclss == TimLibClassPTIM) {
+	 for (i=0; i<settings.Size; i++) {
+	    if (settings.Setting[i].Ptim == equip) {
+	       *frame = (settings.Setting[i].Frame & 0xFFFF0000) | (payload & 0x0000FFFF);
+	       *data  = settings.Setting[i].Data;
+	       if (ssctm.Second == 0) *msinsc = 0;
+	       else                   *msinsc = SubtractStamps(&onzero,&ssctm);
+	       *sclenms = TgmGetSCLengthBPs(TgmSPS) * TgmGetBPWidth();
+	       return RocsTimLibErrorOK;
+	    }
+	 }
+      }
+      fprintf(stderr,"RocsTimLib: Unexpected interrupt:%d (0x%X) Class:%d Settings:%d\n",
+	      (int) equip,
+	      (int) equip,
+	      (int) iclss,
+	      (int) settings.Size);
+      for (i=0; i<settings.Size; i++) {
+	 fprintf(stderr,"RocsTimLib:Setting:%d Equip:%d Frame:0x%X Cntrl:0x%X\n",
+		 i,
+		 (int) settings.Setting[i].Ptim,
+		 (int) settings.Setting[i].Frame,
+		 (int) settings.Setting[i].Control);
+      }
+      return RocsTimLibErrorFAILED;
+   }
+
+   fprintf(stderr,"RocsTimLib: Library has not been initialized\n");
+   return RocsTimLibErrorFAILED;
+}
+@
+
+
+1.16
+log
+@Opens any device rather than only a CTR
+@
+text
+@d120 1
+a120 1
+   ctr_device = CtrDrvrDeviceANY;
+@
+
+
+1.15
+log
+@Force using a ctrv
+@
+text
+@d120 1
+a120 1
+   ctr_device = CtrDrvrDeviceCTRV;
+@
+
+
+1.14
+log
+@Cant store a long in a short
+@
+text
+@d20 1
+d40 1
+d120 1
+@
+
+
+1.13
+log
+@Ptm number is the sum of the frame and control word
+@
+text
+@d53 1
+a53 1
+   unsigned short Ptim;     /* The Ptim on which setting implemented */
+d274 1
+a274 1
+		       (int) config->uControl,
+d383 12
+a394 1
+      fprintf(stderr,"RocsTimLib: Unexpected interrupt\n");
+@
+
+
+1.12
+log
+@Removed parameters from TimLibWait to speed things up
+@
+text
+@d144 1
+a144 1
+unsigned long ctm, frm, mod, chn, dim, tmp;
+d189 2
+a190 1
+	 ter = TimLibGetPtimObject(config->uControl,&mod,&chn,&dim);
+d197 1
+a197 1
+	    ter = TimLibCreatePtimObject(config->uControl,mod,chn,dim);
+d199 1
+a199 1
+	       fprintf(stderr,"RocsTimLib: Can't create PTIM:%d\n",(int) config->uControl);
+d205 1
+a205 1
+	    fprintf(stderr,"RocsTimLib: Can't get PTIM:%d:%s\n",(int) config->uControl,TimLibErrorToString(ter));
+d260 1
+a260 1
+	 ter = TimLibSet(config->uControl,0,0,0,ccm,&ccv);
+d264 1
+a264 1
+		    (int) config->uControl,
+d270 1
+a270 1
+	    ter = TimLibConnect(TimLibClassPTIM,config->uControl,mod);
+d280 1
+a280 1
+	 settings.Setting[settings.Size].Ptim = config->uControl;
+@
+
+
+1.11
+log
+@*** empty log message ***
+@
+text
+@d255 1
+a255 1
+	 ccv.Polarity = TimLibPolarityTTL; /* Shit ! I hope there are no wired ORs The CTR is totem pole */
+a307 2
+unsigned long  plnum;
+TimLibHardware source;
+a309 1
+TimLibTime     start;
+a311 4
+unsigned long  mod;
+unsigned long  missed;
+unsigned long  qsize;
+TgmMachine     mch;
+d321 2
+a322 2
+		       &plnum,   /* Ptim line number 1..n or 0 */
+		       &source,  /* Hardware source of interrupt */
+d325 1
+a325 1
+		       &start,   /* Time of counters start */
+d328 4
+a331 4
+		       &mod,     /* Module that interrupted */
+		       &missed,  /* Number of missed interrupts */
+		       &qsize,   /* Remaining interrupts on queue */
+		       &mch);    /* Corresponding TgmMachine */
+@
+
+
+1.10
+log
+@Problem with PTIM numbers when launched multiple times corrected
+@
+text
+@d255 1
+a255 1
+	 ccv.Polarity = TimLibPolarityTTL_BAR; /* Shit ! I hope there are no wired ORs The CTR is totem pole */
+@
+
+
+1.9
+log
+@*** empty log message ***
+@
+text
+@a64 1
+static unsigned long next_ptim = RocsTimLibSETTINGS;
+d138 1
+a138 1
+/* I create a PTIM ID "next_ptim" to emulate the TG8 action.        */
+d189 1
+a189 1
+	 ter = TimLibGetPtimObject(next_ptim,&mod,&chn,&dim);
+d196 1
+a196 1
+	    ter = TimLibCreatePtimObject(next_ptim,mod,chn,dim);
+d198 1
+a198 1
+	       fprintf(stderr,"RocsTimLib: Can't create PTIM:%d\n",(int) next_ptim);
+d204 1
+a204 1
+	    fprintf(stderr,"RocsTimLib: Can't get PTIM:%d:%s\n",(int) next_ptim,TimLibErrorToString(ter));
+d259 1
+a259 1
+	 ter = TimLibSet(next_ptim,0,0,0,ccm,&ccv);
+d263 1
+a263 1
+		    (int) next_ptim,
+d269 1
+a269 1
+	    ter = TimLibConnect(TimLibClassPTIM,next_ptim,mod);
+d273 1
+a273 1
+		       (int) next_ptim,
+d279 1
+a279 2
+	 settings.Setting[settings.Size].Ptim = next_ptim;
+	 next_ptim++;
+@
+
+
+1.8
+log
+@*** empty log message ***
+@
+text
+@d72 2
+d120 2
+d323 1
+a323 1
+int i;
+d349 7
+a355 1
+      if (ctim == OX_SSC_CT)
+d357 2
+@
+
+
+1.7
+log
+@*** empty log message ***
+@
+text
+@d78 7
+a84 1
+int secs, mscs;
+a85 2
+   secs = left->Second - right->Second;
+   mscs = (left->Nano - right->Nano)/1000000;
+d343 1
+a343 3
+      *cystamp = ( (unsigned long long) onzero.Second *
+		   (unsigned long long) 1000000000 )
+		 + (unsigned long long) onzero.Nano;
+@
+
+
+1.6
+log
+@*** empty log message ***
+@
+text
+@d120 1
+a120 1
+   ter = TimLibQueue(1,0); /* Queueing ON timeouts OFF */
+@
+
+
+1.5
+log
+@*** empty log message ***
+@
+text
+@d343 3
+a346 1
+	 if (equip == OX_SSC_CT) ssctm = onzero;
+d348 13
+a360 8
+	    if ((settings.Setting[i].Ctim == equip) &&
+		(settings.Setting[i].Ptim == 0    ) &&
+		((settings.Setting[i].Frame & 0xFFFF) == payload)) {
+	       *frame = settings.Setting[i].Frame;
+	       *data  = settings.Setting[i].Data;
+	       if (ssctm.Second == 0) *msinsc = 0;
+	       else                   *msinsc = SubtractStamps(&onzero,&ssctm);
+	       *sclenms = TgmGetSCLengthBPs(TgmSPS) * TgmGetBPWidth();
+d368 1
+a368 1
+	       *frame = settings.Setting[i].Frame;
+d373 1
+d377 2
+a378 1
+      return RocsTimLibErrorOK;
+@
+
+
+1.4
+log
+@*** empty log message ***
+@
+text
+@d339 4
+a350 1
+	       *cystamp = onzero.Second * 1000000000 + onzero.Nano;
+a362 1
+	       *cystamp = onzero.Second * 1000000000 + onzero.Nano;
+@
+
+
+1.3
+log
+@*** empty log message ***
+@
+text
+@d246 1
+a246 1
+	 ccv.PulsWidth = 39;
+d272 1
+a272 1
+	 settings.Setting[settings.Size].Ptim    = next_ptim;
+@
+
+
+1.2
+log
+@*** empty log message ***
+@
+text
+@d3 1
+d36 2
+a62 6
+typedef enum {
+   RocsTimLibErrorFAILED = 0,
+   RocsTimLibErrorOK     = 1,
+   RocsTimLibERRORS
+ } RocsTimLibError;
+
+d74 1
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d37 2
+d80 10
+a89 1
+   return 0;
+@

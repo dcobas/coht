@@ -1,0 +1,402 @@
+head	1.17;
+access;
+symbols;
+locks
+	baujc:1.17; strict;
+comment	@# @;
+
+
+1.17
+date	2008.07.29.12.27.53;	author nmn;	state Exp;
+branches;
+next	1.16;
+
+1.16
+date	2008.02.04.10.18.02;	author lewis;	state Exp;
+branches;
+next	1.15;
+
+1.15
+date	2007.08.14.16.01.47;	author lewis;	state Exp;
+branches;
+next	1.14;
+
+1.14
+date	2007.08.13.16.09.49;	author lewis;	state Exp;
+branches;
+next	1.13;
+
+1.13
+date	2006.11.29.09.32.17;	author nmn;	state Exp;
+branches;
+next	1.12;
+
+1.12
+date	2006.11.29.08.33.09;	author nmn;	state Exp;
+branches;
+next	1.11;
+
+1.11
+date	2006.06.20.12.56.53;	author lewis;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	2005.11.29.10.14.27;	author baujc;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	2005.11.02.17.25.50;	author lewis;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	2005.08.18.15.28.46;	author lewis;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	2005.08.09.12.58.08;	author lewis;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2005.06.21.09.58.07;	author lewis;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2005.06.20.13.34.38;	author lewis;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2005.06.13.12.19.52;	author lewis;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2005.05.09.12.52.04;	author lewis;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2005.05.03.15.26.27;	author lewis;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2005.04.25.08.32.34;	author lewis;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.17
+log
+@*** empty log message ***
+@
+text
+@#================================================================
+# Makefile to produce TimLib test program
+#================================================================
+
+include /ps/dsc/src/co/Make.auto
+
+CFLAGS := -g -Wall -I. -I.. -I/ps/local/$(CPU)/include -I/ps/src/dsc/drivers/ctr/src/driver
+LDLIBS := ../libtim.$(CPU).a -ltgm -lerr -lerr_dummy -ltgv -lm -lX11 $(XTRALIBS) -lnc
+
+ifeq ($(CPU),ppc4)
+CFLAGS += -fwritable-strings
+LDLIBS += -lnetinet
+endif
+ifeq ($(CPU),Lces)
+LDLIBS += -lXau -lXdmcp -ldl
+endif
+
+ALL  = Main.$(CPU) timtest.$(CPU) TimLookat.$(CPU) TimClock.$(CPU)
+
+SRCS = Main.c TimCmds.c DoCmd.c GetAtoms.c Cmds.c
+
+HDRS = Cmds.h ../TimLib.h
+
+all: $(ALL)
+
+clean:
+	$(RM) *.$(CPU) *.$(CPU).o ,*
+
+# Run on Workstation only
+
+TimLookat.$(CPU).o: TimLookat.c
+
+TimLookat.$(CPU): TimLookat.$(CPU).o
+
+TimClock.$(CPU).o: TimClock.c
+
+TimClock.$(CPU): TimClock.$(CPU).o
+
+timtest.$(CPU): Main.$(CPU)
+	rm -f timtest.$(CPU)
+	cp Main.$(CPU) timtest.$(CPU)
+
+Main.$(CPU).o: $(SRCS) $(HDRS)
+
+Main.$(CPU): Main.$(CPU).o
+
+install: tg8sl.exe tg8leg.exe tg8rocs.exe timtest.$(CPU) reload_sl_tg8 reload_leg_tg8 reload_rocs_tg8 \
+	 timtest.config TimLookat.$(CPU) TimClock.$(CPU) TimClock.$(CPU)
+	@@for a in $(ACCS); do \
+		d=/acc/dsc/$$a/$(CPU)/tim;\
+		echo Installing tg8 firmware in $$d; \
+		dsc_install tg8sl.exe $$d;\
+		dsc_install tg8leg.exe $$d; \
+		dsc_install tg8rocs.exe $$d; \
+		echo Installing timtest in $$d;\
+		dsc_install timtest.$(CPU) $$d;\
+		echo Installing reload tg8 shell scripts in $$d;\
+		dsc_install reload_sl_tg8 $$d;\
+		dsc_install reload_leg_tg8 $$d;\
+		dsc_install reload_rocs_tg8 $$d; \
+		echo Installing configuration file; \
+		dsc_install timtest.config $$d;\
+		echo Installing TimLookat.$(CPU) in $$d; \
+		dsc_install TimLookat.$(CPU) $$d; \
+		echo Installing TimClock.$(CPU) in $$d; \
+		dsc_install TimClock.$(CPU) $$d; \
+	done;
+@
+
+
+1.16
+log
+@*** empty log message ***
+@
+text
+@d8 1
+a8 1
+LDLIBS := ../libtim.$(CPU).a -ltgm -lerr -lerr_dummy -ltgv -lm -lX11 $(XTRALIBS) -lnetinet -lnc
+d10 1
+a10 1
+ifneq ($(CPU),Lces)
+d12 3
+a14 1
+else
+a17 1
+
+@
+
+
+1.15
+log
+@Removed TimSurvey from here
+@
+text
+@a6 2
+ACCS=lab oper
+
+@
+
+
+1.14
+log
+@Use new version of TimSurvey
+@
+text
+@d49 1
+a49 1
+	 timtest.config TimLookat.$(CPU) TimClock.$(CPU) TimClock.$(CPU) DiagStuff/TimSurvey.$(CPU)
+a67 2
+		echo Installing TimSurvey.$(CPU) in $$d; \
+		dsc_install DiagStuff/TimSurvey.$(CPU) $$d; \
+@
+
+
+1.13
+log
+@*** empty log message ***
+@
+text
+@d19 1
+a19 1
+ALL  = Main.$(CPU) timtest.$(CPU) TimLookat.$(CPU) TimClock.$(CPU) TimSurvey.$(CPU)
+a39 4
+TimSurvey.$(CPU).o: TimSurvey.c
+
+TimSurvey.$(CPU): TimSurvey.$(CPU).o
+
+d49 1
+a49 1
+	 timtest.config TimLookat.$(CPU) TimClock.$(CPU) TimClock.$(CPU) TimSurvey.$(CPU)
+d69 1
+a69 1
+		dsc_install TimSurvey.$(CPU) $$d; \
+@
+
+
+1.12
+log
+@Added Lces
+@
+text
+@d52 2
+a53 1
+install: Main.$(CPU)
+@
+
+
+1.11
+log
+@*** empty log message ***
+@
+text
+@d7 1
+a7 1
+ACCS=tst mcr
+d9 8
+a16 1
+CFLAGS = -g -Wall -fwritable-strings -I. -I.. -I/ps/local/$(CPU)/include -I/dsrc/drivers/ctr/src/driver
+a17 1
+LDLIBS = ../libtim.$(CPU).a -ltgm -lerr -lerr_dummy -ltgv -lm -lX11 -llynx -lnetinet -lnc
+d54 1
+a54 1
+		d=/ps/dsc/$$a/$(CPU)/tim;\
+@
+
+
+1.10
+log
+@Allow 68k compilation.
+@
+text
+@d49 1
+a49 3
+		echo Installing tg8sl.exe in $$d; \
+		rm -f tg8sl.exe; \
+		cp ../tg8sps/tg8/CrossFirmware/tg8.exe tg8sl.exe; \
+d51 2
+d55 1
+a55 1
+		echo Installing reload_sl_tg8 shell script in $$d;\
+d57 2
+@
+
+
+1.9
+log
+@Added TimSurvey
+@
+text
+@d11 1
+a11 1
+LDLIBS = ../libtim.$(CPU).a -ltgm -lerr -lerr_dummy -ltgv -lm -lX11
+@
+
+
+1.8
+log
+@*** empty log message ***
+@
+text
+@d13 1
+a13 1
+ALL  = Main.$(CPU) timtest.$(CPU) TimLookat.$(CPU) TimClock.$(CPU)
+d34 4
+d63 2
+@
+
+
+1.7
+log
+@*** empty log message ***
+@
+text
+@d13 1
+a13 1
+ALL  = Main.$(CPU) timtest.$(CPU) TimLookat.$(CPU)
+d30 4
+d57 2
+@
+
+
+1.6
+log
+@Added hwt command
+@
+text
+@d11 1
+a11 1
+LDLIBS = ../libtim.$(CPU).a -ltgm -lerr -lerr_dummy -ltgv -lm
+d13 1
+a13 1
+ALL  = Main.$(CPU) timtest.$(CPU)
+d26 4
+d51 2
+@
+
+
+1.5
+log
+@Changed install because the way dsc_install uses links for date
+@
+text
+@d9 1
+a9 1
+CFLAGS = -g -Wall -fwritable-strings -I. -I.. -I/ps/local/$(CPU)/include
+d45 2
+@
+
+
+1.4
+log
+@*** empty log message ***
+@
+text
+@d37 5
+a41 1
+		echo Installing timtest tg8sl.exe and reload_sl_tg8 in $$d;\
+d43 1
+a43 1
+		dsc_install tg8sl.exe $$d;\
+@
+
+
+1.3
+log
+@*** empty log message ***
+@
+text
+@d22 1
+a22 1
+	$(RM) $(ALL) $(BAKS)
+d37 4
+a40 3
+		f="timtest.$(CPU)";\
+		echo Installing $$f in $$d;\
+		dsc_install $$f $$d;\
+@
+
+
+1.2
+log
+@Works OK
+@
+text
+@d36 1
+a36 1
+		d=/ps/local/$(CPU)/tim;\
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d11 1
+a11 1
+LDLIBS = ../libtim.$(CPU).a -ltgm -lerr -lerr_dummy -ltgv
+@

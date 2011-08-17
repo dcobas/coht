@@ -1,0 +1,941 @@
+/***************************************************************************/
+/* Tg8 Dialog program:                                                     */
+/* _ Open/Close the PPC driver                                             */
+/* _ Read its Status reg.                                                  */
+/* _ Read/Write a part of the User Table                                   */
+/* _ Read the others Tables ( Rec, Aux, Int, & Clock)                      */
+/* _ Attach an interrupt to an expected trig                               */
+/* _ Download a new User Table                                             */
+/* _ Enable/Disable the module   	                                   */
+/* _ Reset and Read the result of the Self-Test                            */
+/*                                                                         */
+/*  Original: 29/05/98  ( Bruno )                                          */
+/*  Modif.1 : 13/07/98 Introduce a parameter "N" to access to several Tg8s */
+/*                     in the same crate ( Bruno )                         */ 
+/*  Modif.2 : 24/09/99 Remove Bug in Option Wait ( Bruno )                 */
+/* 	             change 'lynx_sem_signal' for LynxOS 2.5.1 compilation */
+/***************************************************************************/
+
+#include <stdio.h>
+#include <file.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#include <signal.h>
+#include <string.h>
+#include <errno.h>
+#include <a.out.h>
+#include <smem.h>
+
+#include <tg8drvr.h>
+#include <tg8.h>
+#include <tg8User.h>
+
+/* functions which are in tg8dial_s1.c */
+extern DisplayHardwareStatus();
+extern DisplayXilinxStatus();
+extern DisplayFirmwareStatus();
+extern DisplayDriverStatus();
+extern DisplaySelfTestResult();
+
+#define UBCD(bcd) ((bcd&0xF)+10*(bcd>>4))
+
+char verbose  = 0 ;  /*=0(general Comments are OFF) or =1(Print them)    */
+
+static int dev[Tg8DrvrMODULES]; /* After Driver installation, indicates  */ 
+                                /* if the device is free or already taken*/
+                               
+                                
+static Tg8IoBlock iob;          /* Data returned by all ioctl operations */
+
+static int tg8_open ;          	/* Value returned by open device command */
+static char cmd[32];           	/* To display results or commands        */
+
+Tg8User 	*act; 	       	/* Structure for accessing to Action tab.*/
+Tg8User          usr;           /*           to download new Action table*/
+Tg8Recording    *rec;           /* Structure for accessing Recording tab.*/
+Tg8History      *hit;           /* Structure for accessing to History tab*/
+Tg8Clock     	*ckt;		/* Structure for accessing to Clock table*/
+Tg8DrvrEvent    *conn;	        /* Structure for Waiting Event Routine   */
+
+/***************************************************************************/
+/* Scan for a free Tg8.device    ( Vova / tg8test of Feb.97 )              */
+/***************************************************************************/
+int OpenModule(int modn) {
+int i,f,dv;
+  f = dev[modn-1];          /* array contains -1 if device already taken */
+  if (f>0) return f;       /* or 3(?) if device is free */   
+  dv = (modn-1)*Tg8DrvrDEVICES+1;
+  for (i=0; i<Tg8DrvrDEVICES;i++,dv++) {
+    sprintf(cmd,"/dev/Tg8.%d",dv);
+    f = open(cmd,O_RDWR,O_NONBLOCK);   
+    if (f>0) {
+      dev[modn-1] = f;
+      if (verbose) printf("open successful on minor device /dev/Tg8.%d\n",dv);
+      return f;
+    };
+  };
+  printf("tg8dial ERROR: Cannot open Device Driver for module#%d\n",modn);
+  perror("OpenModule() ");
+  return f;
+}
+
+/***************************************************************************/
+/* Signal handler to do gracefull termination. ( Vova / tg8test of Feb.97 )*/
+/***************************************************************************/
+
+static int semid = 0;
+
+void Terminate(ar)
+int ar; {
+
+   if (tg8_open>0) close(tg8_open);
+   if (semid) lynx_sem_signal(semid); 	/* instead of sem_signal(): Mod. of 24/09/99 */
+   printf("End(%1d) of tg8dial\n",ar);
+   exit(ar);
+};
+
+         	
+/***************************************************************************/
+/*                                                                         */
+/* Main                                                                    */
+/*                                                                         */
+/***************************************************************************/
+main(int argc,char *argv[]) {
+
+
+   int modnum;             /* Tg8 Module number in the target crate */
+                           /* By default: access to the fisrt one   */
+   int row_nbr;            /* Row number in accessing Action Table*/
+   int cont;               /* Flag Continue Action Table list or not? */                    
+ 
+   int param;              /* Input modify parameter */
+   int new;                /* New value for parameter */                  
+                     
+   char tabnam[12];        /* input file name to download a table */
+   int i, j, k, from, cnt;
+   char xin, *cp, *ep;
+   static char menu[2];    /* input character to select menu option */
+   static char submenu[2]; /* input character to select a sub_menu option */ 
+   static char choice[10]; /* input command to scroll or select a choice */
+   static char tabline[32];/* To Download Table via the the DPRAM */ 
+   FILE *fp;
+
+   /* Check now the input parameters... */
+   /* ----------------------------------*/ 
+   if  ( argc == 1 ) {          /* Any argument has been passed */
+   	modnum = 1;             /* Default value is no parameter was given */ 
+   	verbose = 0;            /* Verbose mode not selected */ 	 
+   }
+ 
+   if  ( argc == 2 ) {          /* Only 1 param. has been passed: -h or -v or N? */
+       
+       if ( strcmp(argv[1],"-h") == 0 ) {
+        	printf ("\n The valid arguments for 'tg8dial' are :\n");
+        	printf ("\n tg8dial N -v  \n");
+        	printf ("\n         N indicates the Tg8 Number in the crate [Max=10]");
+        	printf ("\n            (The default value is always =1) ");
+        	printf ("\n         & -v to set an optional Verbose Mode.");
+        	printf ("\n\n");
+        	exit(0); 
+   	} 
+   	
+        if ( strcmp(argv[1],"-v") == 0 ) {
+        	modnum = 1;     /* No Number was given => Default value is 1  */
+        	verbose = 1; printf ("\n---------- Verbose Mode selected ----------\n");
+   	} 
+   	else { 
+   		modnum = (*argv[1])-48; /* Convert ASCII Value into a Module-number */
+   		verbose =0;     /* Verbose mode not selected */
+        }	 
+   }
+   if  ( argc == 3 ) {
+   	modnum = (*argv[1])-48; /* Convert ASCII Value into a Module-number */
+   	if ( strcmp(argv[2],"-v") == 0 ) {
+        	verbose = 1; printf ("\n---------- Verbose Mode selected ----------\n");
+   	} 
+   	else { 
+   		verbose = 0;    /* Verbose mode not selected */
+        }
+        	 
+   } 
+   if  ( argc > 3 ) {
+   		printf ("\n ERROR: Too many input parameters!\n");
+        	printf ("\n The valid arguments are :");
+        	printf ("\n\ntg8dial N -v  \n");
+        	printf ("\n          N indicates the Tg8 Number in the crate [Max=10].");
+        	printf ("\n             (The default value is always =1) ");
+        	printf ("\n          & -v to set an optional Verbose Mode");
+        	exit(0);
+   }
+       
+   if ( (modnum <1 ) || (modnum >10 ) ){ 
+        printf("FATAL ERROR: Invalid Tg8 Number!\n");
+        printf("The valid input is: tg8dial N ( with N=1 or 2 ...[max=10])\n");
+     	Terminate(-2);}
+     	
+   if (verbose) printf ("\n Ready to Dialog with Tg8 Number#%d \n",modnum);
+    
+     	
+   /* Open the Tg8 minor device (i.e client) */
+   /* ---------------------------------------*/   
+   if (modnum) {
+     	tg8_open = OpenModule(modnum);
+   }
+   else {
+     	for (modnum=1; modnum<=Tg8DrvrMODULES;modnum++) {
+     		tg8_open = OpenModule(modnum);
+     		if (tg8_open>0) break;
+     	}
+   }
+   if (tg8_open <= 0) { /* Cannot open the Tg8 device driver */
+     	Terminate(-1);}
+   else {
+     	if (verbose) printf(" OpenModule() returns f=%d\n",tg8_open);
+   }
+      
+   printf("\n\n");
+   printf("*******************************************************\n");
+   printf("*                                                     *\n");
+   printf("*               Dialog Program with                   *\n");
+   printf("*                  Tg8 Number#%2d                      *\n",modnum);
+   printf("*                                                     *\n");
+   printf("*************** ( ABORT = <CTRL+C> ) ******************\n\n");
+
+   for(;;) { 
+   	printf("\n\n");
+   	printf("        Read the module Status ............ S\n");
+   	printf("        Read the User Table ............... R\n");
+   	printf("        Modify the User Table ............. M\n");
+        printf("        Load a new User Table ............. L\n"); 
+   	printf("        Clear a part of the User Table .... C\n");
+   	printf("        Read one of the others Tables ..... T\n");
+   	printf("        Wait for a specified Event......... W\n");
+        printf("        Enable/Disable the Module ......... E\n");
+   	printf("        Reset and provoke the Self-Test ... Z\n");
+   	printf("        Quit .............................. Q\n");
+   	printf("        Input your choice.................: ");
+   	
+   	gets(menu);printf("\n");
+        switch(menu[0]) {
+        case 'S': case 's': 
+            printf("Reading Status for Tg8 Number#%2d:\n",modnum);
+            printf("----------------------------------\n");
+	    if (ioctl(tg8_open,Tg8DrvrGET_RAW_STATUS,&iob)<0) {
+	       	printf("ERROR: Cannot get the Status Reg.\n");
+	       	perror("       Using ioctl Tg8DrvrGET_RAW_STATUS ");
+	    }
+	    /* DisplayMmResult(RHST); */
+	    Display_RHST();               
+	    ioctl(tg8_open,Tg8DrvrGET_STATUS,&iob); /* Read Driver Status */
+	    Display_DPRAM();
+	    DisplayDriverStatus(iob.Status.Status);
+	    
+	    for ( i=0;i<=50;i++) printf(" ");
+	    printf ("<Enter> for Menu");gets(cmd);
+	break;
+	    
+        case 'R': case 'r':
+        	iob.Range.Row = 1;   /* Start on 1st row */
+   		iob.Range.Cnt = 255; /* Row count */
+        	if (ioctl(tg8_open,Tg8DrvrUSER_TABLE,&iob) < 0) {
+	      		printf("ERROR: Cannot read the user table\n");
+	      		perror("       Using ioctl Tg8DrvrUSER_TABLE ");
+	      		break;
+	    	}
+	    	for (row_nbr=iob.Range.Row,act=iob.UserTable.Table;
+		 iob.Range.Cnt-- >0; row_nbr++,act++) {
+		        printf("%3d/",row_nbr);
+	       		printf(" Trigger Frame=0x%08X  CW=0x%04X Delay:%d\n"
+	       		,act->uEvent.Long,act->uControl,act->uDelay);
+		       	if ( (row_nbr % 16) == 0 ) {
+		       	        for ( i=0;i<=12;i++) printf(" ");
+	                        printf("<Enter> for next block or '0' to Stop:");
+				gets(choice) ; if ( choice[0] == '0' ) break;
+	                } 
+	        }
+	        if ( choice[0] == '0' ) break;
+	        for ( i=0;i<=50;i++) printf(" ");
+	   	printf ("<Enter> for Menu");gets(cmd);         
+        break;
+       
+        case 'M': case 'm': 
+            do {
+        	printf("From 1 to 255, Input the Row number ( 0 = end ):");
+        	scanf("%d",&row_nbr);
+        	if (  row_nbr == 0 ) { continue; }
+        	if ( ( row_nbr < 0 ) || ( row_nbr >255 ) ) {
+        		printf(" Invalid input! [1 to 255]"); continue;
+        	}	
+
+		printf("\nThe present values are:");
+        	iob.Range.Row = row_nbr; /*Start on req. row */
+   		iob.Range.Cnt = 1;       /* Row count */
+   		if (ioctl(tg8_open,Tg8DrvrUSER_TABLE,&iob) < 0) {
+	      		printf("ERROR: Cannot read the user table\n");
+	      		perror("       Using ioctl Tg8DrvrUSER_TABLE ");
+	      		break;
+	    	}
+	    	act=iob.UserTable.Table;
+	    	printf(" Trigger=0x%08X  CW=0x%04X",
+	    	         act->uEvent.Long,act->uControl);
+		printf("  Delay=%d\n",act->uDelay);
+		Display_CW();
+		
+		param = -1;
+                while ( param != 0) {
+                	printf("Modify Trigger(=1), Control Word(=2), ");
+                        printf("Delay(=3), or NO more change(=0)");
+                	scanf("%d",&param);
+                	
+        		if ( ( param < 0 ) || ( param >3 ) ) {
+        			printf(" Invalid input!\n "); break;
+        		}
+        			
+			if (  param == 0 ) continue;
+			
+                	if ( param == 1 ) {
+                		printf("Input the 4 bytes of the new Trigger (in Hex as 0x12345678):");
+                		scanf("%i",&new);
+                		act->uEvent.Long=new;
+                		/* Clear line to get an emptyslot in UserT.*/
+                		if (ioctl(tg8_open,Tg8DrvrCLEAR_ACTION,&iob) < 0) {
+	     				printf("ERROR: Cannot clear line:%d\n",row_nbr);
+	     				perror("       Using ioctl CLEAR_ACTION ");
+	     				break;
+	   			}
+	   			else {
+	   				if (verbose) printf("ioctl Clear_Action OK\n");}
+	   			/* Write now the new param. in the empty slot ...*/
+                		if (write(tg8_open,act,sizeof(Tg8User)) != sizeof(Tg8User)) {
+	     				  printf("ERROR: Cannot write into User Table!\n");
+	      				  perror("       Using Write call ");
+	      				  break;
+	      			}
+	      			else { printf("-----> Row written with the new Trigger\n"); }
+	    		}
+	    		
+                	if ( param == 2 ) {
+                		printf("Input the Hex value of the new CW {as 0x****} (or -1 for Bit Description):"); scanf("%i",&new);
+                		if ( new == -1 ) { Display_bit(); scanf("%i",&new); }
+                		act->uControl=new;
+                		if (ioctl(tg8_open,Tg8DrvrCLEAR_ACTION,&iob) < 0) {
+	     				printf("ERROR: Cannot clear the line:%d\n",row_nbr);
+	     				perror("       Using ioctl CLEAR_ACTION "); break;
+	   			}
+                		if (write(tg8_open,act,sizeof(Tg8User)) != sizeof(Tg8User)) {
+	     				  printf("ERROR: Cannot write into the User Table!\n");
+	      				  perror("       Using Write call "); break;
+	      			}
+	                        else { printf("-----> Row written with the new CW\n"); }
+                	}	
+                	if ( param == 3 ) {
+                		printf("Input the new decimal value for the Delay:"); scanf("%i",&new);
+                		act->uDelay=new;
+                		if (ioctl(tg8_open,Tg8DrvrCLEAR_ACTION,&iob) < 0) {
+	     				printf("ERROR: Cannot clear the line:%d\n",row_nbr);
+	     				perror("       Using ioctl CLEAR_ACTION "); break;
+	   			}
+                		if (write(tg8_open,act,sizeof(Tg8User)) != sizeof(Tg8User)) {
+	     				  printf("ERROR: Cannot write into the User Table!\n");
+	      				  perror("       Using Write call "); break;
+	      			}
+	      			else { printf("-----> Row written with the new Delay\n"); }
+	      		}	
+		} /*** end of while ( param != 0) ***/
+		
+                printf("Another row to modify?\n");
+            }  while ( ( row_nbr > 0) && ( row_nbr < 256 ) );
+            gets(cmd); 
+            /* end of do { } while () */        
+        break;
+        
+        case 'L': case 'l':     
+        
+lsf:        	printf(" In the current directory, the files containing a User Table are:\n"); 
+        	system("ls *.tab");
+        	printf("Input the complete name of the choosen file:");
+        	scanf("%s",tabnam);
+	   	fp = fopen(tabnam,"r"); 
+	   	if (!fp) { printf("Error: Cannot open the file called '%s'!\n",tabnam); goto end;
+	   		}
+	   	else printf("\nHere is the contents of %s:\n",tabnam);
+	   	
+	   	i=0; /* Row Number */
+	   	printf(" Row   :  Trigger  / Ctrl /\n");
+	   	printf("Number :  Choosen  / Word / Delay\n");
+	   	
+	   	while(tabline == fgets(tabline,sizeof(tabline),fp)) {
+	     		i++;printf("   %3d : %s",i,tabline); 
+	     	}
+	     	printf("\nDownload this (=1),");
+	     	printf(" Choose another one (=0), or Back to Menu(=-1)?");
+	     	scanf("%d",&param);
+	     	if ( param == 0 ) goto lsf;
+	     	if ( param == 1 ) {
+	     		/* Now download the choosen Table ( Copy of option UT in tg8test.c by Vova */
+	     	   	if (verbose) printf("\nStarting the download...\n");
+	     	   	fp = fopen(tabnam,"r"); 
+	   		if (!fp) { printf("Input error: Cannot open file called '%s'!\n",tabnam); goto end;
+	   			}
+	     	   	while(tabline == fgets(tabline,sizeof(tabline),fp)) {
+	     			/* i++;printf("   %3d : %s",i,tabline); */		
+	     			cp = tabline;
+	     			usr.uEvent.Long = strtoul(cp,&ep,0);
+	     			if (cp == ep) {
+syn:           				printf(" Syntax error in line: %s\n",tabline);
+               				break; 
+	     			};
+	     			cp = ep;
+	     			usr.uControl = strtoul(cp,&ep,0);
+	     			if (cp == ep) goto syn; 
+	     			cp = ep;
+	     			usr.uDelay = strtoul(cp,&ep,0);
+	     			if (cp == ep) goto syn; 
+	     			if (write(tg8_open,&usr,sizeof(usr))<0) {
+	       				printf("ERROR: Cannot write the action: %s\n",tabline);
+	       				perror("       Using Call write ");
+	       				break;
+	     			}
+	   	  	}
+	   	  	printf ( "\n----------> Choosen table written !\n");
+	   	}
+	   	else { printf("\n----------> Loading Table aborted!\n"); }
+	   	fclose(fp);
+end:	   	gets(cmd);for ( i=0;i<=50;i++) printf(" ");
+	   	printf ("<Enter> for Menu");gets(cmd);
+        break;
+                
+        case 'C': case 'c':
+        
+                printf("Clear ALL the User Table (=1), a PART of it (=2) or Abort (=0)");
+                gets(choice);
+         	if ( ( choice[0] < '0' ) || (choice[0] >'2' ) ) {
+        			printf(" Invalid input!\n "); continue;
+        		}
+        			
+		if ( choice[0] == '0' ) { continue; }
+		
+		if (  choice[0] == '1' ) {
+			iob.Range.Row = 1;
+   			iob.Range.Cnt = 255;
+   			if (ioctl(tg8_open,Tg8DrvrCLEAR_ACTION,&iob) < 0) {
+	     			printf("ERROR: Cannot clear the User table\n");
+	   			perror("       Using ioctl CLEAR_ACTION ");break;
+	   		}
+	   		printf("\n----------> All of the Table has been cleared!\n");
+	   		continue;
+	        }
+	        
+	        if (  choice[0] == '2' ) {
+        		printf("From 1 to 255, Input the Starting Row number ( 0 = abort):");
+        		scanf("%d",&row_nbr);
+        		if (  row_nbr == 0 ) { gets(cmd);continue;}
+        		if ( ( row_nbr < 0 ) || ( row_nbr >255 ) ) {
+        			printf(" Invalid input! [1 to 255]");
+        			gets(cmd);continue;
+        		}
+        		iob.Range.Row = row_nbr;
+        		printf("From 1 to 255, Input the Number of row ( 0 = abort):");
+        		scanf("%d",&row_nbr);
+        		if (  row_nbr == 0 ) {gets(cmd); continue;}
+        		if ( ( row_nbr < 0 ) || ( row_nbr >255 ) ) {
+        			printf(" Invalid input! [1 to 255]");gets(cmd); continue;
+        		}
+        		iob.Range.Cnt = row_nbr;
+        		if (verbose) printf("\niob.Range.Row=%d",iob.Range.Row);
+        		if (verbose) printf("\niob.Range.Cnt=%d",iob.Range.Cnt);
+        		if (ioctl(tg8_open,Tg8DrvrCLEAR_ACTION,&iob) < 0) {
+	     			printf("ERROR: Cannot clear the User table\n");
+	   			perror("       Using ioctl CLEAR_ACTION ");gets(cmd);break;
+	   		}
+	   		printf("\n--------> Part of Table cleared!\n");
+	        }
+	        gets(cmd);for ( i=0;i<=50;i++) printf(" ");
+	   	printf ("<Enter> for Menu");gets(cmd);
+        break;
+                
+        case 'T': case 't':
+        	printf("Read Recording table  (=R)\nRead Interrupt table  (=I)\n");
+        	printf("Read Auxiliary table  (=A)\nRead History table    (=H)\n");;
+        	printf("Read Clock table      (=C)\nor back to Menu       (=M)\n");
+        	printf("Input the choosen Table:");
+        	gets(submenu);
+                switch(submenu[0]) {
+        			
+		case 'M': case'm' : { continue; }
+		break;
+		
+		case'R': case'r': { 
+		        printf("\n ----------> Recording Table:");
+		        printf("\n(corresponding to User Table)"); 
+			iob.Range.Row = 1;
+   			iob.Range.Cnt = 255;
+   			if (ioctl(tg8_open,Tg8DrvrRECORDING_TABLE,&iob) < 0) {
+	     			printf("ERROR: Cannot Read the Recording Table\n");
+	   			perror("       Using ioctl RECORDING_TABLE ");break;
+	   		}
+	   		printf("\n Row :S-Cycle | Occur. | Output |  Number || Overwr , by ");
+	   		printf("\n Nbr : Number |  Time  |  Time  | of Trig.|| Number , Row\n");
+	   		for (i=0,rec=iob.RecTable.Table; i<iob.Range.Cnt; i++,rec++) {
+               			printf(" %3d : %06d | %05d  | %05d  | %06d  ||  %3d   , %03d\n",
+		      		iob.Range.Row+i,
+		      		rec->rSc,
+		      		rec->rOcc,
+		      		rec->rOut,
+		      		rec->rNumOfTrig,
+		      		rec->rOvwrCnt,
+		      		rec->rOvwrAct);
+		      		if ( ((i+1) % 16) == 0 ) {
+		      			for ( j=0;j<=12;j++) printf(" ");
+	                        	printf("<Enter> for next block or '0' to Stop:");
+	                                gets(choice) ; if ( choice[0] == '0' ) break;
+	                	} 
+            		};	
+	        }
+	        break;
+	        case'I': case'i':  { /* Interr. Table  */
+	                printf("\n\n");
+ita:	    		iob.Range.Row = 1; from = 1;
+	    		iob.Range.Cnt = 8; cnt = 8;
+	    		if (ioctl(tg8_open,Tg8DrvrINTERRUPT_TABLE,&iob) < 0) {
+	       			printf("ERROR: Cannot Read the Interrupt Table\n");
+	       			perror("       Using ioctl INTERRUPT_TABLE "); break;
+	    		};
+	    		DisplayInterruptTable(&iob.IntTable,1,16);
+	    	        for ( i=0;i<=40;i++) printf(" ");
+	   	        printf ("<Enter> to Read AGAIN or 'M' for Menu:");gets(choice);
+	   	        if ( choice[0] != 'M' & choice[0]!= 'm' ) goto ita;    
+	        }
+	        break;
+	        case'A': case'a': { /* Aux. Table */
+aux:	        	if (ioctl(tg8_open,Tg8DrvrAUX_TABLE,&iob) < 0) {
+	       			printf("ERROR: Cannot read the Auxiliary Table\n");
+	       			perror("       Using ioctl AUX_TABLE "); break;
+	    		};
+	    		DisplayAuxTable(&iob.AuxTable);
+	    		for ( i=0;i<=40;i++) printf(" ");
+	   	        printf ("<Enter> to Read AGAIN or 'M' for Menu:");gets(choice);
+	   	        if ( choice[0] != 'M' & choice[0]!= 'm' ) goto aux;   
+	        }
+	        break;
+	        case'H': case'h': { /* Hist. Table */
+	        	printf("\nInput the depth ( 1 to 1000 ) or Abort (=0):");
+                	scanf("%d",&row_nbr);
+        		if ( ( row_nbr < 0 ) || ( row_nbr >1000 ) ) {
+        			printf(" Invalid input!\n "); continue;
+        		}
+        			
+his:			if (  row_nbr == 0 ) { continue; }
+			
+	        	iob.HistTable.Cnt = row_nbr;
+	    		if (ioctl(tg8_open,Tg8DrvrHISTORY_TABLE,&iob) < 0) {
+	       			printf("ERROR: Cannot read the History Table\n");
+	       			perror("       Using ioctl HISTORY_TABLE "); break;
+	    		};
+	    		printf("History Table with the %d last frames received:\n",row_nbr );
+	    		for (i=0,hit=iob.HistTable.Table+iob.HistTable.Cnt-1;
+	     			              i<iob.HistTable.Cnt; i++,hit--) {
+				printf("%3d/  Ev:%08X Sc:%6d Occ:%5d Rcv:%02X Time:%02d.%02d.%02d\n",
+				i+1, hit->hEvent.Long, hit->hSc,
+				hit->hOcc, hit->hRcvErr,
+				UBCD(hit->hHour),UBCD(hit->hMinute),UBCD(hit->hSecond));
+    			}
+    		        for ( i=0;i<=40;i++) printf(" ");
+	   	        printf ("<Enter> to Read AGAIN or 'M' for Menu:");gets(choice);
+	   	        if ( choice[0] != 'M' & choice[0]!= 'm' ) goto his;  
+	        }
+	        break;
+	        case'C': case'c': {
+clk:	        	printf("\n--------> Clock Table: \n");
+	        	iob.ClockTable.Cnt = 16;
+	        	if (ioctl(tg8_open,Tg8DrvrCLOCK_TABLE,&iob) < 0) {
+				printf("ERROR: Cannot read the Clock Table\n");
+				perror("       Using ioctl CLOCK_TABLE "); break;
+	    		}
+	       		for (i=0,ckt=iob.ClockTable.Table; i<iob.ClockTable.Cnt; i++,ckt++) {
+               			printf("Time:%02d.%02d.%02d S-Cy#%06d Occ.=%05d RcvEr=%02X NumMs=%07d MsEv=%08X\n",
+		      			UBCD(ckt->cHour),
+		      			UBCD(ckt->cMinute),
+		      			UBCD(ckt->cSecond),
+		      			ckt->cSc,
+		      			ckt->cOcc,
+		      			ckt->cRcvErr,
+		      			ckt->cNumOfMs,
+		      			ckt->cMsEvent);
+                        }
+	                for ( i=0;i<=40;i++) printf(" ");
+	   	        printf ("<Enter> to Read AGAIN or 'M' for Menu:");gets(choice);
+	   	        if ( choice[0] != 'M' & choice[0]!= 'm' ) goto clk; 
+	        }
+	        break;
+	        
+	        default:
+	        	printf("\n Not Valid Input!\n\n"); break;
+	        break;
+	     } /* end of switch(x) */
+        break; /* end of case'T': */
+                
+        case 'W': case 'w':  /* Wait for the specified event */
+                        printf("\nWait for a specified Timing Frame:");
+                        printf("\n----------------------------------");
+                        printf("\nNote:These 4 bytes must be input in Hex format with the prefix '0x'");
+                        printf("\n     as 0x12345678 , and you could place (if required) a wild card ");
+	   		printf("\n     (i.e. FF) in any position, as for example:");
+	   		printf("\n               0xFF345678 or 0x12FF5678 or 0x1234FF78 or 0x123456FF");
+	     		printf("\n\nInput now the new Trigger:");
+                	scanf("%i",&new);
+                	iob.Filter.Event.Long = new;
+                	printf("\nLooking into the Table if the Trigger 0x%08X is already there...\n",new);
+                	if (ioctl(tg8_open,Tg8DrvrFILTER_EVENT,&iob)<0) {
+	     			printf("ERROR: Cannot setup the event's filter\n");
+	                        perror("       Using ioctl Tg8DrvrFILTER_EVENT"); gets(cmd);break;
+	                };
+	                if ( iob.Filter.Matches != 0 ) {
+	                	printf("YES! and the number of Matches founded = %d\n",iob.Filter.Matches);
+	                }
+	                if ( iob.Filter.Matches == 0 ) {
+	                        printf(" NO match founded! so");
+	                	printf(" Writting the selected Trigger in User Table...\n");
+	                	act=iob.UserTable.Table; /* insert in Mod. of 24/09/99 */
+	                        act->uEvent.Long=new;
+	                        act->uControl=0xC700; /* Why not the counter#7 ? */
+	                        act->uDelay=0;
+
+                		if (write(tg8_open,act,sizeof(Tg8User)) != sizeof(Tg8User)) {
+	     				  printf("ERROR: Cannot write into User Table!\n");
+	      				  perror("       Using Write call ");
+	      				  gets(cmd);break;
+	      			}
+	      			else { printf("-----> Row written with the new Trigger\n"); }
+	      		}
+                	printf("\n{with CTRL-C to abort} Waiting for the selected frame");
+                        if (ioctl(tg8_open,Tg8DrvrGET_RAW_STATUS,&iob)<0) {
+	       	       		printf("ERROR: Cannot get the Status Reg.\n");
+	       			perror("       Using ioctl Tg8DrvrGET_RAW_STATUS ");
+	       			gets(cmd);break;
+	    		} 
+	    		Display_ENB(); /* Read Status to check if Tg8 Enabled?*/
+
+                	conn = &iob.Event;
+                        cont = 1; param=1; 
+	                for (i=j=k=0; i<cont;) { /* Wait for any event */
+	                	from = read(tg8_open,&iob.Event,sizeof(Tg8DrvrEvent));
+	     			if (from<0) { perror("ReadEvent:"); gets(cmd);break; };
+	     			if (!from) { printf("User table is empty!\n"); gets(cmd);break; };
+
+	     			i++; j++;
+	     			if (++k < param) continue;
+	     			k = 0;
+	     			Display_WaitInfos(&conn->Inter);
+	   		};
+       			gets(cmd); for ( i=0;i<=50;i++) printf(" ");
+	   	        printf ("<Enter> for Menu");gets(cmd); 
+        break;
+                
+        case 'E': case 'e': /* Enable or Disable commands */
+         	printf("\nThis command could be Asynch. or Synchronous with the Start S-Cycle.\n");
+        	printf("With ENable Async.(=1)\n");
+        	printf("     ENable Syncr.(=2)\n");
+        	printf("    DISable Async.(=3)\n");
+        	printf("    DISable Syncr.(=4)\n");
+        	printf("         or Abort (=0)\n");
+        	printf("  Input your choice:"); scanf("%d",&param);
+        	
+        	if ( ( param < 0 ) || ( param >4 ) ) {
+        	                for ( i=0;i<=50;i++) printf(" ");
+        			printf(" Invalid input!\n "); gets(cmd); continue;
+        		}
+        			
+		if (  param == 0 ) { for ( i=0;i<=50;i++) printf(" ");
+		                     printf("\n Nothing done!\n"); gets(cmd);}
+		
+		if ( param == 1 ) {
+			if (ioctl(tg8_open,Tg8DrvrENABLE_MODULE,NULL) < 0) {
+	      			printf("ERROR: Cannot Enable the module\n");
+	      			perror("       Using ioctl ENABLE_MODULE "); break;
+	    		}
+	    		else { for ( i=0;i<=50;i++) printf(" ");
+	    		       printf("\n -------> Tg8 Enabled !\n");gets(cmd); }
+	    	}	
+        	if ( param == 2 ) {
+			if (ioctl(tg8_open,Tg8DrvrENABLE_SYNC,NULL) < 0) {
+	      			printf("ERROR: Cannot Enable the module\n");
+	      			perror("       Using ioctl ENABLE_SYNC "); break;
+	    		}
+	    		else { for ( i=0;i<=50;i++) printf(" ");
+	    		       printf("\n -------> Tg8 will be Enabled at the next SSC...\n");
+	    		       gets(cmd); }
+	    	}
+	    	if ( param == 3 ) {
+			if (ioctl(tg8_open,Tg8DrvrDISABLE_MODULE,NULL) < 0) {
+	      			printf("ERROR: Cannot Disable the module\n");
+	      			perror("       Using ioctl DISABLE_MODULE "); break;
+	    		}
+	    		else { for ( i=0;i<=50;i++) printf(" ");
+	    		       printf("\n ----------> Tg8 Disabled !\n") ;gets(cmd); }
+	    	}	
+        	if ( param == 4 ) {
+			if (ioctl(tg8_open,Tg8DrvrDISABLE_SYNC,NULL) < 0) {
+	      			printf("ERROR: Cannot Disable the module\n");
+	      			perror("       Using ioctl DISABLE_SYNC "); break;
+	    		}
+	    		else { for ( i=0;i<=50;i++) printf(" ");
+	    		       printf("\n -------> Tg8 will be Disabled at the next SSC...\n");
+	    		       gets(cmd); }
+	    	}  
+        break;
+                
+        case 'Z': case 'z': /* Reset module */
+        	printf("\n Send a RESET command and,\n");
+        	printf(" Waiting for the internal Self-Test completion...\n");
+	   	if (ioctl(tg8_open,Tg8DrvrRESET_MODULE,NULL) < 0) {
+	       		printf("\nERROR: Cannot execute the Reset command\n");
+	       		perror("         Using ioctl RESET_MODULE "); break;
+	        }
+        	else {  printf("\n --------> Self-Test completed!");
+        		if (ioctl(tg8_open,Tg8DrvrGET_RAW_STATUS,&iob)<0) {
+	       			printf("\nERROR: Cannot get the Status Register\n");
+	       			perror("         Using ioctl Tg8DrvrGET_RAW_STATUS "); break;
+	       		}		
+	    	}
+	    	/* Depending Self-Test bit, display now the Self-Test results */
+	    	Display_SELF();
+	        for ( i=0;i<=50;i++) printf(" ");
+	   	printf ("<Enter> for Menu");gets(cmd);  	 
+        break;
+                              
+	case 'Q':case'q':
+           	printf("\n                          bye! bye!\n");
+   		Terminate(0); 
+   		     
+        default:
+        	printf("----------> Input character <%c> is not valid!\n\n",menu[0]);
+        	 
+	} /* end of switch */
+    } /* end of for(;;) */
+} /* end of main() */
+
+ 
+/***************************************************************************/
+/* Display various Hardware Status ( from Vova / Feb.97 )                  */
+/***************************************************************************/
+
+Display_RHST() {
+   int i;
+   Tg8StatusBlock	*sb = &iob.RawStatus.Sb;
+   
+	    DisplayHardwareStatus(sb->Hw);	    
+	   
+	    if (sb->Hw & Tg8HS_SELF_TEST_ERROR) {
+	   	printf ("Error(s) detected by Self-Test!");
+	   	printf (" (<Enter> to read the details):");gets(cmd); 
+	    	DisplaySelfTestResult(&iob.RawStatus.Res); 
+	        for ( i=0;i<=50;i++) printf(" ");
+	   	printf ("<Enter> to go on");gets(cmd); 
+	    }
+            DisplayXilinxStatus(sb->Dt.aRcvErr);
+	    DisplayFirmwareStatus(sb->Fw);
+}
+
+/***************************************************************************/
+/* Depending Self-Test bit,  Display Self-Test results (from Vova / Feb.97)*/
+/***************************************************************************/
+
+Display_SELF() {
+   Tg8StatusBlock	*sb = &iob.RawStatus.Sb;
+   Tg8Dpram      	*dp = &iob.Dpram;
+   StDpm           	*dpl;
+   int a, i;  char x;
+     	    
+	    if (sb->Hw & Tg8HS_SELF_TEST_ERROR) {
+	    	printf(" and Error(s) detected!\n\n");
+	    	printf(" Details of the Self-Test:\n");
+	    	printf(" -------------------------\n");
+	    	DisplaySelfTestResult(&iob.RawStatus.Res); 
+	        if (ioctl(tg8_open,Tg8DrvrGET_DPRAM,&iob)>=0) {
+	       		dpl = (StDpm *)dp;
+	    		a = dpl->Head.FirmwareStatus;
+	    		printf("Firmware status: %X   (%s)\n",a,
+		   		(a==Tg8BOOT? "BOOT":
+		    		a==Tg8DOWNLOAD? "DOWNLOAD":
+		    		a==Tg8DOWNLOAD_PENDING? "D/L PENDING":
+		    		a==Tg8332Bug? "332BUG":
+		    		a==0? "FIRMWARE RUNNING": "???")); 
+	    	}
+	    	else {
+	    		printf("ERROR: Cannot read the DP-Ram\n");
+	       		perror("       Using ioctl Tg8DrvrGET_DPRAM ");
+	       	}	
+	    }	    	
+	    else  printf(" and No error detected.\n\n");
+}	     	    
+
+/***************************************************************************/
+/* Display DPRAM Results ( from Vova / Feb.97 )                            */
+/***************************************************************************/
+
+Display_DPRAM() {
+   Tg8Dpram      *dp = &iob.Dpram;
+   StDpm         *dpl;
+   int a;
+
+	    dpl = (StDpm *)dp;
+	    a = dpl->Head.FirmwareStatus;
+	    printf("\n        Mailbox = 0x%04X  (%s)\n",a,
+		   (a==Tg8BOOT? "BOOT":
+		    a==Tg8DOWNLOAD? "DOWNLOAD":
+		    a==Tg8DOWNLOAD_PENDING? "D/L PENDING":
+		    a==Tg8332Bug? "332BUG":
+		    a==0? "Normal RUNNING": "???"));
+	    if (a) DisplaySelfTestResult(&dpl->Info);
+}
+/***************************************************************************/
+/* Display Control-Word bit signifiaction                                  */
+/***************************************************************************/
+
+Display_CW() {
+   int actn_sel, cntr_sel, mode_sel, clck_sel; 
+   		
+   if ( act->uControl != 0 ) { 
+        printf("CW=%4X means:",	act->uControl);
+	actn_sel=( (act->uControl >> 14 ) & 0x3 );
+	cntr_sel= ( act->uControl >> 8 & 0x7 );
+	if ( cntr_sel == 0 ) cntr_sel =8; /* only on 3 bits => so 8 is coded 000 */
+	if ( actn_sel == 3 ) printf ("[Pulse on Out#%1d & VME INT]",cntr_sel);
+	if ( actn_sel == 1 ) printf ("[Pulse ONLY on Output#%1d]",cntr_sel);
+	if ( actn_sel == 2 ) printf ("[VME Interrupt ONLY] using Counter#%1d, ",cntr_sel); 
+	if ( actn_sel == 0 ) {
+				printf (" Neither Interrupt NOR a Pulse ! but,\n");
+				printf (" using Counter#%1d, ",cntr_sel); }	     		
+        mode_sel=( act->uControl >> 6 & 0x3 );
+        if ( mode_sel == 0 ) printf (" with Normal Start ");
+        if ( mode_sel == 1 ) printf (" with Chained Mode ");
+        if ( mode_sel == 2 ) printf (" with Ext. Start ");
+        if ( mode_sel == 3 ) printf (" with ???? Mode ");
+        clck_sel=( act->uControl & 0x0003 );
+        if ( clck_sel == 0 ) printf ("& 1 mS clock");
+        if ( clck_sel == 1 ) printf ("& PS Cable clock");
+        if ( clck_sel == 2 ) printf ("& Ext#1(or Int)Clock");
+        if ( clck_sel == 3 ) printf ("& External Clock#2");
+    }
+    printf("\n\n");
+}
+/***************************************************************************/
+/* Display bit description to input a new CW                               */
+/***************************************************************************/
+
+Display_bit() {
+   int i; 
+   		
+   printf("\nThe Control Word should be input as 4 Hex Digits with a prefix 0x (like 0xABCD)\n");
+   printf("1)The left one select the required action:\n");
+   printf(" 0xC... means: VME Int. AND Pulse on one Output# (# depending of sel. counter)\n");
+   printf(" 0x8... means: a VME Interrupt ONLY\n");
+   printf(" 0x4... means: Pulse ONLY on one Output# (with # depending of selected counter)\n"); 
+   printf(" 0x0... means: Neither an Interrupt NOR a Pulse (i.e disabling the row )\n\n");
+   printf("2)The second digit is MANDATORY and selects one of the 8 counters:\n");
+   printf(" 0x.1.. means: using Counter#1\n");
+   printf("               ...etc...\n");
+   printf(" 0x.7.. means: using Counter#7\n");
+   printf(" 0x.0.. means: using Counter#8\n\n");
+   printf("3)The following digit selects Start for the selected counter {even if delay=0}:\n");	     		
+   printf(" 0x..0. means: With a Normal Start (i.e. synchr. with the next mS tick)\n");
+   printf(" 0x..4. means: With the Chained Mode (counter#N will start when the #N-1 fires)\n");
+   printf(" 0x..8. means: With an External Start ( must be supplied at the front panel)\n\n");
+   printf("4)The rigthest digit selects Clock for the selected counter {even if delay=0}:\n");
+   printf(" 0x...0 means: the 1 mS machine clock\n");
+   printf(" 0x...1 means: the 'PS cable' clock (not distributed in the SL Timing)\n");
+   printf(" 0x...2 means: the External Clock#1 or Internal Clock (depending on Jumper J2)\n");
+   printf(" 0x...3 means: the External Clock#2 on the front panel\n");
+   for ( i=0;i<=50;i++) printf(" ");
+   gets(cmd);printf ("<Enter> to go on");gets(cmd);  
+   printf("\nFollowing the above description, Input the new CW (as 0x....):");
+}
+/***************************************************************************/
+/* Display the Interrupt Table ( from Vova / Feb.97 )                      */
+/***************************************************************************/
+
+
+DisplayInterruptTable(Tg8InterruptTable *t,int from,int cnt) {
+Tg8Interrupt *ip; int i;
+  if (--from<Tg8CHANNELS) {
+    printf(">>> Counter Interrupts Table:");
+    printf("\n Cnt : Row :  Trigger | SCycle | Occur. | Output || Receiv | Overwr , Sem. ");
+    printf("\n Nbr : Nbr :   source | Number |  Time  |  Time  || Regist | Number , Flag\n");
+    for (i=from,ip=&t->CntInter[from]; i<Tg8CHANNELS && cnt>0; i++,cnt--,from++,ip++) {
+      printf("  %1d  :",i+1);
+      DisplayInterrupt(ip);
+    };
+  };
+  if (cnt) {
+    from -= Tg8IMM_INTS;
+    printf(">>> Immediate Interrupts Table:\n");
+    for (i=from,ip=&t->ImmInter[from]; i<Tg8IMM_INTS && cnt>0; i++,cnt--,ip++) {
+      printf("%d:",i+1);
+      DisplayInterrupt(ip);
+    };
+  };
+}
+
+DisplayInterrupt(Tg8Interrupt *ip) {
+  printf(" %03d | %08X | %06d | %05d  | %05d  ||   %02X   |    %03d , %d\n",
+	 ip->iExt.iAct,
+	 ip->iEvent.Long,
+	 ip->iSc,
+	 ip->iOcc,
+	 ip->iOut,
+	 ip->iExt.iRcvErr,
+	 ip->iExt.iOvwrAct,
+	 ip->iExt.iSem);
+}
+
+/***************************************************************************/
+/* Display the Auxiliary Table ( from Vova / Feb.97 )                      */
+/***************************************************************************/
+
+DisplayAuxTable(Tg8Aux *a) {
+Tg8DateTime *tp = &a->aDt; int i; char cr;
+
+  printf("\n\n>>> Part of the Auxiliary Table :");
+  printf("\n( For complete info: use 'tg8test' program)\n\n");
+
+  printf("Super-Cycle Length      = %dmS\n",a->aScLen);
+  printf("Current S-Cycle Time    = %dmS\n",a->aScTime);
+  printf("Super-Cycle Number      = %d\n",a->aSc);
+  
+  printf("Value of the SSC Header = 0x%02X\n",a->aSscHeader);
+  printf("Number of SSC received  = %d\n",a->aNumOfSc);
+  printf("Last Frame received     = 0x%08X\n",a->aEvent.Long);
+  printf("Last MS Frame received  = 0x%08X\n",a->aMsEvent.Long);
+  printf("Nbr of Frames received  :\n");
+  printf(" in the  current S-Cycle= %d\n",a->aNumOfEv);
+  printf(" in the previous S-Cycle= %d\n",a->aPrNumOfEv);
+  printf("Current Date & Time     : %u-%u-%u %uh %um %us %umS\n",
+	 UBCD(tp->aYear),UBCD(tp->aMonth),UBCD(tp->aDay),
+	 UBCD(tp->aHour),UBCD(tp->aMinute),UBCD(tp->aSecond),
+	 tp->aMilliSecond);
+}
+/***************************************************************************/
+/* Display one Status bit to check if Tg8 is Enabled                       */
+/***************************************************************************/
+
+Display_ENB() {
+   Tg8StatusBlock	*sb = &iob.RawStatus.Sb;   
+	    if (sb->Hw & Tg8HS_RECEIVER_ENABLED) {
+	   	printf ("...\n");
+	    }
+            else { printf ("\n WARNING: Tg8 is DISabled!\n"); }
+            
+}
+
+/***************************************************************************/
+/* Display Infos from Interrupt Table for the WAIT option                  */
+/***************************************************************************/
+
+Display_WaitInfos(Tg8Interrupt *ip) {
+  printf("\nThe frame 0x%08X has been detected at %05d mS",ip->iEvent.Long, ip->iOcc);
+  printf(" in S-Cycle#%06d.",ip->iSc);
+  printf("\n { From Row Number %03d of the User Table }\n",ip->iExt.iAct);
+}
+
+/************************ End of File **********************************/

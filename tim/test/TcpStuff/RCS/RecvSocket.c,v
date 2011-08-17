@@ -1,0 +1,696 @@
+head	1.4;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.4
+date	2006.04.24.12.45.05;	author lewis;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2006.04.21.15.58.22;	author lewis;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2006.04.21.08.59.52;	author lewis;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2006.04.18.16.45.14;	author lewis;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.4
+log
+@*** empty log message ***
+@
+text
+@/* ============================================================= */
+/* Recieve packets as text from source socket and print them.    */
+/* Julian Lewis AB/CO/HT 23rd Feb 2006 Julian.Lewis@@CERN.ch      */
+/* For Email the Subject line should contain the string "nospam" */
+/* ============================================================= */
+
+#include <stdarg.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <netdb.h>
+#include <sys/time.h>
+#include <errno.h>
+#include <strings.h>
+#include <string.h>
+#include <time.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+#include <err/err.h>      /* Error handling */
+#include <tgv/tgv.h>
+
+#include <TimLib.h>
+#include <SendSocket.h>
+
+static int ssock     = 0;
+static int errors    = 0;
+static int domain    = PF_UNIX;
+
+char *options[OPTIONS] = {"-p","-t","-inet","-eC","-eP","-d"};
+
+/* ============================================================= */
+/* Errlog handler                                                */
+/* ============================================================= */
+
+static Boolean error_handler(class,text)
+ErrClass class;
+char *text; {
+
+   errors++;
+   fprintf(stderr,"SendSocket:Errors:%d %s\n",errors,text);
+   return(False);
+}
+
+/* ============================================================= */
+/* Open a UDP port for RecvSocket data                           */
+/* ============================================================= */
+
+int OpenPort(unsigned short port) {
+
+struct sockaddr_un snm;
+struct sockaddr_in sin;
+
+int s, size;
+char   fnam[FILE_NAME_SIZE];
+
+   if (!ssock) {
+
+      s = socket(domain, SOCK_DGRAM, 0);
+      if (s < 0) {
+	 fprintf(stderr,"SendSocket:OpenPort:Error:Cant open sockets\n");
+	 perror("SendSocket:OpenPort:errno");
+	 return FAIL;
+      }
+      ssock = s;
+
+      if (domain == PF_INET) {
+	 bzero((void *) &sin, SinSIZE);
+	 sin.sin_family = domain;
+	 sin.sin_port = htons(port);
+	 sin.sin_addr.s_addr = htonl(INADDR_ANY);
+	 if (bind(s,(struct sockaddr *) &sin, SinSIZE) < 0) {
+	    fprintf(stderr,"SendSocket:OpenPort:Error:Cant bind port:%d\n",port);
+	    perror("SendSocket:OpenPort:errno");
+	    close(ssock);
+	    ssock = 0;
+	    return FAIL;
+	 }
+      } else {
+	 sprintf(fnam,"/tmp/SktRcv%d",(int) port);
+	 snm.sun_family = PF_LOCAL;
+	 strncpy (snm.sun_path, fnam, sizeof (snm.sun_path));
+	 unlink(fnam);
+	 size = SUN_LEN(&snm);
+	 if (bind(ssock,(struct sockaddr *) &snm,size) < 0) {
+	    fprintf(stderr,"SendSocket:OpenPort:Error:Cant bind port:%d\n",port);
+	    perror("SendSocket:OpenPort:errno");
+	    close(ssock);
+	    ssock = 0;
+	    return FAIL;
+	 }
+      }
+   }
+   return ssock;
+}
+
+/* ============================================================= */
+/* Receive packets from socket                                   */
+/* ============================================================= */
+
+int RecvFromPort(unsigned short source_port, char *spkt) {
+
+int cc;
+char fnam[FILE_NAME_SIZE];
+socklen_t from;
+
+struct sockaddr_un snm;
+struct sockaddr_in sin;
+
+   if (ssock) {
+
+      if (domain == PF_INET) {
+	 bzero((void *) &sin, SinSIZE);
+	 sin.sin_family = domain;
+	 sin.sin_port = htons(source_port);
+	 cc = recvfrom(ssock,
+		       (char *) spkt,
+		       PACKET_STRING_SIZE,
+		       0,
+		       (struct sockaddr *) &sin,
+		       &from);
+      } else {
+	 sprintf(fnam,"/tmp/SktSnd%d",(int) source_port);
+	 snm.sun_family = PF_LOCAL;
+	 strncpy (snm.sun_path, fnam, sizeof (snm.sun_path));
+	 from = SUN_LEN(&snm);
+	 cc = recvfrom(ssock,
+		       (char *) spkt,
+		       PACKET_STRING_SIZE,
+		       0,
+		       (struct sockaddr *) &snm,
+		       &from);
+      }
+      if (cc < 0) {
+	 fprintf(stderr,
+		"RecvSocket:RecvFromPort:Error:Cant recvfrom port:%d\n",
+		 source_port);
+	 perror("RecvSocket:RecvFromPort:errno");
+	 return FAIL;
+      }
+      return OK;
+   }
+   return FAIL;
+}
+
+/* ==================================================================== */
+/* Main: Proccess arguments and recieve events and print them for ever. */
+/* ==================================================================== */
+
+int main(int argc,char *argv[]) {
+
+unsigned short port;
+
+char spkt[PACKET_STRING_SIZE];
+int       i;
+char      *cp,
+	  *ep;
+
+   /* Set up defaults */
+
+   port = 1234;
+
+   bzero((void *) spkt, PACKET_STRING_SIZE);
+
+   /* Process command line arguments */
+
+   for (i=1; i<argc; i++) {
+
+      cp = NULL;
+
+      if (strncmp(argv[i],options[PORT],strlen(options[PORT])) == 0) {
+	 i++;
+	 cp = argv[i];
+	 if (cp) port = (unsigned short) strtoul(cp,&ep,0);
+	 continue;
+      }
+
+      if (strncmp(argv[i],options[DOMAIN],strlen(options[DOMAIN])) == 0) {
+	 domain = PF_INET;
+	 continue;
+      }
+
+      printf("RecvSocket: No such option: %s\n",argv[i]);
+      exit(1);
+   }
+
+   ErrSetHandler((ErrHandler) error_handler);
+
+   if (OpenPort(port)) {
+
+      fprintf(stderr,"RecvSocket: Up and Running OK\n");
+
+      while (errors < MAX_ERRORS) {
+
+	 bzero((void *) spkt, PACKET_STRING_SIZE);
+
+	 if (RecvFromPort(port,spkt) == FAIL) {
+	    sleep(1);
+	    errors++;
+	 } else
+	    printf("%s\n",spkt);
+      }
+   } else errors++;
+
+   fprintf(stderr,"RecvSocket: ABORTED, after ErrorCount:%d\n",errors);
+
+   exit(1);
+}
+@
+
+
+1.3
+log
+@Yipee !!!
+@
+text
+@d33 1
+a33 1
+char *options[OPTIONS] = {"-p","-t","-eC","-eP","-d"};
+d104 1
+a104 1
+int RecvFromPort(char *source_ip, unsigned short source_port, char *spkt) {
+a118 1
+	 sin.sin_addr.s_addr = htonl(INADDR_ANY);
+d139 2
+a140 3
+		"RecvSocket:RecvFromPort:Error:Cant recvfrom port:%d at:%s\n",
+		 source_port,
+		 source_ip);
+a154 1
+char           target[TARGET_IP_NAME_SIZE];
+a164 1
+   strcpy(target,"127.0.0.1");
+d181 2
+a182 7
+      if (strncmp(argv[i],options[TARGET],strlen(options[TARGET])) == 0) {
+	 i++;
+	 cp = argv[i];
+	 if (cp) {
+	    strcpy(target,cp);
+	    domain = PF_INET;
+	 }
+d200 1
+a200 1
+	 if (RecvFromPort(target,port,spkt) == FAIL) {
+@
+
+
+1.2
+log
+@*** empty log message ***
+@
+text
+@d19 1
+d31 1
+a31 1
+static int domain    = AF_LOCAL;
+d54 1
+d57 2
+a58 1
+int s;
+d62 1
+a62 7
+      bzero((void *) &sin, SinSIZE);
+
+      sin.sin_family      = AF_INET;
+      sin.sin_port        = htons(port);
+      sin.sin_addr.s_addr = htonl(INADDR_ANY);
+
+      s = socket(AF_INET, SOCK_DGRAM, 0);
+d64 2
+a65 2
+	 fprintf(stderr,"RecvSocket:OpenPort:Error:Cant open AF_INET sockets\n");
+	 perror("RecvSocket:OpenPort:errno");
+d70 25
+a94 4
+      if (bind(s,(struct sockaddr *) &sin, SinSIZE) < 0) {
+	 fprintf(stderr,"RecvSocket:OpenPort:Error:Cant bind port:%d\n",port);
+	 perror("RecvSocket:OpenPort:errno");
+	 return FAIL;
+a96 1
+
+d107 4
+a111 1
+socklen_t from;
+d115 23
+a137 13
+      bzero((void *) &sin, SinSIZE);
+
+      sin.sin_family      = domain;
+      sin.sin_port        = htons(source_port);
+
+      from = SinSIZE;
+
+      cc = recvfrom(ssock,
+		    (char *) spkt,
+		    PACKET_STRING_SIZE,
+		    0,
+		    (struct sockaddr *) &sin,
+		    &from);
+d190 1
+a190 1
+	    domain = AF_INET;
+d207 2
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d2 1
+a2 1
+/* Receive packets at Gran Sasso from CERN.                      */
+d22 2
+a23 1
+#include <CNGS.h>
+d25 2
+a26 1
+#define SinSIZE (sizeof(struct sockaddr_in))
+d30 1
+d32 1
+a32 6
+typedef enum {
+   HELP,
+   PORT,
+   DEBUG,
+   OPTIONS
+ } Options;
+d34 3
+a36 1
+char *options[OPTIONS] = {"help","port","debug"};
+d38 3
+a40 2
+#define MNAMES 8
+char *mnames[MNAMES] = {"CPS","PSB","LEI","ADE","SPS","LHC","SCT","FCT"};
+d42 4
+a45 2
+#define BUCKETS 100
+static unsigned long buckets[BUCKETS];
+d48 2
+d67 3
+a69 3
+	 fprintf(stderr,"RecvCNGS:OpenPort:Error:Cant open AF_INET sockets\n");
+	 perror("RecvCNGS:OpenPort:errno");
+	 return CngsFAIL;
+d74 3
+a76 3
+	 fprintf(stderr,"RecvCNGS:OpenPort:Error:Cant bind port:%d\n",port);
+	 perror("RecvCNGS:OpenPort:errno");
+	 return CngsFAIL;
+d79 1
+d84 2
+d87 1
+a87 1
+int RecvFromPort(char *source_ip, unsigned short source_port, CngsPacket *pkt) {
+d97 1
+a97 1
+      sin.sin_family      = AF_INET;
+d103 2
+a104 2
+		    (char *) pkt,
+		    sizeof(CngsPacket),
+d110 1
+a110 19
+		"RecvCNGS:RecvFromPort:Error:Cant recvfrom port:%d at:%s\n",
+		 source_port,
+		 source_ip);
+	 perror("RecvCNGS:RecvFromPort:errno");
+	 return CngsFAIL;
+      }
+
+      strcpy(source_ip,inet_ntoa(sin.sin_addr));
+      if (strncmp(source_ip,CngsSOURCE_NETWORK,strlen(CngsSOURCE_NETWORK)) != 0) {
+	 fprintf(stderr,
+		"RecvCNGS:RecvFromPort:Packet rejected (Not CERN): port:%d from:%s\n",
+		 source_port,
+		 source_ip);
+	 return CngsFAIL;
+      }
+
+      if (pkt->MagicNumber != CngsMAGIG_NUMBER) {
+	 fprintf(stderr,
+		"RecvCNGS:RecvFromPort:Packet rejected (Corrupt): port:%d from:%s\n",
+d113 2
+a114 1
+	 return CngsFAIL;
+d116 1
+a116 3
+
+
+      return CngsOK;
+d118 1
+a118 1
+   return CngsFAIL;
+d121 3
+a123 6
+/* ============================================================= */
+/* Convert a CNGS time in milliseconds to a string routine.      */
+/* Result is a pointer to a static string representing the time  */
+/*    the format is: Thu-18/Jan/2001 08:25:14.967                */
+/*                   day-dd/mon/yyyy hh:mm:ss.ddd                */
+/* ============================================================= */
+d125 1
+a125 1
+char *TimeToStr(CngsTime *t) {
+d127 2
+a128 90
+static char tbuf[128];
+
+char tmp[128];
+char *yr, *ti, *md, *mn, *dy;
+
+   bzero((void *) tbuf, 128);
+   bzero((void *) tmp, 128);
+
+   if (t->Second) {
+      ctime_r(&t->Second, tmp);
+      tmp[3] = 0;
+      dy = &(tmp[0]);
+      tmp[7] = 0;
+      mn = &(tmp[4]);
+      tmp[10] = 0;
+      md = &(tmp[8]);
+      if (md[0] == ' ') md[0] = '0';
+      tmp[19] = 0;
+      ti = &(tmp[11]);
+      tmp[24] = 0;
+      yr = &(tmp[20]);
+      sprintf (tbuf, "%s-%s/%s/%s %s"  , dy, md, mn, yr, ti);
+      if (t->Nano) {
+      	  sprintf(&tbuf[strlen(tbuf)],".%09lu",t->Nano);
+      }
+
+   } else sprintf (tbuf, "--- Zero ---");
+
+   
+   if ((t->Machine < MNAMES) && (t->CTrain > 0)) {
+      strcat(tbuf," ");
+      strcat(tbuf,mnames[t->Machine]);
+      strcat(tbuf," C:");
+      sprintf(tmp,"%d",(int) t->CTrain);
+      strcat(tbuf,tmp);
+   }
+   return (tbuf);
+}
+
+/* ============================================================= */
+/* Get the time of day from the system clock in milliseconds.    */
+/* ============================================================= */
+
+CngsTime *GetSystemClock(void) {
+
+static CngsTime result;
+
+struct timeval tv;
+struct timezone tz;
+
+   tz.tz_dsttime = 0;
+   tz.tz_minuteswest = 0;
+   gettimeofday (&tv, &tz);
+
+   result.Second  = tv.tv_sec;
+   result.Nano    = tv.tv_usec * 1000;
+   result.CTrain  = 0;
+   result.Machine = 4;
+
+
+   return &result;
+}
+
+/* ============================================================= */
+/* Get difference between times                                  */
+/* ============================================================= */
+
+int TimeDifference(CngsTime *t1, CngsTime *t2) {
+
+int dfns, dfsc;
+
+   /* t1 must be greater than t2 */
+
+   if (t1->Second < t2->Second) return 0;
+   if ((t1->Second == t2->Second)
+   &&  (t1->Nano < t2->Nano))   return 0;
+
+   dfns = t1->Nano   - t2->Nano;
+   dfsc = t1->Second - t2->Second;
+
+   return (dfsc*1000) + (dfns/1000000);
+}
+
+/* ============================================================= */
+/* To be filled out by Gran Sasso people                         */
+/* This routine is called each basic period (1.2S) while there   */
+/* is an active GNGS cycle. Put whatever logic you want here.    */
+/* I guess this means that the detecor must go out of the        */
+/* calibration mode an take a real measurment.                   */
+/* ============================================================= */
+d130 4
+a133 1
+void CngsCycleUserRoutine(CngsPacket *pkt) {    /* Cycle is CNGS */
+d135 1
+a135 5
+   printf("UserRoutine >>> CNGS Cycle\n");
+}
+
+/* ============================================================= */
+/* Go back to calibration mode, its not a CNGS cycle             */
+d137 2
+a138 1
+void OtherCycleUserRoutine(CngsPacket *pkt) {   /* Not CNGS */
+d140 1
+a140 2
+   printf("UserRoutine >>> Not a CNGS cycle\n");
+}
+d142 1
+a142 15
+/* ============================================================= */
+
+int main(int argc,char *argv[]) {
+int i, fw, tt, df, deb;
+unsigned long newsqn, oldsqn, missed;
+char source[32], *cp, *ep;
+unsigned short port;
+CngsPacket pkt;
+CngsTime *tod;
+FILE *fp;
+
+   newsqn = oldsqn = missed = 0;
+   bzero((void *) &buckets, BUCKETS * sizeof(unsigned long));
+
+   port = CngsPORT;
+d146 1
+a146 24
+      if (strcmp(argv[i],options[HELP]) == 0) {
+	 printf("\nOptions are:\n\n");
+	 for (i=0; i<OPTIONS; i++) {
+	    printf("%s ",options[i]);
+	    switch ((Options) i) {
+	       case HELP:
+		  printf("[print this help text]\n");
+	       break;
+
+	       case PORT:
+		  printf("<UDP Port number to be used. Default:%d>\n",CngsPORT);
+	       break;
+
+	       case DEBUG:
+		  printf("<Debug level: 0/None 1/Debug ON. Default:0>\n");
+	       break;
+
+	       default:
+		  printf("For help type: RecvCNGS help\n");
+	    }
+	 }
+	 printf("\n\n");
+	 exit(0);
+      }
+d148 1
+a148 1
+      else if (strcmp(argv[i],options[PORT]) == 0) {
+d155 1
+a155 1
+      else if (strcmp(argv[i],options[DEBUG]) == 0) {
+d158 4
+a161 1
+	 deb = strtoul(cp,&ep,0);
+d165 2
+a166 5
+      else {
+	 printf("No such option: %s\n",argv[i]);
+	 printf("For help type: timtest %s\n",options[HELP]);
+	 exit(1);
+      }
+d169 1
+a169 25
+   fprintf(stderr,"RecvCNGS:Sartup Port:%d\n",port);
+
+   if (OpenPort(port))  {
+
+      fprintf(stderr,"RecvCNGS: Up and running OK\n");
+
+      while (errors < CngsMAX_ERRORS) {
+
+	 if (RecvFromPort(source, port, &pkt)) {
+
+	    tod = GetSystemClock(); /* Get local arrival time from system clock */
+
+	    printf("\n==CNGS======:==PACKET===\n");
+
+	    printf("SequenceNumb:%d\n",(int) pkt.SequenceNumber);
+	    printf("SourceIpAddr:%s\n",source);
+	    printf("Arrival time:%s (Local  NTP)\n",TimeToStr(tod));
+	    printf("Sender  time:%s (Sender NTP)\n",TimeToStr(&pkt.SendTime));
+	    printf("BPeriod time:%s (CERN GPS)\n",  TimeToStr(&pkt.BasicPeriod));
+	    printf("Extract time:%s (CERN GPS)\n",  TimeToStr(&pkt.Extraction));
+	    printf("StCycle time:%s (CERN GPS)\n",  TimeToStr(&pkt.StartCycle));
+	    printf("EnCycle time:%s (CERN GPS)\n",  TimeToStr(&pkt.EndCycle));
+	    printf("SPSCycleName:%s\n",pkt.CycleName);
+
+	    /* Deal with missed packets by checking packet sequence numbers */
+d171 1
+a171 2
+	    if ((oldsqn == 0)
+	    &&  (newsqn == 0)) newsqn = pkt.SequenceNumber; /* First time ? */
+d173 1
+a173 2
+	    oldsqn = newsqn;
+	    newsqn = pkt.SequenceNumber;
+d175 1
+a175 5
+	    if (newsqn > oldsqn) {
+	       df = newsqn - oldsqn - 1;    /* Difference -1 should be zero */
+	       missed += df;
+	       if (df) printf("PacketMissed:%d\n",df);
+	    }
+d177 5
+a181 31
+	    if (missed) printf("TotalMissed:%d\n",missed);
+
+	    /* Calculate some travel/arrival time statistics */
+
+	    tt = TimeDifference(tod,&pkt.SendTime);
+	    printf("TravelTimeMs:%dms\n",tt);
+	    if ((tt >= 0) && (tt < BUCKETS)) buckets[tt]++;
+
+	    if (newsqn % BUCKETS) {             /* Dump stats in a file for gnuplot */
+	       fp = fopen("arrival_stats","w");
+	       if (fp) {
+		  for (i=0; i<BUCKETS; i++) {
+		     fprintf(fp,"%03d %d\n",i+1,(int) buckets[i]);
+		  }
+		  fclose(fp);
+	       }
+	    }
+
+	    /* Extraction forwarning packets sent once per extraction */
+
+	    fw = TimeDifference(&pkt.Extraction,tod);   /* Posative forewarning ? */
+	    if (fw) printf("FWExtraction:%dms\7\n",fw); /* Kicker will fire at time */
+
+	    /* Call some user code routine for CNGS and other cycles */
+
+	    if (strstr(pkt.CycleName,"CNGS")) CngsCycleUserRoutine(&pkt);
+	    else                             OtherCycleUserRoutine(&pkt);
+
+	    errors = 0; /* Contiguous errors */
+
+	 } else { sleep(1); errors++; }
+d185 1
+a185 3
+   close(ssock);
+
+   fprintf(stderr,"RecvCNGS: ABORTED, after ErrorCount:%d\n",errors);
+@

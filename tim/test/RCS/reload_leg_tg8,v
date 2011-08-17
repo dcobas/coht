@@ -1,0 +1,25 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2006.03.27.09.55.05;	author lewis;	state Exp;
+branches;
+next	;
+
+
+desc
+@,
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@echo "frl /usr/local/tim/tg8leg.exe" | /usr/local/bin/tg8test > /dev/null
+@

@@ -1,0 +1,3997 @@
+head	1.57;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.57
+date	2008.11.12.13.55.19;	author lewis;	state Exp;
+branches;
+next	1.56;
+
+1.56
+date	2008.03.28.09.43.20;	author lewis;	state Exp;
+branches;
+next	1.55;
+
+1.55
+date	2007.12.18.15.49.18;	author lewis;	state Exp;
+branches;
+next	1.54;
+
+1.54
+date	2007.12.17.15.24.08;	author lewis;	state Exp;
+branches;
+next	1.53;
+
+1.53
+date	2007.08.30.09.45.57;	author lewis;	state Exp;
+branches;
+next	1.52;
+
+1.52
+date	2007.08.29.16.45.54;	author lewis;	state Exp;
+branches;
+next	1.51;
+
+1.51
+date	2007.08.29.15.17.44;	author lewis;	state Exp;
+branches;
+next	1.50;
+
+1.50
+date	2007.08.15.14.46.25;	author lewis;	state Exp;
+branches;
+next	1.49;
+
+1.49
+date	2007.08.14.15.56.51;	author lewis;	state Exp;
+branches;
+next	1.48;
+
+1.48
+date	2007.06.11.15.35.56;	author lewis;	state Exp;
+branches;
+next	1.47;
+
+1.47
+date	2007.06.04.13.46.29;	author lewis;	state Exp;
+branches;
+next	1.46;
+
+1.46
+date	2006.12.20.16.39.53;	author nmn;	state Exp;
+branches;
+next	1.45;
+
+1.45
+date	2006.05.02.14.00.23;	author lewis;	state Exp;
+branches;
+next	1.44;
+
+1.44
+date	2006.04.20.15.31.11;	author lewis;	state Exp;
+branches;
+next	1.43;
+
+1.43
+date	2006.04.19.12.41.45;	author baujc;	state Exp;
+branches;
+next	1.42;
+
+1.42
+date	2006.03.13.13.24.11;	author lewis;	state Exp;
+branches;
+next	1.41;
+
+1.41
+date	2006.02.13.16.19.21;	author lewis;	state Exp;
+branches;
+next	1.40;
+
+1.40
+date	2006.01.27.10.23.48;	author lewis;	state Exp;
+branches;
+next	1.39;
+
+1.39
+date	2005.11.29.14.30.51;	author lewis;	state Exp;
+branches;
+next	1.38;
+
+1.38
+date	2005.08.31.12.51.21;	author lewis;	state Exp;
+branches;
+next	1.37;
+
+1.37
+date	2005.08.29.14.11.53;	author lewis;	state Exp;
+branches;
+next	1.36;
+
+1.36
+date	2005.08.29.12.04.42;	author lewis;	state Exp;
+branches;
+next	1.35;
+
+1.35
+date	2005.08.26.16.17.44;	author lewis;	state Exp;
+branches;
+next	1.34;
+
+1.34
+date	2005.08.23.16.08.19;	author lewis;	state Exp;
+branches;
+next	1.33;
+
+1.33
+date	2005.07.04.12.22.28;	author lewis;	state Exp;
+branches;
+next	1.32;
+
+1.32
+date	2005.07.04.11.59.05;	author lewis;	state Exp;
+branches;
+next	1.31;
+
+1.31
+date	2005.06.20.16.16.34;	author lewis;	state Exp;
+branches;
+next	1.30;
+
+1.30
+date	2005.06.20.15.50.47;	author lewis;	state Exp;
+branches;
+next	1.29;
+
+1.29
+date	2005.06.20.14.48.12;	author lewis;	state Exp;
+branches;
+next	1.28;
+
+1.28
+date	2005.06.20.13.25.54;	author lewis;	state Exp;
+branches;
+next	1.27;
+
+1.27
+date	2005.05.17.15.56.54;	author lewis;	state Exp;
+branches;
+next	1.26;
+
+1.26
+date	2005.05.17.14.02.20;	author lewis;	state Exp;
+branches;
+next	1.25;
+
+1.25
+date	2005.05.13.16.33.12;	author lewis;	state Exp;
+branches;
+next	1.24;
+
+1.24
+date	2005.05.13.12.16.14;	author lewis;	state Exp;
+branches;
+next	1.23;
+
+1.23
+date	2005.05.04.13.38.31;	author lewis;	state Exp;
+branches;
+next	1.22;
+
+1.22
+date	2005.05.04.09.08.49;	author lewis;	state Exp;
+branches;
+next	1.21;
+
+1.21
+date	2005.04.28.08.30.50;	author lewis;	state Exp;
+branches;
+next	1.20;
+
+1.20
+date	2005.04.27.15.02.58;	author lewis;	state Exp;
+branches;
+next	1.19;
+
+1.19
+date	2005.04.27.08.44.08;	author ikozsar;	state Exp;
+branches;
+next	1.18;
+
+1.18
+date	2005.02.16.12.40.54;	author lewis;	state Exp;
+branches;
+next	1.17;
+
+1.17
+date	2005.02.15.14.00.08;	author lewis;	state Exp;
+branches;
+next	1.16;
+
+1.16
+date	2005.02.04.13.26.35;	author lewis;	state Exp;
+branches;
+next	1.15;
+
+1.15
+date	2005.02.04.10.22.55;	author ikozsar;	state Exp;
+branches;
+next	1.14;
+
+1.14
+date	2005.01.19.10.11.54;	author lewis;	state Exp;
+branches;
+next	1.13;
+
+1.13
+date	2005.01.18.17.55.14;	author lewis;	state Exp;
+branches;
+next	1.12;
+
+1.12
+date	2005.01.18.14.04.49;	author ikozsar;	state Exp;
+branches;
+next	1.11;
+
+1.11
+date	2005.01.17.10.55.54;	author lewis;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	2005.01.17.10.49.56;	author lewis;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	2005.01.17.10.18.24;	author ikozsar;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	2005.01.11.15.58.18;	author lewis;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	2005.01.11.14.19.59;	author ikozsar;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2004.11.17.10.57.41;	author lewis;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2004.11.17.10.54.47;	author ikozsar;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2004.08.26.12.36.11;	author ikozsar;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2004.07.29.16.18.15;	author lewis;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2004.07.29.15.33.37;	author lewis;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2004.07.28.14.17.45;	author lewis;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.57
+log
+@Added routines to connect to C-time and get module for a CTIM
+@
+text
+@/* ==================================================================== */
+/* Implement the timing library over the CTR familly of timing receiver */
+/* cards, PMC, PCI, and VME.                                            */
+/* Julian Lewis May 2004                                                */
+/* ==================================================================== */
+
+/* ==================================================================== */
+/* 27th/April/2005 Julian did these modifications                       */
+/*    Suppressed unused variable errors in the Set routine              */
+/*    Added plnum parameter to the Get routine                          */
+/*    Added GetStatus routine                                           */
+/*    Added GetAllPtimObjects routine                                   */
+/* 20th/June/2005                                                       */
+/*    Forced use of CheckClass at CTIM_PTIM_BOUNDARY                    */
+/* 04th/July/2005 Julian                                                */
+/*    Enable module code added: Tg8CpsLibInitialize                     */
+/* 24th/August/2005 Julian                                              */
+/*    Added full CTIM support so now can use timload to set up a TG8    */
+/*    Handle Enable option in initialize                                */
+/*    Make the read status function correctly                           */
+/*    Bugs in GetCtim corrected                                         */
+/* 31st/August/2005 Julian                                              */
+/*    Payload logic had to be changed in Wait. Now uses event history   */
+/* 19st/April/2006 Jean-Claude                                          */
+/*    Change CTIM_PTIM_BOUNDARY from 2000 to 2500                       */
+/* 20th back to 2000 again, its a long story ! JL                       */
+
+#include <time.h>
+
+#if defined(__powerpc__)
+
+#include <tg8/Tg8DrvrApi.h>
+
+#define MAX_OB_LIST 1024
+
+static Tg8IoBlock iob;
+static Tg8DrvrActionTable tab;
+/* static int objects[MAX_OB_LIST]; */
+
+#define UBCD(bcd) ((bcd&0xF)+10*(bcd>>4))
+
+extern int timlib_debug;  /* 1/Print stuff, 2/Wipe memory */
+extern int timlib_delay;  /* Input delay when not zero */
+extern int timlib_enable; /* Enable modules */
+extern int timlib_ctims;  /* Size of CTIM table to be created */
+
+/* ==================================================================== */
+/* Open a Tg8Cps Driver file handler                                    */
+
+static int tg8cps = 0;		/* This global holds the Tg8Cps Driver file handler */
+
+static int Tg8CpsOpen() {
+char fnm[32];
+int i;
+
+   if (tg8cps) return tg8cps;
+   for (i = 1; i <= Tg8DrvrDEVNUM; i++) {
+      sprintf(fnm, "/dev/Tg8.%1d", i);
+      if ((tg8cps = open(fnm, O_RDWR, 0)) > 0) return (tg8cps);
+   }
+   return (0);
+}
+
+/* ====== */
+
+static int Tg8CpsFdOpen() {
+char fnm[32];
+int i, fd;
+
+   for (i = 1; i <= Tg8DrvrDEVNUM; i++) {
+      sprintf(fnm, "/dev/Tg8.%1d", i);
+      if ((fd = open(fnm, O_RDWR, 0)) > 0) return fd;
+   }
+   return (0);
+}
+
+/* ==================================================================== */
+/* This is horrible, PTIM and CTIM equipment numbers exist in the same  */
+/* enumeration space so equipment numbers less than the following value */
+/* are assumed to be CTIMs, while greater or equal are PTIMs !!         */
+
+#define CTIM_PTIM_BOUNDARY 2000
+
+static TimLibError CheckClass(TimLibClass iclss, unsigned long equip) {
+
+   if  (tg8cps == 0)                                                 return TimLibErrorINIT;
+   if  (iclss  == TimLibClassHARDWARE)                               return TimLibErrorNOT_IMP;
+   if ((iclss  == TimLibClassCTIM) && (equip >= CTIM_PTIM_BOUNDARY)) return TimLibErrorCTIM;
+   if ((iclss  == TimLibClassPTIM) && (equip <  CTIM_PTIM_BOUNDARY)) return TimLibErrorPTIM;
+   return TimLibErrorSUCCESS;
+}
+
+/* ==================================================================== */
+/* Lets you know how many installed modules there are on this host.     */
+
+unsigned long Tg8CpsLibGetInstalledModuleCount() {
+
+unsigned long cnt = 0;
+Tg8ModuleAddress *moad;
+int i;
+
+   if (tg8cps == 0) return 0;
+   if (ioctl(tg8cps, Tg8DrvrGET_CONFIGURATION, &iob) < 0) return 0;
+   for (i = 0; i < Tg8DrvrMODULES; i++) {
+      moad = &iob.GetConfig.Addresses[i];
+      if (!moad->VMEAddress) continue;
+      cnt++;
+   }
+   return cnt;
+}
+
+/* ==================================================================== */
+/* This routine could have been hidden from the user of the Timing lib, */
+/* however, in some circumstances, the initialization can take several  */
+/* minutes to complete. Hence I have decided to make an initialization  */
+/* routine publicly available, and force users to call it.              */
+/* This routine performs the following initialization functions...      */
+/*    1) Opens a connection to the driver                               */
+/*    2) Checks the Firmware/VHDL version against the latest revision   */
+/*       Some EProms/FPGAs may need updating, this takes a while.       */
+/*    3) Load all relavent CTIM and PTIM definitions if needed.         */
+/* This is the CTR implementation, so device is irrelevant here.        */
+
+TimLibError Tg8CpsLibInitialize(TimLibDevice device) { /* Initialize hardware/software */
+int m, mods;
+
+   char dver[64];
+   if (tg8cps) return TimLibErrorSUCCESS;
+   if (Tg8CpsOpen() == 0) {
+      tg8cps = 0;
+      return TimLibErrorOPEN;
+   }
+   if (ioctl(tg8cps, Tg8DrvrGET_DRI_VERSION, &dver) < 0) {
+      close(tg8cps);
+      tg8cps = 0;
+      return TimLibErrorINIT;
+   }  
+   
+   if  (strlen(dver) < (strlen(__DATE__) + 4)) {
+      close(tg8cps);
+      tg8cps = 0;
+      return TimLibErrorINIT;
+   }
+
+   mods = Tg8CpsLibGetInstalledModuleCount();
+   for (m=1; m<=mods; m++) {
+      ioctl(tg8cps,Tg8DrvrSET_DEFAULT_MODULE,&m);
+      if ((timlib_enable) && (ioctl(tg8cps,Tg8DrvrENABLE_MODULE,NULL) < 0)) {
+	 close(tg8cps);
+	 tg8cps = 0;
+	 return TimLibErrorINIT;
+      }
+   }
+   m = 1;
+   ioctl(tg8cps,Tg8DrvrSET_DEFAULT_MODULE,&m);
+
+   return TimLibErrorSUCCESS;
+}
+
+/* ====== */
+
+int Tg8CpsLibFdInitialize(TimLibDevice device) { /* Initialize hardware/software */
+TimLibError er;
+
+   if (tg8cps == 0) {
+      er = Tg8CpsLibInitialize(device);
+      if (er != TimLibErrorSUCCESS) return 0;
+      return tg8cps;
+   }
+   return Tg8CpsFdOpen();
+}
+
+/* ==================================================================== */
+/* Read status from Tg8 module                                          */
+
+TimLibStatus Tg8CpsLibGetStatus(unsigned long module, TimLibDevice *dev) {
+
+Tg8IoBlock iob;
+TimLibStatus res;
+unsigned long stat;
+
+   if (dev) *dev = TimLibDevice_TG8_CPS;
+
+   if (module)
+      if (ioctl(tg8cps, Tg8DrvrSET_DEFAULT_MODULE, &module) < 0)
+	 return TimLibErrorMODULE;
+
+   if (ioctl(tg8cps,Tg8DrvrGET_STATUS,&iob) < 0)
+      return TimLibErrorIO;
+
+   stat = iob.Status.Status;
+
+   res = 0;
+   if ((stat & Tg8DrvrMODULE_SELFTEST_ERROR) == 0) res |= TimLibStatusSELF_OK;
+   if ((stat & Tg8DrvrMODULE_DPRAM_ERROR)    == 0) res |= TimLibStatusBUS_OK;
+						   res |= TimLibStatusPLL_OK;
+
+   if (ioctl(tg8cps,Tg8DrvrGET_RAW_STATUS,&iob) < 0)
+      return TimLibErrorIO;
+
+   stat = iob.RawStatus.Sb.Dt.aRcvErr;
+
+   if ((stat &
+	( XrDATA_OVERFLOW | XrPARITY_ERROR   | XrEND_SEQUENCE
+	| XrMID_BIT       | XrSTART_SEQUENCE | XrMS_MISSING
+	| XrMS_WATCH_DOG
+	)
+       ) == 0) res |= TimLibStatusGMT_OK;
+
+   stat = iob.RawStatus.Sb.Hw;
+   if (stat & Tg8HS_RECEIVER_ENABLED) res |= TimLibStatusENABLED;
+
+   return res;
+}
+
+/* ==================================================================== */
+/* Connect to an interrupt. If you are connecting to either a CTIM      */
+/* interrupt or to a hardware interrupt, you may need to specify on     */
+/* which device the interrupt should be connected. This is achieved by  */
+/* the module parameter. If the module is zero, the system will decide  */
+/* which device to use, otherwise module contains a value between 1 and */
+/* the number of installed timing receiver cards. For PTIM objects the  */
+/* module parameter must be set to zero or the real module on which the */
+/* PTIM object is implemented. On PTIM objects the module is implicit.  */
+
+static int tg8cps_connected = 0;
+
+TimLibError Tg8CpsLibConnect(TimLibClass iclss,      /* Class of interrupt */
+			     unsigned long equip,    /* Equipment or hardware mask */
+			     unsigned long module) { /* For HARD or CTIM classes */
+TimLibError err;
+Tg8DrvrObjectConnection con;
+
+   err = CheckClass(iclss,equip); if (err) return err;
+
+   if ((module) && (ioctl(tg8cps,Tg8DrvrSET_DEFAULT_MODULE,&module))) return TimLibErrorMODULE;
+
+   con.Id = equip;
+   con.Mask = -1;
+   if (ioctl(tg8cps, Tg8DrvrCONNECT, (char *) &con) < 0) return TimLibErrorCONNECT;
+   tg8cps_connected++;
+
+   return TimLibErrorSUCCESS;
+}
+
+TimLibError Tg8CpsLibFdConnect(int           fd,       /* File handel */
+			       TimLibClass   iclss,    /* Class of interrupt */
+			       unsigned long equip,    /* Equipment or hardware mask */
+			       unsigned long module) { /* For HARD or CTIM classes */
+TimLibError err;
+Tg8DrvrObjectConnection con;
+
+   err = CheckClass(iclss,equip); if (err) return err;
+
+   if ((module) && (ioctl(fd,Tg8DrvrSET_DEFAULT_MODULE,&module))) return TimLibErrorMODULE;
+
+   con.Id = equip;
+   con.Mask = -1;
+   if (ioctl(fd, Tg8DrvrCONNECT, (char *) &con) < 0) return TimLibErrorCONNECT;
+
+   return TimLibErrorSUCCESS;
+}
+
+/* ==================================================================== */
+/* Disconnect from an interrupt                                         */
+
+TimLibError Tg8CpsLibDisConnect(TimLibClass iclss,      /* Class of interrupt */
+				unsigned long equip,    /* Equipment or hardware mask */
+				unsigned long module) { /* For HARD or CTIM classes */
+TimLibError err;
+Tg8DrvrObjectConnection con;
+
+   err = CheckClass(iclss,equip); if (err) return err;
+
+   if ((module) && (ioctl(tg8cps,Tg8DrvrSET_DEFAULT_MODULE,&module))) return TimLibErrorMODULE;
+
+   con.Id = equip;
+   con.Mask = 0;
+   if (ioctl(tg8cps, Tg8DrvrCONNECT, (char *) &con) < 0) return TimLibErrorCONNECT;
+   tg8cps_connected--;
+
+   return TimLibErrorSUCCESS;
+}
+
+/* ==================================================================== */
+/* Set queueing On or Off, and the time out value in micro seconds.     */
+/* A timeout value of zero means no time out, you wait for ever.        */
+
+static int CpsQFlag = 0;
+
+TimLibError Tg8CpsLibQueue(unsigned long qflag,   /* 0=>Queue, 1=>NoQueue  */
+			   unsigned long tmout) { /* 0=>No time outs       */
+
+   if (tg8cps == 0) return TimLibErrorINIT;
+   CpsQFlag = qflag;
+   // if (tmout) return TimLibErrorTIMEOUT;
+   return TimLibErrorSUCCESS;
+}
+
+/* ====== */
+
+TimLibError Tg8CpsLibFdQueue(int           fd,
+			     unsigned long qflag,   /* 0=>Queue, 1=>NoQueue  */
+			     unsigned long tmout) { /* 0=>No time outs       */
+
+   return TimLibErrorSUCCESS;
+}
+
+/* ==================================================================== */
+/* To know if a call to wait will block, this call returns the Queue    */
+/* size. If the size iz greater than zero a call to wait will not block */
+/* and return without waiting. If the qflag is set to NoQueue, zero is  */
+/* allways returned and all calls to wait will block.                   */
+
+unsigned long Tg8CpsLibGetQueueSize() {
+
+unsigned long qsize;
+
+   if (CpsQFlag) return 0;
+   if (ioctl(tg8cps, Tg8DrvrGET_QUEUE_LENGTH, &qsize) < 0) return 0;
+   return qsize;
+}
+
+/* ==================================================================== */
+/* Wait for an interrupt. The parameters are all returned from the call */
+/* so you can know which interrupt it was that came back. Note, when    */
+/* waiting for a hardware interrupt from either CTIM or from a counter, */
+/* it is the CTIM or PTIM object that caused the interrupt returned.    */
+/* The telegram will have been read already by the high prioity task    */
+/* get_tgm_ctr/tg8, be aware of the race condition here, hence payload. */
+/* This routine is a blocking call, it waits for interrupt or timeout.  */
+/* Any NULL argument  is permitted, and no value will be returned.      */
+
+/* Arguments:                                                           */
+/*    iclss:   The class of the interrupt CTIM, PTIM, or hardware       */
+/*    equip:   The PTIM, CTIM equipment, or hardware mask               */
+/*    plnum:   If class is PTIM this is the PLS line number             */
+/*    source:  The hardware source of the interrupt                     */
+/*    onzero:  The time of the interrupt                                */
+/*    trigger: The arrival time of the event that triggered the action  */
+/*    start:   The time the start of the counter occured                */
+/*    ctim:    The CTIM equipment number of the triggering event        */
+/*    payload: The payload of the triggering event                      */
+/*    module:  The module number 1..n of the timing receiver card       */
+/*    missed:  The number of missed events since the last wait          */
+/*    qsize:   The number of remaining interrupts on the queue          */
+
+TimLibError Tg8CpsLibWait(TimLibClass    *iclss,      /* Class of interrupt */
+			  unsigned long  *equip,      /* PTIM CTIM or hardware mask */
+			  unsigned long  *plnum,      /* Ptim line number 1..n or 0 */
+			  TimLibHardware *source,     /* Hardware source of interrupt */
+			  TimLibTime     *onzero,     /* Time of interrupt/output */
+			  TimLibTime     *trigger,    /* Time of counters load */
+			  TimLibTime     *start,      /* Time of counters start */
+			  unsigned long  *ctim,       /* CTIM trigger equipment ID */
+			  unsigned long  *payload,    /* Payload of trigger event */
+			  unsigned long  *modnum,     /* Module that interrupted */
+			  unsigned long  *missed,     /* Number of missed interrupts */
+			  unsigned long  *qsize,      /* Remaining interrupts on queue */
+			  TgmMachine     *machine) {  /* Corresponding TgmMachine */
+Tg8DrvrEvent ev;
+Tg8DateTime dt;
+int qlen, cc, i;
+unsigned long mod, cnt, dim, pln, ctm, frm;
+TgmMachine mch;
+TimLibClass cls;
+TimLibTime tld;
+Tg8DrvrObjectDescriptor obd;
+struct tm mtm;
+time_t tod;
+Tg8History *hp;
+Tg8DrvrEventHistoryTable h;
+
+   if (tg8cps           == 0) return TimLibErrorINIT;
+   if (tg8cps_connected == 0) return TimLibErrorWAIT;
+
+   if (ioctl(tg8cps, Tg8DrvrDATE_TIME, &iob) < 0) return TimLibErrorIO;
+   bcopy((void *) &(iob.DateTime), (void *) &dt, sizeof(Tg8DateTime));
+
+   if (CpsQFlag) ioctl(tg8cps, Tg8DrvrPURGE_QUEUE,NULL);
+   cc = read(tg8cps, &ev, sizeof(Tg8DrvrEvent));
+   if (cc <= 0) return TimLibErrorTIMEOUT;
+
+   if (ev.Inter.iMin || ev.Inter.iSec || ev.Inter.iMs) { /* ev time available ? */
+      dt.aMinute = ev.Inter.iMin;
+      dt.aSecond = ev.Inter.iSec;
+      dt.aMilliSecond = ev.Inter.iMs;
+   }
+
+   if (ioctl(tg8cps, Tg8DrvrGET_QUEUE_LENGTH, &iob) < 0) return TimLibErrorIO;
+   qlen = iob.QueueLength;
+
+   if (ev.Id >= CTIM_PTIM_BOUNDARY) {
+      cls = TimLibClassPTIM;
+      bzero((void *) &obd, sizeof(Tg8DrvrObjectDescriptor));
+      obd.Object.Id = ev.Id;
+      if (ioctl(tg8cps, Tg8DrvrGET_OBJECT, &obd) < 0) return TimLibErrorIO;
+      pln = ev.Inter.iExt.iAct - obd.Act + 1;
+      mod = obd.Object.Module;
+      ctm = obd.Object.Lines[0].TriggerId;
+      mch = TgvTgvToTgmMachine(TgvGetMachineForMember(ctm));
+      cnt = Tg8CW_CNT_Get(obd.Object.Lines[0].Cw);
+      if (!cnt) cnt = 8;
+   } else {
+      cls = TimLibClassCTIM;
+      pln = 0;
+      cnt = 0;
+      dim = 0;
+      mod = 1;
+      mch = TgvTgvToTgmMachine(TgvGetMachineForMember(ev.Id));
+      ctm = ev.Id;
+   }
+
+   mtm.tm_sec   = UBCD(dt.aSecond);
+   mtm.tm_min   = UBCD(dt.aMinute);
+   mtm.tm_hour  = UBCD(dt.aHour);
+   mtm.tm_mday  = UBCD(dt.aDay);
+   mtm.tm_mon   = UBCD(dt.aMonth) - 1;
+   mtm.tm_year  = UBCD(dt.aYear) + 100;
+   mtm.tm_isdst = 0;
+   tod = TgmMkGmtTime(&mtm);
+   tld.Second = (unsigned long) tod;
+   tld.Nano = dt.aMilliSecond * 1000000;
+   tld.Machine = mch;
+   tld.CTrain = ev.Inter.iOcc;
+
+   if (iclss)   *iclss = cls;
+   if (equip)   *equip = ev.Id;
+   if (plnum)   *plnum = pln;
+   if (source)  {
+      if (cls == TimLibClassCTIM) *source = TimLibHardwareCTIM;
+      else                        *source = 1 << (cnt+1);
+   }
+   if (onzero)  *onzero = tld;
+   if (trigger) *trigger = tld;
+   if (start)   *start = tld;
+
+   if (ctim)    *ctim = ctm;
+   if (payload) {
+      *payload = 0;
+
+      h.Cnt = Tg8HISTORIES;
+      if (ioctl(tg8cps,Tg8DrvrHISTORY_TABLE,&h) < 0) return TimLibErrorIO;
+      frm = TgvGetFrameForMember(ev.Id) & 0xFFFF0000;
+      for (i=0; i<h.Cnt; i++) {
+	 hp = &(h.Table[i]);
+	 if (frm == (hp->hEvent.Long & 0xFFFF0000)) {
+	    *payload = 0x0000FFFF & hp->hEvent.Long;
+	    break;
+	 }
+      }
+   }
+
+   if (modnum)  *modnum = mod;
+   if (missed)  *missed = 0;
+   if (qsize)   *qsize = qlen;
+   if (machine) *machine = mch;
+
+   return TimLibErrorSUCCESS;
+}
+
+/* ====== */
+
+TimLibError Tg8CpsLibFdWait(int            fd,          /* File descriptor */
+			    TimLibClass    *iclss,      /* Class of interrupt */
+			    unsigned long  *equip,      /* PTIM CTIM or hardware mask */
+			    unsigned long  *plnum,      /* Ptim line number 1..n or 0 */
+			    TimLibHardware *source,     /* Hardware source of interrupt */
+			    TimLibTime     *onzero,     /* Time of interrupt/output */
+			    TimLibTime     *trigger,    /* Time of counters load */
+			    TimLibTime     *start,      /* Time of counters start */
+			    unsigned long  *ctim,       /* CTIM trigger equipment ID */
+			    unsigned long  *payload,    /* Payload of trigger event */
+			    unsigned long  *modnum,     /* Module that interrupted */
+			    unsigned long  *missed,     /* Number of missed interrupts */
+			    unsigned long  *qsize,      /* Remaining interrupts on queue */
+			    TgmMachine     *machine) {  /* Corresponding TgmMachine */
+Tg8DrvrEvent ev;
+Tg8DateTime dt;
+int qlen, cc, i;
+unsigned long mod, cnt, dim, pln, ctm, frm;
+TgmMachine mch;
+TimLibClass cls;
+TimLibTime tld;
+Tg8DrvrObjectDescriptor obd;
+struct tm mtm;
+time_t tod;
+Tg8History *hp;
+Tg8DrvrEventHistoryTable h;
+
+   if (fd == 0) return TimLibErrorINIT;
+
+   if (ioctl(fd, Tg8DrvrDATE_TIME, &iob) < 0) return TimLibErrorIO;
+   bcopy((void *) &(iob.DateTime), (void *) &dt, sizeof(Tg8DateTime));
+
+   cc = read(fd, &ev, sizeof(Tg8DrvrEvent));
+   if (cc <= 0) return TimLibErrorTIMEOUT;
+
+   if (ev.Inter.iMin || ev.Inter.iSec || ev.Inter.iMs) { /* ev time available ? */
+      dt.aMinute = ev.Inter.iMin;
+      dt.aSecond = ev.Inter.iSec;
+      dt.aMilliSecond = ev.Inter.iMs;
+   }
+
+   if (ioctl(fd, Tg8DrvrGET_QUEUE_LENGTH, &iob) < 0) return TimLibErrorIO;
+   qlen = iob.QueueLength;
+
+   if (ev.Id >= CTIM_PTIM_BOUNDARY) {
+      cls = TimLibClassPTIM;
+      bzero((void *) &obd, sizeof(Tg8DrvrObjectDescriptor));
+      obd.Object.Id = ev.Id;
+      if (ioctl(fd, Tg8DrvrGET_OBJECT, &obd) < 0) return TimLibErrorIO;
+      pln = ev.Inter.iExt.iAct - obd.Act + 1;
+      mod = obd.Object.Module;
+      ctm = obd.Object.Lines[0].TriggerId;
+      mch = TgvTgvToTgmMachine(TgvGetMachineForMember(ctm));
+      cnt = Tg8CW_CNT_Get(obd.Object.Lines[0].Cw);
+      if (!cnt) cnt = 8;
+   } else {
+      cls = TimLibClassCTIM;
+      pln = 0;
+      cnt = 0;
+      dim = 0;
+      mod = 1;
+      mch = TgvTgvToTgmMachine(TgvGetMachineForMember(ev.Id));
+      ctm = ev.Id;
+   }
+
+   mtm.tm_sec   = UBCD(dt.aSecond);
+   mtm.tm_min   = UBCD(dt.aMinute);
+   mtm.tm_hour  = UBCD(dt.aHour);
+   mtm.tm_mday  = UBCD(dt.aDay);
+   mtm.tm_mon   = UBCD(dt.aMonth) - 1;
+   mtm.tm_year  = UBCD(dt.aYear) + 100;
+   mtm.tm_isdst = 0;
+   tod = TgmMkGmtTime(&mtm);
+   tld.Second = (unsigned long) tod;
+   tld.Nano = dt.aMilliSecond * 1000000;
+   tld.Machine = mch;
+   tld.CTrain = ev.Inter.iOcc;
+
+   if (iclss)   *iclss = cls;
+   if (equip)   *equip = ev.Id;
+   if (plnum)   *plnum = pln;
+   if (source)  {
+      if (cls == TimLibClassCTIM) *source = TimLibHardwareCTIM;
+      else                        *source = 1 << (cnt+1);
+   }
+   if (onzero)  *onzero = tld;
+   if (trigger) *trigger = tld;
+   if (start)   *start = tld;
+
+   if (ctim)    *ctim = ctm;
+   if (payload) {
+      *payload = 0;
+
+      h.Cnt = Tg8HISTORIES;
+      if (ioctl(fd,Tg8DrvrHISTORY_TABLE,&h) < 0) return TimLibErrorIO;
+      frm = TgvGetFrameForMember(ev.Id) & 0xFFFF0000;
+      for (i=0; i<h.Cnt; i++) {
+	 hp = &(h.Table[i]);
+	 if (frm == (hp->hEvent.Long & 0xFFFF0000)) {
+	    *payload = 0x0000FFFF & hp->hEvent.Long;
+	    break;
+	 }
+      }
+   }
+
+   if (modnum)  *modnum = mod;
+   if (missed)  *missed = 0;
+   if (qsize)   *qsize = qlen;
+   if (machine) *machine = mch;
+
+   return TimLibErrorSUCCESS;
+}
+
+/* ==================================================================== */
+/* Set the Ccv of a PTIM equipment. Note neither the counter number nor */
+/* the trigger condition can be changed.                                */
+
+TimLibError Tg8CpsLibSet(unsigned long ptim,  /* PTIM to write to */
+			 unsigned long plnum, /* Ptim line number 1..n or 0 */
+			 unsigned long grnum, /* Tgm group number or Zero */
+			 unsigned long grval, /* Group value if num not zero */
+			 TimLibCcvMask ccvm,  /* Which values to write */
+			 TimLibCcv * ccv) {   /* Current control value */
+
+int anum;
+
+Tg8DrvrAction *act;
+Tg8DrvrObjectDescriptor obd;
+Tg8DrvrObjectParameter opr;
+
+Tg8User *uac;
+Tg8ActionParam *apr;
+
+int gt, cw, st, ck, ev, md;
+int i;
+unsigned long msk, mod;
+
+TgmGroupDescriptor desc;
+TimLibError err;
+
+   err = CheckClass(TimLibClassPTIM,ptim); if (err) return err;
+
+   bzero((void *) &opr, sizeof (Tg8DrvrObjectParameter));
+   apr = &(opr.Par);
+
+   bzero((void *) &obd, sizeof(Tg8DrvrObjectDescriptor));
+   obd.Object.Id = ptim;
+   if (ioctl(tg8cps, Tg8DrvrGET_OBJECT, &obd) < 0) return TimLibErrorPTIM;
+
+   if (plnum) anum = (obd.Act -1) + (plnum -1);
+   else if (grnum) {
+     anum = obd.Act + grval - 1;
+   } else {
+     anum = obd.Act - 1;
+   }
+
+   mod = obd.Object.Module;
+   if (mod) {
+      if (ioctl(tg8cps,Tg8DrvrSET_DEFAULT_MODULE,&mod) < 0) {
+	 return TimLibErrorMODULE;
+      }
+   }
+   bzero((void *) &iob, sizeof(Tg8IoBlock));
+   iob.Range.Row = 1;
+   iob.Range.Cnt = 256;
+   if (ioctl (tg8cps, Tg8DrvrACTION_TABLE, &iob) < 0) return TimLibErrorIO;
+   tab = iob.ActionTable;
+   act = &(tab.Table[anum]);
+
+   uac = &(act->Action);
+   cw = uac->uControl;
+
+   for (i=0; i<16; i++) {
+      msk = 1 << i;
+      if (ccvm & msk) {
+
+	 bzero((void *) apr,sizeof (Tg8ActionParam));
+
+	 switch ((TimLibCcvMask) msk) {
+
+	    case TimLibCcvMaskENABLE:
+	       apr->Sel = Tg8SEL_STATE;
+	       if (ccv->Enable  & TimLibEnableOUT)   apr->Val = Tg8DO_OUTPUT;
+	       if (ccv->Enable == TimLibEnableNOOUT) apr->Val = Tg8DO_NOTHING;
+	    break;
+
+	    case TimLibCcvMaskSTART:
+	       st = 0;
+	       if (ccv->Start == TimLibStartNORMAL)  st = Tg8CM_NORMAL;
+	       if (ccv->Start == TimLibStartCHAINED) st = Tg8CM_CHAINED;
+	       if (ccv->Start == TimLibStartEXT1)    st = Tg8CM_EXTERNAL_1;
+	       if (ccv->Start == TimLibStartEXT2)    st = Tg8CM_EXTERNAL_2;
+
+	       cw &= ~(Tg8CW_START_BITM << Tg8CW_START_BITN);
+	       cw |= (st << Tg8CW_START_BITN);
+
+	       apr->Sel = Tg8SEL_CW;
+	       apr->Val = cw;
+	       apr->Aux = uac->uDelay;
+	    break;
+
+	    case TimLibCcvMaskMODE:
+	       md = 0;
+	       if (ccv->Mode == TimLibModeNORMAL) {
+		  if (uac->uDelay == 0) md = Tg8SEL_DIRECT;
+		  else                  md = Tg8SEL_SIMPLE;
+	       }
+	       if (ccv->Mode == TimLibModeMULTIPLE) md = Tg8SEL_DIVIDE;
+	       if (ccv->Mode == TimLibModeBURST)    md = Tg8SEL_BURST;
+
+	       apr->Sel = md;
+	    break;
+
+	    case TimLibCcvMaskCLOCK:
+	       ck = 0;
+	       if (ccv->Clock == TimLibClock1KHZ)   ck = Tg8CLK_MILLISECOND;
+	       if (ccv->Clock == TimLibClock10MHZ)  ck = Tg8CLK_CABLE;
+	       if (ccv->Clock == TimLibClockEXT1)   ck = Tg8CLK_X1;
+	       if (ccv->Clock == TimLibClockEXT2)   ck = Tg8CLK_X2;
+
+	       apr->Sel = Tg8SEL_CLOCK;
+	       apr->Val = ck;
+	       apr->Aux = uac->uDelay;
+	    break;
+
+	    case TimLibCcvMaskPWIDTH:
+	    break;
+
+	    case TimLibCcvMaskDELAY:
+	       apr->Sel = Tg8SEL_DELAY;
+	       apr->Val = ccv->Delay;
+	    break;
+
+	    case TimLibCcvMaskOMASK:
+	    break;
+
+	    case TimLibCcvMaskPOLARITY:
+	    break;
+
+	    case TimLibCcvMaskCTIM:
+	       apr->Sel = Tg8SEL_TRIGG;
+	       apr->Val = ccv->Ctim;
+	       apr->Aux = uac->uDelay;
+	    break;
+
+	    case TimLibCcvMaskPAYLOAD:
+	       ev = TgvGetFrameForMember(ccv->Ctim);
+	       ev &= 0xFFFF0000;
+	       ev |= (ccv->Payload & 0xFFFF);
+
+	       apr->Sel = Tg8SEL_CEVENT;
+	       apr->Val = ev;
+	       apr->Aux = uac->uDelay;
+	    break;
+
+	    case TimLibCcvMaskMACHINE:
+	    case TimLibCcvMaskGRNUM:
+	    case TimLibCcvMaskGRVAL:
+
+	       apr->Sel  = Tg8SEL_GATE;
+	       apr->Mach = ccv->Machine;
+	       apr->Gn   = ccv->GrNum;
+	       apr->Val  = ccv->GrVal;
+	       if (TgmGetGroupDescriptor(ccv->Machine,ccv->GrNum,&desc) == TgmSUCCESS) {
+		  if (desc.Type == TgmBIT_PATTERN)   gt = Tg8GT_BIT;
+		  if (desc.Type == TgmNUMERIC_VALUE) gt = Tg8GT_NUM;
+		  if (desc.Type == TgmEXCLUSIVE)     gt = Tg8GT_EXC;
+
+		  apr->Aux = gt;
+
+		  break;
+	       }
+	    return TimLibErrorGROUP;
+
+	    default:
+	    break;
+	 }
+      }
+   }
+
+   if (apr->Sel) {
+      opr.Id = ptim;
+      opr.Line = plnum;
+      if (ioctl(tg8cps,Tg8DrvrMOD_OBJECT_PARAM,&opr) < 0) return TimLibErrorIO;
+   }
+   return TimLibErrorSUCCESS;
+}
+
+/* ==================================================================== */
+/* Get the Ccv of a PTIM equipment.                                     */
+
+TimLibError Tg8CpsLibGet(unsigned long ptim,
+			 unsigned long plnum,
+			 unsigned long grnum,
+			 unsigned long grval,
+			 TimLibCcvMask * ccvm,    /* Valid fields in ccv */
+			 TimLibCcv * ccv) {
+
+int anum;
+Tg8DrvrAction *act;
+Tg8DrvrObjectDescriptor obd;
+
+Tg8User *uac;
+Tg8Gate *gte;
+
+int tg, gn, gv, cw, st, ck, rs, ds, ev, ti, md;
+int i, ch;
+unsigned long msk, mod;
+TimLibError err;
+
+   err = CheckClass(TimLibClassPTIM,ptim); if (err) return err;
+
+   bzero((void *) &obd, sizeof(Tg8DrvrObjectDescriptor));
+   obd.Object.Id = ptim;
+   if (ioctl(tg8cps, Tg8DrvrGET_OBJECT, &obd) < 0) return TimLibErrorPTIM;
+
+   if (plnum) anum = (obd.Act -1) + (plnum -1);
+   else if (grnum) {
+     anum = obd.Act + grval - 1;
+   } else {
+     anum = obd.Act - 1;
+   }
+
+   mod = obd.Object.Module;
+   if (mod) {
+      if (ioctl(tg8cps,Tg8DrvrSET_DEFAULT_MODULE,&mod) < 0) {
+	 return TimLibErrorMODULE;
+      }
+   }
+   bzero((void *) &iob, sizeof(Tg8IoBlock));
+   iob.Range.Row = 1;
+   iob.Range.Cnt = 256;
+   if (ioctl (tg8cps, Tg8DrvrACTION_TABLE, &iob) < 0) return TimLibErrorIO;
+   tab = iob.ActionTable;
+   act = &(tab.Table[anum]);
+
+   *ccvm = TimLibCcvMaskBITS;
+
+   uac = &(act->Action);
+   gte = &(act->Gate);
+
+   tg = (int) ((gte->Machine) >> 4);    /* Tgm Machine */
+   gn = (int)  (gte->GroupNum);
+   gv = (int)  (gte->GroupVal);
+
+   cw = uac->uControl;
+   ch = (cw >> Tg8CW_CNT_BITN)   & Tg8CW_CNT_BITM; if (ch == 0) ch = 8;
+   st = (cw >> Tg8CW_START_BITN) & Tg8CW_START_BITM;
+   ck = (cw >> Tg8CW_CLOCK_BITN) & Tg8CW_CLOCK_BITM;
+   rs = (cw >> Tg8CW_INT_BITN)   & Tg8CW_INT_BITM;
+   ds = (cw >> Tg8CW_STATE_BITN) & Tg8CW_STATE_BITM;
+   md = (cw >> Tg8CW_MODE_BITN)  & Tg8CW_MODE_BITM;
+
+   ev = (int) uac->uEvent.Long;
+   ti = act->TriggerId;
+
+   for (i=0; i<16; i++) {
+      msk = 1 << i;
+      if (TimLibCcvMaskBITS & msk) {
+	 switch ((TimLibCcvMask) msk) {
+
+	    case TimLibCcvMaskENABLE:
+	       ccv->Enable = TimLibEnableNOOUT;
+	       if (rs & Tg8DO_OUTPUT)        ccv->Enable |= TimLibEnableOUT;
+	       if (rs & Tg8DO_INTERRUPT)     ccv->Enable |= TimLibEnableBUS;
+	       if (ds == 1)                  ccv->Enable  = TimLibEnableNOOUT;
+	    break;
+
+	    case TimLibCcvMaskSTART:
+	       if (st == Tg8CM_NORMAL)       ccv->Start = TimLibStartNORMAL;
+	       if (st == Tg8CM_CHAINED)      ccv->Start = TimLibStartCHAINED;
+	       if (st == Tg8CM_EXTERNAL_1)   ccv->Start = TimLibStartEXT1;
+	       if (st == Tg8CM_EXTERNAL_2)   ccv->Start = TimLibStartEXT2;
+	    break;
+
+	    case TimLibCcvMaskMODE:
+	       if (md == Tg8MODE_NONE)       ccv->Mode = TimLibModeNORMAL;
+	       if (md == Tg8MODE_DIRECT)     ccv->Mode = TimLibModeNORMAL;
+	       if (md == Tg8MODE_DIVIDE)     ccv->Mode = TimLibModeMULTIPLE;
+	       if (md == Tg8MODE_BURST)      ccv->Mode = TimLibModeBURST;
+	    break;
+
+	    case TimLibCcvMaskCLOCK:
+	       if (ck == Tg8CLK_MILLISECOND) ccv->Clock = TimLibClock1KHZ;
+	       if (ck == Tg8CLK_CABLE)       ccv->Clock = TimLibClock10MHZ;
+	       if (ck == Tg8CLK_X1)          ccv->Clock = TimLibClockEXT1;
+	       if (ck == Tg8CLK_X2)          ccv->Clock = TimLibClockEXT2;
+	    break;
+
+	    case TimLibCcvMaskPWIDTH:
+	       ccv->PulsWidth = 40;
+	    break;
+
+	    case TimLibCcvMaskDELAY:
+	       ccv->Delay = uac->uDelay;
+	    break;
+
+	    case TimLibCcvMaskOMASK:
+	       ccv->OutputMask = 1 << ch;
+	    break;
+
+	    case TimLibCcvMaskPOLARITY:
+	       ccv->Polarity = TimLibPolarityTTL_BAR;
+	    break;
+
+	    case TimLibCcvMaskCTIM:
+	       ccv->Ctim = ti;
+	    break;
+
+	    case TimLibCcvMaskPAYLOAD:
+	       ccv->Payload = ev & 0xFFFF;
+	    break;
+
+	    case TimLibCcvMaskMACHINE:
+	       ccv->Machine = tg;
+	    break;
+
+	    case TimLibCcvMaskGRNUM:
+	       ccv->GrNum = gn;
+	    break;
+
+	    case TimLibCcvMaskGRVAL:
+	       ccv->GrVal = gv;
+	    break;
+
+	    default:
+	    break;
+	 }
+      }
+   }
+   return TimLibErrorSUCCESS;
+}
+
+/* ==================================================================== */
+/* By writing to the driver this call simulates an interrupt for the    */
+/* connected clients. Also it can be used as a way of synchronizing     */
+/* processes, this is especially important in Linux systems where the   */
+/* schedular is not preemptive.                                         */
+
+/* Arguments:                                                                     */
+/*    iclss:   Class of interrupt to simulate, PTIM, CTIM or Hardware             */
+/*    equip:   Equipment number for PTIM or CTIM, hardware mask for Hardware      */
+/*    module:  When class is CTIM or Hardware, the module number is used          */
+/*    machine: Telegram ID is used for PTIM interrupts if grnum is not zero       */
+/*    grnum:   If zero, no telegram checking, else the PTIM triggers group number */
+/*    grval:   The telegram group value for the PTIM trigger                      */
+
+TimLibError Tg8CpsLibSimulate(TimLibClass iclss,
+			      unsigned long equip,
+			      unsigned long module,
+			      TgmMachine machine,
+			      unsigned long grnum,
+			      unsigned long grval) {
+
+// int cc;
+
+   if (tg8cps == 0) return TimLibErrorINIT;
+
+   if (module) {
+      if (ioctl(tg8cps, Tg8DrvrSET_DEFAULT_MODULE, &module)) return TimLibErrorMODULE;
+   }
+   //   iob.SimPulseMask = (1 << (LOW(dtr->address1)-1));
+   //   if (ioctl(tg8,Tg8DrvrSIMULATE_PULSE,&iob) < 0) return TimLibErrorIO;
+
+   return TimLibErrorSUCCESS;
+}
+
+/* ==================================================================== */
+/* Set a counter under full remote control (IE under DSC tasks control) */
+/* This feature permits you to do what you like with counters even if   */
+/* there is no timing cable attached. With this you can drive stepper   */
+/* motors, wire scanners or whatever. No PTIM or CTIM is involved, the  */
+/* configuration is loaded directly by the application. Note that when  */
+/* the argument remflg is set to 1, the counter can not be written to   */
+/* by incomming triggers so all PTIM objects using the counter stop     */
+/* overwriting the counter configuration and are effectivley disabled.  */
+/* Setting the remflg 0 permits PTIM triggers to write to the counter   */
+/* configuration, the write block is removed. Also note that in some    */
+/* cases it is useful to perform remote actions, such as remoteSTOP,    */
+/* even if the remflg is set to zero. The remflg simply blocks PTIM     */
+/* overwrites, the counter configuration can still be accessed !        */
+
+TimLibError Tg8CpsLibRemoteControl(unsigned long remflg, /* 0 = Normal, 1 = Remote */
+				   unsigned long module, /* Module or zero */
+				   unsigned long cntr,   /* 1..8 counter number */
+				   TimLibRemote rcmd,    /* Command */
+				   TimLibCcvMask ccvm,   /* Fields to be set */
+				   TimLibCcv * ccv) {    /* Value to load in counter */
+
+   return TimLibErrorNOT_IMP;
+}
+
+/* ==================================================================== */
+/* Get a counters remote configuration                                  */
+
+TimLibError Tg8CpsLibGetRemote(unsigned long module,
+			       unsigned long cntr,
+			       unsigned long *remflg,
+			       TimLibCcvMask *ccvm,
+			       TimLibCcv     *ccv) {
+
+   return TimLibErrorNOT_IMP;
+}
+
+/* ==================================================================== */
+/* Read the instantaneous value of the time in UTC. The module parameter*/
+/* can be set to zero in which case the system decideds which module to */
+/* read the time from, otherwise it can be set to a value between 1 and */
+/* the number of installed modules.                                     */
+
+TimLibError Tg8CpsLibGetTime(unsigned long module, /* Module number to read from */
+			     TimLibTime *utc) {    /* Returned time value */
+Tg8DateTime *dt;
+Tg8DrvrRawStatus *rwst;
+Tg8ModuleAddress *moad;
+struct tm mtm;
+time_t tod;
+
+   if (tg8cps == 0) return TimLibErrorINIT;
+   if (module) if (ioctl(tg8cps, Tg8DrvrSET_DEFAULT_MODULE, &module)) return TimLibErrorMODULE;
+   if (ioctl(tg8cps, Tg8DrvrDATE_TIME, &iob) < 0) return TimLibErrorIO;
+   dt = &iob.DateTime;
+
+   mtm.tm_sec   = UBCD(dt->aSecond);
+   mtm.tm_min   = UBCD(dt->aMinute);
+   mtm.tm_hour  = UBCD(dt->aHour);
+   mtm.tm_mday  = UBCD(dt->aDay);
+   mtm.tm_mon   = UBCD(dt->aMonth) - 1;
+   mtm.tm_year  = UBCD(dt->aYear) + 100;
+   mtm.tm_isdst = 0;
+   tod = TgmMkGmtTime(&mtm);
+   utc->Second = (unsigned long) tod;
+   utc->Nano = dt->aMilliSecond * 1000000;
+
+   if (ioctl(tg8cps, Tg8DrvrGET_CONFIGURATION, &iob) < 0) return TimLibErrorIO;
+   if (module) moad = &iob.GetConfig.Addresses[module - 1];
+   else        moad = &iob.GetConfig.Addresses[0];
+   utc->Machine = moad->Machine;
+
+   if (ioctl(tg8cps, Tg8DrvrGET_RAW_STATUS, &iob) < 0) return TimLibErrorIO;
+   rwst = &iob.RawStatus;
+   utc->CTrain = rwst->Sb.ScTime;
+
+   return TimLibErrorSUCCESS;
+}
+
+/* ==================================================================== */
+/* Read a machines telegram from a timing receiver. The module can be   */
+/* either zero, in which case the system decides which device to use,   */
+/* or it can be explicitly set between 1 and the number of installed    */
+/* modules. The telegram object returned has an opaque structure and    */
+/* can only be decoded through the Tgm library routine .....            */
+
+/* unsigned long grval = TgmGetGroupValueFromTelegram(TgmMachine    machine,   */
+/*                                                    unsigned long grnum,     */
+/*                                                    TgmTelegram   *telegram) */
+
+/* WARNING: The only task that should call this routine will be, get_tgm_lib,  */
+/* all other, LOWER PRIORITY tasks must NEVER call this routine, instead they  */
+/* should call the telegram library directly like this ...                     */
+
+/* TgmTelegram telegram;                                                       */
+/*                                                                             */
+/* if (TgmGetTelegram(machine, index, offset, &telegram) == TgmSUCCESS) { ...  */
+/*                                                                             */
+/* For more information on this function see the Tgm library man pages.        */
+
+TimLibError Tg8CpsLibGetTelegram(unsigned long module,
+				 TgmMachine    machine,
+				 TgmPTelegram  *telegram) {
+
+Tg8DrvrTelegramBlock tbk;
+int i;
+
+   if (tg8cps == 0) return TimLibErrorINIT;
+   if (module) {
+      if (ioctl(tg8cps, Tg8DrvrSET_DEFAULT_MODULE, &module)) return TimLibErrorMODULE;
+   }
+   //tbk.Machine = machine;
+   tbk.Machine = TgvTgmToMtgvMachine(machine);
+   if (ioctl(tg8cps, Tg8DrvrTELEGRAM, &tbk) < 0) return TimLibErrorIO;
+   telegram->Size = TgmLastGroupNumber(machine);
+   telegram->Machine = machine;
+   for (i = 0; i < telegram->Size; i++) {
+      TgmSetGroupValueInTelegram(i + 1, (long) tbk.Data[i], (TgmTelegram *) telegram);
+   }
+
+   return TimLibErrorSUCCESS;
+}
+
+/* ==================================================================== */
+/* Get the description of a given PTIM equipment. The dimension returns */
+/* the PPM dimension, counter and module are obvious.                   */
+
+TimLibError Tg8CpsLibGetPtimObject(unsigned long ptim,	/* PTIM equipment number */
+				   unsigned long *module,
+				   unsigned long *counter,
+				   unsigned long *dimension) {
+int i, cw, ch;
+Tg8DrvrObjectDescriptor obd;
+Tg8ObjectLine oln;
+Tg8DrvrBindMtgEvent *eb;
+
+   if (tg8cps == 0) return TimLibErrorINIT;
+
+   bzero((void *) &iob, sizeof(Tg8IoBlock));
+   iob.BindEvents.Length = Tg8BINDINGS;
+   if (ioctl(tg8cps, Tg8DrvrGET_BINDINGS, &iob) < 0) return TimLibErrorIO;
+
+   for (i = 0; i < iob.BindEvents.Length; i++) {
+      eb = &(iob.BindEvents.Table[i]);
+      if (ptim == eb->Id) return TimLibErrorPTIM;
+   }
+
+   bzero((void *) &obd, sizeof(Tg8DrvrObjectDescriptor));
+   obd.Object.Id = ptim;
+   if (ioctl(tg8cps, Tg8DrvrGET_OBJECT, &obd) < 0) return TimLibErrorPTIM;
+
+   oln = obd.Object.Lines[0];
+   cw = oln.Cw;
+   ch = Tg8CW_CNT_Get(cw);
+
+   //ch = (cw >> Tg8CW_CNT_BITN) & Tg8CW_CNT_BITM;
+
+   if (ch == 0) ch = 8;
+
+   if (module)    *module = obd.Object.Module;
+   if (counter)   *counter = ch;
+   if (dimension) *dimension = obd.Dim;
+
+   return TimLibErrorSUCCESS;
+}
+
+/* ==================================================================== */
+/* Get the event code corresponding to a given CTIM equipment number.   */
+
+TimLibError Tg8CpsLibGetCtimObject(unsigned long ctim,	/* CTIM equipment number */
+				   unsigned long *eventcode) {
+
+Tg8DrvrBindMtgEvent *eb;
+int i;
+
+   if (tg8cps == 0) return TimLibErrorINIT;
+   bzero((void *) &iob, sizeof(Tg8IoBlock));
+   iob.BindEvents.Length = Tg8BINDINGS;
+   if (ioctl(tg8cps, Tg8DrvrGET_BINDINGS, &iob) < 0) return TimLibErrorIO;
+
+   for (i = 0; i < iob.BindEvents.Length; i++) {
+      eb = &(iob.BindEvents.Table[i]);
+      if (ctim == eb->Id) {
+	 if (eventcode) *eventcode = (unsigned long) eb->Event.Long;
+	 return TimLibErrorSUCCESS;
+      }
+   }
+   return TimLibErrorCTIM;
+}
+
+/* ==================================================================== */
+/* In some cases when running a GUI under Linux, say, a file handle to  */
+/* put in a "select" is needed so that one can wait on multiple file    */
+/* handles simultaneously. This routine returns such a handle suitable  */
+/* to check for waiting interrupts. Do not read directly from it, but   */
+/* call the wait routine. The queue flag must be on for this to work !! */
+
+TimLibError Tg8CpsLibGetHandle(int *fd) {
+
+   if (tg8cps == 0) return TimLibErrorINIT;
+   *fd = tg8cps;
+   return TimLibErrorSUCCESS;
+}
+
+/* ==================================================================== */
+/* Create a new PTIM object, the CCV settings will be defaulted.        */
+
+TimLibError Tg8CpsLibCreatePtimObject(unsigned long ptim,	/* PTIM equipment number */
+				      unsigned long module,
+				      unsigned long counter,
+				      unsigned long dimension) {
+Tg8DrvrObject ob;
+/* Tg8DrvrObjectsList obl; */
+Tg8ObjectLine *olp;
+int str, chn, clk, i /* , j, nid, maxobs */ ;
+TimLibError err;
+
+   err = CheckClass(TimLibClassPTIM,ptim); if (err) return err;
+
+   bzero((void *) &ob, sizeof(Tg8DrvrObject));
+   ob.Id     = (unsigned int) ptim;
+   ob.Module = (unsigned char) module;
+   ob.Dim    = (unsigned char) dimension;
+   chn       = counter;
+
+   /* edit the actions with some initial values which will be overwritten by TimLibSet */
+
+   for (i = 0; i < dimension; i++) {
+      olp = &(ob.Lines[i]);	/* get action */
+      olp->TriggerId = 200;	/* set RPLS as load */
+      olp->Cw = (Tg8DO_OUTPUT << Tg8CW_INT_BITN);	/* produce output */
+      str = Tg8CM_NORMAL;
+      Tg8CW_START_Set(olp->Cw, str);	/* set start mode */
+      clk = Tg8CLK_MILLISECOND;
+      Tg8CW_CLOCK_Set(olp->Cw, clk);	/* set clock */
+      Tg8CW_CNT_Set(olp->Cw, chn);	/* set channel */
+      olp->Delay = 1;		/* set delay */
+   }
+
+   if (ioctl(tg8cps, Tg8DrvrCREATE_OBJECT, &ob) < 0) return TimLibErrorIO;
+
+   /* bzero ((void *) &iob, sizeof (Tg8IoBlock));
+      iob.ObjectsList.Length = MAX_OB_LIST;
+      if (ioctl (tg8cps, Tg8DrvrOBJECTS_LIST, &iob) < 0) return TimLibErrorIO;
+
+      for (i = 0; i < iob.ObjectsList.Length; i++) {
+      nid = iob.ObjectsList.Id[i];
+      bzero ((void *) &obl, sizeof (Tg8DrvrObjectsList));
+      obl.Length = Tg8DrvrOBJECTS;
+      obl.Id[0] = nid;
+      if (ioctl (tg8cps, Tg8DrvrGET_MEMBER_IDS, &obl) < 0) return TimLibErrorIO;
+
+      if (nid < 0) {
+	 if (nid != obl.Id[0])
+	 for (j = 0; j < obl.Length; j++)
+	 objects[maxobs++] = obl.Id[j];
+      } else if (nid > 999)
+	 objects[maxobs++] = nid;
+      } */
+
+   return TimLibErrorSUCCESS;
+}
+
+/* ==================================================================== */
+/* Create a new CTIM object. If a payload is to be used for this event  */
+/* be sure to set the low 16-Bits to 0xFFFF                             */
+
+TimLibError Tg8CpsLibCreateCtimObject(unsigned long ctim,	/* CTIM equipment number */
+				      unsigned long eventcode) {
+
+Tg8DrvrBindMtgEvent *eb, *ebn;
+Tg8DrvrEventBinding binds;
+int i;
+
+   if ((ctim == 0) || (ctim > CTIM_PTIM_BOUNDARY))
+      return TimLibErrorCTIM;
+
+   bzero((void *) &binds, sizeof(Tg8DrvrEventBinding));
+   binds.Length = Tg8BINDINGS;
+   if (ioctl(tg8cps,Tg8DrvrGET_BINDINGS,&binds) < 0) return TimLibErrorIO;
+
+   if (binds.Length) {
+      ebn = NULL;
+      for (i=0; i<binds.Length; i++) {
+	 eb = &(binds.Table[i]);
+	 if ((ebn == NULL) && (eb->Event.Long == 0)) ebn = eb;
+	 else if (eb->Id == ctim) {
+	    if (eb->Event.Long == (long) eventcode) return TimLibErrorEXISTS;
+
+	    /* Change the event code */
+
+	    eb->Event.Long = (long) eventcode;
+	    if (ioctl(tg8cps,Tg8DrvrBIND_MTG_EVENTS,&binds) < 0)
+	       return TimLibErrorIO;
+	    return TimLibErrorSUCCESS;
+	 }
+      }
+
+      /* It didn't exist so create a new CTIM in the empty hole */
+
+      if (ebn) {
+	 ebn->Id = ctim;
+	 ebn->Event.Long = (long) eventcode;
+	 if (ioctl(tg8cps,Tg8DrvrBIND_MTG_EVENTS,&binds) < 0)
+	    return TimLibErrorIO;
+	 return TimLibErrorSUCCESS;
+      }
+
+      return TimLibErrorNOMEM; /* Can't extend binding table after created */
+   }
+
+   /* No bindings; so create a new binding table for the first time */
+
+   binds.Length = timlib_ctims; /* Default value set in TimLib.c */
+   eb = &(binds.Table[0]);
+   eb->Id = ctim;
+   eb->Event.Long = (long) eventcode;
+   if (ioctl(tg8cps,Tg8DrvrBIND_MTG_EVENTS,&binds) < 0)
+      return TimLibErrorIO;
+
+   return TimLibErrorSUCCESS;
+}
+
+/*
+ * ==================================================================== 
+ * Get the cable identifier to which a given module is attached so that
+ * the correct module can be used to read telegrams. This function will
+ * be used by the program get_tgm_tim only; it is of no interest to the
+ * majority of clients because calls to ReadTelegram are diverted.
+ */
+
+TimLibError Tg8CpsLibGetCableId(unsigned long module,	/* The given module */
+				unsigned long *cable) { /* The cable ID */
+
+Tg8ModuleAddress *moad;
+int i;
+
+   if (tg8cps == 0) return TimLibErrorINIT;
+   if ((module < 1) || (module > Tg8DrvrMODULES)) return TimLibErrorMODULE;
+   if (ioctl(tg8cps, Tg8DrvrGET_CONFIGURATION, &iob) < 0) return TimLibErrorIO;
+   i = module - 1;
+   moad = &iob.GetConfig.Addresses[i];
+   if (!moad->VMEAddress) return TimLibErrorMODULE;
+   *cable = moad->CableId;
+   return TimLibErrorSUCCESS;
+}
+
+/* ==================================================================== */
+/* Get the list of all defined PTIM objects                             */
+
+#define MAX_LIST_SIZE 1024
+
+TimLibError Tg8CpsLibGetAllPtimObjects(unsigned long *ptimlist,  /* List of ptim equipments */
+				       unsigned long *psize,     /* Number of ptims in list */
+				       unsigned long size) {     /* Max size of list */
+
+Tg8IoBlock iob;
+int i, ix;
+
+   bzero ((void *) &iob, sizeof (Tg8IoBlock));
+   if (size > MAX_LIST_SIZE) size = MAX_LIST_SIZE;
+   iob.ObjectsList.Length = size;
+   if (ioctl (tg8cps, Tg8DrvrOBJECTS_LIST, &iob) < 0) return TimLibErrorIO;
+   for (ix=0,i=0; i<iob.ObjectsList.Length; i++) {
+      if (ix >= size) break;
+      if (iob.ObjectsList.Id[i] >= CTIM_PTIM_BOUNDARY) {
+	 ptimlist[ix++] = iob.ObjectsList.Id[i];
+      }
+   }
+   if (psize) *psize = ix;
+   return TimLibErrorSUCCESS;
+}
+
+/* ==================================================================== */
+/* Get the list of all defined CTIM objects                             */
+
+TimLibError Tg8CpsLibGetAllCtimObjects(unsigned long *ctimlist,  /* List of ctim equipments */
+				       unsigned long *csize,     /* Number of ctims in list */
+				       unsigned long size) {     /* Max size of list */
+
+Tg8DrvrBindMtgEvent *eb;
+Tg8DrvrEventBinding binds;
+int i;
+
+   if (size > Tg8BINDINGS) size = Tg8BINDINGS;
+   binds.Length = size;
+   if (ioctl(tg8cps,Tg8DrvrGET_BINDINGS,&binds) < 0) return TimLibErrorIO;
+   for (i=0; i<binds.Length; i++) {
+      eb = &(binds.Table[i]);
+      ctimlist[i] = eb->Id;
+      *csize = i+1;
+   }
+   return TimLibErrorSUCCESS;
+}
+
+/* ==================================================================== */
+/* Get VHDL/Firmware version of all modules, and the correct version.   */
+
+static char *mnm[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+			"Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
+TimLibError Tg8CpsLibGetModuleVersion(TimLibModuleVersion *tver) {
+
+struct tm stoy;
+time_t toy;
+char dver[64], *cp, *ep;
+int i, cnt, m;
+
+   if (tver == NULL) return TimLibErrorNOMEM;
+   bzero((void *) tver, sizeof(TimLibModuleVersion));
+
+   tver->ModTyp = TimLibModuleTypeCPS_TG8;
+
+   if (ioctl(tg8cps, Tg8DrvrGET_DRI_VERSION, &dver) < 0) return TimLibErrorIO;
+
+   /* Decode: mmm dd yyyy hh:mm:ss */
+   /*         01234567890123456789 */
+
+   bzero((void *) &stoy, sizeof(struct tm));
+
+   for (i=0; i<12; i++) {
+      if (strncmp(dver,mnm[i],3)==0) {
+	 stoy.tm_mon = i;
+	 break;
+      }
+   }
+
+   cp = &dver[4];
+   stoy.tm_mday = strtoul(cp,&ep,10);
+   cp = &dver[7];
+   stoy.tm_year = strtoul(cp,&ep,10) - 1900;
+   cp = &dver[12];
+   stoy.tm_hour = strtoul(cp,&ep,10);
+   cp = &dver[15];
+   stoy.tm_min = strtoul(cp,&ep,10);
+   cp = &dver[18];
+   stoy.tm_sec = strtoul(cp,&ep,10);
+
+   toy = mktime(&stoy);
+   tver->DrvVer = toy;
+
+   cnt = Tg8CpsLibGetInstalledModuleCount();
+   for (m=1; m<=cnt; m++) {
+      if (ioctl(tg8cps, Tg8DrvrSET_DEFAULT_MODULE, &m)) return TimLibErrorMODULE;
+      if (ioctl(tg8cps, Tg8DrvrGET_FIRMWARE_VERSION, &dver) < 0) return TimLibErrorIO;
+
+      bzero((void *) &stoy, sizeof(struct tm));
+
+      for (i=0; i<12; i++) {
+	 if (strncmp(dver,mnm[i],3)==0) {
+	    stoy.tm_mon = i;
+	    break;
+	 }
+      }
+
+      cp = &dver[4];
+      stoy.tm_mday = strtoul(cp,&ep,10);
+      cp = &dver[7];
+      stoy.tm_year = strtoul(cp,&ep,10) - 1900;
+
+      toy = mktime(&stoy);
+      tver->ModVer[m-1] = toy;
+   }
+   tver->CorVer = toy;
+
+   return TimLibErrorSUCCESS;
+}
+
+/* ==================================================================== */
+/* Get specific information string                                      */
+/* There is some very specific module dependent status information.     */
+/* This routine returns a free format human readable string containing  */
+/* specific status information that may help diagnosing problems for a  */
+/* timing receiver module. A null pointer can be returned if the module */
+/* is either dead or not installed.                                     */
+
+/* Software status */
+
+#define SSBITS 11
+
+static char *sson[SSBITS] = {
+   "Enb",        "FwLoad",     "AcLd",   "FwRun",
+   "FwEr",       "HwEr",       "ExtClk", "TimeOut",
+   "SelfTestIn", "SelfTestEr", "DpramEr"
+ };
+
+static char *ssof[SSBITS] = {
+   "Dis",        "NoRply", "NoAc",     "",
+   "",           "HwOK",   "10MhzClk", "",
+   "NoSelfTest", "",       ""
+ };
+
+/* Xylinx status */
+
+#define XSBITS 8
+
+char *xson[XSBITS] = {
+   "DtOverER", "ParityER", "EndSqER",       "MidBitER",
+   "StrtSqER", "XrDisb",   "MSecMissingER", "WatchDogER"
+ };
+
+char *xsof[XSBITS] = {
+   "", "", "", "", "", "XrEnab", "MSecOK", ""
+ };
+
+/* Hardware status */
+
+#define HSBITS 16
+
+char *hson[HSBITS] = {
+   "IntCh1", "IntCh2", "IntCh3",       "IntCh4",
+   "IntCh5", "IntCh6", "IntCh7",       "IntCh8",
+   "IntDPm", "RecEnb", "WaitDownLoad", "",
+   "",       "",       "ExClk",        "SelfTestER"
+ };
+
+char *hsof[HSBITS] = {
+   "", "", "", "", "", "", "", "",
+   "", "RecDis", "", "XRER", "X1ER", "X2ER", "IntClk", ""
+ };
+
+/* Alarm status */
+
+#define ASBITS 16
+
+char *ason[ASBITS] = {
+
+   "",                         /* 01/0x01    Not used */
+   "LostIntIA",                /* 02/0x02    The immediate action's interrupt was lost */
+
+   /* This often simply means the start or clock was missing, it occurs */
+   /* when the counter is reloaded before it has made an output. Hence  */
+   /* this alarm often occurs in normal operation, and is not serious.  */
+
+   "LostOutPt",                /* 03/0x04    The counter pulse was lost */
+
+   "UserQFull",                /* 04/0x08    The UT processes queue is full */
+   "OverWork",                 /* 05/0x10    Too many Machine/Group combinations */
+   "TrainCut",                 /* 06/0x20    Train was terminated by the next trigger */
+   "NoMemMltP",                /* 07/0x40    No space for multipulse list */
+
+   /* The firmware did not have enough time to launch all actions and  */
+   /* process all Aqn TPU interrups before the ms tick arrived. Usualy */
+   /* not soo bad, its only the aqn that is wrong.                     */
+
+   "OverLoad",                 /* 08/0x80    The UT process is not completed before the next ms */
+
+   "ImActMovd",                /* 09/0x100   The immediate interrupts where moved */
+   "XRecError",                /* 10/0x200   XILINX Receiver error detected */
+   "ImActQFl",                 /* 11/0x400   Immediate actions queue overflowed */
+   "MBoxBusy",                 /* 12/0x800   The mailbox busy, but there is the new request */
+   "BadCntInt",                /* 13/0x1000  A counter gives the VME interrupt without the appropriate data in the Interrupt Table. */
+   "DrvrSlowI",                /* 14/0x2000  Interrupt info was lost due to the driver is too busy */
+   "BadSwitch",                /* 15/0x4000  The switch is in bad position */
+
+   /* The firmware recalculates a checksum continuously to monitor    */
+   /* itself, if the checksum check fails, the firmware is corrupted  */
+   /* interrupts are switched off, and the mail box routines remain   */
+   /* alive for memory examination purposes. Experts only. This next  */
+   /* alarm thus is very bad, hardware or software design error.      */
+
+   "BadChkSum",                /* 16/0x8000  Very bad ie 68332 Memory corrupted fatal */
+ };
+
+char *asof[ASBITS] = {
+   "", "", "", "",
+   "", "", "", "",
+   "", "", "", "",
+   "", "", "", ""
+ };
+
+/* ===================== */
+/* Build a status string */
+/* ===================== */
+
+static char ststr[256];
+
+char *BuildStStr (int st, char **on, char **of, int bits) {
+
+int bn, bv;
+char bs[16];
+
+   bzero ((void *) ststr, 256);
+
+   for (bn = 0; bn < bits; bn++) {
+      bv = 1 << bn;
+      if (st & bv)
+	 sprintf (bs, "+%s ", on[bn]);
+      else
+	 sprintf (bs, "-%s ", of[bn]);
+      strcat (ststr, bs);
+   }
+   return (ststr);
+}
+
+/* ==================================================================== */
+
+char *Tg8CpsLibGetSpecificInfo(unsigned long module) { /* The given module */
+
+#define RESLN 1024
+#define TMPLN 512
+static char res[RESLN];
+
+Tg8DrvrRawStatus raw;
+Tg8IoBlock iob;
+unsigned long stat;
+char tmp[TMPLN];
+
+   if (module)
+      if (ioctl(tg8cps, Tg8DrvrSET_DEFAULT_MODULE, &module) < 0)
+	 return NULL;
+
+   if (ioctl(tg8cps,Tg8DrvrGET_STATUS,&iob) < 0)
+      return NULL;
+
+   sprintf(res,"\nFirmware Parameters Module:%d\n",(int) module);
+
+   stat = iob.Status.Status;
+   BuildStStr (stat, sson, ssof, SSBITS);
+   sprintf(tmp,"Software: %04X: %s\n", (int) stat, ststr);
+   strcat(res,tmp);
+
+   stat = iob.Status.Alarms;
+   BuildStStr(stat, ason, asof, ASBITS);
+   sprintf(tmp,"FwAlarms: %04X: %s\n", (int) stat, ststr);
+   strcat(res,tmp);
+
+   if (ioctl(tg8cps,Tg8DrvrGET_RAW_STATUS,&raw) < 0) return res;
+
+   stat = raw.Sb.Hw;
+   BuildStStr(stat, hson, hsof, HSBITS);
+   sprintf(tmp,"Hardware: %04X: %s\n", (int) stat, ststr);
+   strcat(res,tmp);
+
+   stat = raw.Sb.Dt.aRcvErr;
+   BuildStStr (stat, xson, xsof, XSBITS);
+   sprintf(tmp,"XylnxRec: %04X: %s\n", (int) stat, ststr);
+   strcat(res,tmp);
+
+   stat = raw.Res.FaultType;
+   if (stat) {
+      sprintf(tmp,"SelfTest: %04X: Failed self test\n", (int) stat);
+      strcat(res,tmp);
+   }
+
+   return res;
+}
+
+/* ==================================================================== */
+/* Get the module statistics for the given module                       */
+
+TimLibError Tg8CpsLibGetModuleStats(unsigned long module,
+				    TimLibModuleStats *stats) {
+   return TimLibErrorNOT_IMP;
+}
+
+/* ==================================================================== */
+/* Control how the PLL locks after synchronization loss                 */
+
+TimLibError Tg8CpsLibSetPllLocking(unsigned long module,
+				   unsigned long lockflag) { /* 0=> Brutal, else Slow */
+   return TimLibErrorNOT_IMP;
+}
+
+/* ==================================================================== */
+
+TimLibError Tg8CpsLibConnectPayload(unsigned long ctim,        /* The CTIM ID you want to connect to */
+				    unsigned long payload,     /* The 16 bit payload in a long */
+				    unsigned long module) {    /* The module, or zero means don't care */
+   return TimLibErrorNOT_IMP;
+}
+
+/* ==================================================================== */
+/* If its not on a power PC, then there is no VME, and no TG8. So just  */
+/* return Not Implemented everywhere!!                                  */
+/* ==================================================================== */
+
+#else
+TimLibError Tg8CpsLibInitialize(TimLibDevice device) { return TimLibErrorNOT_IMP; }
+int         Tg8CpsLibFdInitialize(TimLibDevice device) { return 0; }
+TimLibError Tg8CpsLibConnect(TimLibClass iclss,
+			     unsigned long equip,
+			     unsigned long module) { return TimLibErrorNOT_IMP; }
+TimLibError Tg8CpsLibFdConnect(int fd,
+			       TimLibClass iclss,
+			       unsigned long equip,
+			       unsigned long module) { return TimLibErrorNOT_IMP; }
+TimLibError Tg8CpsLibDisConnect(TimLibClass iclss,
+				unsigned long equip,
+				unsigned long module) { return TimLibErrorNOT_IMP; }
+TimLibError Tg8CpsLibQueue(unsigned long qflag,
+			   unsigned long tmout) { return TimLibErrorNOT_IMP; }
+TimLibError Tg8CpsLibFdQueue(int fd,
+			     unsigned long qflag,
+			     unsigned long tmout) { return TimLibErrorNOT_IMP; }
+unsigned long Tg8CpsLibGetQueueSize() { return 0; }
+TimLibError Tg8CpsLibWait(TimLibClass * iclss,
+			  unsigned long *equip,
+			  unsigned long *plnum,
+			  TimLibHardware * source,
+			  TimLibTime * onzero,
+			  TimLibTime * trigger,
+			  TimLibTime * start,
+			  unsigned long *ctim,
+			  unsigned long *payload,
+			  unsigned long *module,
+			  unsigned long *missed,
+			  unsigned long *qsize) { return TimLibErrorNOT_IMP; }
+TimLibError Tg8CpsLibFdWait(int fd,
+			    TimLibClass * iclss,
+			    unsigned long *equip,
+			    unsigned long *plnum,
+			    TimLibHardware * source,
+			    TimLibTime * onzero,
+			    TimLibTime * trigger,
+			    TimLibTime * start,
+			    unsigned long *ctim,
+			    unsigned long *payload,
+			    unsigned long *module,
+			    unsigned long *missed,
+			    unsigned long *qsize) { return TimLibErrorNOT_IMP; }
+TimLibError Tg8CpsLibSet(unsigned long ptim,
+			 unsigned long plnum,
+			 unsigned long grnum,
+			 unsigned long grval,
+			 TimLibCcvMask ccvm,
+			 TimLibCcv * ccv) { return TimLibErrorNOT_IMP; }
+TimLibError Tg8CpsLibGet(unsigned long ptim,
+			 unsigned long plnum,
+			 unsigned long grnum,
+			 unsigned long grval,
+			 TimLibCcvMask * ccvm,
+			 TimLibCcv * ccv) { return TimLibErrorNOT_IMP; }
+TimLibError Tg8CpsLibSimulate(TimLibClass iclss,
+			      unsigned long equip,
+			      unsigned long module,
+			      TgmMachine machine,
+			      unsigned long grnum,
+			      unsigned long grval) { return TimLibErrorNOT_IMP; }
+TimLibError Tg8CpsLibRemoteControl(unsigned long remflg,
+				   unsigned long module,
+				   unsigned long cntr,
+				   TimLibRemote rcmd,
+				   TimLibCcvMask ccvm,
+				   TimLibCcv * ccv) { return TimLibErrorNOT_IMP; }
+TimLibError Tg8CpsLibGetRemote(unsigned long module,
+			       unsigned long cntr,
+			       unsigned long *remflg,
+			       TimLibCcvMask *ccvm,
+			       TimLibCcv     *ccv) { return TimLibErrorNOT_IMP; }
+
+TimLibError Tg8CpsLibGetTime(unsigned long module,
+			     TimLibTime * utc) { return TimLibErrorNOT_IMP; }
+TimLibError Tg8CpsLibGetTelegram(unsigned long module,
+				 TgmMachine machine,
+				 TgmTelegram * telegram) { return TimLibErrorNOT_IMP; }
+TimLibError Tg8CpsLibGetPtimObject(unsigned long ptim,
+				   unsigned long *module,
+				   unsigned long *counter,
+				   unsigned long *dimension) { return TimLibErrorNOT_IMP; }
+TimLibError Tg8CpsLibGetCtimObject(unsigned long ctim,
+				   unsigned long *eventcode) { return TimLibErrorNOT_IMP; }
+TimLibError Tg8CpsLibGetHandle(int *fd) { return TimLibErrorNOT_IMP; }
+TimLibError Tg8CpsLibCreatePtimObject(unsigned long ptim,
+				      unsigned long module,
+				      unsigned long counter,
+				      unsigned long dimension) { return TimLibErrorNOT_IMP; }
+TimLibError Tg8CpsLibCreateCtimObject(unsigned long ctim,
+				      unsigned long eventcode) { return TimLibErrorNOT_IMP; }
+unsigned long Tg8CpsLibGetInstalledModuleCount() { return 0; }
+TimLibError Tg8CpsLibGetCableId(unsigned long module,
+				unsigned long *cable) { return TimLibErrorNOT_IMP; }
+
+TimLibError Tg8CpsLibGetAllPtimObjects(unsigned long *ptimlist,  /* List of ptim equipments */
+				    unsigned long *ptims,     /* Number of ptims in list */
+				    unsigned long size) {     /* Max size of list */
+
+   return TimLibErrorNOT_IMP;
+}
+
+TimLibError Tg8CpsLibGetAllCtimObjects(unsigned long *ctimlist,  /* List of ctim equipments */
+				    unsigned long *ctims,     /* Number of ctims in list */
+				    unsigned long size) {     /* Max size of list */
+
+   return TimLibErrorNOT_IMP;
+}
+
+TimLibStatus Tg8CpsLibGetStatus(unsigned long module, TimLibDevice *dev) {
+
+   return TimLibErrorNOT_IMP;
+}
+
+TimLibError Tg8CpsLibGetModuleVersion(TimLibModuleVersion *version) {
+
+   return TimLibErrorNOT_IMP;
+}
+
+char *Tg8CpsLibGetSpecificInfo(unsigned long module) { /* The given module */
+
+   return NULL;
+}
+
+TimLibError Tg8CpsLibGetModuleStats(unsigned long module,
+				    TimLibModuleStats *stats) {
+   return TimLibErrorNOT_IMP;
+}
+
+TimLibError Tg8CpsLibSetPllLocking(unsigned long module,
+				   unsigned long lockflag) { /* 0=> Brutal, else Slow */
+   return TimLibErrorNOT_IMP;
+}
+
+TimLibError Tg8CpsLibConnectPayload(unsigned long ctim,        /* The CTIM ID you want to connect to */
+				    unsigned long payload,     /* The 16 bit payload in a long */
+				    unsigned long module) {    /* The module, or zero means don't care */
+   return TimLibErrorNOT_IMP;
+}
+#endif
+@
+
+
+1.56
+log
+@Added PLL lock control entries as unimplemented
+@
+text
+@d1596 8
+d1743 5
+@
+
+
+1.55
+log
+@Better way to do FdInit
+@
+text
+@d1580 16
+d1725 10
+@
+
+
+1.54
+log
+@Added Thread support via File Descriptor FD extra parameter
+@
+text
+@d163 1
+a163 2
+int  fd;
+char dver[64];
+d165 4
+a168 13
+   fd = 0;
+   if ((device == TimLibDevice_ANY)
+   ||  (device == TimLibDevice_TG8_CPS)) fd = Tg8CpsFdOpen();
+   if (fd == 0) return 0;
+
+   if (ioctl(fd, Tg8DrvrGET_DRI_VERSION, &dver) < 0) {
+      close(fd);
+      return 0;
+   }  
+   
+   if  (strlen(dver) < (strlen(__DATE__) + 4)) {
+      close(fd);
+      return 0;
+d170 1
+a170 2
+
+   return fd;
+@
+
+
+1.53
+log
+@Added Extra info implementation
+@
+text
+@d49 1
+a51 1
+
+d64 13
+d160 24
+d257 18
+d311 9
+d473 115
+d1597 1
+d1601 4
+d1610 3
+d1626 13
+@
+
+
+1.52
+log
+@Added specific info
+@
+text
+@d1239 121
+d1362 47
+a1408 1
+   return NULL;
+@
+
+
+1.51
+log
+@*** empty log message ***
+@
+text
+@d1232 13
+d1348 5
+@
+
+
+1.50
+log
+@Implemented GetModuleVersion
+@
+text
+@d1181 2
+a1199 1
+   stoy.tm_isdst = 0;
+d1208 3
+a1221 3
+      stoy.tm_hour = 0;
+      stoy.tm_min  = 0;
+      stoy.tm_sec  = 0;
+@
+
+
+1.49
+log
+@Added GetModuleVersion
+@
+text
+@d252 1
+a252 1
+   if (tmout) return TimLibErrorTIMEOUT;
+d1161 60
+a1220 1
+TimLibError Tg8CpsLibGetModuleVersion(TimLibModuleVersion *version) {
+d1222 4
+a1225 1
+   return TimLibErrorNOT_IMP;
+d1227 1
+@
+
+
+1.48
+log
+@Event time in TimLibWait will work when new tg8 driver is installed
+@
+text
+@d1159 9
+d1266 5
+@
+
+
+1.47
+log
+@DisConnect
+@
+text
+@d324 3
+d331 5
+a335 2
+   if (ioctl(tg8cps, Tg8DrvrDATE_TIME, &iob) < 0) return TimLibErrorIO;
+   bcopy((void *) &(iob.DateTime), (void *) &dt, sizeof(Tg8DateTime));
+a358 3
+      dt.aMinute = ev.Inter.iMin;
+      dt.aSecond = ev.Inter.iSec;
+      dt.aMilliSecond = ev.Inter.iMs;
+@
+
+
+1.46
+log
+@VME is not dependant from Linux but PowerPC
+@
+text
+@d221 21
+d1165 3
+@
+
+
+1.45
+log
+@Added GetQueueSize
+@
+text
+@d30 1
+a30 1
+#ifndef __linux__
+@
+
+
+1.44
+log
+@Back to 2000
+@
+text
+@d236 15
+d1146 1
+@
+
+
+1.43
+log
+@Change CTIM/PTIM boundary from 2000 to 2500
+@
+text
+@d26 1
+d69 1
+a69 1
+#define CTIM_PTIM_BOUNDARY 2500
+@
+
+
+1.42
+log
+@Problem with TimTags fo PTIM and the machine
+@
+text
+@d24 2
+d68 1
+a68 1
+#define CTIM_PTIM_BOUNDARY 2000
+@
+
+
+1.41
+log
+@Changed CTIM_PTIM_BOUNDARY from 2500 to 2000
+Warning some CTIMS in the CTF are bigger than 2000
+@
+text
+@a290 3
+   dt.aMinute = ev.Inter.iMin;
+   dt.aSecond = ev.Inter.iSec;
+   dt.aMilliSecond = ev.Inter.iMs;
+a301 1
+      mch = TgvMtgvToTgmMachine(obd.Object.Machine);
+d303 1
+d314 3
+@
+
+
+1.40
+log
+@Bug in Get Set, forgot to set the module before reading action table
+@
+text
+@d66 1
+a66 1
+#define CTIM_PTIM_BOUNDARY 2500
+@
+
+
+1.39
+log
+@Added 68k support
+@
+text
+@d389 1
+a389 1
+unsigned long msk;
+d410 6
+d561 1
+a561 1
+unsigned long msk;
+d577 6
+@
+
+
+1.38
+log
+@*** empty log message ***
+@
+text
+@d27 1
+a27 1
+#ifdef __powerpc__
+@
+
+
+1.37
+log
+@Payload logic didnt work, now I read history.
+@
+text
+@d22 2
+@
+
+
+1.36
+log
+@*** empty log message ***
+@
+text
+@d269 2
+a270 2
+int qlen, cc;
+unsigned long mod, cnt, dim, pln, ctm;
+d277 2
+d342 15
+a356 1
+   if (payload) *payload = 0x0000FFFF & ev.Inter.iEvent.Long;
+@
+
+
+1.35
+log
+@Can create and modify CTIMs, so timload now works
+@
+text
+@d40 1
+d1004 1
+a1004 1
+   binds.Length = 500; /* Should be Tg8BINDINGS, but saving memory */
+@
+
+
+1.34
+log
+@Added GetAllCtims
+@
+text
+@d15 1
+a15 1
+/* 04th/July/2005                                                       */
+d17 5
+d829 1
+a829 1
+   iob.BindEvents.Length = 1024;
+a861 1
+Tg8DrvrObjectDescriptor obd;
+d867 1
+a867 1
+   iob.BindEvents.Length = 1024;
+d872 4
+a875 1
+      if (ctim == eb->Id) break;
+d877 1
+a877 7
+   if (i == iob.BindEvents.Length) return TimLibErrorCTIM;
+
+   bzero((void *) &obd, sizeof(Tg8DrvrObjectDescriptor));
+   obd.Object.Id = ctim;
+   if (ioctl(tg8cps, Tg8DrvrGET_OBJECT, &obd) < 0) return TimLibErrorCTIM;
+   if (eventcode) *eventcode = obd.Object.Lines[0].Event.Long;
+   return TimLibErrorSUCCESS;
+d959 52
+a1010 1
+   return TimLibErrorNOT_IMP;
+d1070 13
+a1082 1
+   return TimLibErrorNOT_IMP;
+@
+
+
+1.33
+log
+@*** empty log message ***
+@
+text
+@d1012 10
+d1104 7
+@
+
+
+1.32
+log
+@*** empty log message ***
+@
+text
+@d70 19
+d101 1
+d121 8
+a128 4
+   if ((timlib_enable) && (ioctl(tg8cps,Tg8DrvrENABLE_MODULE,NULL) < 0)) {
+      close(tg8cps);
+      tg8cps = 0;
+      return TimLibErrorINIT;
+d130 2
+a808 19
+/* Lets you know how many installed modules there are on this host.     */
+
+unsigned long Tg8CpsLibGetInstalledModuleCount() {
+
+unsigned long cnt = 0;
+Tg8ModuleAddress *moad;
+int i;
+
+   if (tg8cps == 0) return 0;
+   if (ioctl(tg8cps, Tg8DrvrGET_CONFIGURATION, &iob) < 0) return 0;
+   for (i = 0; i < Tg8DrvrMODULES; i++) {
+      moad = &iob.GetConfig.Addresses[i];
+      if (!moad->VMEAddress) continue;
+      cnt++;
+   }
+   return cnt;
+}
+
+/* ==================================================================== */
+@
+
+
+1.31
+log
+@Bug in get set routines, the machine is a TGM machine
+@
+text
+@d15 2
+d32 4
+d100 7
+@
+
+
+1.30
+log
+@Bug in GetAllPtims, object needs to be checked against boundary to skip over 200 300 objects etc
+@
+text
+@d445 1
+a445 1
+	       apr->Mach = TgvTgmToTgvMachine(ccv->Machine);
+d520 1
+a520 1
+   tg = (int) ((gte->Machine) >> 4);    /* Tgv Machine */
+d593 1
+a593 1
+	       ccv->Machine = TgvTgvToTgmMachine(tg);
+@
+
+
+1.29
+log
+@Forced use of check class at 2500 boundary
+@
+text
+@d975 1
+a975 1
+int i;
+a977 1
+   if (psize) *psize = 0;
+d981 5
+a985 4
+   for (i=0; i<iob.ObjectsList.Length; i++) {
+      if (i >= size) break;
+      ptimlist[i] = iob.ObjectsList.Id[i];
+      *psize = i +1;
+d987 1
+@
+
+
+1.28
+log
+@*** empty log message ***
+@
+text
+@d13 2
+d329 1
+d331 1
+a331 1
+   if (tg8cps == 0) return TimLibErrorINIT;
+d493 1
+d495 1
+a495 1
+   if (tg8cps == 0) return TimLibErrorINIT;
+d884 1
+d886 1
+a886 2
+   if (tg8cps == 0) return TimLibErrorINIT;
+   if (ptim <= 3000) return TimLibErrorPTIM;
+@
+
+
+1.27
+log
+@*** empty log message ***
+@
+text
+@d974 1
+@
+
+
+1.26
+log
+@Rewritten Get/Set
+@
+text
+@d322 1
+a322 1
+int gt, gn, cw, st, ck, ev, md;
+d375 1
+a375 1
+	       cw &= ~Tg8CW_START_BITM;
+d444 2
+a445 2
+	       apr->Val = ccv->GrVal;
+	       if (TgmGetGroupDescriptor(ccv->Machine,gn,&desc) == TgmSUCCESS) {
+d462 5
+a466 4
+   opr.Id = ptim;
+   opr.Line = plnum;
+   if (ioctl(tg8cps,Tg8DrvrMOD_OBJECT_PARAM,&opr) < 0) return TimLibErrorIO;
+
+@
+
+
+1.25
+log
+@*** empty log message ***
+@
+text
+@d313 3
+a316 1
+// Tg8DrvrObject *ob;
+d318 2
+d321 6
+a326 4
+// Tg8DrvrAction *act;
+// Tg8User *uac;
+// Tg8DrvrActionTable tab;
+int ac, msk, mo;
+d329 5
+a333 6
+   
+   //the object parameter will be modified acording to CCVMask
+   bzero ((void *) &opr, sizeof (Tg8DrvrObjectParameter));
+      
+   //get the description of the given ptim
+   bzero ((void *) &obd, sizeof (Tg8DrvrObjectDescriptor));
+d335 7
+a341 11
+   if (ioctl (tg8cps, Tg8DrvrGET_OBJECT, &obd) < 0) return TimLibErrorPTIM;
+   //ac = obd.Act;
+   
+   //set module on which the ptim is as current module; 
+   mo = obd.Object.Module;
+   if (ioctl (tg8cps, Tg8DrvrSET_DEFAULT_MODULE, &mo) < 0) return TimLibErrorMODULE;
+   
+   if (plnum) {
+     ac = plnum;
+   } else if (grnum) {
+     ac = grval;
+d343 17
+a359 6
+   msk = 1;
+   apr = &(opr.Par);
+   //bzero ((void *) apr, sizeof (Tg8ActionParam));
+   do {
+    if (ccvm & msk) {
+     bzero ((void *) apr, sizeof (Tg8ActionParam));
+d361 1
+a361 1
+	    
+d364 3
+a366 2
+	       apr->Val = ccv->Enable;
+	       break;
+d369 13
+a381 14
+//	       apr->Sel = Tg8SEL_CW;
+//	       if (ccv->Start == TimLibStartNORMAL) {
+//	         Tg8CW_START_Set(apr->Val,Tg8CM_NORMAL);
+//	       }
+//	       if (ccv->Start == TimLibStartCHAINED) {
+//	         Tg8CW_START_Set(apr->Val,Tg8CM_CHAINED);
+//	       }
+//	       if (ccv->Start == TimLibStartEXT1) {
+//	         Tg8CW_START_Set(apr->Val,Tg8CM_EXTERNAL_1);
+//	       }
+//	       if (ccv->Start == TimLibStartEXT2) {
+//	         Tg8CW_START_Set(apr->Val,Tg8CM_EXTERNAL_2);
+//	       }
+	       break;
+d384 10
+a393 3
+//	       if (ccv->Mode >= TimLibMODES) return TimLibErrorMODE;
+//	       cnf->Mode = ccv->Mode;
+	       break;
+d396 6
+d403 3
+a405 9
+	       if      (ccv->Clock == TimLibClock1KHZ) {
+	       	 apr->Val = Tg8CLK_MILLISECOND;}
+	       else if ((ccv->Clock == TimLibClock10MHZ)||(ccv->Clock == TimLibClockEXT1)) {
+	         apr->Val = Tg8CLK_X1;}
+	       else if (ccv->Clock == TimLibClockEXT2) {
+	         apr->Val = Tg8CLK_X2;}
+	       //else if () {}
+           //else ccv->Clock = 0;
+	       break;
+d408 1
+a408 2
+	       /* no pwidth change on a tg8cps */
+	       break;
+d413 1
+a413 1
+	       break;
+d416 1
+a416 2
+	       /* no output mask change on a tg8cps */
+	       break;
+d419 1
+a419 2
+	       /* no polarity change on a tg8cps */
+	       break;
+d424 2
+a425 1
+	       break;
+d428 8
+a435 3
+//	       apr->Sel = Tg8SEL_CEVENT;
+//	       apr->Val = ccv->Payload & obd.Object.Lines[ac].Event.Long;
+	       break;
+d438 6
+a443 3
+	       apr->Sel = Tg8SEL_GATE;
+	       apr->Mach = TgvTgmToMtgvMachine(ccv->Machine);
+	       apr->Gn = ccv->GrNum;
+d445 10
+a454 2
+	       apr->Aux = Tg8GT_EXC;
+	       break;
+d456 5
+a460 7
+	    case TimLibCcvMaskGRNUM:
+//           apr->Sel = Tg8SEL_GATE;
+//	       apr->Mach = TgvTgmToMtgvMachine(ccv->Machine);
+//	       apr->Gn = ccv->GrNum;
+//	       apr->Val = ccv->GrVal;
+//	       apr->Aux = Tg8GT_EXC;
+	       break;
+d462 3
+a464 7
+	    case TimLibCcvMaskGRVAL:
+//	       apr->Sel = Tg8SEL_GATE;
+//	       apr->Mach = TgvTgmToMtgvMachine(ccv->Machine);
+//	       apr->Gn = ccv->GrNum;
+//	       apr->Val = ccv->GrVal;
+//	       apr->Aux = Tg8GT_EXC;
+	    break;
+a465 17
+	    default: break;
+	 }
+	 if (apr->Sel) {
+       opr.Id = ptim;
+       opr.Line = ac;
+       if (ioctl (tg8cps, Tg8DrvrMOD_OBJECT_PARAM, &opr) < 0) return TimLibErrorIO;
+     }
+    }
+      msk <<= 1;
+//      if (apr->Sel) {
+//        opr.Id = ptim;
+//        opr.Line = ac;
+//        if (ioctl (tg8cps, Tg8DrvrMOD_OBJECT_PARAM, &opr) < 0) return TimLibErrorIO;
+//      }
+   } while (msk & TimLibCcvMaskBITS);
+   
+   
+d486 1
+a486 1
+int tg, gt, gn, gv, cw, st, ck, rs, ds, ev, ti, md;
+a515 1
+   gt = (int) ((gte->Machine) & 0xF);
+d557 4
+a560 4
+	       if (md == Tg8CLK_MILLISECOND) ccv->Clock = TimLibClock1KHZ;
+	       if (md == Tg8CLK_CABLE)       ccv->Clock = TimLibClock10MHZ;
+	       if (md == Tg8CLK_X1)          ccv->Clock = TimLibClockEXT1;
+	       if (md == Tg8CLK_X2)          ccv->Clock = TimLibClockEXT2;
+@
+
+
+1.24
+log
+@*** empty log message ***
+@
+text
+@d46 16
+d132 2
+a133 1
+   if ((stat & XrDISABLED) == 0) res |= TimLibStatusENABLED;
+d153 1
+d156 4
+a159 4
+   if (tg8cps == 0) return TimLibErrorINIT;
+   if (module) {
+      if (ioctl(tg8cps, Tg8DrvrSET_DEFAULT_MODULE, &module)) return TimLibErrorMODULE;
+   }
+d172 2
+a175 1
+Tg8IoBlock iob;
+d178 2
+a179 10
+   if (qflag) {
+      if (ioctl(tg8cps, Tg8DrvrPURGE_QUEUE,      NULL) < 0) return TimLibErrorIO;
+      if (ioctl(tg8cps, Tg8DrvrGET_QUEUE_LENGTH, &iob) < 0) return TimLibErrorIO;
+   } else {
+      if (ioctl(tg8cps, Tg8DrvrGET_QUEUE_LENGTH, &iob) < 0) return TimLibErrorIO;
+   }
+//   if (tmout) {
+//      printf("No timeout can be set on a TG8 ...\n");
+//   }
+
+d207 13
+a219 13
+TimLibError Tg8CpsLibWait(TimLibClass * iclss,     /* Class of interrupt */
+			  unsigned long *equip,    /* PTIM CTIM or hardware mask */
+			  unsigned long *plnum,    /* Ptim line number 1..n or 0 */
+			  TimLibHardware * source, /* Hardware source of interrupt */
+			  TimLibTime * onzero,     /* Time of interrupt/output */
+			  TimLibTime * trigger,    /* Time of counters load */
+			  TimLibTime * start,      /* Time of counters start */
+			  unsigned long *ctim,     /* CTIM trigger equipment ID */
+			  unsigned long *payload,  /* Payload of trigger event */
+			  unsigned long *modnum,   /* Module that interrupted */
+			  unsigned long *missed,   /* Number of missed interrupts */
+			  unsigned long *qsize,    /* Remaining interrupts on queue */
+			  TgmMachine * machine) {  /* Corresponding TgmMachine */
+d234 1
+d247 1
+a247 1
+   if (ev.Id >= 3000) {
+d469 1
+a469 1
+int anum, cnt;
+d473 7
+d498 1
+a498 1
+   act = &(tab.Table[anum-1]);
+d501 93
+a593 16
+   
+   /* Get the START mode of the Ptim */
+   switch (Tg8CW_START_Get(act->Action.uControl/*obd.Object.Lines[anum].Cw*/)) {
+     case Tg8CM_NORMAL:
+       ccv->Start = TimLibStartNORMAL;
+       break;
+     case Tg8CM_CHAINED:
+       ccv->Start = TimLibStartCHAINED;
+       break;
+     case Tg8CM_EXTERNAL_1:
+       ccv->Start = TimLibStartEXT1;
+       break;
+     case Tg8CM_EXTERNAL_2:
+       ccv->Start = TimLibStartEXT2;
+       break;
+     default: break;
+a594 58
+   //ccv->Start     = Tg8CW_START_Get(obd.Object.Lines[anum].Cw);
+   
+   /* Get the MODE of the Ptim */
+   switch (Tg8CW_MODE_Get(act->Action.uControl/*obd.Object.Lines[anum].Cw*/)) {
+     case Tg8MODE_NONE:
+       ccv->Mode = TimLibModeNORMAL;
+       break;
+     case Tg8MODE_DIRECT:
+       ccv->Mode = TimLibModeNORMAL; /* TO BE CORRECTED */
+       break;
+     case Tg8MODE_DIVIDE:
+       ccv->Mode = TimLibModeNORMAL; /* TO BE CORRECTED */
+       break;
+     case Tg8MODE_BURST:
+       ccv->Mode = TimLibModeBURST;
+       break;
+     default: break;
+   }
+   //ccv->Mode      = Tg8CW_MODE_Get(obd.Object.Lines[anum].Cw);
+   
+   /* Get the CLOCK used by the Ptim */
+   switch (Tg8CW_CLOCK_Get(act->Action.uControl/*obd.Object.Lines[anum].Cw*/)) {
+     case Tg8CLK_MILLISECOND:
+       ccv->Clock = TimLibClock1KHZ;
+       break;
+     case Tg8CLK_CABLE:
+       ccv->Clock = TimLibClock1KHZ; /* TO BE CORRECTED */
+       break;
+     case Tg8CLK_X1:
+       ccv->Clock = TimLibClockEXT1;
+       break;
+     case Tg8CLK_X2:
+       ccv->Clock = TimLibClockEXT2;
+       break;
+     default: break;
+   }
+   //ccv->Clock     = Tg8CW_CLOCK_Get(obd.Object.Lines[anum].Cw);
+   
+   ccv->Enable    = (unsigned long)((Tg8CW_STATE_Get(act->Action.uControl/*obd.Object.Lines[anum].Cw*/)) ^ Tg8CW_STATE_BITM);
+   ccv->Delay     = (unsigned long)(act->Action.uDelay);//obd.Object.Lines[anum].Delay;
+   ccv->Ctim      = (unsigned long)(act->TriggerId);//obd.Object.Lines[anum].TriggerId;
+   ccv->Payload   = (unsigned long)(act->Action.uEvent.Long)/*obd.Object.Lines[anum].Event.Long*/ & 0x0000FFFF;
+   ccv->Machine   = (TgmMachine)TgvMtgvToTgmMachine(act->Gate.Machine>>4/*obd.Object.Machine*/);
+   ccv->GrNum     = (unsigned long)(act->Gate.GroupNum);//obd.Object.GroupNum;
+   ccv->GrVal     = (unsigned long)(act->Gate.GroupVal);//obd.Object.Lines[anum].Gv;
+   
+   /* Get the counter of the Ptim as output mask */
+   cnt = Tg8CW_CNT_Get(act->Action.uControl/*obd.Object.Lines[anum].Cw*/);
+   if ((cnt >= 1) && (cnt <= 7)) {
+     ccv->OutputMask = (TimLibOutput)(2<<(cnt-1));
+   } else if (cnt == 0) {
+     ccv->OutputMask = (TimLibOutput)(2^8);
+   }
+   
+   /* These 2 next fields are hardware dependent and cannot be changed */
+   ccv->Polarity = TimLibPolarityTTL_BAR; 
+   ccv->PulsWidth = 40; 
+
+@
+
+
+1.23
+log
+@Works correctly
+@
+text
+@d205 1
+a205 1
+			  unsigned long *module,   /* Module that interrupted */
+d251 1
+a251 1
+      mod = 0;
+d269 7
+a275 5
+   if (iclss)  *iclss = cls;
+   if (equip)  *equip = ev.Id;
+   if (plnum)  *plnum = pln;
+   if (source) *source = (ev.Id < 3000) ? TimLibHardwareCTIM : 1 << cnt;
+
+d282 1
+a282 1
+   if (module)  *module = mod;
+@
+
+
+1.22
+log
+@*** empty log message ***
+@
+text
+@d620 5
+a624 5
+TimLibError TimLibGetRemote(unsigned long module,
+			    unsigned long cntr,
+			    unsigned long *remflg,
+			    TimLibCcvMask *ccvm,
+			    TimLibCcv     *ccv) {
+d983 5
+a987 5
+TimLibError TimLibGetRemote(unsigned long module,
+			    unsigned long cntr,
+			    unsigned long *remflg,
+			    TimLibCcvMask *ccvm,
+			    TimLibCcv     *ccv) { return TimLibErrorNOT_IMP; }
+@
+
+
+1.21
+log
+@*** empty log message ***
+@
+text
+@d614 13
+a626 1
+   return TimLibErrorIO;
+d983 6
+d1011 1
+a1011 1
+TimLibError Tg8CpsGetAllPtimObjects(unsigned long *ptimlist,  /* List of ptim equipments */
+d1018 1
+a1018 1
+TimLibStatus Tg8CpsGetStatus(unsigned long module, TimLibDevice *dev) {
+@
+
+
+1.20
+log
+@Added plnum to Get
+Added GetStatus
+Added GetAllPtimObjects
+@
+text
+@d905 1
+a905 1
+				       unsigned long *ptims,     /* Number of ptims in list */
+d918 1
+a918 1
+      *ptims = i +1;
+@
+
+
+1.19
+log
+@*** empty log message ***
+@
+text
+@d7 7
+a44 1
+
+d80 42
+d300 1
+a300 1
+Tg8DrvrObject *ob;
+d303 3
+a305 3
+Tg8DrvrAction *act;
+Tg8User *uac;
+Tg8DrvrActionTable tab;
+d449 1
+d464 3
+a466 2
+   
+   if (grnum) {
+d900 24
+d954 1
+d992 13
+@
+
+
+1.18
+log
+@CTIM Machine returns correctly now from Wait
+@
+text
+@d16 1
+d59 7
+a65 2
+   if ((ioctl(tg8cps, Tg8DrvrGET_DRI_VERSION, &dver) < 0)
+   &&  (strlen(dver) < (strlen(__DATE__) + strlen(__TIME__)))) {
+d251 9
+d261 133
+d406 2
+a407 1
+int anum;                    //i, cw, ch;
+a409 5
+//Tg8DrvrObjectParameter opr;
+//Tg8ActionParam *apr;
+Tg8ObjectLine oln;
+//Tg8DrvrBindMtgEvent *eb;
+//
+a411 1
+//   bzero ((void *) &iob, sizeof (Tg8IoBlock));
+d415 6
+a420 1
+   anum = obd.Act - 1;
+d422 6
+a427 1
+   printf("Pulse list : %d\n", obd.Pn);
+d430 74
+a503 13
+   ccv->Start = Tg8CW_START_Get(obd.Object.Lines[anum].Cw);
+//   ccv->Mode      = cnf->Mode;
+//   ccv->Clock     = cnf->Clock;
+   ccv->Enable = Tg8CW_STATE_Get(obd.Object.Lines[anum].Cw) ^ Tg8CW_STATE_BITM;
+   ccv->Delay = obd.Object.Lines[anum].Delay;
+   ccv->Ctim = obd.Object.Lines[anum].TriggerId;
+   ccv->Payload = 0x0000FFFF & obd.Object.Lines[anum].Event.Long;
+   ccv->Machine = TgvMtgvToTgmMachine(obd.Object.Machine);
+   ccv->GrNum = obd.Object.GroupNum;
+   ccv->GrVal = obd.Object.Lines[anum].Gv;
+
+   ccv->Polarity = TimLibPolarityTTL_BAR;
+   ccv->PulsWidth = 400;	/*not really sure about how long the tg8 pulse is */
+@
+
+
+1.17
+log
+@Corrected GetTime routine
+@
+text
+@a77 1
+static int default_module = 1;  /* Used in TimLibWait */
+a86 1
+      if (iclss == TimLibClassCTIM) default_module = module;
+a156 1
+Tg8DrvrConfiguration confg;
+d197 2
+a198 3
+      if (default_module) mod = default_module; else mod = 1;
+      ioctl(tg8cps, Tg8DrvrGET_CONFIGURATION, &confg);
+      mch = TgvTgvToTgmMachine(TgvFirstMachineForCableId(confg.Addresses[mod - 1].CableId));
+@
+
+
+1.16
+log
+@*** empty log message ***
+@
+text
+@d364 1
+a364 1
+			     TimLibTime * utc) {   /* Returned time value */
+d368 2
+a369 7
+unsigned long year;
+unsigned long month;
+unsigned long day;
+unsigned long hour;
+unsigned long minute;
+unsigned long second;
+unsigned long days_in_month;
+d372 1
+a372 3
+   if (module) {
+      if (ioctl(tg8cps, Tg8DrvrSET_DEFAULT_MODULE, &module)) return TimLibErrorMODULE;
+   }
+d376 10
+a385 30
+   // Compute raw seconds from date time
+
+   year   = UBCD(dt->aYear) + 2000;
+   month  = UBCD(dt->aMonth);
+   day    = UBCD(dt->aDay);
+   hour   = UBCD(dt->aHour);
+   minute = UBCD(dt->aMinute);
+   second = UBCD(dt->aSecond);
+
+   if (month == 1) days_in_month = 0;
+   if (month == 2) days_in_month = 31;
+   if (month == 3) days_in_month = 31 + 28;
+   if (month == 4) days_in_month = 31 + 28 + 31;
+   if (month == 5) days_in_month = 31 + 28 + 31 + 30;
+   if (month == 6) days_in_month = 31 + 28 + 31 + 30 + 31;
+   if (month == 7) days_in_month = 31 + 28 + 31 + 30 + 31 + 30;
+   if (month == 8) days_in_month = 31 + 28 + 31 + 30 + 31 + 30 + 31;
+   if (month == 9) days_in_month = 31 + 28 + 31 + 30 + 31 + 30 + 31 + 31;
+   if (month == 10) days_in_month = 31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30;
+   if (month == 11) days_in_month = 31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31;
+   if (month == 12) days_in_month = 31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30;
+
+   day = 365 * (year - 1970) + days_in_month + day - 1;
+   day = day + (year - 1969) / 4;
+   if ((month > 1) && ((year % 4) == 0)) {
+      day++;
+   }
+   second = second + (minute * 60) + (hour * 3600) + (day * 24 * 3600);
+
+   //end of raw seconds computation
+a386 5
+   utc->Second = second;
+
+   //No nanosecond available on TG8
+
+   utc->Nano = -1;
+d388 2
+a389 5
+   if (module) {
+      moad = &iob.GetConfig.Addresses[module - 1];
+   } else {
+      moad = &iob.GetConfig.Addresses[0];
+   }
+d391 1
+@
+
+
+1.15
+log
+@*** empty log message ***
+@
+text
+@d22 1
+a22 1
+static int tg8cps = 0; /* This global holds the Tg8Cps Driver file handler */
+a25 1
+
+d28 7
+a34 6
+	if (tg8cps) return tg8cps;
+	for (i = 1; i <= Tg8DrvrDEVNUM; i++) {
+		sprintf(fnm, "/dev/Tg8.%1d", i);
+		if ((tg8cps = open(fnm, O_RDWR, 0)) > 0) return (tg8cps);
+	}
+	return (0);
+d51 14
+a64 14
+	
+char dver[64];
+	if (tg8cps) return TimLibErrorSUCCESS;
+	if (Tg8CpsOpen() == 0) {
+		tg8cps = 0;
+		return TimLibErrorOPEN;
+	}
+	if ((ioctl(tg8cps, Tg8DrvrGET_DRI_VERSION, &dver) < 0) &&
+		(strlen(dver) < (strlen(__DATE__) + strlen(__TIME__)))) {
+		close (tg8cps);
+		tg8cps = 0;
+		return TimLibErrorINIT;
+	}
+	return TimLibErrorSUCCESS;
+d77 2
+a78 5
+static int tg8cps_connected;
+
+TimLibError Tg8CpsLibConnect(TimLibClass   iclss,    /* Class of interrupt */
+			   unsigned long equip,    /* Equipment or hardware mask */
+			   unsigned long module) { /* For HARD or CTIM classes */
+d80 3
+d85 9
+a93 8
+	if (tg8cps == 0) return TimLibErrorINIT;
+	if (module) {
+		if (ioctl(tg8cps, Tg8DrvrSET_DEFAULT_MODULE, &module)) return TimLibErrorMODULE;
+	}
+	con.Id = equip;
+	con.Mask = -1;
+	if (ioctl (tg8cps, Tg8DrvrCONNECT, (char *) &con) < 0) return TimLibErrorCONNECT;
+	tg8cps_connected++;
+d102 3
+a104 2
+TimLibError Tg8CpsLibQueue(unsigned long qflag,    /* 0=>Queue, 1=>NoQueue  */
+			 unsigned long tmout) {  /* 0=>No time outs       */
+a105 2
+Tg8IoBlock iob;
+   
+d108 2
+a109 2
+   	if (ioctl(tg8cps,Tg8DrvrPURGE_QUEUE,NULL) <0 ) return TimLibErrorIO;
+	if (ioctl(tg8cps,Tg8DrvrGET_QUEUE_LENGTH,&iob) <0 ) return TimLibErrorIO;
+d111 1
+a111 1
+	if (ioctl(tg8cps,Tg8DrvrGET_QUEUE_LENGTH,&iob) <0 ) return TimLibErrorIO;
+d114 1
+a114 1
+//	printf("No timeout can be set on a TG8 ...\n");
+d116 1
+a116 1
+   
+d144 13
+a156 14
+TimLibError Tg8CpsLibWait(TimLibClass  *iclss,   /* Class of interrupt */
+			unsigned long  *equip,   /* PTIM CTIM or hardware mask */
+			unsigned long  *plnum,   /* Ptim line number 1..n or 0 */
+			TimLibHardware *source,  /* Hardware source of interrupt */
+			TimLibTime     *onzero,  /* Time of interrupt/output */
+			TimLibTime     *trigger, /* Time of counters load */
+			TimLibTime     *start,   /* Time of counters start */
+			unsigned long  *ctim,    /* CTIM trigger equipment ID */
+			unsigned long  *payload, /* Payload of trigger event */
+			unsigned long  *module,  /* Module that interrupted */
+			unsigned long  *missed,  /* Number of missed interrupts */
+			unsigned long  *qsize,   /* Remaining interrupts on queue */
+			TgmMachine     *machine) {   /* Corresponding TgmMachine */
+
+d159 1
+d164 1
+a164 1
+TimLibTime  tld;
+d169 1
+a169 1
+   if (tg8cps == 0) return TimLibErrorINIT;
+d171 2
+a172 1
+   cc = read(tg8cps,&ev,sizeof(Tg8DrvrEvent));
+d176 3
+a178 3
+   bcopy((void *) &(iob.DateTime),(void *) &dt, sizeof(Tg8DateTime));
+   dt.aMinute      = ev.Inter.iMin;
+   dt.aSecond      = ev.Inter.iSec;
+d186 1
+a186 1
+      bzero ((void *) &obd, sizeof (Tg8DrvrObjectDescriptor));
+d188 1
+a188 1
+      if (ioctl (tg8cps, Tg8DrvrGET_OBJECT, &obd) < 0) return TimLibErrorIO;
+d197 6
+a202 2
+      pln = 0; mod = 0; cnt = 0; dim = 0;
+      mch = TgvTgvToTgmMachine(TgvGetMachineForMember(ev.Id));
+d210 2
+a211 2
+   mtm.tm_mon   = UBCD(dt.aMonth) -1;
+   mtm.tm_year  = UBCD(dt.aYear)  +100;
+d213 9
+a221 9
+   tod          = TgmMkGmtTime(&mtm);
+   tld.Second   = (unsigned long) tod;
+   tld.Nano     = dt.aMilliSecond * 1000000;
+   tld.Machine  = mch;
+   tld.CTrain   = ev.Inter.iOcc;
+
+   if (iclss)  *iclss  = cls;
+   if (equip)  *equip  = ev.Id;
+   if (plnum)  *plnum  = pln;
+d224 1
+a224 1
+   if (onzero)  *onzero  = tld;
+d226 1
+a226 1
+   if (start)   *start   = tld;
+d228 1
+a228 1
+   if (ctim)    *ctim    = ctm;
+d230 3
+a232 3
+   if (module)  *module  = mod;
+   if (missed)  *missed  = 0;
+   if (qsize)   *qsize   = qlen;
+d242 6
+a247 6
+TimLibError Tg8CpsLibSet(unsigned long ptim,    /* PTIM to write to */
+		       unsigned long plnum,   /* Ptim line number 1..n or 0 */
+		       unsigned long grnum,   /* Tgm group number or Zero */
+		       unsigned long grval,   /* Group value if num not zero */
+		       TimLibCcvMask ccvm,    /* Which values to write */
+		       TimLibCcv     *ccv) {  /* Current control value */
+d257 4
+a260 4
+		       unsigned long grnum,
+		       unsigned long grval,
+		       TimLibCcvMask *ccvm,  /* Valid fields in ccv */
+		       TimLibCcv     *ccv) {
+d262 1
+a262 1
+int anum;//i, cw, ch;
+d264 1
+d273 1
+a273 1
+   bzero ((void *) &obd, sizeof (Tg8DrvrObjectDescriptor));
+d277 1
+a277 1
+   
+d279 3
+a281 3
+   
+   *ccvm          = TimLibCcvMaskBITS;
+   ccv->Start     = Tg8CW_START_Get(obd.Object.Lines[anum].Cw);
+d284 3
+a286 3
+   ccv->Enable  = Tg8CW_STATE_Get(obd.Object.Lines[anum].Cw) ^ Tg8CW_STATE_BITM;
+   ccv->Delay   = obd.Object.Lines[anum].Delay;
+   ccv->Ctim    = obd.Object.Lines[anum].TriggerId;
+d289 6
+a294 6
+   ccv->GrNum   = obd.Object.GroupNum;
+   ccv->GrVal   = obd.Object.Lines[anum].Gv;
+   
+   ccv->Polarity   = TimLibPolarityTTL_BAR;
+   ccv->PulsWidth  = 400; /*not really sure about how long the tg8 pulse is*/
+   
+d312 6
+a317 6
+TimLibError Tg8CpsLibSimulate(TimLibClass   iclss,
+			     unsigned long equip,
+			     unsigned long module,
+			     TgmMachine    machine,
+			     unsigned long grnum,
+			     unsigned long grval) {
+d321 7
+a327 1
+    if (tg8cps == 0) return TimLibErrorINIT;
+a328 7
+    if (module) {
+		if (ioctl(tg8cps, Tg8DrvrSET_DEFAULT_MODULE, &module)) return TimLibErrorMODULE;
+	}
+
+ //   iob.SimPulseMask = (1 << (LOW(dtr->address1)-1));
+ //   if (ioctl(tg8,Tg8DrvrSIMULATE_PULSE,&iob) < 0) return TimLibErrorIO;
+   
+d348 5
+a352 5
+				 unsigned long module, /* Module or zero */
+				 unsigned long cntr,   /* 1..8 counter number */
+				 TimLibRemote  rcmd,   /* Command */
+				 TimLibCcvMask ccvm,   /* Fields to be set */
+				 TimLibCcv     *ccv) { /* Value to load in counter */
+d364 1
+a364 1
+			   TimLibTime    *utc) { /* Returned time value */
+d376 53
+a428 47
+	if (tg8cps == 0) return TimLibErrorINIT;
+	if (module) {
+		if (ioctl(tg8cps, Tg8DrvrSET_DEFAULT_MODULE, &module)) return TimLibErrorMODULE;
+	}
+	if (ioctl(tg8cps, Tg8DrvrDATE_TIME, &iob) < 0) return TimLibErrorIO;
+	dt = &iob.DateTime;
+	// Compute raw seconds from date time
+	year   = UBCD(dt->aYear) + 2000;
+	month  = UBCD(dt->aMonth);
+	day    = UBCD(dt->aDay);
+	hour   = UBCD(dt->aHour);
+	minute = UBCD(dt->aMinute);
+	second = UBCD(dt->aSecond);
+	
+	if (month == 1)  days_in_month = 0;
+	if (month == 2)  days_in_month = 31;
+	if (month == 3)  days_in_month = 31+28;
+	if (month == 4)  days_in_month = 31+28+31;
+	if (month == 5)  days_in_month = 31+28+31+30;
+	if (month == 6)  days_in_month = 31+28+31+30+31;
+	if (month == 7)  days_in_month = 31+28+31+30+31+30;
+	if (month == 8)  days_in_month = 31+28+31+30+31+30+31;
+	if (month == 9)  days_in_month = 31+28+31+30+31+30+31+31;
+	if (month == 10) days_in_month = 31+28+31+30+31+30+31+31+30;
+	if (month == 11) days_in_month = 31+28+31+30+31+30+31+31+30+31;
+	if (month == 12) days_in_month = 31+28+31+30+31+30+31+31+30+31+30;
+	
+	day = 365 * (year - 1970) + days_in_month + day -1;
+	day = day + (year -1969)/4;
+	if ((month > 1) && ((year % 4) == 0)) {
+		day++;
+	}
+	second = second + (minute * 60) + (hour * 3600) + (day * 24 *3600);
+	//end of raw seconds computation
+	utc->Second = second;
+    //No nanosecond available on TG8
+	utc->Nano = -1;
+	if (ioctl(tg8cps, Tg8DrvrGET_CONFIGURATION, &iob) < 0) return TimLibErrorIO;
+	if (module) {
+		moad = &iob.GetConfig.Addresses[module -1];
+	} else {
+		moad = &iob.GetConfig.Addresses[0];
+	}
+	utc->Machine = moad->Machine;
+	if (ioctl(tg8cps, Tg8DrvrGET_RAW_STATUS, &iob) < 0) return TimLibErrorIO;
+	rwst = &iob.RawStatus;
+	utc->CTrain = rwst->Sb.ScTime;
+d455 2
+a456 2
+			       TgmMachine    machine,
+			       TgmPTelegram  *telegram) {
+d460 13
+a472 14
+	
+	if (tg8cps == 0) return TimLibErrorINIT;
+	if (module) {
+		if (ioctl(tg8cps, Tg8DrvrSET_DEFAULT_MODULE, &module)) return TimLibErrorMODULE;
+	}
+
+    //tbk.Machine = machine;
+    tbk.Machine = TgvTgmToMtgvMachine(machine);
+    if (ioctl (tg8cps, Tg8DrvrTELEGRAM, &tbk) < 0) return TimLibErrorIO;
+    telegram->Size = TgmLastGroupNumber(machine);
+    telegram->Machine = machine;
+	for (i = 0; i < telegram->Size; i++) {
+		TgmSetGroupValueInTelegram(i+1,(long) tbk.Data[i], (TgmTelegram *) telegram);
+	}
+d486 7
+a492 7
+	if (tg8cps == 0) return 0;
+	if (ioctl(tg8cps, Tg8DrvrGET_CONFIGURATION, &iob) < 0) return 0;
+	for (i = 0; i < Tg8DrvrMODULES; i++) {
+        moad = &iob.GetConfig.Addresses[i];
+        if (!moad->VMEAddress) continue;
+        cnt++;
+    }
+d500 4
+a503 5
+TimLibError Tg8CpsLibGetPtimObject(unsigned long ptim, /* PTIM equipment number */
+				 unsigned long *module,
+				 unsigned long *counter,
+				 unsigned long *dimension) {
+
+a507 25
+	
+	if (tg8cps == 0) return TimLibErrorINIT;	
+	
+	bzero ((void *) &iob, sizeof (Tg8IoBlock));
+	iob.BindEvents.Length = 1024;
+    if (ioctl (tg8cps, Tg8DrvrGET_BINDINGS, &iob) < 0) return TimLibErrorIO;
+
+    for (i = 0; i < iob.BindEvents.Length; i++) {
+        eb = &(iob.BindEvents.Table[i]);
+        if (ptim == eb->Id) return TimLibErrorPTIM;
+    }
+	
+	bzero ((void *) &obd, sizeof (Tg8DrvrObjectDescriptor));
+	obd.Object.Id = ptim;
+	if (ioctl(tg8cps, Tg8DrvrGET_OBJECT, &obd) < 0) return TimLibErrorPTIM;
+	
+	oln = obd.Object.Lines[0];
+    cw = oln.Cw;
+    ch = Tg8CW_CNT_Get(cw);
+    //ch = (cw >> Tg8CW_CNT_BITN) & Tg8CW_CNT_BITM;
+    if (ch == 0) ch = 8;
+    
+	if (module) *module = obd.Object.Module;
+	if (counter) *counter = ch;
+	if (dimension) *dimension = obd.Dim;
+d509 28
+a536 1
+	return TimLibErrorSUCCESS;
+d542 2
+a543 2
+TimLibError Tg8CpsLibGetCtimObject(unsigned long ctim, /* CTIM equipment number */
+				 unsigned long *eventcode) {
+d548 17
+a564 17
+	
+	if (tg8cps == 0) return TimLibErrorINIT;
+	bzero ((void *) &iob, sizeof (Tg8IoBlock));
+	iob.BindEvents.Length = 1024;
+    if (ioctl (tg8cps, Tg8DrvrGET_BINDINGS, &iob) < 0) return TimLibErrorIO;
+
+    for (i = 0; i < iob.BindEvents.Length; i++) {
+        eb = &(iob.BindEvents.Table[i]);
+        if (ctim == eb->Id) break;
+    }
+    if (i == iob.BindEvents.Length) return TimLibErrorCTIM;
+	
+	bzero ((void *) &obd, sizeof (Tg8DrvrObjectDescriptor));
+	obd.Object.Id = ctim;
+	if (ioctl(tg8cps, Tg8DrvrGET_OBJECT, &obd) < 0) return TimLibErrorCTIM;
+	if (eventcode) *eventcode = obd.Object.Lines[0].Event.Long;
+	return TimLibErrorSUCCESS;
+a575 1
+
+d584 1
+a584 2
+
+TimLibError Tg8CpsLibCreatePtimObject(unsigned long ptim, /* PTIM equipment number */
+a587 1
+
+d591 2
+a592 2
+int str, chn, clk, i/* , j, nid, maxobs */;
+   
+d595 3
+a597 3
+   
+   bzero ((void *) &ob, sizeof (Tg8DrvrObject));
+   ob.Id = (unsigned int) ptim;
+d599 3
+a601 2
+   ob.Dim = (unsigned char) dimension;
+   chn = counter; /* set counter */
+d603 1
+d605 13
+a617 11
+       olp = &(ob.Lines[i]);                                     /* get action */
+       olp->TriggerId = 200;                                     /* set RPLS as load */
+       olp->Cw = (Tg8DO_OUTPUT << Tg8CW_INT_BITN);               /* produce output */
+       str = Tg8CM_NORMAL; Tg8CW_START_Set (olp->Cw, str);       /* set start mode */
+       clk = Tg8CLK_MILLISECOND; Tg8CW_CLOCK_Set (olp->Cw, clk); /* set clock */
+       Tg8CW_CNT_Set (olp->Cw, chn);                             /* set channel */
+       olp->Delay = 1;                                           /* set delay */
+   }
+   
+   if (ioctl (tg8cps, Tg8DrvrCREATE_OBJECT, &ob) < 0) return TimLibErrorIO;
+   
+d619 18
+a636 19
+   iob.ObjectsList.Length = MAX_OB_LIST;
+   if (ioctl (tg8cps, Tg8DrvrOBJECTS_LIST, &iob) < 0) return TimLibErrorIO;
+   
+   for (i = 0; i < iob.ObjectsList.Length; i++) {
+       nid = iob.ObjectsList.Id[i];
+       bzero ((void *) &obl, sizeof (Tg8DrvrObjectsList));
+       obl.Length = Tg8DrvrOBJECTS;
+       obl.Id[0] = nid;
+       if (ioctl (tg8cps, Tg8DrvrGET_MEMBER_IDS, &obl) < 0) return TimLibErrorIO;
+       
+       if (nid < 0) {
+                if (nid != obl.Id[0])
+                    for (j = 0; j < obl.Length; j++)
+                        objects[maxobs++] = obl.Id[j];
+            }
+            else if (nid > 999)
+                objects[maxobs++] = nid;
+   } */
+   
+d644 2
+a645 2
+TimLibError Tg8CpsLibCreateCtimObject(unsigned long ctim, /* CTIM equipment number */
+				   unsigned long eventcode) {
+d657 1
+a657 1
+TimLibError Tg8CpsLibGetCableId(unsigned long module,   /* The given module */
+d666 1
+a666 1
+   i = module -1;
+d679 35
+a713 42
+TimLibError Tg8CpsLibInitialize   (TimLibDevice device)      { return TimLibErrorNOT_IMP; }
+
+TimLibError Tg8CpsLibConnect      (TimLibClass   iclss,
+				   unsigned long equip,
+				   unsigned long module)     { return TimLibErrorNOT_IMP; }
+
+TimLibError Tg8CpsLibQueue        (unsigned long qflag,
+				   unsigned long tmout)      { return TimLibErrorNOT_IMP; }
+
+TimLibError Tg8CpsLibWait         (TimLibClass    *iclss,
+				   unsigned long  *equip,
+				   unsigned long  *plnum,
+				   TimLibHardware *source,
+				   TimLibTime     *onzero,
+				   TimLibTime     *trigger,
+				   TimLibTime     *start,
+				   unsigned long  *ctim,
+				   unsigned long  *payload,
+				   unsigned long  *module,
+				   unsigned long  *missed,
+				   unsigned long  *qsize)    { return TimLibErrorNOT_IMP; }
+
+TimLibError Tg8CpsLibSet          (unsigned long ptim,
+				   unsigned long plnum,
+				   unsigned long grnum,
+				   unsigned long grval,
+				   TimLibCcvMask ccvm,
+				   TimLibCcv     *ccv)       { return TimLibErrorNOT_IMP; }
+
+TimLibError Tg8CpsLibGet          (unsigned long ptim,
+				   unsigned long grnum,
+				   unsigned long grval,
+				   TimLibCcvMask *ccvm,
+				   TimLibCcv     *ccv)       { return TimLibErrorNOT_IMP; }
+
+TimLibError Tg8CpsLibSimulate     (TimLibClass   iclss,
+				   unsigned long equip,
+				   unsigned long module,
+				   TgmMachine    machine,
+				   unsigned long grnum,
+				   unsigned long grval)      { return TimLibErrorNOT_IMP; }
+
+d717 1
+a717 1
+				   TimLibRemote  rcmd,
+d719 6
+a724 9
+				   TimLibCcv     *ccv)       { return TimLibErrorNOT_IMP; }
+
+TimLibError Tg8CpsLibGetTime      (unsigned long module,
+				   TimLibTime    *utc)       { return TimLibErrorNOT_IMP; }
+
+TimLibError Tg8CpsLibGetTelegram  (unsigned long module,
+				   TgmMachine    machine,
+				   TgmTelegram   *telegram)  { return TimLibErrorNOT_IMP; }
+
+a728 1
+
+d731 2
+a732 4
+
+TimLibError Tg8CpsLibGetHandle(int *fd)                      { return TimLibErrorNOT_IMP; }
+
+TimLibError Tg8CpsLibCreatePtimObject(unsigned long ptim, /* PTIM equipment number */
+d736 1
+a736 2
+				      
+TimLibError Tg8CpsLibCreateCtimObject(unsigned long ctim, /* CTIM equipment number */
+d738 3
+a740 17
+
+unsigned long Tg8CpsLibGetInstalledModuleCount()             { return 0; };
+
+/*
+ * ==================================================================== 
+ * Get the cable identifier to which a given module is attached so that
+ * the correct module can be used to read telegrams. This function will
+ * be used by the program get_tgm_tim only; it is of no interest to the
+ * majority of clients because calls to ReadTelegram are diverted.
+ */
+
+TimLibError Tg8CpsLibGetCableId(unsigned long module,   /* The given module */
+				unsigned long *cable) { /* The cable ID */
+
+   return TimLibErrorNOT_IMP;
+}
+
+@
+
+
+1.14
+log
+@*** empty log message ***
+@
+text
+@d16 1
+d190 1
+a190 1
+      mch = TgvTgvToTgmMachine(obd.Object.Machine);
+d208 1
+a208 1
+   tod          = mktime(&mtm);
+d224 1
+a224 1
+   if (payload) *payload = 0x0000FFFF & ev.Event.Long;
+d257 2
+a258 2
+//int i, cw, ch;
+//Tg8DrvrObjectDescriptor obd;
+d261 1
+a261 1
+//Tg8ObjectLine oln;
+d266 19
+a284 29
+   bzero ((void *) &iob, sizeof (Tg8IoBlock));
+//	iob.BindEvents.Length = 1024;
+//    if (ioctl (tg8cps, Tg8DrvrGET_BINDINGS, &iob) < 0) return TimLibErrorIO;
+//
+//    for (i = 0; i < iob.BindEvents.Length; i++) {
+//        eb = &(iob.BindEvents.Table[i]);
+//        if (ptim == eb->Id) return TimLibErrorPTIM;
+//    }
+//	
+//	bzero ((void *) &obd, sizeof (Tg8DrvrObjectDescriptor));
+//	obd.Object.Id = ptim;
+//	if (ioctl(tg8cps, Tg8DrvrGET_OBJECT, &obd) < 0) return TimLibErrorPTIM;
+//	
+//	opr.Id = ptim;
+//    opr.Line = 0;
+//    apr = &(opr.Par);
+//    
+//    apr->Sel = Tg8SEL_STATE;
+//    apr->Val = enb;
+//    bzero ((void *) apr, sizeof (Tg8ActionParam));
+//    for (ac = obd.Act; ac < (obd.Act + obd.Dim); ac++) {
+//        opr.Line++;
+//        if (ioctl (tg8cps, Tg8DrvrMOD_OBJECT_PARAM, &opr) < 0) {
+//            printf ("EnableObject: MOD_OBJECT_PARAM: Failed ioctl.\n");
+//            return (arg);
+//        }
+//    }
+//    
+//   
+d287 1
+a287 1
+   ccv->PulsWidth  = 400;
+d580 23
+a602 1
+//Tg8DrvrObject ob;
+d604 1
+d606 3
+d610 17
+a626 1
+   return TimLibErrorNOT_IMP;
+@
+
+
+1.13
+log
+@*** empty log message ***
+@
+text
+@a107 1
+	printf("queue flag is OFF\n");
+a108 1
+	printf("the que length is : %d\n", iob.QueueLength);
+a109 1
+	printf("queue flag is ON\n");
+a110 1
+	printf("the que length is : %d\n", iob.QueueLength);
+d174 1
+a174 1
+   bcopy((void *) &dt, (void *) &(iob.DateTime), sizeof(Tg8DateTime));
+d182 1
+a182 1
+   if (ev.Id >= 1000) {
+d209 1
+a209 1
+   tld.Nano     = UBCD(dt.aMilliSecond) * 1000000;
+d211 1
+a211 1
+   tld.CTrain   = UBCD(ev.Inter.iOcc);
+d216 1
+a216 1
+   if (source) *source = (ev.Id < 1000) ? TimLibHardwareCTIM : 1 << cnt;
+a465 1
+    printf("TgvMachine is : %d\n", tbk.Machine);
+a466 1
+    printf("TG8 Groups : %d\n", TgmLastGroupNumber(machine));
+a489 1
+        printf("Module %d VME address: %x\n", (i+1), (int) moad->VMEAddress);
+@
+
+
+1.12
+log
+@*** empty log message ***
+@
+text
+@d7 2
+d12 1
+d14 5
+d147 1
+a147 1
+TimLibError Tg8CpsLibWait(TimLibClass    *iclss,   /* Class of interrupt */
+d159 1
+a159 1
+			TgmMachine     *mch) {   /* Corresponding TgmMachine */
+a160 1
+//Tg8DrvrObjectConnection con;
+d162 10
+a171 2
+int cc;
+  
+d176 26
+a201 2
+   if ( equip!=NULL ) {
+   	*equip = ev.Id;
+d203 30
+a232 6
+   if ( ctim!=NULL ) {
+   	*ctim = ev.Event.Long;
+   }
+   if ( iclss!=NULL ) {
+   	*iclss=(ev.Id==ev.Event.Long) ? TimLibClassCTIM : TimLibClassPTIM;
+   }   
+a233 1
+   
+a264 1
+Tg8IoBlock iob;
+d326 1
+a326 2
+Tg8IoBlock iob;
+int cc;
+a374 1
+Tg8IoBlock iob;
+a383 2
+#define UBCD(bcd) ((bcd&0xF)+10*(bcd>>4))
+
+a487 1
+Tg8IoBlock iob;
+a513 1
+Tg8IoBlock iob;
+a550 1
+Tg8IoBlock iob;
+a622 1
+Tg8IoBlock iob;
+@
+
+
+1.11
+log
+@*** empty log message ***
+@
+text
+@a158 1
+   ev.Id = *equip;
+d161 9
+a169 5
+   printf("Wait completion code %d\n", cc);
+   
+   printf("Tgv machine from header code %d\n", TgvMACHINE_HEADER(ev.Event.Simple.Header));
+   //if (plnum) {}
+   
+d203 1
+a203 1
+//Tg8IoBlock iob;
+d207 2
+a208 2
+//   
+//   bzero ((void *) &iob, sizeof (Tg8IoBlock));
+d237 4
+a240 1
+//   
+d265 13
+a277 1
+   return TimLibErrorIO;
+@
+
+
+1.10
+log
+@*** empty log message ***
+@
+text
+@d401 1
+a401 1
+		TgmSetGroupValueInTelegram(i+1,(long) tbk.Data[i], telegram);
+d548 1
+a548 1
+TimLibError Tg8SpsLibGetCableId(unsigned long module,   /* The given module */
+d655 1
+a655 1
+TimLibError Tg8SpsLibGetCableId(unsigned long module,   /* The given module */
+@
+
+
+1.9
+log
+@*** empty log message ***
+@
+text
+@d540 25
+d647 14
+@
+
+
+1.8
+log
+@\.
+@
+text
+@d182 1
+d203 1
+a203 1
+//   if (tg8cps == 0) return TimLibErrorINIT;
+@
+
+
+1.7
+log
+@*** empty log message ***
+@
+text
+@d382 1
+a382 1
+			       TgmTelegram   *telegram) {
+@
+
+
+1.6
+log
+@*** empty log message ***
+@
+text
+@d43 1
+d49 6
+d176 1
+a176 1
+		       TgmMachine    machine, /* Telegram identifier */
+a188 1
+		       TgmMachine    machine,
+d277 1
+d398 1
+a507 1
+Tg8IoBlock iob;
+a509 2
+   if (ioctl(tg8cps,Tg8DrvrGET_QUEUE_LENGTH,&iob) <0 ) return TimLibErrorIO;
+   //if iob.QueueLength
+d522 5
+d568 1
+a568 1
+				   TgmMachine    machine,
+a574 1
+				   TgmMachine    machine,
+d588 1
+@
+
+
+1.5
+log
+@*** empty log message ***
+@
+text
+@d606 2
+a607 2
+TimLibError CtrLibCreateCtimObject(unsigned long ctim, /* CTIM equipment number */
+				   unsigned long eventcode) { return TimLibErrorNOT_IMP; }
+@
+
+
+1.4
+log
+@working connect, telegram, getCtim, getPtim
+@
+text
+@d74 1
+a74 1
+	con.Mask = 1;
+d88 17
+d143 2
+a144 1
+			unsigned long  *qsize) { /* Remaining interrupts on queue */
+d146 14
+d188 40
+d276 1
+a276 1
+   return TimLibErrorSUCCESS;
+d287 1
+a287 1
+Tg8DateTime *tp;
+a289 1
+TgmMachine tmch;
+d291 9
+d305 33
+a337 3
+	//if (ioctl(tg8cps, Tg8DrvrDATE_TIME, &iob) < 0) return TimLibErrorIO;
+	//tp = &iob.DateTime;
+	//utc->Second = tp->aSecond;
+d344 1
+a344 2
+	tmch = moad->Machine;
+	utc->Machine = tmch;
+a345 2
+	tp = &iob.DateTime;
+	utc->Second = tp->aSecond;
+d348 1
+a348 2
+	
+	utc->Nano = -1;
+d451 2
+a452 1
+    ch = (cw >> Tg8CW_CNT_BITN) & Tg8CW_CNT_BITM;
+d500 6
+d510 20
+d600 8
+@
+
+
+1.3
+log
+@*** empty log message ***
+@
+text
+@d10 18
+d42 7
+a48 2
+
+   return TimLibErrorSUCCESS;
+d61 2
+d67 11
+d129 1
+d215 28
+a242 2
+
+
+d271 18
+d297 13
+a309 2
+unsigned long cnt;
+
+d322 31
+a352 1
+   return TimLibErrorSUCCESS;
+d361 21
+a381 1
+   return TimLibErrorCTIM;
+@
+
+
+1.2
+log
+@*** empty log message ***
+@
+text
+@d7 2
+d253 76
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d7 1
+a7 18
+#include <unistd.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <sched.h>
+#include <fcntl.h>
+#include <io.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <sys/file.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <time.h>
+
+#include <tgm/tgm.h>
+#include <tgv/tgv.h>
+#include <TimLib.h>
+#include <tg8.h>
+a34 2
+
+static int connected = 0;
+@

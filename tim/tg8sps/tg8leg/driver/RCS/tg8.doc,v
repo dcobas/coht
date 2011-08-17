@@ -1,0 +1,591 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2005.07.26.12.41.54;	author lewis;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@
+                   The Tg8-PPC Driver User Guide.
+
+
+                        0. Introduction
+
+   The Tg8 modules are fundamental components of the timing
+system. We shall talk about of how to use them on the Power PC
+based DSCs. As usually for any kind of equipment there is an
+appropriate device driver that implements the interface 
+between the equipment and the operating system. The Tg8 driver
+does such job for the famous Tg8 card. It allows the multiprocess
+access to one or more Tg8 cards in parallel. Any process that wish
+to interact with the Tg8 card must open a device. There is the
+correspondence between the set of devices and the set of cards
+installed on the given DSC. Namely, the first N devices (group 1)
+link with the first Tg8 card (the value of N is 4 at the moment),
+the next N devices (group 2) link with next Tg8 card, and so on.
+A process can interact simultaneosly with a number of the Tg8 cards,
+in this case it ought to open the same number of devices - one for
+every card using appropriate groups of devices. A device being
+opened reserved by its process until the process will close it 
+explicitly via the close function or implicitly by killing itself.
+All processes that share the same Tg8 card (e.g. use devices from
+the same group) have the equal rights in relation to that card;
+nobody can reserve the Tg8 card for his own usage. Consequently
+such processes should be rather carefull when they are going to
+delete some resources related to the card - resources are shared!
+
+
+                        I. Open the Tg8 device
+
+   A process uses the ordinar open function to obtain a device.
+For example, fd = open("/dev/Tg8.1",O_RDWR,0). This function
+returns an error (EBUSY) in the case if this device was reserved
+by the other process, hence, a process should try to open the
+next device from the same group.
+
+
+                        II. Close the Tg8 device
+
+   The device is reserved by the process that opened it. That
+process should execute the close function to free the corresponding
+device. An example is close(fd), where the variable fd was
+initialized by the open call. The driver disconnects given process
+from any connected actions and cleans the VME bus interrupt flag
+for any actions having no more processes being connected to them.
+An application can specify additional actions, such as
+  Tg8ONCL_LEAVE   - leave the card in working (e.g. current) state;
+  Tg8ONCL_DISABLE - disable the card asynchronously;
+  Tg8ONCL_CLEAR   - disable the card asynchronously and clear the user table;
+  Tg8ONCL_DISABLE_SYNC - disable the card synchronously -
+by means of the ioctl call with the function named Tg8DrvrON_CLOSE.
+
+
+                        III. Write operation
+
+   The write function is used to declare the timing entity. This entity
+includes the timing frame code (the wildcards are allowed for any
+part of the frame except of the header byte), the control
+word and the delay for decrementing counter. The control word specifies
+the channel (or counter) number inside the range 1-8, the clock type
+(the millisecond clock, the 10 MHz internal clock, the external #1 or #2)
+that used by the counter, the counter start mode (normal, external start,
+the chain) and the type of counter's output (to produce either the output
+pulse, or the VME bus interrupt, or both, or nothing). In the last case
+the timing entity will be disabled. The drivers looks for the same entity inside
+its internal memory - so called user table - and if successed simply connect
+the requesting process to existence timing entity. Otherwise it looks for the
+first free entry in the user table and creates new timing entity. It
+returns the error (ENOSPC) if the table is full.
+   An example is following:
+
+	#include <tg8drvr.h>
+	Tg8User act;
+	act.uEvent.Long = 0x21ff0101; /* Timing frame code with the wildcard */
+	act.uControl = 0x8000;        /* Do the VME bus interrupt only */
+	act.uDelay = 0;               /* No delay */
+	if (write(fd,&act,sizeof(Tg8User)) != sizeof(Tg8User)) {
+	  printf("Can't write the timing entity\n");
+	  exit(-1);
+	};	
+
+
+                        IV. Read operation
+
+   A process waiting for the events from the driver should use either
+the read function call or the select function call or signals. In the last
+case it must inform the driver (via the ioctl function call) about of what
+signal number and the process identifier shall be used when event arrives
+to the driver. In any case a process obtains event's details (including
+the super cycle number, the occurence and ouput time, the frame code, the
+current status of the firmware program) by means of the read function.
+Below is the example of how to use the read function:
+
+	Tg8DrvrEvent event;
+	if (read(fd,&event,sizeof(Tg8DrvrEvent)) != sizeof(Tg8DrvrEvent)) {
+	  perror("ReadEvent");
+	  exit(-1);
+	};
+	/* Display event's details and so on ... */
+
+
+                        V. IO Control functions
+
+   The most of functions work with the union declared as Tg8IoBlock iob.
+It contains structures used by the appropriate IO Control functions.
+
+
+   Function		Description and an example
+   --------		--------------------------
+
+   ------------------------------------------------------------------------
+
+                0. Functions related to the Tg8 driver
+
+
+   ------------------------------------------------------------------------
+
+   Tg8DrvrDEBUG_ON          Allows to logg the debugging printout on the console.
+			    ioctl(fd,Tg8DrvrDEBUG_ON,NULL);
+
+   Tg8DrvrDEBUG_OFF         Stops the logg.
+			    ioctl(fd,Tg8DrvrDEBUG_OFF,NULL);
+
+   Tg8DrvrGET_DRI_VERSION   Get the driver's revision date.
+			    ioctl(fd,Tg8DrvrGET_DRI_VERSION,iob.Ver);
+
+   Tg8DrvrGET_STATUS        Get the driver status and alarm code.
+			    ioctl(fd,Tg8DrvrGET_STATUS,&iob.Status);
+
+   Tg8DrvrGET_CONFIGURATION Get the current driver's configuration.
+			    ioctl(fd,Tg8DrvrGET_CONFIGURATION,&iob.GetConfig);
+
+   Tg8DrvrINSTALL_MODULE    Install the new module dynamically.
+			    iob.InsModule.Index = 3; /* The third module */
+			    iob.InsModule.Address.VMEAddress = 0xDEC200000;
+			    iob.InsModule.Address.InterruptVector = 0xBA;
+			    iob.InsModule.Address.InterruptLevel = 2; /* Always 2 */
+			    iob.InsModule.Address.SwitchSettings = 0; /* 10 MHz clock */
+			    iob.InsModule.Address.SscHeader = 0x20;
+			    ioctl(fd,Tg8DrvrINSTALL_MODULE,&iob.InsModule);
+
+   ------------------------------------------------------------------------
+
+
+                1. Functions related to the Tg8 module (card)
+
+
+   ------------------------------------------------------------------------
+
+   Tg8DrvrENABLE_MODULE    Enable outputs and interrupts asynchronously.
+		           ioctl(fd,Tg8DrvrENABLE_MODULE,NULL);
+
+   Tg8DrvrENABLE_SYNC      Enable outputs and interrupts synchronously with the SSC frame.
+		           ioctl(fd,Tg8DrvrENABLE_SYNC,NULL);
+
+   Tg8DrvrDISABLE_MODULE   Disable outputs and interrupts asynchonously.
+		           ioctl(fd,Tg8DrvrDISABLE_MODULE,NULL);
+
+   Tg8DrvrDISABLE_SYNC     Disable outputs and interrupts synchronously with the SSC frame.
+		           ioctl(fd,Tg8DrvrDISABLE_SYNC,NULL);
+
+   Tg8DrvrRESET_MODULE     Hardware reset of the card.
+			   ioctl(fd,Tg8DrvrRESET_MODULE,NULL);
+
+   Tg8DrvrSIMULATE_PULSE   Simulate a set of pulses on the card. The card should be disabled.
+			   iob.SimPulseMask =0x03; /* Use counters 1 and 2 */
+			   ioctl(fd,Tg8DrvrSIMULATE_PULSE,&iob);
+
+   ------------------------------------------------------------------------
+
+   Tg8DrvrDATE_TIME	    Get the current date and time.
+		   	    ioctl(fd,Tg8DrvrDATE_TIME,&iob.DateTime);
+
+   Tg8DrvrSC_INFO   	    Get the most important Super Cycle information.
+		    	    ioctl(fd,Tg8DrvrSC_INFO,&iob.ScInfo);
+
+   Tg8DrvrSET_SSC_HEADER    Set the SSC Event Header code.
+			    iob.SscHeader = 0x20; /* The SPS SSC event header code */
+			    ioctl(fd,Tg8DrvrSET_SSC_HEADER,&iob.SscHeader);
+
+   ------------------------------------------------------------------------
+
+   Tg8DrvrUSER_TABLE       Read a part of the user table back from the card RAM.
+		           Tg8IoBlock iob;
+		      	   iob.Range.Row = 5;  /* The first action number */
+		      	   iob.Range.Cnt = 10; /* Number of actions to read */
+		      	   ioctl(fd,Tg8DrvrUSER_TABLE,&iob.UserTable);
+
+   Tg8DrvrRECORDING_TABLE  Get a part of the Recording table.
+			   iob.Range.Row = 5;  /* The first action number */
+			   iob.Range.Cnt = 10; /* Number of actions to read */
+			   ioctl(fd,Tg8DrvrRECORDING_TABLE,&iob.RecTable);
+
+   Tg8DrvrHISTORY_TABLE    Get a part of the Event History Table.
+			   iob.HistTable.Cnt = 1000; /*Number of the last entries to read */
+			   ioctl(fd,Tg8DrvrHISTORY_TABLE,&iob.HistTable);
+
+   Tg8DrvrCLOCK_TABLE      Get a part of the Clock table.
+			   iob.ClockTable.Cnt = 15; /*Number of the last entries to read */
+			   ioctl(fd,Tg8DrvrCLOCK_TABLE,&iob.ClockTable);
+
+   Tg8DrvrINTERRUPT_TABLE  Get a part of the Interrupt table.
+			   Tg8IoBlock iob;
+			   iob.Range.Row = 1;  /* The first entry number */
+			   iob.Range.Cnt = 16; /* Number of aentries to read */
+			   ioctl(fd,Tg8DrvrINTERRUPT_TABLE,&iob.IntTable);
+
+   Tg8DrvrAUX_TABLE	   Get the Auxiliary table.
+			   ioctl(fd,Tg8DrvrAUX_TABLE,&iob.AuxTable);
+
+   ------------------------------------------------------------------------
+
+   Tg8DrvrGET_DPRAM       Read the whole DPRAM content.
+			  ioctl(fd,Tg8DrvrGET_DPRAM,&iob.Dpram);
+
+   Tg8DrvrGET_RAW_STATUS  Read current status directly from the DPRAM.
+			  ioctl(fd,Tg8DrvrGET_RAW_STATUS,&iob.StatusBlock);
+
+   Tg8DrvrTELEGRAM	  Read a telegram buffer for selected accelerator machine.
+		  	  iob.Telegram.Machine = Tg8CPS;
+		  	  ioctl(fd,Tg8DrvrTELEGRAM,&iob.Telegram);
+
+   ------------------------------------------------------------------------
+
+   Tg8DrvrGET_FIRMWARE_VERSION  Get the firmware program revision date.
+			        ioctl(fd,Tg8DrvrGET_FIRMWARE_VERSION,iob.Ver);
+
+   Tg8DrvrTRACE_FIRMWARE   Get the firmware trace data.
+			   ioctl(fd,Tg8DrvrTRACE_FIRMWARE,&iob.Trace);
+
+   Tg8DrvrRELOAD_FIRMWARE  Reset the card and restart the firmware program.
+			   ioctl(fd,Tg8DrvrRELOAD_FIRMWARE,&iob.FirmwareObject);
+
+   Tg8DrvrRELOAD_ACTIONS   Reload the Tg8 module by the driver's user table.
+			   ioctl(fd,Tg8DrvrRELOAD_ACTIONS,NULL);
+
+   ------------------------------------------------------------------------
+
+
+                2. Functions related to process connections
+
+
+   ------------------------------------------------------------------------
+
+  Tg8DrvrON_CLOSE       Predefine the device close mode.
+			iob.CloseMode.Mode = Tg8ONCL_CLEAR; /* Disable the card and
+							       clear the user table */
+			iob.CloseMode.SimPulseMask = 0x01;  /* And simulate the pulse #1 */
+			ioctl(fd,Tg8DrvrON_CLOSE,&iob.CloseMode);
+
+  Tg8DrvrSET_SIGNAL     Set the Pid & Signal codes.
+			iob.Signal.Pid = getpid();
+			iob.Signal.Signal = sig_num;
+			ioctl(fd,Tg8DrvrSET_SIGNAL,&iob.Signal);
+
+  Tg8DrvrGET_SIGNAL     Read Pid & Signal codes back.
+			ioctl(fd,Tg8DrvrGET_SIGNAL,&iob.Signal);
+
+   ------------------------------------------------------------------------
+
+   Tg8DrvrWAIT_EVENT    Wait for the given event (no wildcards allowed).
+			iob.Event.Event.Long = 0x211E0101;
+			ioctl(fd,Tg8DrvrWAIT_EVENT,&iob.Event);
+
+   Tg8DrvrFILTER_EVENT  Filter events in the user table
+			(connect to the subset of actions from the user table).
+			iob.Filter.Event.Long = 0x21FFFFFF;
+			ioctl(fd,Tg8DrvrFILTER_EVENT,&iob.Filter);
+
+   ------------------------------------------------------------------------
+
+   Tg8DrvrGET_QUEUE_LENGTH  Get the events queue length.
+			    ioctl(fd,Tg8DrvrGET_QUEUE_LENGTH,&iob.QueueLength);
+
+   Tg8DrvrPURGE_QUEUE       Discard all events on the process's queue.
+			    ioctl(fd,Tg8DrvrPURGE_QUEUE,NULL);
+
+   ------------------------------------------------------------------------
+
+
+               3. Functions related to the timing actions
+
+
+   ------------------------------------------------------------------------
+
+   Tg8DrvrSET_ACTION_STATE  Set the actions Enabled/Disabled state.
+			    iob.Range.Row = 10; /* The first action number */
+			    iob.Range.Cnt = 2;  /* The number of actions */
+			    iob.ActState.State = Tg8ENABLED; /* Enable them */
+			    ioctl(fd,Tg8DrvrSET_ACTION_STATE,&iob.ActState);
+
+   Tg8DrvrCLEAR_ACTION      Clear the range of the actions.
+			    iob.Range.Row = 5;  /* The first action number to be cleared */
+			    iob.Range.Cnt = 10; /* The number of actions to clear */
+			    ioctl(fd,Tg8DrvrCLEAR_ACTION,&iob.Range);
+
+   ------------------------------------------------------------------------
+
+
+              4. Functions related to the timing objects
+
+
+   ------------------------------------------------------------------------
+
+   Tg8DrvrSET_OBJECT    Define the new timing object.
+			Tg8Object *obj = &iob.Object;
+			obj->Id = 1001;          /* Object's identifier */
+			obj->Timing.Machine = 0; /* No gate conditions */
+			obj->Timing.Trigger.Long = 0x02FFFFFF; /* Trigger code */
+			obj->Timing.LineCw[0] = 0x4100; /* Use the counter #1 */
+			obj->Timing.LineDelay[0] = 120; /*     and delay 120 ms */
+			ioctl(fd,Tg8DrvrSET_OBJECT,obj);
+
+   Tg8DrvrREMOVE_OBJECT  Remove the timing object.
+			 iob.ObjectId = 1001;         /* Object's identifier */
+			 ioctl(fd,Tg8DrvrREMOVE_OBJECT,&iob.ObjectId);
+
+   Tg8DrvrOBJECTS_LIST   Get the list of all known timing object IDs on the module.
+			 iob.ObjectsList.Length = 256;  /* Maximal number of IDs */
+			 ioctl(fd,Tg8DrvrOBJECTS_LIST,&iob.ObjectList);
+
+   ------------------------------------------------------------------------
+
+   Tg8DrvrGET_OBJECT     Get the timing object's details.
+			 iob.ObjectDescr.Object.Id = 1001;
+			 ioctl(fd,Tg8DrvrGET_OBJECT,&iob.ObjectDescr);
+
+   Tg8DrvrOBJECT_PARAM   Change the timing object's parameter.
+			 iob.ObjectParam.Id = 1001;
+			 iob.ObjectParam.Sel= Tg8SEL_DELAY; /* Change the delay */
+			 iob.ObjectParam.Value = 17;  /* New value for the delay */
+			 iob.ObjectParam.Aux = 0;     /* Donn't change clock type */
+			 ioctl(fd,Tg8DrvrOBJECT_PARAM,&iob.ObjectParam);
+
+   ------------------------------------------------------------------------
+
+   Tg8DrvrCONNECT        Connect to the timing object.
+			 iob.ObjectConnect.Id = 1001;
+			 iob.ObjectConnect.Mask = 1; /*1=Connect; 0=Disconnect */
+			 ioctl(fd,Tg8DrvrCONNECT,&iob.ObjectConnect);
+
+   ------------------------------------------------------------------------
+
+
+                        VI. The Driver installation procedure
+
+   The installation procedure scans the range of possible addresses (0xC00000 -
+0xC10000),
+reads and check its interrupt vector and the clock switch setting, reads
+the card hardware status, sets the SSC event header code and finally installs
+the interrupt service routine and unmasks interrupt level according to the
+driver configuration parameters.
+
+
+                        VII. The Driver uninstallation procedure
+
+   The uninstallation procedure resets each configured module, clears appropriate
+interrupt vector and frees the memory allocated during the installation.
+
+
+                        VIII. The restrictions
+
+   The number of actions in the user table is 255, the first action is referenced
+by the number 1. Any number of actions can share the same counter inside the Tg8
+card. Any actions that use only the VME bus interrupt flag (without of the pulse
+generation) have lower priority (in the firmware) in comparison with actions
+producing pulses; their delay value is ALWAYS ZERO even if a process tries to
+setup it to nonzero. The firmware program uses the DPRAM interrupt for all such
+actions and NEVER uses so called direct actions (the Tg8 hardware allows to reuse
+its counters while they are counting in the case if new action will use zero delay).
+These actions can even produce an interrupt later than the next millisecond frame
+will arrive (for heavy loaded firmware program).
+
+
+
+
+			*******************************
+			APPENDIX A. The data structures
+			*******************************
+
+
+				-- The User Table --
+
+
+     Tg8User Table[Tg8ACTIONS]; /* Array of actions */
+
+where the Tg8User structure has a format:
+
+   Tg8Event	uEvent;   /* 32 bits Trigger event */
+   Word		uControl; /* 16 bits Control word  */
+   Word         uDelay;   /* 16 bits Delay value */
+
+
+				-- The Recording Table
+
+
+    Tg8Recording Table[Tg8ACTIONS]; /* Array of Recording blocks */
+
+where
+   Tg8Recording structure has a format:
+
+   Uint   rSc;        /* The 32 bits Super Cycle number (only 24 bits are meaningfull) */
+   Uint   rOcc,       /* Occurence time from the start of the last S-Cycle */
+          rOut;       /* Output time from the start of the last S-Cycle */
+   Word   rNumOfTrig; /* How many times an action was triggered since the last reset */
+   Byte   rOvwrCnt,   /* Number of the lost VME bus interrupts */
+          rOvwrAct;   /* What action was in the interrupt table waiting for the driver service */
+
+
+				-- The Interrupt Table --
+
+
+   Tg8Interrupt CntInter[Tg8CHANNELS]; /* Counter interrupts description list */
+   Tg8Interrupt ImmInter[Tg8IMM_INTS]; /* Immediate interrupts description list */
+
+where
+   Tg8CHANNELS (the number of channels, or counters) is equal to 8,
+   Tg8IMM_INTS (the number of so called immediate actions, e.g. actions that use the
+                VME bus interrupt only and being triggered at the same millisecond),
+   Tg8Interrupt is a structure with the following format:
+
+   Tg8Event iEvent;     /* The trigger event frame */
+   Uint     iSc;        /* The Super Cycle number */
+   Uint     iOcc,       /* Occurence time from the start of the last S-Cycle */
+            iOut;       /* Output time from the start of the last S-Cycle */
+   Tg8IntAction iExt;   /* Extra data concerning the interrupted action */
+where
+   Tg8IntAction organized as follows:
+
+   Byte     iRcvErr;    /* Value of the reception error register */
+   Byte     iOvwrAct;   /* Which action was overwitten (if not 0) -- DONN'T USED */
+   Byte     iAct;       /* Which action was triggered and fired */
+   Byte     iSem;       /* Semaphore to solve the read/write conflicts */
+
+
+				-- The History Table --
+
+
+   Tg8History Table[Tg8HISTORIES]; /* Histories array */
+where
+   Tg8HISTORIES is 1000 (the number of entries inside of the Tg8 card RAM),
+   Tg8History formatted as follows:
+
+   Tg8Event hEvent;     /* Received event frame code */
+   Uint     hSc;        /* The Super Cycle number */
+   Uint     hOcc;       /* Occurence time from the start of the last S-Cycle */
+   Byte     hRcvErr,    /* Value of the reception error register */
+            hHour,      /* The current hour, */
+            hMinute,    /* minute, */
+            hSecond;    /* second */
+
+
+				-- The Clock Table --
+
+
+   Tg8Clock Table[Tg8CLOCKS]; /* Clock errors info records */
+where
+   Tg8CLOCKS is 16 (the table capacity inside of the Tg8 RAM),
+   Tg8Clock is a structure with the format:
+
+   Tg8Event cMsEvent;   /* The last valid ms frame code */
+   Uint     cNumOfMs;   /* Number of previous ms frames received without of errors */
+   Uint     cSc;        /* The Super Cycle number */
+   Uint     cOcc;       /* Occurence time from the start of the last S-Cycle */
+   Byte     cRcvErr,    /* Value of the reception error register */
+            cHour,      /* The current hour, */
+            cMinute,    /* minute, */
+            cSecond;    /* second */
+
+
+				-- The Auxiliary Table --
+
+
+  Tg8Event aEvent;     /* The last received event frame */
+  Tg8Event aMsEvent;   /* The last received ms frame */
+  Uint     aScLen;     /* The last completed S-Cycle length */
+  Uint     aScTime;    /* The current value of the S-Cycle time */
+  Uint     aSc;        /* The Super Cycle number */
+  Uint     aNumOfSc;   /* Number of SC received since the last Reset */
+  Word     aTrace;     /* Used for the firmware debugging */
+  Word     aIntSrc;    /* There are 16 interrupt sources each
+			  corresponds to a bit in this mask */
+  Word     aNumOfBus,  /* Number of the MPC bus interrupts */
+           aNumOfSpur; /* Number of the spurios interrupts */
+  Word     aMbox;      /* The last mailbox operation code */
+  short    aCoco;      /* The last mailbox operation completion code */
+  Word     aFwStat;    /* The firmware state (booting,runnung,stopped) */
+  Word     aSscHeader; /* The SSC header selected (SPS or LEP) */
+  Word     aNumOfEv,   /* Number of events received in the current S-Cycle */
+           aPrNumOfEv; /* Number of events received in the previous S-Cycle */
+  Word     aNumOfAct;  /* Number of defined actions */
+  Word     aAlarms;    /* The bitmask of error conditions */
+  Tg8DateTime aDt;     /* Date, time, rcv error */
+  Byte     aFwVer[16]; /* The firmware version */
+  Word     aSem;       /* Semaphore to solve the read/write conflicts */
+  Word     aQueueSize;   /* Number of frames in the AT queue */
+  Word     aMaxQueueSize;/* Maximal queue size */
+  Word     aMovedFrames; /* Number of unserved frames in the AT queue at the next MS */
+  Uint     aMovedScTime; /* The S-Cycle time when frame moving detected */
+  Uint     aMovedSc;     /* and the Super Cycle number */
+  Word     aProcFrames,  /* Number of the frames processed during the last MS */
+           aModStatus;   /* The module's status  */
+  Tg8Event aQueue[8];    /* Incoming frames queue */
+  Word     aTelegLEP [Tg8GROUPS]; /* The current LEP telegram */
+  Word     aTelegSPS [Tg8GROUPS]; /* The current SPS telegram */
+  Word     aTelegCPS [Tg8GROUPS]; /* The current CPS telegram */
+  Word     aTelegPSB [Tg8GROUPS]; /* The current PSB telegram */
+  Word     aTelegLPI [Tg8GROUPS]; /* The current LPI telegram */
+
+where
+  Tg8GROUPS is 24 (the number of groups in the PS telegrams),
+  Tg8DateTime structured as follows:
+
+  Byte     aYear,      /* The date part */
+           aMonth,
+           aDay,
+           aSpare1;    /* 32-bits alignment is required */
+  Byte     aRcvErr,    /* Value of the reception error register */
+           aHour,      /* The time part */
+           aMinute,
+           aSecond;
+
+
+				-- Event -- Tg8DrvrEvent
+
+
+   Incoming timing event (as returned by the read function) has following format:
+
+   int          Id;     /* Timing object identifier OR action number */
+   Tg8Event     Event;  /* The trigger value as declared in the user table */
+   Tg8Interrupt Inter;  /* Interrupt information about of this event */
+   Word	        Alarms; /* The firmware alarms bit mask ORed with the
+			   driver alarms bit mask */
+   Word         FwStat; /* The current status of the Firmware Program */
+
+where
+   The firmware status bit masks:
+
+   Tg8FS_RUNNING  = 0x1,   /* The firmware program is running normally */
+   Tg8FS_ALARMS   = 0x2,   /* Some errors (alarms) were occured during the
+			      execution of event program */
+and Alarms bit masks:
+   Tg8ALARM_OK       = 0,	/* No alarms */
+
+   The Firmware program sets following bits:
+
+   Tg8ALARM_LOST_IMM = 0x2,     /* The immediate action's interrupt was lost */
+   Tg8ALARM_LOST_OUT = 0x4,     /* The counter pulse was lost */
+   Tg8ALARM_MANY_PROC= 0x8,     /* The AT processes queue is full */
+   Tg8ALARM_QUEUED_PROC = 0x10, /* The AT process was queued (as usually!) */
+   Tg8ALARM_DIFF_EVN = 0x20,    /* The number of events for 2 seq. SCs are different */
+   Tg8ALARM_DIFF_LEN = 0x40,    /* The SC length has been changed */
+   Tg8ALARM_MOVED_PROC=0x80,    /* The AT process is not completed before the next ms */
+   Tg8ALARM_MOVED_IMM =0x100,   /* The immediate interrupts where moved */
+   Tg8ALARM_ACT_DISBL =0x200,   /* The action was disabled, but till is in the CAM */
+   Tg8ALARM_IMMQ_OVF  =0x400,   /* Immediate actions queue overflowed */
+   Tg8ALARM_MBX_BUSY  =0x800,   /* The mailbox busy, but there is the new request */
+
+   The Tg8 Driver sets the rest bits:
+
+   Tg8ALARM_UNCOM    = 0x1000,  /* A counter gives the VME interrupt without the 
+				   appropriate data in the Interrupt Table */
+   Tg8ALARM_BAD_SWITCH=0x2000,  /* The switch ExtClock/10MHz is in bad position */
+   Tg8ALARM_INT_LOST  =0x4000   /* Interrupt info was lost due to the driver is too busy */
+
+========================================================================================
+@

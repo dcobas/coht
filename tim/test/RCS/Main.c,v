@@ -1,0 +1,926 @@
+head	1.21;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.21
+date	2006.08.01.14.38.05;	author lewis;	state Exp;
+branches;
+next	1.20;
+
+1.20
+date	2006.07.04.16.59.43;	author lewis;	state Exp;
+branches;
+next	1.19;
+
+1.19
+date	2006.01.25.13.27.00;	author lewis;	state Exp;
+branches;
+next	1.18;
+
+1.18
+date	2005.09.27.12.51.31;	author lewis;	state Exp;
+branches;
+next	1.17;
+
+1.17
+date	2005.08.29.09.14.42;	author lewis;	state Exp;
+branches;
+next	1.16;
+
+1.16
+date	2005.08.22.09.44.15;	author lewis;	state Exp;
+branches;
+next	1.15;
+
+1.15
+date	2005.08.18.14.57.36;	author lewis;	state Exp;
+branches;
+next	1.14;
+
+1.14
+date	2005.08.11.15.24.28;	author lewis;	state Exp;
+branches;
+next	1.13;
+
+1.13
+date	2005.07.11.08.36.57;	author lewis;	state Exp;
+branches;
+next	1.12;
+
+1.12
+date	2005.07.08.15.57.38;	author lewis;	state Exp;
+branches;
+next	1.11;
+
+1.11
+date	2005.07.04.16.20.56;	author lewis;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	2005.07.04.12.29.25;	author lewis;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	2005.07.04.09.51.31;	author lewis;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	2005.07.04.09.47.22;	author lewis;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	2005.07.04.08.18.12;	author lewis;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2005.07.01.16.37.37;	author lewis;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2005.06.20.13.32.48;	author lewis;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2005.05.04.15.42.56;	author lewis;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2005.05.04.14.57.57;	author lewis;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2005.05.02.09.31.50;	author lewis;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2005.04.25.09.02.13;	author lewis;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.21
+log
+@*** empty log message ***
+@
+text
+@/**************************************************************************/
+/* TimLib test program                                                    */
+/* Julian Lewis 25th April 2005                                           */
+/**************************************************************************/
+
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <sys/types.h>
+#include <errno.h>        /* Error numbers */
+#include <sys/file.h>
+#include <a.out.h>
+#include <ctype.h>
+
+#include <err/err.h>      /* Error handling */
+
+#include <TimLib.h>
+
+extern int timlib_debug;  /* 1/Print stuff, 2/Wipe memory */
+extern int timlib_delay;  /* Input delay when not zero */
+extern int timlib_enable; /* Enable modules */
+extern int timlib_jtag;   /* Reload outdated VHDL accross jtag */
+extern int timlib_ctims;  /* Size of CTIM table in CPS TG8 driver */
+extern int timlib_oby1_8; /* CTRV P2 Output bytes for modules 8..1 */
+
+#include <ctrdrvr.h>
+
+extern CtrDrvrDevice ctr_device; /* To handle specific kinds of CTR devices */
+extern char *devnames[];         /* by name ctr ctri ctrp ctrv ctre etc */
+
+/**************************************************************************/
+/* Code section from here on                                              */
+/**************************************************************************/
+
+/* Print news on startup if not zero */
+
+typedef enum {
+   HELP,
+   ENABLE,
+   DELAY,
+   DEBUG,
+   JTAG,
+   P2BYTES,
+   DEVICE,  /* This must be last as it causes the call to TimLibInit !! */
+   OPTIONS
+ } Options;
+
+char *options[OPTIONS] = {"help","enable","delay","debug","jtag","p2bytes","device"};
+
+#define NEWS 1
+
+#define HISTORIES 24
+#define CMD_BUF_SIZE 128
+
+static char history[HISTORIES][CMD_BUF_SIZE];
+static char *cmdbuf = &(history[0][0]);
+static unsigned int  cmdindx = 0;
+static char prompt[32];
+static char *pname = NULL;
+
+static char *DevNames[TimLibDEVICES] = { "...", "CTR", "CPS_TG8", "SPS_TG8", "NETWORK" };
+static TimLibDevice Dev = TimLibDevice_ANY;
+
+#include "Cmds.h"
+#include "GetAtoms.c"
+#include "PrintAtoms.c"
+#include "DoCmd.c"
+#include "Cmds.c"
+#include "TimCmds.c"
+
+/******************************************************************/
+/* Get size of CTIM table needed on CPS TG8. The driver allocates */
+/* memory dynamically via sysbrk. Once the memory is allocated it */
+/* can not change size. The "extra" parameter is used to allocate */
+/* a few more CTIM for dynamic use through the CreateCtim routine */
+
+unsigned int GetCtimSize(unsigned int extra) {
+unsigned int cnt;
+unsigned long equip;
+
+   cnt = extra; equip = TgvFirstGMember();
+
+   while (equip) {
+      cnt++;
+      equip = TgvNextGMember();
+   }
+   return cnt;
+}
+
+/******************************************************************/
+
+static Boolean error_handler(class,text)
+ErrClass class;
+char *text; {
+
+   fprintf(stderr,"%s\n",text);
+   return(False);
+}
+
+/**************************************************************************/
+/* Prompt and do commands in a loop                                       */
+/**************************************************************************/
+
+#define SPARE_CTIMS 10    /* Space for dynamic CTIMs in TG8 CPS */
+
+int main(int argc,char *argv[]) {
+
+int i, j, found_device;
+unsigned long cnt, mod, cbl, dbg, ind, enb, jtg, oby;
+char *cp, *ep;
+char host[49];
+char tmpb[CMD_BUF_SIZE];
+TimLibError err;
+TimLibDevice dev, fdev, ldev;
+TgvName cblnam;
+
+   TimLibClient = 1;
+   cp = NULL; ep = NULL;
+
+   dev = TimLibDevice_ANY;
+   found_device = 0;
+
+   for (i=1; i<argc; i++) {
+
+      if (strcmp(argv[i],options[HELP]) == 0) {
+	 printf("\nOptions are:\n\n");
+	 for (i=0; i<OPTIONS; i++) {
+	    printf("%s ",options[i]);
+	    switch ((Options) i) {
+	       case HELP:
+		  printf("[print this help text]\n");
+	       break;
+
+	       case ENABLE:
+		  printf("<Enable: 1/Enable>\n");
+	       break;
+
+	       case DELAY:
+		  printf("<Input delay in 25ns ticks>\n");
+	       break;
+
+	       case DEBUG:
+		  printf("<Debug level: 0/None 1/Driver 2/ReWriteActions 3/ClearActions>\n");
+	       break;
+
+	       case JTAG:
+		  printf("<Jtag: 1/Update out of date modules with new VHDL>\n");
+	       break;
+
+	       case P2BYTES:
+		  printf("<p2bytes: in this order:0x87654321 for VME P2 CTRV>\n");
+	       break;
+
+	       case DEVICE:
+		  printf("<Device:");
+		  for (dev=TimLibDevice_CTR; dev<TimLibDEVICES; dev++) {
+		     printf(" %s",DevNames[(int) dev]);
+		  }
+		  printf(">\n");
+	       break;
+
+	       default:
+		  printf("For help type: timtest help\n");
+	    }
+	 }
+	 printf("\n\n");
+	 exit(0);
+      }
+
+      else if (strcmp(argv[i],options[ENABLE]) == 0) {
+	 i++;
+	 cp = argv[i];
+	 enb = 1;
+	 if (cp) enb = strtoul(cp,&ep,0);
+	 if (enb) printf("Enable All Modules: %d/On\n", (int) enb);
+	 timlib_enable = enb;
+	 continue;
+      }
+
+      else if (strcmp(argv[i],options[DELAY]) == 0) {
+	 i++;
+	 cp = argv[i];
+	 ind = 4;
+	 if (cp) ind = strtoul(cp,&ep,0);
+	 if (ind) printf("Input Delay: %d = %dns\n", (int) ind, (int) (ind*25));
+	 timlib_delay = ind;
+	 continue;
+      }
+
+      else if (strcmp(argv[i],options[DEBUG]) == 0) {
+	 i++;
+	 cp = argv[i];
+	 dbg = 0;
+	 if (cp) dbg = strtoul(cp,&ep,0);
+	 TimLibSetDebug(dbg);
+	 if (dbg)      printf("Driver debugging ON\n");
+	 if (dbg == 2) printf("Re-write all actions\n");
+	 if (dbg == 3) printf("Clearing all actions\n");
+	 continue;
+      }
+
+      else if (strcmp(argv[i],options[JTAG]) == 0) {
+	 i++;
+	 cp = argv[i];
+	 jtg = 1;
+	 if (cp) jtg = strtoul(cp,&ep,0);
+	 if (jtg) printf("Jtag VHDL Auto update: %d/On\n",(int) jtg);
+	 timlib_jtag = jtg;
+	 continue;
+      }
+
+      else if (strcmp(argv[i],options[P2BYTES]) == 0) {
+	 i++;
+	 cp = argv[i];
+	 oby = 0;
+	 if (cp) oby = strtoul(cp,&ep,0);
+	 if (oby) printf("P2Bytes for CTRV P2 connector: 0x%X\n",(int) oby);
+	 timlib_oby1_8 = oby;
+	 continue;
+      }
+
+      else if (strcmp(argv[i],options[DEVICE]) == 0) {
+	 i++;
+	 cp = argv[i];
+	 dev = TimLibDevice_ANY;
+	 if (cp) {
+	    for (fdev=TimLibDevice_CTR; fdev<TimLibDEVICES; fdev++) {
+	       if (strcmp(DevNames[(int) fdev],argv[i]) == 0) {
+		  dev = ldev = fdev;
+		  break;
+	       }
+	    }
+	 }
+	 continue;
+      }
+
+   }
+
+   if (dev == TimLibDevice_ANY) {
+      fdev = TimLibDevice_CTR;
+      ldev = TimLibDevice_NETWORK;
+   }
+
+   for (j=1; j<argc; j++) {
+      for (i=0; i<CtrDrvrDEVICES; i++) {
+	 if (strcmp(argv[j],devnames[i]) == 0) {
+	    ctr_device = (CtrDrvrDevice) i;
+	    printf("Forcing CTR device type:%s\n",devnames[i]);
+	    break;
+	 }
+      }
+   }
+
+   for (dev=fdev; dev<=ldev; dev++) {
+      err = TimLibInitialize(dev);
+      if (err == TimLibErrorSUCCESS) {
+	 Dev = dev;
+	 fprintf(stderr,"timtest: Initialized library for device: %s OK\n",DevNames[(int) dev]);
+	 found_device = 1;
+
+	 /* For the CPS TG8 the table must be allocated once by the driver */
+	 /* so I allocate an extra few slots for dynamic CTIM creation. */
+
+	 if (Dev == TimLibDevice_TG8_CPS) {
+	    timlib_ctims = GetCtimSize(SPARE_CTIMS);
+	    fprintf(stderr,"timtest: CPS TG8 driver Ctim table allocation size:%d\n",
+		    (int) timlib_ctims);
+	 }
+	 break;
+      }
+   }
+
+   if (found_device == 0) {
+
+      fprintf(stderr,"timtest: Could not initialize TimLib: No device found\n");
+      printf("For help type: timtest %s\n",options[HELP]);
+
+      exit(1);
+   }
+
+#if NEWS
+   printf("timtest: See <news> command\n");
+   printf("timtest: Type h for help\n");
+#endif
+
+   pname = argv[0];
+   printf("%s: Compiled %s %s\n",pname,__DATE__,__TIME__);
+
+   cnt = TimLibGetInstalledModuleCount();
+   for (i=0; i<cnt; i++) {
+      mod = i+1;
+      TimLibGetCableId(mod,&cbl);
+      if (cbl) {
+	 if (TgvGetCableName(cbl,&cblnam) == 0) {
+	    fprintf(stderr,
+		    "timtest: WARNING: This DSC is NOT configured for Cable:%d on Module:%d\n",
+		    (int) cbl,
+		    (int) mod);
+	 } else printf("DSC Configuration OK on module:%d for Cable:%s(%d)\n",
+		      (int) mod,
+			    cblnam,
+		      (int) cbl);
+      }
+   }
+   if (cnt) printf("timtest: Found:%d %s Modules\n",(int) cnt, DevNames[(int) Dev]);
+
+   bzero((void *) host,49);
+   gethostname(host,48);
+
+   ErrSetHandler((ErrHandler) error_handler);
+
+   while (True) {
+
+      cmdbuf = &(history[cmdindx][0]);
+      if (strlen(cmdbuf)) printf("{%s} ",cmdbuf);
+      fflush(stdout);
+
+      sprintf(prompt,"%s:Tim:%s[%02d]",host,DevNames[(int) Dev],cmdindx+1);
+      printf("%s",prompt);
+
+      bzero((void *) tmpb,CMD_BUF_SIZE);
+      if (gets(tmpb)==NULL) exit(1);
+
+      cp = &(tmpb[0]);
+
+      if (*cp == '!') {
+	 ++cp;
+	 cmdindx = strtoul(cp,&cp,0) -1;
+	 if (cmdindx >= HISTORIES) cmdindx = 0;
+	 cmdbuf = &(history[cmdindx][0]);
+	 continue;
+      } else if (*cp == '.') {
+	 printf("Execute:%s\n",cmdbuf); fflush(stdout);
+      } else if ((*cp == '\n') || (*cp == '\0')) {
+	 cmdindx++;
+	 if (cmdindx >= HISTORIES) { printf("\n"); cmdindx = 0; }
+	 cmdbuf = &(history[cmdindx][0]);
+	 continue;
+      } else if (*cp == '?') {
+	 printf("History:\n");
+	 printf("\t!<1..24> Goto command\n");
+	 printf("\tCR       Goto next command\n");
+	 printf("\t.        Execute current command\n");
+	 printf("\this      Show command history\n");
+	 continue;
+      } else {
+	 cmdindx++; if (cmdindx >= HISTORIES) { printf("\n"); cmdindx = 0; }
+	 strcpy(cmdbuf,tmpb);
+      }
+      bzero((void *) val_bufs,sizeof(val_bufs));
+      GetAtoms(cmdbuf);
+      DoCmd(0);
+   }
+}
+@
+
+
+1.20
+log
+@Handle specific kinds of CTR device forced by an option
+@
+text
+@d121 1
+a121 1
+   cp = ep = NULL;
+d330 2
+a331 1
+	 cmdindx = strtoul(++cp,&cp,0) -1;
+@
+
+
+1.19
+log
+@Handle errors locally, suppress printing by errlog
+@
+text
+@d29 5
+d111 1
+a111 1
+int i, found_device;
+a239 5
+      else {
+	 printf("No such option: %s\n",argv[i]);
+	 printf("For help type: timtest %s\n",options[HELP]);
+	 exit(1);
+      }
+d247 9
+@
+
+
+1.18
+log
+@Handel extra option for CTRV P2 Byte (p2bytes) on VME version
+@
+text
+@d18 2
+d88 10
+d304 2
+@
+
+
+1.17
+log
+@Dynamic calculation of CTIM size for TG8 CPS
+@
+text
+@d25 1
+d39 1
+d44 1
+a44 1
+char *options[OPTIONS] = {"help","enable","delay","debug","jtag","device"};
+d95 1
+a95 1
+unsigned long cnt, mod, cbl, dbg, ind, enb, jtg;
+d136 4
+d198 10
+@
+
+
+1.16
+log
+@*** empty log message ***
+@
+text
+@d24 1
+d65 19
+d88 2
+d219 1
+d226 9
+@
+
+
+1.15
+log
+@*** empty log message ***
+@
+text
+@d131 2
+a132 1
+	 enb = strtoul(cp,&ep,0);
+d141 2
+a142 1
+	 ind = strtoul(cp,&ep,0);
+d151 2
+a152 1
+	 dbg = strtoul(cp,&ep,0);
+d163 2
+a164 1
+	 jtg = strtoul(cp,&ep,0);
+d172 8
+a179 4
+	 for (fdev=TimLibDevice_CTR; fdev<TimLibDEVICES; fdev++) {
+	    if (strcmp(DevNames[(int) fdev],argv[i]) == 0) {
+	       dev = ldev = fdev;
+	       break;
+@
+
+
+1.14
+log
+@Made history easier to use, fed up re-typing commands
+@
+text
+@d239 2
+a240 1
+      printf("{%s}\t ",cmdbuf); fflush(stdout);
+@
+
+
+1.13
+log
+@*** empty log message ***
+@
+text
+@d50 1
+a50 1
+static int  cmdindx = 0;
+d70 1
+a70 1
+int i, rp, pr, found_device;
+d238 3
+a243 2
+      cmdbuf = &(history[cmdindx][0]);
+
+a247 2
+      pr = 0;           /* Dont print a history */
+      rp = 0;           /* Dont repeat a command */
+d249 22
+a270 34
+      while ((*cp == '-')
+      ||     (*cp == '+')
+      ||     (*cp == '.')
+      ||     (*cp == '!')) {
+
+	 pr = 1;        /* Print command on */
+
+	 if (*cp == '!') {
+	    cmdindx = strtoul(++cp,&cp,0) -1;
+	    if (cmdindx >= HISTORIES) cmdindx = 0;
+	    if (cmdindx < 0) cmdindx = HISTORIES -1;
+	    rp = 1;
+	    break;
+	 }
+
+	 if (*cp == '-') {
+	    if (--cmdindx < 0) cmdindx = HISTORIES -1;
+	    cmdbuf = &(history[cmdindx][0]);
+	 }
+
+	 if (*cp == '+') {
+	    if (++cmdindx >= HISTORIES) cmdindx = 0;
+	    cmdbuf = &(history[cmdindx][0]);
+	 }
+
+	 if (*cp == '.') {
+	    rp = 1;
+	    break;
+	 };
+	 cp++;
+      }
+      if (pr) {
+	 printf("{%s}\t ",cmdbuf); fflush(stdout);
+	 if (!rp) continue;
+a271 2
+      if (!rp) strcpy(cmdbuf,tmpb);
+
+a274 2
+
+      if ((!rp) && (++cmdindx >= HISTORIES)) cmdindx = 0;
+@
+
+
+1.12
+log
+@Auto update VHDL version added
+@
+text
+@d80 1
+@
+
+
+1.11
+log
+@*** empty log message ***
+@
+text
+@d23 1
+d36 1
+d41 1
+a41 1
+char *options[OPTIONS] = {"help","enable","delay","debug","device"};
+d71 1
+a71 1
+unsigned long cnt, mod, cbl, dbg, ind, enb;
+d76 1
+a76 1
+TimLibDevice dev;
+d107 4
+d131 1
+a131 1
+	 printf("Enable All Modules: %d/On\n", (int) enb);
+d140 1
+a140 1
+	 printf("Input Delay: %d = %dns\n", (int) ind, (int) (ind*25));
+d150 1
+a150 1
+	 if (dbg == 1) printf("Driver debugging ON\n");
+d156 9
+d167 4
+a170 9
+	 for (dev=TimLibDevice_CTR; dev<TimLibDEVICES; dev++) {
+	    if (strcmp(DevNames[(int) dev],argv[i]) == 0) {
+	       err = TimLibInitialize(dev);
+	       if (err == TimLibErrorSUCCESS) {
+		  Dev = dev;
+		  fprintf(stderr,"timtest: Initialized library for device: %s OK\n",DevNames[(int) dev]);
+		  found_device = 1;
+		  break;
+	       }
+d184 11
+a194 8
+      for (dev=TimLibDevice_CTR; dev<TimLibDEVICES; dev++) {
+	 err = TimLibInitialize(dev);
+	 if (err == TimLibErrorSUCCESS) {
+	    Dev = dev;
+	    fprintf(stderr,"timtest: Initialized library for device: %s OK\n",DevNames[(int) dev]);
+	    found_device = 1;
+	    break;
+	 }
+@
+
+
+1.10
+log
+@*** empty log message ***
+@
+text
+@d39 1
+a39 1
+char *options[OPTIONS] = {"help","enable","delay","device","debug"};
+@
+
+
+1.9
+log
+@Device option must be the last
+@
+text
+@d125 1
+a125 1
+	 printf("Enable Module: %d\n", (int) enb);
+@
+
+
+1.8
+log
+@Proper handling of options
+@
+text
+@a33 1
+   DEVICE,
+d35 1
+@
+
+
+1.7
+log
+@*** empty log message ***
+@
+text
+@d30 11
+d68 2
+a69 2
+int i, rp, pr;
+unsigned long cnt, mod, cbl, dbg, ind;
+d77 4
+a80 4
+#if NEWS
+   printf("timtest: See <news> command\n");
+   printf("timtest: Type h for help\n");
+#endif
+d82 1
+a82 2
+   pname = argv[0];
+   printf("%s: Compiled %s %s\n",pname,__DATE__,__TIME__);
+d84 8
+a91 1
+   TimLibClient = 1;
+d93 3
+a95 1
+   timlib_enable = 1;
+d97 3
+a99 6
+   if (argc >3) {
+      cp = argv[3];
+      ind = strtoul(cp,&ep,0);
+      printf("Input Delay: %d = %d Us\n", (int) ind, (int) (ind*25)/1000000);
+      timlib_delay = ind;
+   }
+d101 3
+a103 8
+   if (argc > 2) {
+      cp = argv[2];
+      dbg = strtoul(cp,&ep,0);
+      TimLibSetDebug(dbg);
+      if (dbg == 1) printf("Driver debugging ON\n");
+      if (dbg == 2) printf("Re-write all actions\n");
+      if (dbg == 3) printf("Clearing all actions\n");
+   }
+d105 6
+a110 7
+   if (argc > 1) {
+      for (dev=TimLibDevice_CTR; dev<TimLibDEVICES; dev++) {
+	 if (strcmp(DevNames[(int) dev],argv[1]) == 0) {
+	    err = TimLibInitialize(dev);
+	    if (err == TimLibErrorSUCCESS) {
+	       Dev = dev;
+	       fprintf(stderr,"timtest: Initialized library for device: %s OK\n",DevNames[(int) dev]);
+d112 3
+d117 2
+d120 54
+a173 1
+   } else {
+d179 1
+d185 5
+a189 13
+   if (dev == TimLibDEVICES) {
+      if (argc > 1)
+	 fprintf(stderr,"timtest: WARNING: Could not initialize TimLib with:%s\n",argv[1]);
+     else
+	 fprintf(stderr,"timtest: WARNING: Could not initialize TimLib: No device found\n");
+
+      fprintf(stderr,"timtest: WARNING: Could not initialize TimLib: No device found\n");
+      fprintf(stderr,"timtest: ERROR: %s\n",TimLibErrorToString(err));
+      fprintf(stderr,"timtest: Valid devices are:");
+      for (dev=TimLibDevice_CTR; dev<TimLibDEVICES; dev++) {
+	 fprintf(stderr,"%s ",DevNames[(int) dev]);
+      }
+      printf("\n");
+d193 8
+@
+
+
+1.6
+log
+@*** empty log message ***
+@
+text
+@d20 4
+@
+
+
+1.5
+log
+@Initialize size in GetAllPtims
+@
+text
+@d54 1
+a54 1
+unsigned long cnt, mod, cbl, dbg;
+d72 9
+a90 1
+
+a101 1
+
+@
+
+
+1.4
+log
+@*** empty log message ***
+@
+text
+@d54 2
+a55 2
+unsigned long cnt, mod, cbl;
+char *cp;
+d72 30
+a101 6
+   for (dev=TimLibDevice_CTR; dev<TimLibDEVICES; dev++) {
+      err = TimLibInitialize(dev);
+      if (err == TimLibErrorSUCCESS) {
+	 Dev = dev;
+	 fprintf(stderr,"timtest: Initialized library for device: %s OK\n",DevNames[(int) Dev]);
+	 break;
+d104 1
+d106 5
+d113 6
+a118 1
+      dev = TimLibDevice_ANY;
+@
+
+
+1.3
+log
+@*** empty log message ***
+@
+text
+@d96 4
+a99 1
+	 } else printf("OK on module:%d for %s\n",(int) mod, cblnam);
+d102 1
+a102 1
+   printf("timtest: Found:%d installed %s modules\n",(int) cnt, DevNames[(int) Dev]);
+@
+
+
+1.2
+log
+@Compiles OK, starting to do tests
+@
+text
+@d37 1
+a37 1
+static char *DevNames[TimLibDEVICES] = { "DevNone", "DevCtr", "DevTg8Cps", "DevTg8Sps", "DevNetwork" };
+d53 2
+a54 1
+int rp, pr;
+d60 1
+d70 2
+d76 1
+a76 1
+	 printf("timtest: Initialized library for device: %s OK\n",DevNames[(int) Dev]);
+d81 2
+a82 2
+      printf("timtest: WARNING: Could not initialize TimLib: No device found\n");
+      printf("timtest: ERROR: %s\n",TimLibErrorToString(err));
+d85 15
+a99 1
+   printf("\n");
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d58 1
+d71 1
+@

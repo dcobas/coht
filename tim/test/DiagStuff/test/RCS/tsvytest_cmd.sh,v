@@ -1,0 +1,84 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.08.29.08.17.03;	author lewis;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2007.08.17.12.56.14;	author lewis;	state Exp;
+branches;
+next	;
+
+
+desc
+@Shell for web browser to start tsvytest
+@
+
+
+1.2
+log
+@Old one was rubbish
+@
+text
+@#/bin/csh
+
+########################################################################
+#       Description:    Takes command line args and feeds them
+#                       into tsvytest.L864.
+#
+#                       Note: This script only works under linux
+#                       Requires additional work to incrase robustness
+#
+#
+#       Author: Paul Kennerley
+#
+#######################################################################
+for x in "$@@"
+do
+	args=$args' '${x}
+done
+
+echo  $args  |/mcr/tim/tsvytest
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d4 2
+a5 2
+#	Description: 	Takes command line args and feeds them
+#			into tsvytest.L864.
+d7 2
+a8 2
+#			Note: This script only works under linux
+#			Requires additional work to incrase robustness
+d10 2
+a11 2
+#	
+#	Author: Paul Kennerley
+d14 4
+d19 1
+a19 13
+#for x in "$@@"
+#do
+#	args=$args' '${x}
+#	echo $x
+#done
+
+#if [ "$OS"  =  "Linux" ]
+#then
+echo   $1
+echo "(dsc dleitim) rrst q "
+ 
+echo  $1  |/mcr/tim/tsvytest 
+#fi
+@

@@ -1,0 +1,4774 @@
+head	1.41;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.41
+date	2007.08.17.14.44.09;	author lewis;	state Exp;
+branches;
+next	1.40;
+
+1.40
+date	2007.08.17.13.40.37;	author lewis;	state Exp;
+branches;
+next	1.39;
+
+1.39
+date	2007.08.16.14.47.09;	author lewis;	state Exp;
+branches;
+next	1.38;
+
+1.38
+date	2007.08.16.12.17.13;	author lewis;	state Exp;
+branches;
+next	1.37;
+
+1.37
+date	2007.08.15.15.21.21;	author lewis;	state Exp;
+branches;
+next	1.36;
+
+1.36
+date	2007.08.15.12.56.32;	author lewis;	state Exp;
+branches;
+next	1.35;
+
+1.35
+date	2007.08.14.11.57.19;	author lewis;	state Exp;
+branches;
+next	1.34;
+
+1.34
+date	2007.08.13.15.54.00;	author lewis;	state Exp;
+branches;
+next	1.33;
+
+1.33
+date	2007.08.06.07.16.48;	author lewis;	state Exp;
+branches;
+next	1.32;
+
+1.32
+date	2007.07.27.07.38.24;	author lewis;	state Exp;
+branches;
+next	1.31;
+
+1.31
+date	2007.07.26.08.24.31;	author lewis;	state Exp;
+branches;
+next	1.30;
+
+1.30
+date	2007.07.20.14.12.13;	author lewis;	state Exp;
+branches;
+next	1.29;
+
+1.29
+date	2007.07.11.14.22.43;	author lewis;	state Exp;
+branches;
+next	1.28;
+
+1.28
+date	2007.07.09.09.37.08;	author lewis;	state Exp;
+branches;
+next	1.27;
+
+1.27
+date	2007.07.03.15.46.22;	author lewis;	state Exp;
+branches;
+next	1.26;
+
+1.26
+date	2007.07.03.14.20.31;	author lewis;	state Exp;
+branches;
+next	1.25;
+
+1.25
+date	2007.07.03.12.04.45;	author lewis;	state Exp;
+branches;
+next	1.24;
+
+1.24
+date	2007.07.02.16.26.50;	author lewis;	state Exp;
+branches;
+next	1.23;
+
+1.23
+date	2007.07.02.15.49.49;	author lewis;	state Exp;
+branches;
+next	1.22;
+
+1.22
+date	2007.06.29.09.53.54;	author lewis;	state Exp;
+branches;
+next	1.21;
+
+1.21
+date	2007.06.27.15.44.57;	author lewis;	state Exp;
+branches;
+next	1.20;
+
+1.20
+date	2007.06.21.14.48.48;	author lewis;	state Exp;
+branches;
+next	1.19;
+
+1.19
+date	2007.06.13.15.34.08;	author lewis;	state Exp;
+branches;
+next	1.18;
+
+1.18
+date	2007.06.12.09.44.03;	author lewis;	state Exp;
+branches;
+next	1.17;
+
+1.17
+date	2007.06.05.15.18.19;	author lewis;	state Exp;
+branches;
+next	1.16;
+
+1.16
+date	2007.06.05.09.45.03;	author lewis;	state Exp;
+branches;
+next	1.15;
+
+1.15
+date	2007.06.05.09.31.31;	author lewis;	state Exp;
+branches;
+next	1.14;
+
+1.14
+date	2007.06.05.09.14.03;	author lewis;	state Exp;
+branches;
+next	1.13;
+
+1.13
+date	2007.06.05.08.47.57;	author lewis;	state Exp;
+branches;
+next	1.12;
+
+1.12
+date	2007.06.04.07.38.24;	author lewis;	state Exp;
+branches;
+next	1.11;
+
+1.11
+date	2007.06.01.12.16.27;	author lewis;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	2007.06.01.09.54.33;	author lewis;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	2007.05.31.16.35.55;	author lewis;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	2007.05.31.12.57.18;	author lewis;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	2007.05.31.09.23.48;	author lewis;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2007.05.29.12.36.22;	author lewis;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2007.05.29.12.24.10;	author lewis;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2007.05.25.15.22.54;	author lewis;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2007.05.25.15.01.51;	author lewis;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2007.05.25.13.28.10;	author lewis;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2007.05.22.09.16.51;	author lewis;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.41
+log
+@Reset added and corrected history logic
+@
+text
+@/* ================================================================================= */
+/*                                                                                   */
+/* Survey daemon to monitor all hardware and timings on a DSC                        */
+/* This program monitors all timings over a super-cycle and stores the results       */
+/* It answers calls  to an input socket and sends 3 types of data back to the caller */
+/*    1) GetStatus:<msk>  Returns the status of the modules described by <msk>       */
+/*    2) GetStatic:<msk>  Returns the settings of all ptims implemented on <msk>     */
+/*    3) GetDynamic:<msk> Returns one complete super-cycle of acquisitions for <msk> */
+/*                                                                                   */
+/* There are some additional commands this task responds to                          */
+/*                                                                                   */
+/*   4) Strings:<flg>    Sets the strings option on or off according to <flg>        */
+/*   5) Help             Sends back some basic help text, good for testing the link  */
+/*   6) List             Sends back list on connected and disconnected ptims         */
+/*   And more see Help text below for a complete list of commands                    */
+/*                                                                                   */
+/* A stream of UDP packets not exceeding 1024 bytes each is sent back to the caller, */
+/* The last packet returned contains the text "EOF\n"                                */
+/*                                                                                   */
+/* The main purpose of this program is to provide timing diagnostics to TimDiag, the */
+/* Java program presenting the timing map, and to provide a WEB page to observe all  */
+/* information about the timing on the DSCs independently of FESA, GM etc, and for   */
+/* any timing reciever module type, CTR TG8 etc                                      */
+/*                                                                                   */
+/* Julian Lewis AB/CO/HT Wed 30th May 2007                                           */
+/*                                                                                   */
+/* ================================================================================= */
+
+#include <pthread.h>
+#include <sched.h>
+#include <stdarg.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <netdb.h>
+#include <sys/time.h>
+#include <errno.h>
+#include <strings.h>
+#include <string.h>
+#include <time.h>
+#include <sys/socket.h>
+#include <sys/sem.h>
+#include <sys/un.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netinet/tcp.h>
+#include <fcntl.h>
+#include <signal.h>
+#include <wait.h>
+#include <unistd.h>
+#include <string.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <errno.h>
+#include <sys/file.h>
+#include <a.out.h>
+#include <ctype.h>
+
+#include <tgv/tgv.h>
+#include <tgm/tgm.h>
+#include <TimLib.h>
+
+#define SEND_PORT 2002
+#define RECV_PORT 2001
+
+#define SinSIZE (sizeof(struct sockaddr_in))
+
+#define MAX_MODULE_COUNT 16
+#define LN 128
+
+extern pid_t getpgid(pid_t pid);
+
+static int domain = AF_INET;
+
+#define SSC_SAMPLES 4                   /* Maximum number of SSCs to disconnect  */
+#define TIME_OUT 1200                   /* 10 Basic periods time out for SCY     */
+
+static unsigned int ssc_samples = 0;    /* Number of SSCs since sampling started */
+static unsigned int sampling    = 0;    /* Zero when disconnected, else PTIMs    */
+static unsigned int use_strings = 1;
+static unsigned int debug       = 0;
+
+static char ScTimeStamp[2][LN];
+static TimLibTime ScTimeOnzt[2];
+
+#define PTIMS 256
+static unsigned long psize;
+static unsigned long ptimlist[PTIMS];
+static unsigned long ptimodes[PTIMS];
+static unsigned long pconnect[PTIMS];
+
+#define OUT_BUF_SZ (100*1024)
+static char *out_buf = NULL;
+					 /* CPS, PSB, LEI, ADE, SPS, LHC, SCT,  FCT            */
+static unsigned long sscs[TgmMACHINES] = {  104, 207, 1,   402, 301, 522, 1104, 0 }; /* SSC-CT */
+static unsigned long scys[TgmMACHINES] = {  105, 205, 2,   404, 308, 0,   1105, 0 }; /* SCY-CT */
+
+typedef enum {
+   SPORT,
+   RPORT,
+   DEBUG,
+   OPTIONS
+ } Options;
+
+static char *options[OPTIONS] = { "-sport",
+				  "-rport",
+				  "-debug" };
+static char *help =
+   "   -sport <PORT>       ;Sets the SEND port number\n"
+   "   -rport <PORT>       ;Sets the RECEIVE port number\n"
+   "   -debug              ;Set Debug printing on\n";
+
+static char *cmd_hlp =
+   "Commands:\n"
+   "   Help                ;Send this help text\n"
+   "   Kill                ;Kills survey task\n"
+   "   List                ;List all PTIMs surveyed and not\n"
+   "   Strings:<Flag>      ;Strings format on if <Flag> is not zero\n"
+   "   Sampling:<Mask>     ;Sample AQNs 16 times on modules by <Mask>\n"
+   "   GetStatus           ;Get status\n"
+   "   GetStatic:[<Mask>]  ;Get settings by <Mask>\n"
+   "   GetDynamic          ;Get dynamic data for Sampling mask\n"
+   "   Debug:<Flag>        ;Switch debug printout on if <Flag> is not zero\n"
+   "   Version             ;Get TimSurvey version\n"
+   "   Ping                ;Used to see if this daemon is alive\n"
+   "   Reset               ;Reset status history\n"
+   "\n"
+   "   If <Module> has value zero, this means all modules\n"
+   "\n"
+   "Keywords: Lists enclosed in [] are exclusive and start from zero\n"
+   "          Lists not enclosed in [] are binary masks\n"
+   "   C:  <Millisecond modulo>        0..n\n"
+   "   ENB:<Enable flag>               [Dis,Enb]\n"
+   "   STR:<Counter start>             [Nor,Ext1/2,Chnd,Self,Remt,Pps,C+S]\n"
+   "   MDE:<Counter mode>              [Once,Mult,Brst,M+B]\n"
+   "   CLK:<Counter clock>             [1KHz,10MHz,40MHz,Ext1/2,Chnd]\n"
+   "   PWD:<Pulse width in 25ns ticks> 1..n\n"
+   "   DLY:<Delay value in CLK units>  0..n\n"
+   "   OMS:<List:Counter outputs>      [Ctim,Cntr1/2/3/4/5/6/7/8,40Mh,ExCk1,ExCk2]\n"
+   "   POL:<Polarity>                  [TTL,BAR]\n"
+   "   CTM:<Ctim event trigger>        1..n/Name\n"
+   "   PLD:<Payload trigger>           0..n\n"
+   "   MCH:<Telegram machine>          [CPS,PSB,LEI,ADE,SPS,LHC,SCT,FCT]\n"
+   "   GRN:<Telegram group number>     1..n/Name\n"
+   "   GRV:<Telegram group value>      0..n/Name\n"
+   "   SSC:<Super cycle time>          Day-dd/Mon/Year hh:mm:ss.ddd <MCH> C:dddd\n"
+   "   ERR:<Error string>              Error message text\n"
+   "   INF:<Information>               Information string\n"
+   "   DEB:<Debug Flag>                [Off,On]\n"
+   "   SMP:<Sampling>                  The number of PTIMs currently sampled\n"
+   "   CNT:<Remaining SSCs>            The number of SSCs left to sample\n"
+   "   MOD:<Module number>             1..16\n"
+   "   DEV:<Device type>               [ANY,CTR,CPS,SPS,NET]\n"
+   "   TYP:<Module type>               [NONE,CTRI,CTRP,CTRV,CPS_TG8,SPS_TG8]\n"
+   "   STS:<List:Status>               [GmtOk/Bad,PllOk/Bad,SlfOK/Bad,BusOk/Bad]\n"
+   "   BAD:<Count>                     Number times module status surveyed bad\n"
+   "   PTM:<Ptim identifier>           1..n\n"
+   "   CHN:<Channel number>            1..8\n"
+   "   DIM:<Dimension of PTM>          1..1024\n"
+   "   PLN:<Program line number>       1..32\n"
+   "   AQN:<Acquisition time value>    n/Date_string\n"
+   "   SVY:<PTIM survey status>        NotSurveyed/Surveyed\n"
+   "   PKT:<Number:hostname>           1..n Packet number in stream, hostname\n"
+   "   EXI:<Host>                      Exit as a result of kill on host\n"
+   "   PNG:<Host>                      Ping reply from host, daemon is alive\n"
+   "   VER:<Date string>               Version string as a date\n"
+   "   VHD:<UTC time>                  VHDL version number\n"
+   "   FMW:<UTC time>                  What VHDL version should be installed\n"
+   "   LIB:<UTC time>                  TimLib version number\n"
+   "   DRV:<UTC time>                  Driver version number\n"
+   "   EOF:<Count:hostname>            1..n Packet count in stream, hostname\n"
+   "\n"
+   "Syntax:\n"
+   "   <keyword>:<value>\n"
+   "   <keyword>::<list>\n";
+
+#define SCY_MARKER 0xffffffff
+#define MAX_EVENTS 1024
+
+static unsigned long scptm[2][MAX_EVENTS]; /* PTIM ID */
+static unsigned long scpld[2][MAX_EVENTS]; /* Payload */
+static unsigned long scpln[2][MAX_EVENTS]; /* User PLS Line number */
+static TimLibTime    sconz[2][MAX_EVENTS]; /* Output time */
+static float         sctim[2][MAX_EVENTS]; /* SC Time diff */
+
+static int sci = 0; /* Super-cycle index 0..1 */
+static int evi = 0; /* Event index 0..MAX_EVENTS */
+static int pec = 0; /* Previous Event index 0..MAX_EVENTS */
+
+#define MAX_ERRORS 50
+
+static int ecnt = 0; /* Error count */
+
+#define HOST_NAME_SZ 32
+char host[HOST_NAME_SZ];
+
+/* ====================================== */
+/* See if an event should be disconnected */
+
+#define MAX_EVENTS_SC 100
+
+int TooFast(unsigned long eqp) {
+
+int i, cnt, evt;
+
+   if (evi < MAX_EVENTS_SC) return 0;
+   for (i=0, cnt=0; i<evi; i++) {
+      evt = scptm[sci][i];
+      if (eqp == evt) cnt++;
+      if (cnt >= MAX_EVENTS_SC) return 1; /* Too fast */
+   }
+   return 0;
+}
+
+/* ============================================ */
+/* Subtract times and return a float in seconds */
+
+float TimeDiff(TimLibTime *l, TimLibTime *r) {
+
+float s, n;
+unsigned long nl, nr;
+
+   s = (float) (l->Second - r->Second);
+
+   nl = l->Nano;
+   nr = r->Nano;
+
+   if (nr > nl) {
+      nl += 1000000000;
+      s -= 1;
+   }
+   n = (unsigned long) ((nl - nr)/1000)*1000;
+
+   return s + (n / 1000000000.0);
+}
+
+/* ============================================================= */
+/* Convert a TimLib time in milliseconds to a string routine.    */
+/* Result is a pointer to a static string representing the time. */
+/*    the format is: Thu-18/Jan/2001 08:25:14.967                */
+/*                   day-dd/mon/yyyy hh:mm:ss.ddd                */
+
+#define NANO_TO_MS 1000000
+
+char *TmToStr(TimLibTime *t, int flg) {
+
+static char tbuf[LN];
+
+char tmp[LN];
+char *yr, *ti, *md, *mn, *dy;
+int prec;
+
+   bzero((void *) tbuf, LN);
+   bzero((void *) tmp,  LN);
+
+   if (((t->Nano/NANO_TO_MS)*NANO_TO_MS) != t->Nano) prec = 1;
+   else                                              prec = NANO_TO_MS;
+
+   if (use_strings) {
+      ctime_r(&t->Second, tmp);
+      tmp[3] = 0;
+      dy = &(tmp[0]);
+      tmp[7] = 0;
+      mn = &(tmp[4]);
+      tmp[10] = 0;
+      md = &(tmp[8]);
+      if (md[0] == ' ') md[0] = '0';
+      tmp[19] = 0;
+      ti = &(tmp[11]);
+      tmp[24] = 0;
+      yr = &(tmp[20]);
+      if (flg == 0) sprintf(tbuf, "%s",ti);
+      if (flg == 1) sprintf(tbuf, "%s-%s/%s/%s %s", dy, md, mn, yr, ti);
+      if (flg != 2) sprintf(&tbuf[strlen(tbuf)],".%03d ",(int) t->Nano/prec);
+   
+      if (t->Machine != TgmMACHINE_NONE) {
+	 strcat(tbuf,TgmGetMachineName(t->Machine));
+	 strcat(tbuf," C:");
+	 sprintf(tmp,"%d",(int) t->CTrain);
+	 strcat(tbuf,tmp);
+      }
+   } else {
+      sprintf(tbuf,"%u.%03d %d C:%u",
+	      (int) t->Second,
+	      (int) t->Nano/prec,
+	      (int) t->Machine,
+	      (int) t->CTrain);
+   }
+   return (tbuf);
+}
+
+/* ================= */
+/* Status To String. */
+
+#define STATAE 5
+
+static char *StatusOn[STATAE] = { "GmtOk",
+				  "PllOk",
+				  "SlfOk",
+				  "EnbOk",
+				  "BusOk"  };
+
+static char *StatusOf[STATAE] = { "GmtBad",
+				  "PllBad",
+				  "SlfBad",
+				  "EnbBad",
+				  "BusBad"};
+
+#define ST_STR_SZ 48
+static char StsStr[ST_STR_SZ];
+
+char *StatusToStr(TimLibStatus sts) {
+int i;
+unsigned long msk;
+
+   bzero((void *) StsStr,ST_STR_SZ);
+   if (use_strings) {
+      for (i=0; i<STATAE; i++) {
+	 msk = 1 << i;
+	 if (msk & TimLibStatusBITS) {
+	    strcat(StsStr,":");
+	    if (msk & sts) strcat(StsStr,StatusOn[i]);
+	    else           strcat(StsStr,StatusOf[i]);
+	 } else break;
+      }
+   } else
+      sprintf(StsStr,"0x%02X",(int) sts);
+   return StsStr;
+}
+
+/* ================= */
+/* Device to string. */
+
+#define DV_STR_SZ 8
+static char DevStr[DV_STR_SZ];
+
+static char *DevNames[TimLibDEVICES] = { "ANY", "CTR", "CPS", "SPS", "NET" };
+
+char *DeviceToStr(TimLibDevice dev) {
+
+   bzero((void *) DevStr,DV_STR_SZ);
+   if (use_strings) {
+      if ((dev <1) || (dev >= TimLibDEVICES)) dev = 0;
+      strcpy(DevStr,DevNames[(int) dev]);
+   } else sprintf(DevStr,"%d",(int) dev);
+   return DevStr;
+}
+
+/* ============================================== */
+/* Get PTIM names. They depend on the device type */
+
+#define PTM_NAME_SZ 32
+
+typedef struct {
+   unsigned long Eqp;
+   char Name[PTM_NAME_SZ];
+   unsigned long Flg;
+ } PtmNames;
+
+static int ptm_names_size = 0;
+static PtmNames ptm_names[PTIMS];
+
+static char ptm_name_txt[PTM_NAME_SZ];
+
+/* ===================================================== */
+/* CPS_TG8 procedure to get names. Look at the info file */
+
+char *GetCpsTg8PtmName(unsigned long eqp) {
+
+char *cp, *ep;
+int i, j, nf, gf;
+FILE *inp;
+char txt[LN];   /* One line of text for temp storage */
+
+   if (ptm_names_size == 0) {
+      inp = fopen("/tmp/tg8infofile","r");
+      if (inp) {
+	 gf = 0;
+	 while (fgets(txt,LN,inp) != NULL) {
+	    nf = 0;
+	    for (i=0; i<strlen(txt); i++) {
+	       if (txt[i] == '=') {
+		  gf = nf = 1;
+	       }
+	       if ((nf) && (txt[i] != '=') && (txt[i] != ' ')) {
+		  cp = &(txt[i]);
+		  for (j=0; j<strlen(cp); j++) {
+		     if (cp[j] == ' ') {
+			cp[j] = 0;
+			break;
+		     }
+		  }
+		  strcpy(ptm_names[ptm_names_size].Name,cp);
+		  break;
+	       }
+	    }
+	    if (gf) {
+	       cp = txt;
+	       if (strncmp("   MEMBER{",cp,10) == 0) {
+		  cp += 10;
+		  ptm_names[ptm_names_size].Eqp = strtoul(cp,&ep,0);
+		  ptm_names_size++;
+	       }
+	    }
+	    if (ptm_names_size >= PTIMS) break;
+	 }
+	 fclose(inp);
+      }
+   }
+
+   bzero((void *) ptm_name_txt, PTM_NAME_SZ);
+
+   if (eqp) {
+      for (i=0; i<ptm_names_size; i++) {
+	 if (ptm_names[i].Eqp == eqp) {
+	    sprintf(ptm_name_txt,"%04d:%s",(int) eqp,ptm_names[i].Name);
+	    return ptm_name_txt;
+	 }
+      }
+   }
+   return ptm_name_txt;
+}
+
+/* ======================================= */
+/* If its a CTR read the ltim.obnames file */
+
+char *GetCtrPtmName(unsigned long eqp) {
+
+char *cp, *ep;
+int i;
+FILE *inp;
+
+   if (ptm_names_size == 0) {
+
+      bzero((void *) &ptm_names, sizeof(ptm_names));
+
+      inp = fopen("/tmp/ltim.obnames","r");
+      if (inp) {
+	 while (fgets(ptm_name_txt,LN,inp) != NULL) {
+	    cp = ep = ptm_name_txt;
+	    ptm_names[ptm_names_size].Eqp = strtoul(cp,&ep,0);
+	    if (cp == ep) continue;
+	    if ((*ep != 0) && (*ep != '\n')) cp = ep +1;
+	    ptm_names[ptm_names_size].Flg = strtoul(cp,&ep,0);
+	    if (cp != ep) ep++;
+
+	    cp = index(ep,':');
+	    if (cp) { *cp = '\0'; cp++; }
+
+	    if (ep) {
+	       for (i=strlen(ep); i>=0; i--) {
+		  if (ep[i] == '\n') {
+		     ep[i] = 0;
+		     break;
+		  }
+	       }
+	       strcpy(ptm_names[ptm_names_size].Name,ep);
+	    }
+
+	    if (++ptm_names_size >= PTIMS) break;
+	 }
+	 fclose(inp);
+      }
+   }
+
+   bzero((void *) ptm_name_txt, PTM_NAME_SZ);
+
+   if (eqp) {
+      for (i=0; i<ptm_names_size; i++) {
+	 if (ptm_names[i].Eqp == eqp) {
+	    sprintf(ptm_name_txt,"%s",ptm_names[i].Name);
+	    return ptm_name_txt;
+	 }
+      }
+   }
+   sprintf(ptm_name_txt,"EQP%d",(int) eqp);
+   return ptm_name_txt;
+}
+
+/* ==================================== */
+/* Get Ptm name for a given device type */
+
+char *GetPtmName(TimLibDevice dev, unsigned long eqp) {
+
+   bzero((void *) ptm_name_txt, PTM_NAME_SZ);
+
+   if (use_strings) {
+      switch (dev) {
+	 case TimLibDevice_CTR:     GetCtrPtmName(eqp);
+	 break;
+	 case TimLibDevice_TG8_CPS: GetCpsTg8PtmName(eqp);
+	 break;
+	 default:                   sprintf(ptm_name_txt,"EQP%d",(int) eqp);
+      }
+   } else sprintf(ptm_name_txt,"%d",(int) eqp);
+
+   return ptm_name_txt;
+}
+
+/* ===================== */
+
+#define USR_NAME_SZ 10
+static char usr_name_txt[USR_NAME_SZ];
+
+char *GetUsrName(int usr, TgmMachine mch) {
+
+unsigned long gn;
+TgmGroupDescriptor desc;
+TgmLineNameTable ltab;
+
+   bzero((void *) usr_name_txt, USR_NAME_SZ);
+   if (use_strings) {
+      if (usr > 0) {
+	 gn = TgmGetGroupNumber(mch,"USER");
+	 if (gn) {
+	    if (TgmGetGroupDescriptor(mch,gn,&desc) == TgmSUCCESS) {
+	       if (TgmGetLineNameTable(mch,"USER",&ltab) == TgmSUCCESS) {
+		  if (usr <= ltab.Size) {
+		     sprintf(usr_name_txt,"%s=0x%x",ltab.Table[usr -1].Name,usr);
+		     return usr_name_txt;
+		  }
+	       }
+	    }
+	 }
+      }
+      sprintf(usr_name_txt,"USR=0x%X",usr);
+      return usr_name_txt;
+   }
+   sprintf(usr_name_txt,"%d",usr);
+   return usr_name_txt;
+}
+
+/* ===================== */
+/* Get Program line name */
+
+#define PLN_NAME_SZ 32
+static char pln_name_text[PLN_NAME_SZ];
+
+char *GetPlnName(unsigned long pln, TimLibCcv *ccv) {
+
+int i, j;
+unsigned long msk;
+TgmGroupDescriptor desc;
+TgmLineNameTable ltab;
+
+   bzero((void *) pln_name_text, PLN_NAME_SZ);
+
+   if (use_strings) {
+      if (ccv->GrNum != 0) {
+	 if ((ccv->Machine < 0) || (ccv->Machine >= TgmMACHINES)) ccv->Machine = 0;
+	 if (TgmGetGroupDescriptor(ccv->Machine,ccv->GrNum,&desc) == TgmSUCCESS) {
+	    if (desc.Type != TgmNUMERIC_VALUE) {
+	       if (TgmGetLineNameTable(ccv->Machine,desc.Name,&ltab) == TgmSUCCESS) {
+		  if (desc.Type == TgmEXCLUSIVE) {
+		     if ((ccv->GrVal > 0) && (ccv->GrVal <= ltab.Size)) j = ccv->GrVal -1;
+		     else                                               j = 0;
+		     sprintf(pln_name_text,"%s.%s",desc.Name,ltab.Table[j].Name);
+		     return pln_name_text;
+		  }
+		  sprintf(pln_name_text,"%s",desc.Name);
+		  for (i=0; i<ltab.Size; i++) {
+		     msk = 1 << i;
+		     if (msk & ccv->GrVal) {
+			strcat(pln_name_text,".");
+			strcat(pln_name_text,ltab.Table[i].Name);
+		     }
+		  }
+		  return pln_name_text;
+	       }
+	    }
+	 }
+      }
+      sprintf(pln_name_text,"GRV%d",(int) pln);
+      return pln_name_text;
+   }
+   sprintf(pln_name_text,"%d",(int) pln);
+   return pln_name_text;
+}
+
+/* =============================== */
+/* Counters output mask to string. */
+
+#define OUT_MASKS  12
+static char *OtmNames[OUT_MASKS] = {"Ctim","Cntr1","Cntr2","Cntr3","Cntr4","Cntr5","Cntr6","Cntr7","Cntr8",
+				    "40Mh","ExCk1","ExCk2" };
+
+#define OTM_STR_SZ 80
+static char OtmStr[OTM_STR_SZ];
+
+char *OtmToStr(TimLibOutput otm) {
+int i;
+unsigned long msk;
+
+   bzero((void *) OtmStr,OTM_STR_SZ);
+   if (use_strings) {
+      if (otm == 0) {
+	 strcat(OtmStr,"NotSet");
+	 return OtmStr;
+      }
+      for (i=0; i<OUT_MASKS; i++) {
+	 msk = 1 << i;
+	 if (msk & TimLibOutputBITS) {
+	    if (msk & otm) {
+	       strcat(OtmStr,":");
+	       strcat(OtmStr,OtmNames[i]);
+	    }
+	 } else break;
+      }
+   } else sprintf(OtmStr,"0x%X",(int) otm);
+
+   return OtmStr;
+}
+
+/* ======================= */
+/* Counters CCV to string. */
+
+#define CCV_FIELDS 13
+#define POLARATIES 3
+
+static char *CounterStart [TimLibSTARTS]  = {"Nor", "Ext1", "Ext2", "Chnd", "Self", "Remt", "Pps", "C+S"};
+static char *CounterMode  [TimLibMODES]   = {"Once", "Mult", "Brst", "M+B"};
+static char *CounterClock [TimLibCLOCKS]  = {"1KHz", "10MHz", "40MHz", "Ext1", "Ext2", "Chnd" };
+static char *Polarity     [POLARATIES]    = {"TTL","BAR","TTL"};
+static char *Enable       [TimLibENABLES] = {"Dis","Enb","Dis","Enb"};
+
+#define CCV_STR_SZ 132
+static char CcvStr[CCV_STR_SZ];
+
+char * CcvToStr(TimLibCcvMask ccm, TimLibCcv *ccv, int pln) {
+
+int i, j;
+unsigned long msk;
+TgmGroupDescriptor desc;
+TgmLineNameTable ltab;
+char tmp[CCV_STR_SZ];
+TgvName tname;
+
+   bzero((void *) CcvStr,CCV_STR_SZ);
+   bzero((void *) tmp   ,CCV_STR_SZ);
+
+   sprintf(CcvStr,"PLN:%d ",pln);
+
+   if (use_strings) {
+      for (i=0; i<CCV_FIELDS; i++) {
+	 msk = 1 << i;
+	 if (msk & TimLibCcvMaskBITS) {
+	    if (msk & ccm) {
+	       switch (msk) {
+		  case TimLibCcvMaskENABLE:
+		     if (ccv->Enable >= TimLibENABLES) ccv->Enable = 0;
+		     sprintf(tmp,"ENB:%s ",Enable[(int) ccv->Enable]);
+		  break;
+
+		  case TimLibCcvMaskSTART:
+		     if (ccv->Start >= TimLibSTARTS) ccv->Start = 0;
+		     sprintf(tmp,"STR:%s ",CounterStart[(int) ccv->Start]);
+		  break;
+
+		  case TimLibCcvMaskMODE:
+		     if (ccv->Mode >= TimLibMODES) ccv->Mode = 0;
+		     sprintf(tmp,"MDE:%s ",CounterMode[(int) ccv->Mode]);
+		  break;
+
+		  case TimLibCcvMaskCLOCK:
+		     if (ccv->Clock >= TimLibCLOCKS) ccv->Clock = 0;
+		     sprintf(tmp,"CLK:%s ",CounterClock[(int) ccv->Clock]);
+		  break;
+
+		  case TimLibCcvMaskPWIDTH:
+		     sprintf(tmp,"PWD:%d ",(int) ccv->PulsWidth);
+		  break;
+
+		  case TimLibCcvMaskDELAY:
+		     sprintf(tmp,"DLY:%d ",(int) ccv->Delay);
+		  break;
+
+		  case TimLibCcvMaskOMASK:
+		     sprintf(tmp,"OMS:%s ",OtmToStr(ccv->OutputMask));
+		  break;
+
+		  case TimLibCcvMaskPOLARITY:
+		     if (ccv->Polarity >= POLARATIES) ccv->Polarity = 0;
+		     sprintf(tmp,"POL:%s ",Polarity[(int) ccv->Polarity]);
+		  break;
+
+		  case TimLibCcvMaskCTIM:
+		     if (TgvGetNameForMember(ccv->Ctim,&tname)) {
+			sprintf(tmp,"CTM:%s ",(char *) tname);
+		     } else {
+			sprintf(tmp,"CTM:%d ",(int) ccv->Ctim);
+		     }
+		  break;
+
+		  case TimLibCcvMaskPAYLOAD:
+		     if (ccv->Payload) sprintf(tmp,"PLD:0x%X ",(int) ccv->Payload);
+		  break;
+
+		  case TimLibCcvMaskMACHINE:
+		     if (ccv->GrNum == 0) break;
+		     if ((ccv->Machine < 0) || (ccv->Machine >= TgmMACHINES)) ccv->Machine = 0;
+		     sprintf(tmp,"MCH:%s ",TgmGetMachineName(ccv->Machine));
+		  break;
+
+		  case TimLibCcvMaskGRNUM:
+		     if (ccv->GrNum == 0) break;
+		     if (TgmGetGroupDescriptor(ccv->Machine,ccv->GrNum,&desc) == TgmSUCCESS) {
+			sprintf(tmp,"GRN:%s ",desc.Name);
+		     } else {
+			sprintf(tmp,"GRN:%d ",(int) ccv->GrNum);
+		     }
+		  break;
+
+		  case TimLibCcvMaskGRVAL:
+		     if (ccv->GrNum == 0) break;
+		     if (TgmGetGroupDescriptor(ccv->Machine,ccv->GrNum,&desc) == TgmSUCCESS) {
+			if (desc.Type != TgmNUMERIC_VALUE) {
+			   if (TgmGetLineNameTable(ccv->Machine,desc.Name,&ltab) == TgmSUCCESS) {
+			      if (desc.Type == TgmEXCLUSIVE) {
+				 if ((ccv->GrVal > 0) && (ccv->GrVal <= ltab.Size)) {
+				    j = ccv->GrVal -1;
+				 } else {
+				    j = 0;
+				 }
+				 sprintf(tmp,"GRV=%s ",ltab.Table[j].Name);
+				 break;
+			      }
+			      sprintf(tmp,"GRV:");
+			      for (i=0; i<ltab.Size; i++) {
+				 msk = 1 << i;
+				 if (msk & ccv->GrVal) {
+				    strcat(tmp,ltab.Table[i].Name);
+				    strcat(tmp,":");
+				 }
+			      }
+			      tmp[strlen(tmp) -1] = ' ';
+			      break;
+			   }
+			}
+		     }
+		     sprintf(tmp,"GRV:%d ",(int) ccv->GrVal);
+		  break;
+
+		  default:
+		  break;
+	       }
+	       if ((strlen(tmp) && (strlen(CcvStr) + strlen(tmp)) < CCV_STR_SZ))
+		  strcat(CcvStr,tmp);
+
+	       bzero((void *) tmp,CCV_STR_SZ);
+	    }
+	 }
+      }
+      if (strlen(CcvStr)) CcvStr[strlen(CcvStr) -1] = 0;
+   } else {
+      for (i=0; i<CCV_FIELDS; i++) {
+	 msk = 1 << i;
+	 if (msk & TimLibCcvMaskBITS) {
+	    if (msk & ccm) {
+	       switch (msk) {
+		  case TimLibCcvMaskENABLE:
+		     sprintf(tmp,"ENB:%d ",(int) ccv->Enable);
+		  break;
+
+		  case TimLibCcvMaskSTART:
+		     sprintf(tmp,"STR:%d ",(int) ccv->Start);
+		  break;
+
+		  case TimLibCcvMaskMODE:
+		     sprintf(tmp,"MDE:%d ",(int) ccv->Mode);
+		  break;
+
+		  case TimLibCcvMaskCLOCK:
+		     sprintf(tmp,"CLK:%d ",(int) ccv->Clock);
+		  break;
+
+		  case TimLibCcvMaskPWIDTH:
+		     sprintf(tmp,"PWD:%d ",(int) ccv->PulsWidth);
+		  break;
+
+		  case TimLibCcvMaskDELAY:
+		     sprintf(tmp,"DLY:%d ",(int) ccv->Delay);
+		  break;
+
+		  case TimLibCcvMaskOMASK:
+		     sprintf(tmp,"OMS:%d ",(int) ccv->OutputMask);
+		  break;
+
+		  case TimLibCcvMaskPOLARITY:
+		     sprintf(tmp,"POL:%d ",(int) ccv->Polarity);
+		  break;
+
+		  case TimLibCcvMaskCTIM:
+		     sprintf(tmp,"CTM:%d ",(int) ccv->Ctim);
+		  break;
+
+		  case TimLibCcvMaskPAYLOAD:
+		     if (ccv->Payload) sprintf(tmp,"PLD:0x%X ",(int) ccv->Payload);
+		  break;
+
+		  case TimLibCcvMaskMACHINE:
+		     if (ccv->GrNum == 0) break;
+		     sprintf(tmp,"MCH:%d ",(int) ccv->Machine);
+		  break;
+
+		  case TimLibCcvMaskGRNUM:
+		     if (ccv->GrNum == 0) break;
+		     sprintf(tmp,"GRN:%d ",(int) ccv->GrNum);
+		  break;
+
+		  case TimLibCcvMaskGRVAL:
+		     if (ccv->GrNum == 0) break;
+		     sprintf(tmp,"GRV:%d ",(int) ccv->GrVal);
+		  break;
+
+		  default:
+		  break;
+	       }
+	       if ((strlen(tmp) && (strlen(CcvStr) + strlen(tmp)) < CCV_STR_SZ))
+		  strcat(CcvStr,tmp);
+	       bzero((void *) tmp,CCV_STR_SZ);
+	    }
+	 }
+      }
+      if (strlen(CcvStr)) CcvStr[strlen(CcvStr) -1] = 0;
+   }
+   return CcvStr;
+}
+
+/* ==================================== */
+/* Open a UDP port for SendSocket data  */
+
+static unsigned short send_port = 0;
+static int send_sock = 0;
+#define SEND_IP_SZ 16
+static char send_ip[SEND_IP_SZ];
+
+int OpenSendPort(unsigned short port) {
+
+struct sockaddr_in sin;
+int    s;
+
+   if (!send_sock) {
+      s = socket(domain, SOCK_DGRAM, 0);
+      if (s < 0) {
+	 fprintf(stderr,"TimSurvey:OpenSendPort:Error:Cant open sockets\n");
+	 perror("TimSurvey:OpenSendPort:errno");
+	 return 0;
+      }
+      send_sock = s;
+
+      bzero((void *) &sin, SinSIZE);
+      sin.sin_family = domain;
+      sin.sin_port = htons(port);
+      sin.sin_addr.s_addr = htonl(INADDR_ANY);
+      if (bind(s,(struct sockaddr *) &sin, SinSIZE) < 0) {
+	 fprintf(stderr,"TimSurvey:OpenSendPort:Error:Cant bind port:%d\n",port);
+	 perror("TimSurvey:OpenSendPort:errno");
+	 close(s);
+	 send_sock = 0;
+	 return 0;
+      }
+   }
+   return 1;
+}
+
+/* ============================= */
+/* Send packet to a port via UDP */
+
+int SendToPort(char *ip, unsigned short port, char *pkt, int sze) {
+
+int cc;
+struct sockaddr_in sin;
+
+   if (send_sock) {
+      bzero((void *) &sin, SinSIZE);
+      sin.sin_family = domain;
+      sin.sin_port = htons(port);
+      sin.sin_addr.s_addr = inet_addr(ip);
+      cc = sendto(send_sock,
+		  pkt,
+		  sze,
+		  0,
+		  (struct sockaddr *) &sin,
+		  SinSIZE);
+
+      if (cc < 0) {
+	 fprintf(stderr,
+		"TimSurvey:SendToPort:Error:Cant sendto port:%d at:%s\n",
+		 port,
+		 ip);
+	 perror("TimSurvey:SendToPort:errno");
+	 return 0;
+      }
+      usleep(10000); /* Avoid saturating network and client */
+   }
+   return 1;
+}
+
+/* ==================================== */
+/* Open a UDP port for RecvSocket data  */
+
+static unsigned short recv_port = 0;
+static int recv_sock = 0;
+
+int OpenRecvPort(unsigned short port) {
+
+struct sockaddr_in sin;
+
+int s;
+
+   if (!recv_sock) {
+      s = socket(domain, SOCK_DGRAM, 0);
+      if (s < 0) {
+	 fprintf(stderr,"TimSurvey:OpenRecvPort:Error:Cant open sockets\n");
+	 perror("TimSurvey:OpenRecvPort:errno");
+	 return 0;
+      }
+      recv_sock = s;
+
+      bzero((void *) &sin, SinSIZE);
+      sin.sin_family = domain;
+      sin.sin_port = htons(port);
+      sin.sin_addr.s_addr = htonl(INADDR_ANY);
+      if (bind(s,(struct sockaddr *) &sin, SinSIZE) < 0) {
+	 fprintf(stderr,"TimSurvey:OpenRecvPort:Error:Cant bind port:%d\n",port);
+	 perror("TimSurvey:OpenRecvPort:errno");
+	 close(recv_sock);
+	 recv_sock = 0;
+	 return 0;
+      }
+   }
+   return 1;
+}
+
+/* ============================ */
+/* Receive packets from socket  */
+
+#define PKB_SZ 132
+static char rbuf[PKB_SZ];
+
+int RecvFromPort(unsigned short source_port) {
+
+int                cc;
+socklen_t          from;
+struct sockaddr_in sin;
+
+   if (recv_sock) {
+      bzero((void *) &sin, SinSIZE);
+      from = sizeof(sin);
+      cc = recvfrom(recv_sock,
+		    (char *) rbuf,
+		    PKB_SZ,
+		    0,
+		    (struct sockaddr *) &sin,
+		    &from);
+      if (cc < 0) {
+	 fprintf(stderr,
+		"TimSurvey:RecvFromPort:Error:Cant recvfrom port:%d\n",
+		 source_port);
+	 perror("TimSurvey:RecvFromPort");
+	 return 0;
+      }
+
+      strcpy(send_ip,inet_ntop(domain,&(sin.sin_addr),send_ip,SEND_IP_SZ)); /* Reply address */
+
+      return 1;
+   }
+   return 0;
+}
+
+/* =============================================== */
+/* Break up packets into sub packets and send them */
+
+#define PKT_SZ 1024
+#define EN_PKT_SZ 16
+#define IO_PKT_SZ (PKT_SZ + 48)
+static char EnPkt[EN_PKT_SZ];
+static char IoPkt[IO_PKT_SZ];
+
+int BreakAndSend(char *pkt, char *cmd) {
+
+int i, from, to, chrs, pkln, cnt;
+
+   pkln = strlen(pkt);
+
+   for (i=0, from=0, chrs=0, cnt=0; i<pkln; i++) {
+
+      if (pkt[i] == '\n') to = i;
+
+      if (chrs >= PKT_SZ) {
+	 chrs = to - from + 1; cnt++;
+
+	 bzero((void *) IoPkt, IO_PKT_SZ);
+	 sprintf(IoPkt,"PKT:%d:%s:%s\n",cnt,host,cmd);
+	 strncat(IoPkt,&(pkt[from]),chrs);
+	 SendToPort(send_ip, send_port, IoPkt, strlen(IoPkt));
+
+	 from = to + 1; i = from; chrs = 0;
+      } else chrs++;
+   }
+
+   if (from < pkln) {
+      chrs = pkln - from; cnt++;
+
+      bzero((void *) IoPkt, IO_PKT_SZ);
+      sprintf(IoPkt,"PKT:%d:%s:%s\n",cnt,host,cmd);
+      strncat(IoPkt,&(pkt[from]),chrs);
+      SendToPort(send_ip, send_port, IoPkt, strlen(IoPkt));
+   }
+
+   sprintf(EnPkt,"EOF:%d:%s:%s\n",cnt,host,cmd);
+   chrs = strlen(EnPkt);
+   SendToPort(send_ip, send_port, EnPkt, chrs);
+
+   return 1;
+}
+
+/* ========================================== */
+/* Catch broken pipe signals when client dies */
+
+static int pok = 1;
+
+void sigpipehand(int signo) {
+   pok = 0;
+}
+
+/* =================================== */
+/* Catch Sig Child to clean up zombies */
+
+void sigchildhand(int signo) {
+   while (waitpid(-1,NULL,WNOHANG) >0);
+}
+
+/* ========================== */
+/* Catch Sig HUP from wreboot */
+
+void sighuphand(int signo) {
+   exit(kill(0,SIGHUP));
+}
+
+/* ============= */
+/* Other signals */
+
+void sigother(int signo) {
+   printf("TimSurvey:Caught signal: %d: Shutting down\n",signo);
+   sighuphand(SIGHUP);
+}
+
+/* ==================================== */
+/* Convert module mask to module number */
+
+unsigned long MaskToMod(unsigned long *mmask, int flag) {
+
+unsigned long i, msk;
+
+   for (i=16; i>0; i--) {
+      msk = 1 << (i-1);
+      if (msk & *mmask) {
+	 if (flag) *mmask &= ~msk;
+	 return i;
+      }
+   }
+   return 0;
+}
+
+/* ==================================== */
+/* Convert module number to module mask */
+
+unsigned long ModToMask(unsigned long mod) {
+
+   if ((mod > 0) && (mod <= 16)) {
+      return (1 << (mod-1));
+   }
+   return 0;
+}
+
+/* ========================================= */
+/* Convert a module count into a module mask */
+
+unsigned long CntToMask(unsigned long cnt) {
+
+static unsigned long mmask;
+
+int i;
+
+   mmask = 0;
+   if ((cnt > 0) && (cnt <= 16)) {
+      for (i=0; i<cnt; i++) mmask |= 1<<i;
+   }
+   return mmask;
+}
+
+/* ========================================= */
+/* Convert a module mask into a module count */
+
+unsigned long MaskToCnt(unsigned long mmask) {
+
+static unsigned long cnt;
+
+int i;
+
+   cnt = 0;
+   for (i=0; i<16; i++) {
+      if ((1 << i) & mmask) cnt++;
+   }
+   return cnt;
+}
+
+/* ====================================================================== */
+/* ComsThread waits for start of the super-cycle signaled by main thread. */
+/* There needs to be at least 2 SSCs since sampling was switched on.      */
+
+void WaitSsc() {
+
+int si;
+
+   if (sampling) {
+      if (ssc_samples < 2) {
+	 while (ssc_samples < 2) usleep(10000);
+      } else {
+	 si = sci;
+	 while (si == sci)       usleep(10000);
+      }
+   }
+   return;
+}
+
+/* ============================== */
+/* Paranoid buffer append routine */
+
+int AppendBuf(char *data) {
+
+int i;
+
+   for (i=OUT_BUF_SZ; i <OUT_BUF_SZ + 16; i++) {
+      if (out_buf[i] != (char) (0xFF & i)) {
+	 fprintf(stderr,"TimSurvey:AppendBuf:Fatal:Buffer Over-run error\n");
+	 exit(1);
+      }
+   }
+
+   if (strlen(out_buf) >= OUT_BUF_SZ) {
+      fprintf(stderr,"TimSurvey:AppendBuf:Fatal:Buffer corrupted error\n");
+      exit(1);
+   }
+
+   if ((strlen(data) + strlen(out_buf)) >= OUT_BUF_SZ) return 0;
+
+   strcat(out_buf,data);
+   return strlen(out_buf);
+}
+
+/* ================================ */
+/* Check status and kepp in history */
+
+static char ErStsLog[MAX_MODULE_COUNT][LN];
+static long ErStsCnt[MAX_MODULE_COUNT];
+static long OkStsFlg[MAX_MODULE_COUNT];
+
+void CheckStatus() {
+
+unsigned long sts, mcn, mod;
+TimLibDevice dev;
+int i;
+
+   mcn = TimLibGetInstalledModuleCount();
+   for (i=0; i<mcn; i++) {
+      mod = i+1;
+      sts = TimLibGetStatus(mod,&dev);
+      if (sts == TimLibStatusBITS) {
+	 OkStsFlg[i]++;
+	 continue;
+      }
+
+      if (OkStsFlg[i] && (strlen(ScTimeStamp[sci]))) {
+	 OkStsFlg[i] = 0;
+	 ErStsCnt[i]++;
+	 sprintf(ErStsLog[i],
+		 "BAD:%d MOD:%d STS:%s SSC:%s\n",
+		 (int) ErStsCnt[i],
+		 (int) mod,
+		 StatusToStr(sts),
+		 ScTimeStamp[sci]);
+      }
+   }
+}
+
+/* ================================================ */
+/* Get the versions of VHDL/Firmware on all modules */
+
+static char *mtyp[TimLibModuleTYPES] = {"NONE","CTRI","CTRP","CTRV",
+					"CPS_TG8", "SPS_TG8" };
+
+char *BuildVersion() {
+
+TimLibModuleVersion tver;
+TimLibTime t;
+char tmp[LN];
+int i;
+
+#ifndef COMPILE_TIME
+#define COMPILE_TIME 0
+#endif
+
+   bzero((void *) out_buf, OUT_BUF_SZ);
+
+   bzero((void *) &t, sizeof(TimLibTime));
+   t.Machine = TgmMACHINE_NONE;
+   t.Second = COMPILE_TIME;
+
+   sprintf(out_buf,"LIB:%d VER:%s\n",(int) t.Second, TmToStr(&t,1));
+
+   if (TimLibGetModuleVersion(&tver) == TimLibErrorSUCCESS) {
+
+      t.Second = tver.DrvVer;
+      sprintf(tmp,"DRV:%d VER:%s\n",(int) t.Second, TmToStr(&t,1));
+      strcat(out_buf,tmp);
+      t.Second = tver.CorVer;
+      sprintf(tmp,"TYP:%s FMW:%d VER:%s\n",
+	      mtyp[(int) tver.ModTyp],
+	      (int) t.Second,
+	      TmToStr(&t,1));
+      strcat(out_buf,tmp);
+
+      for (i=0; i<TimLibMODULES; i++) {
+	 if (tver.ModVer[i]) {
+	    t.Second  = tver.ModVer[i];
+	    if (tver.CorVer == t.Second) {
+	       sprintf(tmp,"MOD:%d VHD:%d\n",
+		       i+1,
+		       (int) t.Second);
+	    } else {
+	       sprintf(tmp,"MOD:%d VHD:%d VER:%s FMW:%d ERR:Bad VHD not equal FMW\n",
+		       i+1,
+		       (int) t.Second,
+		       TmToStr(&t,1),
+		       (int) tver.CorVer);
+	    }
+	    strcat(out_buf,tmp);
+	 }
+      }
+   }
+   return out_buf;
+}
+
+/* ============================= */
+/* Build the status data strings */
+
+char *BuildStatus(unsigned long mmask) {
+
+char tmp[LN];
+int i, si;
+unsigned long sts, mcn, mod;
+TimLibDevice dev;
+
+   bzero((void *) out_buf, OUT_BUF_SZ);
+   if (sci) si = 0; else si = 1;
+   sprintf(out_buf,"SSC:%s\n",ScTimeStamp[si]);
+
+   mcn = TimLibGetInstalledModuleCount();
+   mmask &= CntToMask(mcn);
+
+   while ((mod = MaskToMod(&mmask,1))) {
+      sts = TimLibGetStatus(mod,&dev);
+      sprintf(tmp,
+	      "MOD:%d DEV:%s STS:%s\n",
+	      (int) mod,
+	      DeviceToStr(dev),
+	      StatusToStr(sts));
+      if (!AppendBuf(tmp)) {
+	 sprintf(out_buf,"ERR:(out_buf string too small)\n");
+	 fprintf(stderr,"TimSurvey:BuildStatus:Error:(out_buf string too small)");
+	 return out_buf;
+      }
+
+      if (mod) {
+	 i = mod -1;
+	 if (ErStsCnt[i]) {
+	    if (!AppendBuf(ErStsLog[i])) {
+	       sprintf(out_buf,"ERR:(out_buf string too small)\n");
+	       fprintf(stderr,"TimSurvey:BuildStatus:Error:(out_buf string too small)");
+	       return out_buf;
+	    }
+	 }
+      }
+   }
+   sprintf(tmp,
+	   "SMP:%d CNT:%d DEB:%d\n",
+	   sampling,
+	   (SSC_SAMPLES - ssc_samples),
+	   debug);
+   if (!AppendBuf(tmp)) {
+      sprintf(out_buf,"ERR:(out_buf string too small)\n");
+      fprintf(stderr,"TimSurvey:BuildStatus:Error:(out_buf string too small)");
+   }
+
+   return out_buf;
+}
+
+/* ============================================ */
+/* Build the list of all ptims surveyed and not */
+
+#define NAMES_PER_LINE 6
+
+char *BuildList() {
+
+char tmp[LN];
+int i, si;
+TimLibDevice dev;
+
+   bzero((void *) out_buf, OUT_BUF_SZ);
+   if (sci) si = 0; else si = 1;
+   sprintf(out_buf,"SSC:%s\n",ScTimeStamp[si]);
+
+   TimLibGetStatus(1,&dev);
+
+   if (use_strings) sprintf(tmp,"SVY:Surveyed\n");
+   else             sprintf(tmp,"SVY:1\n");
+   strcat(out_buf,tmp);
+   for (i=0; i<psize; i++) {
+      if ((sampling) && (ptimodes[i] == 0) && pconnect[i]) {
+	 sprintf(tmp,":%s",GetPtmName(dev,ptimlist[i]));
+	 if (((i+1)%NAMES_PER_LINE)==0) strcat(tmp,"\n");
+	 if (!AppendBuf(tmp)) {
+	    sprintf(out_buf,"ERR:(out_buf string too small)\n");
+	    fprintf(stderr,"TimSurvey:BuildList:Error:(out_buf string too small)");
+	    return out_buf;
+	 }
+      }
+   }
+   if (use_strings) sprintf(tmp,"\nSVY:NotSurveyed\n");
+   else             sprintf(tmp,"\nSVY:0\n");
+   strcat(out_buf,tmp);
+   for (i=0; i<psize; i++) {
+      if ((sampling == 0) || (ptimodes[i]) || (pconnect[i] == 0)) {
+	 sprintf(tmp,":%s",GetPtmName(dev,ptimlist[i]));
+	 if (((i+1)%NAMES_PER_LINE)==0) strcat(tmp,"\n");
+	 if (!AppendBuf(tmp)) {
+	    sprintf(out_buf,"ERR:(out_buf string too small)\n");
+	    fprintf(stderr,"TimSurvey:BuildList:Error:(out_buf string too small)");
+	    return out_buf;
+	 }
+      }
+   }
+   AppendBuf("\n");
+   return out_buf;
+}
+
+/* =================== */
+/* Short CCV to String */
+
+char *ShCcvToStr(TimLibCcv *ccv) {
+
+static char res[LN];
+TgvName tname;
+
+   if (ccv->Start >= TimLibSTARTS) ccv->Start = 0;
+   if (ccv->Clock >= TimLibCLOCKS) ccv->Clock = 0;
+
+   if (TgvGetNameForMember(ccv->Ctim,&tname) == NULL)
+      sprintf((char *) tname,"%d",(int) ccv->Ctim);
+
+   if (use_strings) {
+      sprintf(res,
+	      "CLK:%s STR:%s DLY:%d CTM:%s",
+	      CounterClock[(int) ccv->Clock],
+	      CounterStart[(int) ccv->Start],
+	      (int) ccv->Delay,
+	      (char *) tname);
+   } else {
+      sprintf(res,
+	      "CLK:%d STR:%d DLY:%d CTM:%d",
+	      (int) ccv->Clock,
+	      (int) ccv->Start,
+	      (int) ccv->Delay,
+	      (int) ccv->Ctim);
+   }
+   return res;
+}
+
+/* ============================= */
+/* Build the static data strings */
+
+#define MAX_MODULES_IN_ONE_GO 3
+
+char *BuildStatic(unsigned long mmask) {
+
+char tmp[CCV_STR_SZ];
+int i, j, si;
+unsigned long mcn, ptm, pmd, chn, dim, pln, grn, grv;
+TimLibCcvMask ccm;
+TimLibCcv ccv;
+TimLibError err;
+TimLibDevice dev;
+
+   bzero((void *) out_buf, OUT_BUF_SZ);
+   if (sci) si = 0; else si = 1;
+   sprintf(out_buf,"SSC:%s\n",ScTimeStamp[si]);
+
+   mcn = TimLibGetInstalledModuleCount();
+   mmask &= CntToMask(mcn);
+
+   if (MaskToCnt(mmask) > MAX_MODULES_IN_ONE_GO) {
+      sprintf(out_buf,"MOD:%d ERR:(Too many modules installed)\n",(int) mcn);
+      return out_buf;
+   }
+
+   err = TimLibGetAllPtimObjects(ptimlist, &psize, PTIMS);
+   if (err) {
+      fprintf(stderr,"TimSurvey:BuildStatic:Error:(Can't get PTIM list)\n");
+      fprintf(stderr,"TimSurvey:BuildStatic:Error:%s\n",TimLibErrorToString(err));
+
+      sprintf(tmp,"ERR:(Can't get PTIM object list)\n");
+      if (!AppendBuf(tmp)) strcpy(out_buf,tmp);
+      return out_buf;
+   }
+
+   for (i=0; i<psize; i++) {
+
+      ptm = ptimlist[i];
+      if (ptm) {
+
+	 err = TimLibGetPtimObject(ptm,&pmd,&chn,&dim);
+	 if (err) {
+	    fprintf(stderr,"TimSurvey:BuildStatic:Error:(Can't get PTIM object:%d)\n",(int) ptm);
+	    fprintf(stderr,"TimSurvey:BuildStatic:Error:%s\n",TimLibErrorToString(err));
+
+	    sprintf(tmp,"ERR:(Can't get PTIM object:%d)\n",(int) ptm);
+	    if (!AppendBuf(tmp)) strcpy(out_buf,tmp);
+	    return out_buf;
+	 }
+	 if (ModToMask(pmd) & mmask) {
+	    err = TimLibGetStatus(pmd,&dev);
+	    sprintf(tmp,
+		    "\nPTM:%s MOD:%d CHN:%d DIM:%d\n",
+		    GetPtmName(dev,ptm),
+		    (int) pmd,
+		    (int) chn,
+		    (int) dim);
+	    if (!AppendBuf(tmp)) {
+	       strcpy(out_buf,tmp);
+	       return out_buf;
+	    }
+
+	    for (j=0; j<dim; j++) {
+	       pln = j+1; grn = 0; grv = 0;
+	       err = TimLibGet(ptm,pln,grn,grv,&ccm,&ccv);
+	       if (err) {
+		  fprintf(stderr,"TimSurvey:BuildStatic:Error:(Can't get PTIM CCV:%d.%d)\n",
+			  (int) ptm, (int) pln);
+		  fprintf(stderr,"TimSurvey:Main:Static:Error:%s\n",TimLibErrorToString(err));
+
+		  sprintf(tmp,"ERR:(Can't get PTIM CCV:%d.%d)\n",(int) ptm, (int) pln);
+		  if (!AppendBuf(tmp)) strcpy(out_buf,tmp);
+		  return out_buf;
+	       }
+	       sprintf(tmp,"%s\n",CcvToStr(ccm,&ccv,pln));
+	       if (!AppendBuf(tmp)) {
+		  fprintf(stderr,"TimSurvey:BuildStatic:Error:(out_buf string too small)");
+		  sprintf(out_buf,"ERR:(out_buf string too small)\n");
+		  return out_buf;
+	       }
+	    }
+	 }
+      }
+   }
+   return out_buf;
+}
+
+/* ============================== */
+/* Build the dynamic data strings */
+
+char *BuildDynamic(unsigned long mmask) {
+
+char tmp[LN];
+int i, si;
+unsigned long mcn, ptm, sts, pmd, chn, dim, pln, grn, grv;
+TimLibError err;
+TimLibDevice dev;
+TimLibCcvMask ccm;
+TimLibCcv ccv;
+
+   WaitSsc();
+
+   bzero((void *) out_buf, OUT_BUF_SZ);
+   if (sci) si = 0; else si = 1;
+   sprintf(out_buf,"0.000 SSC:%s:%s\n",host,ScTimeStamp[si]);
+
+   mcn = TimLibGetInstalledModuleCount();
+   mmask &= CntToMask(mcn);
+
+   for (i=0; i<pec; i++) {
+      ptm = scptm[si][i];
+      if (ptm) {
+	 if (ptm == SCY_MARKER) {
+	    sprintf(tmp,
+		    "%2.3f USR:%s SCY:%s:%s\n",
+		    sctim[si][i],
+		    GetUsrName(scpld[si][i],
+			       sconz[si][i].Machine),
+		    host,
+		    TmToStr(&(sconz[si][i]),0));
+	    if (!AppendBuf(tmp)) {
+	       fprintf(stderr,"TimSurvey:BuildDynamic:Error:(out_buf string too small)");
+	       sprintf(out_buf,"ERR:(out_buf string too small)\n");
+	       return out_buf;
+	    }
+	    continue;
+	 }
+	 err = TimLibGetPtimObject(ptm,&pmd,&chn,&dim);
+	 if (err) {
+	    fprintf(stderr,"TimSurvey:BuildDynamic:Error:(Can't get PTIM object:%d)\n",(int) ptm);
+	    fprintf(stderr,"TimSurvey:BuildDynamic:Error:%s\n",TimLibErrorToString(err));
+
+	    sprintf(tmp,"ERR:(Can't get PTIM object:%d)\n",(int) ptm);
+	    if (!AppendBuf(tmp)) strcpy(out_buf,tmp);
+	    return out_buf;
+	 }
+	 if (ModToMask(pmd) & mmask) {
+	    sts = TimLibGetStatus(pmd,&dev);
+	    pln = scpln[si][i]; grn = 0; grv = 0;
+	    err = TimLibGet(ptm,pln,grn,grv,&ccm,&ccv);
+	    if (dim>1) {
+	       if (scpld[si][i]) {
+		  sprintf(tmp,
+			  "%2.3f PTM:%s PLN:%s PLD:0x%X AQN:%s MOD:%d CHN:%d %s\n",
+			  sctim[si][i],
+			  GetPtmName(dev,ptm),
+			  GetPlnName(pln,&ccv),
+			  (int) scpld[si][i],
+			  TmToStr(&(sconz[si][i]),2),
+			  (int) pmd,
+			  (int) chn,
+			  ShCcvToStr(&ccv));
+	       } else {
+		  sprintf(tmp,
+			  "%2.3f PTM:%s PLN:%s AQN:%s MOD:%d CHN:%d %s\n",
+			  sctim[si][i],
+			  GetPtmName(dev,ptm),
+			  GetPlnName(pln,&ccv),
+			  TmToStr(&(sconz[si][i]),2),
+			  (int) pmd,
+			  (int) chn,
+			  ShCcvToStr(&ccv));
+	       }
+	    } else {
+	       if (scpld[si][i]) {
+		  sprintf(tmp,
+			  "%2.3f PTM:%s PLD:0x%X AQN:%s MOD:%d CHN:%d %s\n",
+			  sctim[si][i],
+			  GetPtmName(dev,ptm),
+			  (int) scpld[si][i],
+			  TmToStr(&(sconz[si][i]),2),
+			  (int) pmd,
+			  (int) chn,
+			  ShCcvToStr(&ccv));
+	       } else {
+		  sprintf(tmp,
+			  "%2.3f PTM:%s AQN:%s MOD:%d CHN:%d %s\n",
+			  sctim[si][i],
+			  GetPtmName(dev,ptm),
+			  TmToStr(&(sconz[si][i]),2),
+			  (int) pmd,
+			  (int) chn,
+			  ShCcvToStr(&ccv));
+	       }
+	    }
+	    if (!AppendBuf(tmp)) {
+	       fprintf(stderr,"TimSurvey:BuildDynamic:Error:(out_buf string too small)");
+	       sprintf(out_buf,"ERR:(out_buf string too small)\n");
+	       return out_buf;
+	    }
+	 }
+      } else break;
+   }
+   if (sampling == 0) AppendBuf("SMP:0 (Sampling is OFF, no PTIM results)\n");
+
+   return out_buf;
+}
+
+/* ===================== */
+/* DisConnect from PTIMS */
+
+int DisconnectPtims() {
+
+int i, cnt;
+
+unsigned long ptm;
+unsigned long dim;
+unsigned long mod;
+unsigned long chn;
+TimLibError   err;
+
+   cnt = 0;
+   if (sampling != 0) {
+      for (i=0; i<psize; i++) {
+	 ptm = ptimlist[i];
+	 if (ptm && (ptimodes[i] == 0) && pconnect[i]) {
+	    pconnect[i] = 0;
+	    err = TimLibGetPtimObject(ptm,&mod,&chn,&dim);
+	    if (err) continue;
+	    err = TimLibDisConnect(TimLibClassPTIM,ptm,mod);
+	    if (err) continue;
+	    cnt++;
+	 }
+      }
+
+      bzero((void *) scptm[0], MAX_EVENTS * sizeof(unsigned long));
+      bzero((void *) scptm[1], MAX_EVENTS * sizeof(unsigned long));
+      sampling = 0;
+   }
+   return cnt;
+}
+
+/* ========================================== */
+/* Connect to the PTIM timings for monitoring */
+
+int ConnectPtims(unsigned long mmask) {
+
+int i, j, cnt;
+TimLibDevice  dev;
+TimLibStatus  sts;
+unsigned long mcn;
+unsigned long ptm;
+unsigned long dim;
+unsigned long pmd;
+unsigned long chn;
+unsigned long pln;
+unsigned long grn;
+unsigned long grv;
+TimLibCcvMask ccm;
+TimLibCcv     ccv;
+TimLibError   err;
+
+   mcn = TimLibGetInstalledModuleCount();
+   mmask &= CntToMask(mcn);
+
+   cnt = 0;
+   if (sampling == 0) {
+      for (i=0; i<psize; i++) {
+
+	 ptm = ptimlist[i];
+	 if (ptm) {
+
+	    err = TimLibGetPtimObject(ptm,&pmd,&chn,&dim);
+	    if (err) {
+	       fprintf(stderr,"TimSurvey:ConnectPtims:(Can't get PTIM object:%d)\n",(int) ptm);
+	       fprintf(stderr,"TimSurvey:ConnectPtims:(%s)\n",TimLibErrorToString(err));
+	       return 0;
+	    }
+	    sts = TimLibGetStatus(pmd,&dev);
+	    if (debug) {
+	       printf("TimSurvey:ConnectPtims:Debug:PTM:%s MOD:%02d CHN:%d DEV:%s DIM:%d\n",
+		      GetPtmName(dev,ptm),(int) pmd,(int) chn,DeviceToStr(dev),(int) dim);
+	    }
+
+	    for (j=0; j<dim; j++) {
+	       pln = j+1; grn = 0; grv = 0;
+	       err = TimLibGet(ptm,pln,grn,grv,&ccm,&ccv);
+	       if (err) {
+		  fprintf(stderr,"TimSurvey:ConnectPtims:(Can't get PTIM CCV:%d.%d)\n",
+			  (int) ptm, (int) pln);
+		  fprintf(stderr,"TimSurvey:ConnectPtims:(%s)\n",TimLibErrorToString(err));
+		  return 0;
+	       }
+	       if (ccv.Mode != TimLibModeNORMAL) ptimodes[i]++;
+	    }
+
+	    if (ptimodes[i]) {
+	       if (debug) {
+		  printf("TimSurvey:ConnectPtims:Debug:PTM:%s (Skipped mode not NORMAL)\n",
+			 GetPtmName(dev,ptm));
+	       }
+	       continue;
+	    }
+
+	    if (mmask & ModToMask(pmd)) {
+	       err = TimLibConnect(TimLibClassPTIM,ptm,pmd);
+	       if (err) {
+		  fprintf(stderr,"TimSurvey:ConnectPtims:(Can't connect PTIM:%d)\n",(int) ptm);
+		  fprintf(stderr,"TimSurvey:ConnectPtims:(%s)\n",TimLibErrorToString(err));
+		  return 0;
+	       }
+	       cnt++;
+	       pconnect[i] = 1;
+	    }
+	 }
+      }
+      sampling = cnt;
+      ssc_samples = 0;
+   }
+   return cnt;
+}
+
+/* ==================== */
+/* Comunications thread */
+
+static void ComsThread(void) {
+
+char *cp, *ep, *dp;
+unsigned long mmask, tmask;
+char cmd_err[LN];
+int i;
+
+   mmask = 0;
+
+   if (OpenSendPort(send_port) == 0) {
+      fprintf(stderr,"TimSurvey:ComsThread:Error:(Can't Open Send port:%d)\n",(int) send_port);
+      exit(127);
+   }
+
+   if (OpenRecvPort(recv_port) == 0) {
+      fprintf(stderr,"TimSurvey:ComsThread:Error:(Can't Open receive port:%d)\n",(int) recv_port);
+      exit(127);
+   }
+
+   while (RecvFromPort(recv_port)) {
+
+      if (debug) printf("TimSurvey:ComsThread:Debug:ReplyIp:%s\n",send_ip);
+
+      dp = "Ping";
+      if (strncmp(dp,rbuf,strlen(dp)) == 0) {
+	 BreakAndSend("",dp);
+	 if (debug) printf("TimSurvey:ComsThread:Debug:Command:(%s)\n",rbuf);
+	 bzero((void *) rbuf, PKB_SZ);
+	 continue;
+      }
+
+      dp = "Kill";
+      if (strncmp(dp,rbuf,strlen(dp)) == 0) {
+	 sprintf(cmd_err,"EXI:%s\n",host);
+	 BreakAndSend(cmd_err,dp);
+	 if (debug) printf("TimSurvey:ComsThread:Debug:Command:(%s)\n",rbuf);
+	 bzero((void *) rbuf, PKB_SZ);
+	 exit(0);
+      }
+
+      dp = "Help";
+      if (strncmp(dp,rbuf,strlen(dp)) == 0) {
+	 BreakAndSend(cmd_hlp,dp);
+	 if (debug) printf("TimSurvey:ComsThread:Debug:Command:(%s)\n",rbuf);
+	 bzero((void *) rbuf, PKB_SZ);
+	 continue;
+      }
+
+      dp = "List";
+      if (strncmp(dp,rbuf,strlen(dp)) == 0) {
+	 BuildList();
+	 BreakAndSend(out_buf,dp);
+	 if (debug) printf("TimSurvey:ComsThread:Debug:Command:(%s)\n",rbuf);
+	 bzero((void *) rbuf, PKB_SZ);
+	 continue;
+      }
+
+      dp = "Version";
+      if (strncmp(dp,rbuf,strlen(dp)) == 0) {
+	 BuildVersion();
+	 BreakAndSend(out_buf,dp);
+	 if (debug) printf("TimSurvey:ComsThread:Debug:Command:(%s)\n",rbuf);
+	 bzero((void *) rbuf, PKB_SZ);
+	 continue;
+      }
+
+      dp = "Debug:";
+      if (strncmp(dp,rbuf,strlen(dp)) == 0) {
+	 cp = &rbuf[strlen(dp)];
+	 debug = strtoul(cp,&ep,0);
+	 sprintf(cmd_err,"DEB:%d\n",debug);
+	 BreakAndSend(cmd_err,dp);
+	 if (debug) printf("TimSurvey:ComsThread:Debug:Command:(%s)\n",rbuf);
+	 bzero((void *) rbuf, PKB_SZ);
+	 continue;
+      }
+
+      dp = "Strings:";
+      if (strncmp(dp,rbuf,strlen(dp)) == 0) {
+	 cp = &rbuf[strlen(dp)];
+	 use_strings = strtoul(cp,&ep,0);
+	 sprintf(cmd_err,"PSR:%d\n",use_strings);
+	 BreakAndSend(cmd_err,dp);
+	 if (debug) printf("TimSurvey:ComsThread:Debug:Command:(%s)\n",rbuf);
+	 bzero((void *) rbuf, PKB_SZ);
+	 continue;
+      }
+
+      dp = "Sampling:";
+      if (strncmp(dp,rbuf,strlen(dp)) == 0) {
+	 cp = &rbuf[strlen(dp)];
+	 DisconnectPtims();
+	 sampling = 0;
+	 ssc_samples = 0;
+	 mmask = strtoul(cp,&ep,0);
+	 if (mmask) ConnectPtims(mmask);
+	 sprintf(cmd_err,"SMP:%d\n",sampling);
+	 BreakAndSend(cmd_err,dp);
+	 if (debug) printf("TimSurvey:Main:Debug:Command:(%s)\n",rbuf);
+	 bzero((void *) rbuf, PKB_SZ);
+	 continue;
+      }
+
+      dp = "Reset";
+      if (strncmp(dp,rbuf,strlen(dp)) == 0) {
+	 for (i=0; i<MAX_MODULE_COUNT; i++) {
+	    ErStsCnt[i] = 0;
+	    OkStsFlg[i] = 1;
+	 }
+	 BreakAndSend("",dp);
+	 if (debug) printf("TimSurvey:Main:Debug:Command:(%s)\n",rbuf);
+	 bzero((void *) rbuf, PKB_SZ);
+	 continue;
+      }
+
+      dp = "GetStatus";
+      if (strncmp(dp,rbuf,strlen(dp)) == 0) {
+	 cp = &rbuf[strlen(dp)];
+	 tmask = 0xFFFF;
+	 BuildStatus(tmask);
+	 BreakAndSend(out_buf,dp);
+	 if (debug) printf("TimSurvey:Main:Debug:Command:(%s)\n",rbuf);
+	 bzero((void *) rbuf, PKB_SZ);
+	 continue;
+      }
+
+      dp = "GetStatic:";
+      if (strncmp(dp,rbuf,strlen(dp)) == 0) {
+	 cp = &rbuf[strlen(dp)];
+	 tmask = strtoul(cp,&ep,0); if (tmask == 0) tmask = mmask;
+	 BuildStatic(tmask);
+	 BreakAndSend(out_buf,dp);
+	 if (debug) printf("TimSurvey:Main:Debug:Command:(%s)\n",rbuf);
+	 bzero((void *) rbuf, PKB_SZ);
+	 continue;
+      }
+
+      dp = "GetDynamic";
+      if (strncmp(dp,rbuf,strlen(dp)) == 0) {
+	 BuildDynamic(mmask);
+	 BreakAndSend(out_buf,dp);
+	 if (debug) printf("TimSurvey:Main:Debug:Command:(%s)\n",rbuf);
+	 bzero((void *) rbuf, PKB_SZ);
+	 continue;
+      }
+
+      sprintf(cmd_err,"ERR:BadString:(%s)",rbuf);
+      BreakAndSend(cmd_err,"");
+      if (debug) printf("TimSurvey:Main:Debug:%s\n",cmd_err);
+      bzero((void *) rbuf, PKB_SZ);
+   }
+   fprintf(stderr,"TimSurvey:ComsThread:Error:(Error RecvPort port:%d)\n",(int) recv_port);
+   perror("TimSurvey:ComsThread");
+   exit(127);
+}
+
+/* ========================================================== */
+/* Ensure TimSurvey runs only once, by taking SysIV semaphore */
+
+int SetRunning(char *name) {
+
+int key = TgmGetKey(name);
+int sd;
+struct sembuf sop;
+union semun {
+   int val;
+   struct semid_ds *buff;
+   unsigned short *array;
+} arg;
+
+  sd  = semget(key,1,0666|IPC_CREAT);
+  if (sd == -1) {
+  fail:
+    return -1; /* can not start */
+  }
+
+/* Unblock semaphore */
+
+  bzero((char *) &arg, sizeof(arg));
+  arg.val = 1;
+  if (semctl(sd,0,SETVAL,arg) == -1) goto fail;
+
+/* Block it */
+
+  bzero((char *) &sop, sizeof(sop));
+  sop.sem_num = 0;
+  sop.sem_op  = -1;
+  sop.sem_flg = SEM_UNDO; /* Undo block if task dies */
+  if (semop(sd,&sop,1) == -1) goto fail;
+  return 0;
+}
+
+/* ================================================= */
+/* Check semaphore to see if task is running already */
+
+int CheckRunning(char *name) {
+
+int key = TgmGetKey(name);
+int sd;
+int cnt;
+struct semid_ds desc;
+union semun {
+   int val;
+   struct semid_ds *buff;
+   unsigned short *array;
+} arg;
+
+  sd  = semget(key,1,0);
+  if (sd == -1) return 0; /* Task is not running */
+
+  bzero((char *) &desc, sizeof(desc));
+  bzero((char *) &arg, sizeof(arg));
+  arg.buff = &desc;
+
+  if (semctl(sd,0,IPC_STAT,arg) == -1 || desc.sem_otime == 0) return 0;
+  cnt = semctl(sd,0,GETVAL,arg);
+  return (cnt == 0); /* cnt is 0 only when the daemon is running */
+}
+
+/* ================================================================================ */
+/* Main                                                                             */
+
+int main(int argc,char *argv[]) {
+
+int i;
+char *cp, *ep;
+pid_t pid;
+pthread_t tid;
+
+struct sigaction action, old;
+
+TimLibDevice  dev;
+TimLibStatus  sts;
+TimLibError   err;
+int           mcn;
+unsigned long cid;
+unsigned long grn;
+
+TimLibClass    icls;
+unsigned long  eqp;
+unsigned long  pln;
+TimLibHardware hsrc;
+TimLibTime     onzt;
+TimLibTime     trgt;
+TimLibTime     strt;
+unsigned long  ctm;
+unsigned long  ssc;
+unsigned long  scy;
+unsigned long  pld;
+unsigned long  mod;
+unsigned long  mis;
+unsigned long  qsz;
+TgmMachine     mch;
+
+   if (CheckRunning("TimSurvey") == 0) SetRunning("TimSurvey");
+   else                                exit(0);
+
+   out_buf = (char *) malloc(OUT_BUF_SZ + 16);
+   if (out_buf == NULL) {
+      fprintf(stderr,"TimSurvey:Main:(Can't allocate buffers)\n");
+      fprintf(stderr,"TimSurvey:Main:Fatal:(Not enough memory)\n");
+      exit(1);
+   }
+   for (i=OUT_BUF_SZ; i <OUT_BUF_SZ + 16; i++) out_buf[i] = (char) (0xFF & i);
+
+   TimLibClient = 1; /* Unblock special TimLib code */
+
+   /* Default arg values */
+
+   debug       = 0;
+   use_strings = 1;
+
+   bzero((void *) ScTimeStamp,sizeof(ScTimeStamp));
+   bzero((void *) ScTimeOnzt ,sizeof(ScTimeOnzt));
+
+   /* Process command line arguments */
+
+   send_port = SEND_PORT;
+   recv_port = RECV_PORT;
+
+   for (i=1; i<argc; i++) {
+
+      cp = NULL;
+
+      if (strncmp(argv[i],options[SPORT],strlen(options[SPORT])) == 0) {
+	 i++;
+	 cp = argv[i];
+	 if (cp) send_port = (unsigned short) strtoul(cp,&ep,0);
+	 continue;
+      }
+
+      if (strncmp(argv[i],options[RPORT],strlen(options[RPORT])) == 0) {
+	 i++;
+	 cp = argv[i];
+	 if (cp) recv_port = (unsigned short) strtoul(cp,&ep,0);
+	 continue;
+      }
+
+      if (strncmp(argv[i],options[DEBUG],strlen(options[DEBUG])) == 0) {
+	 debug = 1;
+	 continue;
+      }
+
+      printf("%s\n",help);
+      exit(1);
+   }
+
+   if ((send_port == 0) || (recv_port == 0)) {
+      printf("TimSurvey:Main:Fatal:(Send/Receive ports not specified)\n");
+      exit(1);
+   }
+
+   setsid();
+   chdir("/tmp");
+   freopen( "/dev/null"    , "r", stdin);
+   freopen( "/dev/console" , "w", stdout);
+   freopen( "/dev/console" , "w", stderr);
+
+#ifdef __linux__
+   setpgid (pid,getpgid(0));
+#else
+   setpgid (pid,getpgrp());
+#endif
+
+   gethostname(host,HOST_NAME_SZ);
+
+   bzero((void *) &action, sizeof (action));
+   action.sa_handler = (void (*)(int)) sigchildhand;
+   sigaction(SIGCHLD, &action, &old);
+
+   bzero((void *) &action, sizeof (action));
+   action.sa_handler = (void (*)(int)) sighuphand;
+   sigaction(SIGHUP, &action, &old);
+
+   err = TimLibInitialize(TimLibDevice_ANY);
+   if (err) {
+      fprintf(stderr,"TimSurvey:Main:(Can't initialize TimLib)\n");
+      fprintf(stderr,"TimSurvey:Main:(%s)\n",TimLibErrorToString(err));
+      exit(err);
+   }
+
+   mod = 1;
+   mcn = TimLibGetInstalledModuleCount();
+   if (mcn) {
+      sts = TimLibGetStatus(mod,&dev);
+      printf("TimSurvey:Main:Modules:%d Device:%s\n",(int) mod,DeviceToStr(dev));
+   } else {
+      fprintf(stderr,"TimSurvey:Main:Fatal:(No installed modules)\n");
+      exit(1);
+   }
+
+   err = TimLibGetCableId(mod,&cid);
+   if (err) {
+      fprintf(stderr,"TimSurvey:Main:(Can't get GMT Cable ID)\n");
+      fprintf(stderr,"TimSurvey:Main:Fatal:(%s)\n",TimLibErrorToString(err));
+      exit(err);
+   }
+   mch = TgvTgvToTgmMachine(TgvFirstMachineForCableId(cid));
+   if ((mch < 0) || (mch > TgmMACHINES)) {
+      fprintf(stderr,"TimSurvey:Main:(Can't get Tgm machine)\n");
+      fprintf(stderr,"TimSurvey:Main:Fatal:(Bad GMT cable ID)\n");
+      exit(1);
+   }
+   if (TgmAttach(mch,TgmTELEGRAM | TgmLINE_NAMES) != TgmSUCCESS) {
+      fprintf(stderr,"TimSurvey:Main:Fatal:(Can't attach Tgm machine)\n");
+      exit(1);
+   }
+
+   ssc = sscs[(int) mch];
+   if (debug) printf("TimSurvey:Main:Debug:TgmMachine:%s SSC:%d\n",
+		     TgmGetMachineName(mch),(int) ssc);
+   scy = scys[(int) mch];
+   if (debug) printf("TimSurvey:Main:Debug:TgmMachine:%s SCY:%d\n",
+		     TgmGetMachineName(mch),(int) scy);
+
+   for (i=0; i<PTIMS; i++) ptimlist[i] = 0;
+   for (i=0; i<PTIMS; i++) ptimodes[i] = 0;
+   for (i=0; i<PTIMS; i++) pconnect[i] = 0;
+   psize = 0;
+
+   for (i=0; i<MAX_MODULE_COUNT; i++) OkStsFlg[i] = 1;
+   for (i=0; i<MAX_MODULE_COUNT; i++) ErStsCnt[i] = 0;
+
+   err = TimLibGetAllPtimObjects(ptimlist, &psize, PTIMS);
+   if (err) {
+      fprintf(stderr,"TimSurvey:Main:(Can't get PTIM list)\n");
+      fprintf(stderr,"TimSurvey:Main:Fatal:%s\n",TimLibErrorToString(err));
+      exit(err);
+   }
+   printf("TimSurvey:Main:(Found:%d PTIMS)\n",(int) psize);
+
+   if (ssc) {
+      err = TimLibConnect(TimLibClassCTIM,ssc,mod);
+      if (err) {
+	 fprintf(stderr,"TimSurvey:Main:(Can't connect to SSC-CT:%d)\n",(int) ssc);
+	 fprintf(stderr,"TimSurvey:Main:Fatal:(%s)\n",TimLibErrorToString(err));
+	 exit(err);
+      }
+   }
+   if (scy) {
+      err = TimLibConnect(TimLibClassCTIM,scy,mod);
+      if (err) {
+	 fprintf(stderr,"TimSurvey:Main:(Can't connect to SCY-CT:%d)\n",(int) scy);
+	 fprintf(stderr,"TimSurvey:Main:Fatal:(%s)\n",TimLibErrorToString(err));
+	 exit(err);
+      }
+   }
+   err = TimLibQueue(0,TIME_OUT);
+   if (err) {
+      fprintf(stderr,"TimSurvey:Main:(Can't set timeout)\n");
+      fprintf(stderr,"TimSurvey:Main:Warning:(%s)\n",TimLibErrorToString(err));
+      exit(err);
+   }
+
+   pthread_create(&tid,NULL,(void *(*)()) ComsThread, NULL);
+
+   ecnt = 0;
+   while (ecnt < MAX_ERRORS) {
+
+      CheckStatus();
+
+      err = TimLibWait( &icls, &eqp,  &pln, &hsrc,
+			&onzt, &trgt, &strt,
+			&ctm,  &pld,  &mod,
+			&mis,  &qsz,  &mch );
+      if (err) {
+	 if (err == TimLibErrorTIMEOUT) {
+	    if (debug) printf("TimSurvey:Main:Debug:TimeOut:(From TimLibWait)\n");
+	    continue;
+	 }
+	 fprintf(stderr,"TimSurvey:Main:(From TimLibWait)\n");
+	 fprintf(stderr,"TimSurvey:Main:(%s)\n",TimLibErrorToString(err));
+	 sleep(1);
+	 ecnt++;
+	 continue;
+      }
+
+      if (icls == TimLibClassCTIM) {
+	 onzt.Nano = (onzt.Nano/NANO_TO_MS)*NANO_TO_MS;
+	 if (eqp == ssc) {
+	    pec = evi; evi = 0;
+	    if (sci) sci = 0; else sci = 1;
+	    bzero((void *) scptm[sci], MAX_EVENTS * sizeof(unsigned long));
+	    strcpy(ScTimeStamp[sci],TmToStr(&onzt,1));
+	    ScTimeOnzt[sci] = onzt;
+	    sched_yield();
+	    if (debug) {
+	       if (sampling) {
+		  printf("TimSurvey:Main:Debug:Event:(SSC:%s CNT:On:%d)\n",
+			 ScTimeStamp[sci],
+			 (SSC_SAMPLES - ssc_samples));
+	       } else {
+		  printf("TimSurvey:Main:Debug:Event:(SSC:%s CNT:Off)\n",
+			 ScTimeStamp[sci]);
+	       }
+	    }
+	    if (sampling) {
+	       if (++ssc_samples >= SSC_SAMPLES) {
+		  DisconnectPtims();
+		  if (debug) printf("TimSurvey:Main:Debug:Event:(AutoDisconnect PTIMs)\n");
+	       }
+	    }
+	    continue;
+	 }
+	 if (eqp == scy) {
+	    eqp = SCY_MARKER; pld = 0;
+	    grn = TgmGetGroupNumber(mch,"USER");
+	    if (grn) TgmGetGroupValue(mch,TgmCURRENT,0,grn,(int *) &pld);
+	    if (debug) printf("TimSurvey:Main:Debug:Event:(SCY:%s)\n",TmToStr(&onzt,1));
+	 }
+      }
+
+      if (evi >= MAX_EVENTS) continue;
+
+      scptm[sci][evi] = eqp;
+      scpld[sci][evi] = pld;
+      scpln[sci][evi] = pln;
+      sconz[sci][evi] = onzt;
+      sctim[sci][evi] = TimeDiff(&onzt,&(ScTimeOnzt[sci]));
+
+      if (TooFast(eqp)) {
+	 TimLibDisConnect(TimLibClassPTIM,eqp,mod);
+	 if (debug) printf("TimSurvey:Main:Debug:DisConnect:(PTIM:%d too many interrupts)\n",(int) eqp);
+	 for (i=0; i<psize; i++) {
+	    if (eqp == ptimlist[i]) ptimodes[i]++;
+	 }
+      }
+      evi++;
+   }
+   fprintf(stderr,"TimSurvey:Main:Fatal:(Too many errors:%d)\n",(int) ecnt);
+   exit(ecnt);
+}
+@
+
+
+1.40
+log
+@*** empty log message ***
+@
+text
+@d127 1
+d1175 2
+a1176 1
+      if (OkStsFlg[i]) {
+d1704 1
+d1802 12
+d2079 3
+@
+
+
+1.39
+log
+@*** empty log message ***
+@
+text
+@d1190 1
+a1190 1
+static char *mtyp[TimLibModuleTYPES] = {"???","CTRI","CTRP","CTRV",
+@
+
+
+1.38
+log
+@Added Ping
+@
+text
+@a1720 1
+	 sprintf(cmd_err,"PNG:%s\n",host);
+@
+
+
+1.37
+log
+@Max SSC samples reduced from 16 to 4
+@
+text
+@d77 1
+d126 1
+d165 1
+d1719 9
+d2089 1
+a2089 1
+   err = TimLibQueue(0,130);
+@
+
+
+1.36
+log
+@*** empty log message ***
+@
+text
+@d76 1
+a76 1
+#define SSC_SAMPLES 16                  /* Maximum number of SSCs to disconnect  */
+@
+
+
+1.35
+log
+@Added Kill
+@
+text
+@d152 1
+d163 5
+d1184 58
+d1744 2
+a1745 2
+	 sprintf(cmd_err,"VER:%s %s\n",__DATE__, __TIME__);
+	 BreakAndSend(cmd_err,dp);
+@
+
+
+1.34
+log
+@Autolaunch
+@
+text
+@d116 1
+d161 1
+d1652 9
+d1922 4
+@
+
+
+1.33
+log
+@*** empty log message ***
+@
+text
+@d43 1
+d1754 63
+d1852 3
+d1910 2
+@
+
+
+1.32
+log
+@*** empty log message ***
+@
+text
+@d129 8
+a136 8
+   "   ENB:<enable flag>               [Dis,Enb]\n"
+   "   STR:<counter start>             [Nor,Ext1/2,Chnd,Self,Remt,Pps,C+S]\n"
+   "   MDE:<counter mode>              [Once,Mult,Brst,M+B]\n"
+   "   CLK:<counter clock>             [1KHz,10MHz,40MHz,Ext1/2,Chnd]\n"
+   "   PWD:<pulse width in 25ns ticks> 1..n\n"
+   "   DLY:<delay value in CLK units>  0..n\n"
+   "   OMS:<counter output mask>       Ctim,Cntr1/2/3/4/5/6/7/8,40Mh,ExCk1,ExCk2\n"
+   "   POL:<polarity>                  [TTL,BAR]\n"
+d138 9
+a146 9
+   "   PLD:<payload trigger>           0..n\n"
+   "   MCH:<telegram machine>          [CPS,PSB,LEI,ADE,SPS,LHC,SCT,FCT]\n"
+   "   GRN:<telegram group number>     1..n/Name\n"
+   "   GRV:<telegram group value>      0..n/Name\n"
+   "   SSC:<super cycle time>          n/Date_string\n"
+   "   ERR:<error string>              Error_text\n"
+   "   INF:<information>               Information in string\n"
+   "   DEB:<Flag>                      Switch debug on or off\n"
+   "   SMP:<sampling>                  The number of PTIMs currently sampled\n"
+d148 4
+a151 3
+   "   MOD:<module number>             1..16\n"
+   "   DEV:<device type>               [ANY,CTR,CPS,SPS,NET]\n"
+   "   STS:<status>                    GmtOk/Bad,PllOk/Bad,SlfOK/Bad,BusOk/Bad\n"
+d153 4
+a156 4
+   "   CHN:<channel number>            1..8\n"
+   "   DIM:<dimension of PTM>          1..1024\n"
+   "   PLN:<program line number>       1..32\n"
+   "   AQN:<acquisition time value>    n/Date_string\n"
+d158 2
+a159 2
+   "   PKT:<number:hostname>           1..n Packet number in stream, hostname\n"
+   "   EOF:<count:hostname>            1..n Packet count in stream, hostname\n"
+@
+
+
+1.31
+log
+@*** empty log message ***
+@
+text
+@d290 5
+a294 5
+static char *StatusOf[STATAE] = { "BadGmt",
+				  "BadPll",
+				  "BadSlf",
+				  "BadEnb",
+				  "BadBus"};
+d1140 34
+d1180 1
+a1180 1
+int si;
+d1203 11
+d1220 4
+a1223 1
+   AppendBuf(tmp);
+d1928 6
+d1940 2
+d1947 4
+a1950 1
+	 if (err == TimLibErrorTIMEOUT) continue;
+a1954 1
+	 if (debug) printf("TimSurvey:Main:Debug:TimeOut:(From TimLibWait\n");
+@
+
+
+1.30
+log
+@*** empty log message ***
+@
+text
+@d1235 1
+d1240 3
+d1245 1
+a1245 1
+	      "CLK:%s STR:%s DLY:%d",
+d1248 2
+a1249 1
+	      (int) ccv->Delay);
+d1252 1
+a1252 1
+	      "CLK:%d STR:%d DLY:%d",
+d1255 2
+a1256 1
+	      (int) ccv->Delay);
+d1406 1
+a1406 1
+			  "%2.3f PTM:%s PLN:%s PLD:0x%X AQN:%s %s\n",
+d1412 2
+d1417 1
+a1417 1
+			  "%2.3f PTM:%s PLN:%s AQN:%s %s\n",
+d1422 2
+d1429 1
+a1429 1
+			  "%2.3f PTM:%s PLD:0x%X AQN:%s %s\n",
+d1434 2
+d1439 1
+a1439 1
+			  "%2.3f PTM:%s AQN:%s %s\n",
+d1443 2
+d1651 3
+a1655 1
+	 else       DisconnectPtims();
+@
+
+
+1.29
+log
+@*** empty log message ***
+@
+text
+@d1229 26
+d1400 1
+a1400 1
+			  "%2.3f PTM:%s PLN:%s PLD:0x%X AQN:%s\n",
+d1405 2
+a1406 1
+			  TmToStr(&(sconz[si][i]),2));
+d1409 1
+a1409 1
+			  "%2.3f PTM:%s PLN:%s AQN:%s\n",
+d1413 2
+a1414 1
+			  TmToStr(&(sconz[si][i]),2));
+d1419 1
+a1419 1
+			  "%2.3f PTM:%s PLD:0x%X AQN:%s\n",
+d1423 2
+a1424 1
+			  TmToStr(&(sconz[si][i]),2));
+d1427 1
+a1427 1
+			  "%2.3f PTM:%s AQN:%s\n",
+d1430 2
+a1431 1
+			  TmToStr(&(sconz[si][i]),2));
+@
+
+
+1.28
+log
+@*** empty log message ***
+@
+text
+@d6 3
+a8 5
+/*    1) GetStatus:<mod>  Returns the status of the modules described by <mod>       */
+/*    2) GetStatic:<mod>  Returns the settings of all ptims implemented on <mod>     */
+/*    3) GetDynamic:<mod> Returns one complete super-cycle of acquisitions for <mod> */
+/*                                                                                   */
+/* <mod> Can be zero, meaning all modules on the DSC or the cardinal module number   */
+d89 1
+d117 4
+a120 4
+   "   Sampling:<Flag>     ;Sample AQNs 16 times if <Flag> is not zero\n"
+   "   GetStatus:<Module>  ;Get status for <Module>\n"
+   "   GetStatic:<Module>  ;Get settings for <Module>\n"
+   "   GetDynamic:<Module> ;Get dynamic data for <Module>\n"
+d1036 60
+d1143 1
+a1143 1
+char *BuildStatus(unsigned long mod) {
+d1146 2
+a1147 2
+int i, si;
+unsigned long sts, mcn;
+d1155 1
+a1155 6
+   if (mod > mcn) {
+      sprintf(out_buf,"ERR:(No such module:%d)\n",(int) mod);
+      return out_buf;
+   }
+   if (mod != 0) mcn = 1;
+   else          mod = 1;
+d1157 2
+a1158 2
+   for (i=mod; i<mod+mcn; i++) {
+      sts = TimLibGetStatus(i,&dev);
+d1161 1
+a1161 1
+	      (int) i,
+d1201 1
+a1201 1
+      if ((sampling) && (ptimodes[i] == 0)) {
+d1215 1
+a1215 1
+      if ((sampling == 0) || (ptimodes[i])) {
+d1232 1
+a1232 1
+#define MAX_MODULES_IN_ONE_GO 2
+d1234 1
+a1234 1
+char *BuildStatic(unsigned long mod) {
+d1249 1
+a1249 4
+   if (mod > mcn) {
+      sprintf(out_buf,"ERR:(No such module:%d)\n",(int) mod);
+      return out_buf;
+   }
+d1251 1
+a1251 1
+   if ((mcn > MAX_MODULES_IN_ONE_GO) && (mod == 0)) {
+d1280 1
+a1280 1
+	 if ((mod == 0) || (mod == pmd)) {
+d1321 1
+a1321 1
+char *BuildDynamic(unsigned long mod) {
+d1338 1
+a1338 4
+   if (mod > mcn) {
+      sprintf(out_buf,"ERR:(No such module:%d)",(int) mod);
+      return out_buf;
+   }
+d1367 2
+a1368 2
+	 if ((mod == 0) || (mod == pmd)) {
+	    sts = TimLibGetStatus(mod,&dev);
+d1434 2
+a1435 1
+	 if (ptm && (ptimodes[i] == 0)) {
+d1454 1
+a1454 1
+int ConnectPtims() {
+d1459 1
+d1462 1
+a1462 1
+unsigned long mod;
+d1471 3
+d1481 1
+a1481 1
+	    err = TimLibGetPtimObject(ptm,&mod,&chn,&dim);
+d1487 1
+a1487 1
+	    sts = TimLibGetStatus(mod,&dev);
+d1490 1
+a1490 1
+		      GetPtmName(dev,ptm),(int) mod,(int) chn,DeviceToStr(dev),(int) dim);
+d1513 9
+a1521 5
+	    err = TimLibConnect(TimLibClassPTIM,ptm,mod);
+	    if (err) {
+	       fprintf(stderr,"TimSurvey:ConnectPtims:(Can't connect PTIM:%d)\n",(int) ptm);
+	       fprintf(stderr,"TimSurvey:ConnectPtims:(%s)\n",TimLibErrorToString(err));
+	       return 0;
+a1522 1
+	    cnt++;
+d1537 1
+a1537 1
+unsigned long mod;
+d1540 2
+d1607 3
+a1609 2
+	 if (strtoul(cp,&ep,0)) ConnectPtims();
+	 else                   DisconnectPtims();
+d1617 1
+a1617 1
+      dp = "GetStatus:";
+d1620 2
+a1621 2
+	 mod = strtoul(cp,&ep,0);
+	 BuildStatus(mod);
+d1631 2
+a1632 2
+	 mod = strtoul(cp,&ep,0);
+	 BuildStatic(mod);
+d1639 1
+a1639 1
+      dp = "GetDynamic:";
+d1641 1
+a1641 3
+	 cp = &rbuf[strlen(dp)];
+	 mod = strtoul(cp,&ep,0);
+	 BuildDynamic(mod);
+d1807 1
+@
+
+
+1.27
+log
+@*** empty log message ***
+@
+text
+@d507 1
+a507 1
+		     strcat(usr_name_txt,ltab.Table[usr -1].Name);
+d514 1
+a514 1
+      sprintf(usr_name_txt,"USR%d",usr);
+d1326 1
+a1326 1
+			  "%2.3f PTM:%s PLN:%s PLD:0x%04X AQN:%s\n",
+d1343 1
+a1343 1
+			  "%2.3f PTM:%s PLD:0x%04X AQN:%s\n",
+@
+
+
+1.26
+log
+@*** empty log message ***
+@
+text
+@d123 1
+d1515 9
+@
+
+
+1.25
+log
+@*** empty log message ***
+@
+text
+@d1382 10
+a1391 8
+   for (i=0; i<psize; i++) {
+      ptm = ptimlist[i];
+      if (ptm) {
+	 err = TimLibGetPtimObject(ptm,&mod,&chn,&dim);
+	 if (err) continue;
+	 err = TimLibDisConnect(TimLibClassPTIM,ptm,mod);
+	 if (err) continue;
+	 cnt++;
+d1393 4
+a1397 4
+
+   bzero((void *) scptm[0], MAX_EVENTS * sizeof(unsigned long));
+   bzero((void *) scptm[1], MAX_EVENTS * sizeof(unsigned long));
+   sampling = 0;
+d1421 2
+a1422 1
+   for (i=0; i<psize; i++) {
+d1424 2
+a1425 14
+      ptm = ptimlist[i];
+      if (ptm) {
+
+	 err = TimLibGetPtimObject(ptm,&mod,&chn,&dim);
+	 if (err) {
+	    fprintf(stderr,"TimSurvey:ConnectPtims:(Can't get PTIM object:%d)\n",(int) ptm);
+	    fprintf(stderr,"TimSurvey:ConnectPtims:(%s)\n",TimLibErrorToString(err));
+	    return 0;
+	 }
+	 sts = TimLibGetStatus(mod,&dev);
+	 if (debug) {
+	    printf("TimSurvey:ConnectPtims:Debug:PTM:%s MOD:%02d CHN:%d DEV:%s DIM:%d\n",
+		   GetPtmName(dev,ptm),(int) mod,(int) chn,DeviceToStr(dev),(int) dim);
+	 }
+d1427 1
+a1427 3
+	 for (j=0; j<dim; j++) {
+	    pln = j+1; grn = 0; grv = 0;
+	    err = TimLibGet(ptm,pln,grn,grv,&ccm,&ccv);
+d1429 1
+a1429 2
+	       fprintf(stderr,"TimSurvey:ConnectPtims:(Can't get PTIM CCV:%d.%d)\n",
+		       (int) ptm, (int) pln);
+d1433 17
+a1449 2
+	    if (ccv.Mode != TimLibModeNORMAL) ptimodes[i]++;
+	 }
+d1451 6
+a1456 4
+	 if (ptimodes[i]) {
+	    if (debug) {
+	       printf("TimSurvey:ConnectPtims:Debug:PTM:%s (Skipped mode not NORMAL)\n",
+		      GetPtmName(dev,ptm));
+a1457 2
+	    continue;
+	 }
+d1459 7
+a1465 5
+	 err = TimLibConnect(TimLibClassPTIM,ptm,mod);
+	 if (err) {
+	    fprintf(stderr,"TimSurvey:ConnectPtims:(Can't connect PTIM:%d)\n",(int) ptm);
+	    fprintf(stderr,"TimSurvey:ConnectPtims:(%s)\n",TimLibErrorToString(err));
+	    return 0;
+a1466 1
+	 cnt++;
+d1468 2
+a1470 2
+   sampling = cnt;
+   ssc_samples = 0;
+d1518 1
+a1518 1
+	 sprintf(cmd_err,"DEB:%d\n",use_strings);
+@
+
+
+1.24
+log
+@*** empty log message ***
+@
+text
+@d17 1
+d77 1
+a77 1
+#define SSC_SAMPLES 16
+d79 2
+a80 2
+static unsigned int ssc_samples = 0;
+static unsigned int sampling    = 0;
+d118 1
+a118 1
+   "   Sampling:<Flag>     ;Sample AQNs if <Flag> is not zero\n"
+d122 1
+d145 1
+d147 1
+d1036 3
+a1038 2
+/* ================================= */
+/* Wait for start of the super-cycle */
+d1044 9
+a1052 2
+   si = sci;
+   while (si == sci) usleep(10000);
+d1115 7
+d1510 11
+d1793 1
+a1793 1
+		  printf("TimSurvey:Main:Debug:Event:(SSC:%s SMP:On:%d)\n",
+d1797 1
+a1797 1
+		  printf("TimSurvey:Main:Debug:Event:(SSC:%s SMP:Off)\n",
+@
+
+
+1.23
+log
+@*** empty log message ***
+@
+text
+@d76 3
+d1447 1
+d1761 16
+a1776 1
+	    if (debug) printf("TimSurvey:Main:Debug:Event:(SSC:%s)\n",ScTimeStamp[sci]);
+@
+
+
+1.22
+log
+@*** empty log message ***
+@
+text
+@d31 1
+d76 1
+d114 1
+d139 2
+d1124 1
+a1124 1
+      if (ptimodes[i] == 0) {
+d1138 1
+a1138 1
+      if (ptimodes[i]) {
+d1148 1
+d1341 2
+d1346 101
+d1468 1
+a1468 1
+      if (debug) printf("TimSurvey:Main:Debug:ReplyIp:%s\n",send_ip);
+d1473 1
+a1473 1
+	 if (debug) printf("TimSurvey:Main:Debug:Command:(%s)\n",rbuf);
+d1482 1
+a1482 1
+	 if (debug) printf("TimSurvey:Main:Debug:Command:(%s)\n",rbuf);
+d1493 12
+d1558 1
+a1558 1
+int i, j;
+a1568 6
+TimLibCcvMask ccm;
+TimLibCcv     ccv;
+unsigned long chn;
+unsigned long ptm;
+unsigned long dim;
+unsigned long grv;
+d1590 2
+a1591 2
+      fprintf(stderr,"TimSurvey:Main:Error:(Can't allocate buffers)\n");
+      fprintf(stderr,"TimSurvey:Main:Error:Fatal:(Not enough memory)\n");
+d1639 1
+a1639 1
+      printf("TimSurvey:Main:Error:Fatal:(Send/Receive ports not specified)\n");
+d1661 2
+a1662 2
+      fprintf(stderr,"TimSurvey:Main:Error:(Can't initialize TimLib)\n");
+      fprintf(stderr,"TimSurvey:Main:Error:Fatal:%s\n",TimLibErrorToString(err));
+d1672 1
+a1672 1
+      fprintf(stderr,"TimSurvey:Main:Error:Fatal:(No installed modules)\n");
+d1678 2
+a1679 2
+      fprintf(stderr,"TimSurvey:Main:Error:(Can't get GMT Cable ID)\n");
+      fprintf(stderr,"TimSurvey:Main:Error:Fatal:%s\n",TimLibErrorToString(err));
+d1684 2
+a1685 2
+      fprintf(stderr,"TimSurvey:Main:Error:(Can't get Tgm machine)\n");
+      fprintf(stderr,"TimSurvey:Main:Error:Fatal:(Bad GMT cable ID)\n");
+d1689 1
+a1689 1
+      fprintf(stderr,"TimSurvey:Main:Error:(Can't attach Tgm machine)\n");
+d1706 2
+a1707 2
+      fprintf(stderr,"TimSurvey:Main:Error:(Can't get PTIM list)\n");
+      fprintf(stderr,"TimSurvey:Main:Error:Fatal:%s\n",TimLibErrorToString(err));
+d1715 2
+a1716 2
+	 fprintf(stderr,"TimSurvey:Main:Error:(Can't connect to SSC-CT:%d)\n",(int) ssc);
+	 fprintf(stderr,"TimSurvey:Main:Error:Fatal:%s\n",TimLibErrorToString(err));
+d1723 2
+a1724 2
+	 fprintf(stderr,"TimSurvey:Main:Error:(Can't connect to SCY-CT:%d)\n",(int) scy);
+	 fprintf(stderr,"TimSurvey:Main:Error:Fatal:%s\n",TimLibErrorToString(err));
+a1727 44
+   for (i=0; i<psize; i++) {
+
+      ptm = ptimlist[i];
+      if (ptm) {
+
+	 err = TimLibGetPtimObject(ptm,&mod,&chn,&dim);
+	 if (err) {
+	    fprintf(stderr,"TimSurvey:Main:Error:(Can't get PTIM object:%d)\n",(int) ptm);
+	    fprintf(stderr,"TimSurvey:Main:Error:Fatal:%s\n",TimLibErrorToString(err));
+	    exit(err);
+	 }
+	 if (debug) {
+	    printf("TimSurvey:Main:Debug:PTM:%s MOD:%02d CHN:%d DEV:%s DIM:%d\n",
+		   GetPtmName(dev,ptm),(int) mod,(int) chn,DeviceToStr(dev),(int) dim);
+	 }
+
+	 for (j=0; j<dim; j++) {
+	    pln = j+1; grn = 0; grv = 0;
+	    err = TimLibGet(ptm,pln,grn,grv,&ccm,&ccv);
+	    if (err) {
+	       fprintf(stderr,"TimSurvey:Main:Error:(Can't get PTIM CCV:%d.%d)\n",
+		       (int) ptm, (int) pln);
+	       fprintf(stderr,"TimSurvey:Main:Error:Fatal:%s\n",TimLibErrorToString(err));
+	       exit(err);
+	    }
+	    if (ccv.Mode != TimLibModeNORMAL) ptimodes[i]++;
+	 }
+
+	 if (ptimodes[i]) {
+	    if (debug) {
+	       printf("TimSurvey:Main:Debug:PTM:%s (Skipped mode not NORMAL)\n",
+		      GetPtmName(dev,ptm));
+	    }
+	    continue;
+	 }
+
+	 err = TimLibConnect(TimLibClassPTIM,ptm,mod);
+	 if (err) {
+	    fprintf(stderr,"TimSurvey:Main:Error:(Can't connect PTIM:%d)\n",(int) ptm);
+	    fprintf(stderr,"TimSurvey:Main:Error:Fatal:%s\n",TimLibErrorToString(err));
+	    exit(err);
+	 }
+      }
+   }
+d1740 2
+a1741 2
+	 fprintf(stderr,"TimSurvey:Main:Error:(From TimLibWait)\n");
+	 fprintf(stderr,"TimSurvey:Main:Error:%s\n",TimLibErrorToString(err));
+d1756 1
+d1785 1
+a1785 1
+   fprintf(stderr,"TimSurvey:Main:Error:Fatal:(Too many errors:%d)\n",(int) ecnt);
+@
+
+
+1.21
+log
+@*** empty log message ***
+@
+text
+@d247 3
+a249 3
+      if (flg) sprintf(tbuf, "%s-%s/%s/%s %s"  , dy, md, mn, yr, ti);
+      else     sprintf(tbuf, "%s",ti);
+      sprintf(&tbuf[strlen(tbuf)],".%03d",(int) t->Nano/prec);
+a251 1
+	 strcat(tbuf," ");
+d1024 11
+d1251 2
+d1302 1
+a1302 1
+			  TmToStr(&(sconz[si][i]),0));
+d1309 1
+a1309 1
+			  TmToStr(&(sconz[si][i]),0));
+d1318 1
+a1318 1
+			  TmToStr(&(sconz[si][i]),0));
+d1324 1
+a1324 1
+			  TmToStr(&(sconz[si][i]),0));
+@
+
+
+1.20
+log
+@*** empty log message ***
+@
+text
+@d86 2
+a87 2
+#define OUT_BUF_SZ (200*1024)
+static char out_buf[OUT_BUF_SZ];
+d1025 25
+a1052 3
+#define ST_DATA_SZ OUT_BUF_SZ
+static char *status_data = out_buf;
+
+d1060 1
+a1060 1
+   bzero((void *) status_data, ST_DATA_SZ);
+d1062 1
+a1062 1
+   sprintf(status_data,"SSC:%s\n",ScTimeStamp[si]);
+d1066 2
+a1067 2
+      sprintf(status_data,"ERR:(No such module:%d)\n",(int) mod);
+      return status_data;
+d1079 4
+a1082 6
+      if ((strlen(status_data) + strlen(tmp)) < ST_DATA_SZ) {
+	 strcat(status_data,tmp);
+      } else {
+	 sprintf(status_data,"ERR:(status_data string too small)\n");
+	 fprintf(stderr,"TimSurvey:BuildStatus:Error:(status_data string too small)");
+	 return status_data;
+d1085 1
+a1085 1
+   return status_data;
+a1090 3
+#define LS_DATA_SZ OUT_BUF_SZ
+static char *list_data = out_buf;
+
+d1099 1
+a1099 1
+   bzero((void *) list_data, LS_DATA_SZ);
+d1101 1
+a1101 1
+   sprintf(list_data,"SSC:%s\n",ScTimeStamp[si]);
+d1107 1
+a1107 1
+   strcat(list_data,tmp);
+d1112 4
+a1115 6
+	 if ((strlen(list_data) + strlen(tmp)) < LS_DATA_SZ) {
+	    strcat(list_data,tmp);
+	 } else {
+	    sprintf(list_data,"ERR:(list_data string too small)\n");
+	    fprintf(stderr,"TimSurvey:BuildList:Error:(list_data string too small)");
+	    return list_data;
+d1121 1
+a1121 1
+   strcat(list_data,tmp);
+d1126 4
+a1129 6
+	 if ((strlen(list_data) + strlen(tmp)) < LS_DATA_SZ) {
+	    strcat(list_data,tmp);
+	 } else {
+	    sprintf(list_data,"ERR:(list_data string too small)\n");
+	    fprintf(stderr,"TimSurvey:BuildList:Error:(list_data string too small)");
+	    return list_data;
+d1133 1
+a1133 1
+   return list_data;
+d1139 1
+a1139 2
+#define AC_DATA_SZ OUT_BUF_SZ
+static char *static_data = out_buf;
+d1151 1
+a1151 1
+   bzero((void *) static_data, AC_DATA_SZ);
+d1153 1
+a1153 1
+   sprintf(static_data,"SSC:%s\n",ScTimeStamp[si]);
+d1157 7
+a1163 2
+      sprintf(static_data,"ERR:(No such module:%d)\n",(int) mod);
+      return static_data;
+d1172 2
+a1173 6
+      if ((strlen(static_data) + strlen(tmp)) < AC_DATA_SZ) {
+	 strcat(static_data,tmp);
+      } else {
+	 strcpy(static_data,tmp);
+      }
+      return static_data;
+d1187 2
+a1188 6
+	    if ((strlen(static_data) + strlen(tmp)) < AC_DATA_SZ) {
+	       strcat(static_data,tmp);
+	    } else {
+	       strcpy(static_data,tmp);
+	    }
+	    return static_data;
+d1198 3
+a1200 5
+	    if ((strlen(static_data) + strlen(tmp)) < AC_DATA_SZ) {
+	       strcat(static_data,tmp);
+	    } else {
+	       strcpy(static_data,tmp);
+	       return static_data;
+d1212 2
+a1213 6
+		  if ((strlen(static_data) + strlen(tmp)) < AC_DATA_SZ) {
+		     strcat(static_data,tmp);
+		  } else {
+		     strcpy(static_data,tmp);
+		  }
+		  return static_data;
+d1216 4
+a1219 6
+	       if ((strlen(static_data) + strlen(tmp)) < AC_DATA_SZ) {
+		  strcat(static_data,tmp);
+	       } else {
+		  fprintf(stderr,"TimSurvey:BuildStatic:Error:(static_data string too small)");
+		  sprintf(static_data,"ERR:(static_data string too small)\n");
+		  return static_data;
+d1225 1
+a1225 1
+   return static_data;
+a1230 3
+#define DY_DATA_SZ OUT_BUF_SZ
+static char *dynamic_data = out_buf;
+
+d1241 1
+a1241 1
+   bzero((void *) dynamic_data, DY_DATA_SZ);
+d1243 1
+a1243 1
+   sprintf(dynamic_data,"0.000 SSC:%s:%s\n",host,ScTimeStamp[si]);
+d1247 2
+a1248 2
+      sprintf(dynamic_data,"ERR:(No such module:%d)",(int) mod);
+      return dynamic_data;
+d1262 4
+a1265 6
+	    if ((strlen(dynamic_data) + strlen(tmp)) < DY_DATA_SZ) {
+	       strcat(dynamic_data,tmp);
+	    } else {
+	       fprintf(stderr,"TimSurvey:BuildDynamic:Error:(static_data string too small)");
+	       sprintf(dynamic_data,"ERR:(dynamic_data string too small)\n");
+	       return dynamic_data;
+d1275 2
+a1276 6
+	    if ((strlen(dynamic_data) + strlen(tmp)) < DY_DATA_SZ) {
+	       strcat(dynamic_data,tmp);
+	    } else {
+	       strcpy(dynamic_data,tmp);
+	    }
+	    return dynamic_data;
+d1315 4
+a1318 6
+	    if ((strlen(dynamic_data) + strlen(tmp)) < DY_DATA_SZ) {
+	       strcat(dynamic_data,tmp);
+	    } else {
+	       fprintf(stderr,"TimSurvey:BuildDynamic:Error:(static_data string too small)");
+	       sprintf(dynamic_data,"ERR:(dynamic_data string too small)\n");
+	       return dynamic_data;
+d1323 1
+a1323 1
+   return dynamic_data;
+d1360 1
+a1360 1
+	 BreakAndSend(list_data,dp);
+d1382 1
+a1382 1
+	 BreakAndSend(status_data,dp);
+d1393 1
+a1393 1
+	 BreakAndSend(static_data,dp);
+d1404 1
+a1404 1
+	 BreakAndSend(dynamic_data,dp);
+d1461 8
+@
+
+
+1.19
+log
+@*** empty log message ***
+@
+text
+@d956 1
+a956 1
+int BreakAndSend(char *pkt) {
+d970 1
+a970 1
+	 sprintf(IoPkt,"PKT:%d:%s\n",cnt,host);
+d982 1
+a982 1
+      sprintf(IoPkt,"PKT:%d:%s\n",cnt,host);
+d987 1
+a987 1
+   sprintf(EnPkt,"EOF:%d:%s\n",cnt,host);
+d1245 1
+a1245 1
+   sprintf(dynamic_data,"SSC:%s\n",ScTimeStamp[si]);
+d1258 1
+a1258 1
+		    "%2.3f USR:%s SCY:%s\n",
+d1262 1
+d1361 1
+a1361 1
+	 BreakAndSend(cmd_hlp);
+d1370 1
+a1370 1
+	 BreakAndSend(list_data);
+d1381 1
+a1381 1
+	 BreakAndSend(cmd_err);
+d1392 1
+a1392 1
+	 BreakAndSend(status_data);
+d1403 1
+a1403 1
+	 BreakAndSend(static_data);
+d1414 1
+a1414 1
+	 BreakAndSend(dynamic_data);
+d1421 1
+a1421 1
+      BreakAndSend(cmd_err);
+@
+
+
+1.18
+log
+@*** empty log message ***
+@
+text
+@d63 3
+d88 3
+a90 2
+					 /* CPS, PSB, LEI, ADE, SPS, LHC, SCT,  FCT */
+static unsigned long sscs[TgmMACHINES] = {  104, 207, 1,   402, 301, 522, 1104, 0 };
+d152 1
+d163 1
+d477 33
+d870 1
+a870 1
+      usleep(1000); /* Avoid saturating network and client */
+d967 1
+a967 1
+	 chrs = to - from; cnt++;
+d1253 1
+a1253 1
+   for (i=0; i<MAX_EVENTS; i++) {
+d1256 16
+d1289 17
+a1305 8
+	    if (scpld[si][i]) {
+	       sprintf(tmp,
+		       "%2.3f PTM:%s PLN:%s PLD:0x%04X AQN:%s\n",
+		       sctim[si][i],
+		       GetPtmName(dev,ptm),
+		       GetPlnName(pln,&ccv),
+		       (int) scpld[si][i],
+		       TmToStr(&(sconz[si][i]),0));
+d1307 14
+a1320 6
+	       sprintf(tmp,
+		       "%2.3f PTM:%s PLN:%s AQN:%s\n",
+		       sctim[si][i],
+		       GetPtmName(dev,ptm),
+		       GetPlnName(pln,&ccv),
+		       TmToStr(&(sconz[si][i]),0));
+a1321 1
+
+a1403 3
+
+	 printf("%s\n\n",static_data);
+
+a1449 1
+unsigned long grn;
+d1452 1
+d1462 2
+d1480 1
+a1480 4
+   if (argc <= 1) {
+      printf("%s\n",help);
+      exit(1);
+   }
+d1482 2
+a1483 1
+   /* Process command line arguments */
+d1508 1
+a1508 1
+      printf("TimSurvey:Main:Error:Fatal:%s (No such option)\n",argv[i]);
+d1544 1
+a1544 2
+      if (debug) printf("TimSurvey:Main:Debug:Modules:%d Device:%s\n",
+			(int) mod,DeviceToStr(dev));
+d1562 11
+a1572 3
+   ctm = sscs[(int) mch];
+   if (debug) printf("TimSurvey:Main:Debug:TgmMachine:%s CTIM:%d\n",
+		     TgmGetMachineName(mch),(int) ctm);
+d1584 1
+a1584 1
+   if (debug) printf("TimSurvey:Main:Debug:(Found:%d PTIMS)\n",(int) psize);
+d1586 15
+a1600 5
+   err = TimLibConnect(TimLibClassCTIM,ctm,mod);
+   if (err) {
+      fprintf(stderr,"TimSurvey:Main:Error:(Can't connect to CTIM:%d)\n",(int) ctm);
+      fprintf(stderr,"TimSurvey:Main:Error:Fatal:%s\n",TimLibErrorToString(err));
+      exit(err);
+a1601 1
+
+d1667 16
+a1682 7
+	 evi = 0;
+	 if (sci) sci = 0; else sci = 1;
+	 bzero((void *) scptm[sci], MAX_EVENTS * sizeof(unsigned long));
+	 strcpy(ScTimeStamp[sci],TmToStr(&onzt,1));
+	 ScTimeOnzt[sci] = onzt;
+	 if (debug) printf("TimSurvey:Main:Debug:Event:(StartSC:%s)\n",ScTimeStamp[sci]);
+	 continue;
+@
+
+
+1.17
+log
+@*** empty log message ***
+@
+text
+@d831 1
+@
+
+
+1.16
+log
+@*** empty log message ***
+@
+text
+@d141 2
+a142 2
+   "   PKT:<packet number>             1..n Packet number in stream\n"
+   "   EOF:<packet count>              0..n Packet count (End of file), last packet in stream\n"
+d163 3
+d212 3
+a214 1
+char *TimeToStr(TimLibTime *t, int flg) {
+d220 1
+d224 4
+d243 1
+a243 1
+      sprintf(&tbuf[strlen(tbuf)],".%09lu",t->Nano);
+d253 5
+a257 1
+      sprintf(tbuf,"%u.%09lu %d C:%u",(int) t->Second,t->Nano,(int) t->Machine,(int) t->CTrain);
+d632 1
+a632 1
+		     sprintf(tmp,"PLD:0x%X ",(int) ccv->Payload);
+d669 1
+a669 1
+				    strcat(tmp,",");
+d683 1
+a683 1
+	       if ((strlen(CcvStr) + strlen(tmp)) < CCV_STR_SZ)
+d734 1
+a734 1
+		     sprintf(tmp,"PLD:0x%X ",(int) ccv->Payload);
+d755 1
+a755 1
+	       if ((strlen(CcvStr) + strlen(tmp)) < CCV_STR_SZ)
+d912 1
+a912 1
+#define IO_PKT_SZ (PKT_SZ + 16)
+d930 1
+a930 1
+	 sprintf(IoPkt,"PKT:%d\n",cnt);
+d942 1
+a942 1
+      sprintf(IoPkt,"PKT:%d\n",cnt);
+d947 1
+a947 1
+   sprintf(EnPkt,"EOF:%d\n",cnt);
+d1034 2
+d1054 1
+a1054 1
+	 if (((i+1)%8)==0) strcat(tmp,"\n");
+d1064 2
+a1065 2
+   if (use_strings) sprintf(tmp,"SVY:NotSurveyed\n");
+   else             sprintf(tmp,"SVY:0\n");
+d1070 1
+a1070 1
+	 if (((i+1)%8)==0) strcat(tmp,"\n");
+d1233 16
+a1248 7
+	    sprintf(tmp,
+		    "%2.3f PTM:%s PLN:%s PLD:0x%04X AQN:%s\n",
+		    sctim[si][i],
+		    GetPtmName(dev,ptm),
+		    GetPlnName(pln,&ccv),
+		    (int) scpld[si][i],
+		    TimeToStr(&(sconz[si][i]),0));
+d1258 1
+a1258 1
+      }
+d1454 2
+d1585 1
+a1585 1
+	 strcpy(ScTimeStamp[sci],TimeToStr(&onzt,1));
+@
+
+
+1.15
+log
+@*** empty log message ***
+@
+text
+@d141 2
+a142 1
+   "   EOF:<packet count>              0..n End of file, last packet in stream\n"
+@
+
+
+1.14
+log
+@*** empty log message ***
+@
+text
+@d892 2
+a893 2
+/* =================================================== */
+/* Break up packets into blocks of lines and send them */
+d897 3
+a899 1
+static char EndPkt[EN_PKT_SZ];
+d913 6
+a918 1
+	 SendToPort(send_ip, send_port, &(pkt[from]), chrs);
+d924 6
+a929 2
+      chrs = pkln - from;
+      SendToPort(send_ip, send_port, &(pkt[from]), chrs);
+d932 3
+a934 3
+   sprintf(EndPkt,"EOF:%d\n",cnt);
+   chrs = strlen(EndPkt);
+   SendToPort(send_ip, send_port, EndPkt, chrs);
+@
+
+
+1.13
+log
+@*** empty log message ***
+@
+text
+@d133 1
+a133 1
+   "   DEV:<device type>               [NET,CTR,CPS,SPS]\n"
+d140 2
+a141 1
+   "   EOF                             End of file, last packet in stream\n"
+d292 1
+a292 1
+static char *DevNames[TimLibDEVICES] = { "***", "CTR", "CPS", "SPS", "***" };
+d896 2
+a897 1
+static char *EndPkt = "EOF\n";
+d901 1
+a901 1
+int i, from, to, chrs, pkln;
+d905 1
+a905 1
+   for (i=0, from=0, chrs=0; i<pkln; i++) {
+d910 1
+a910 1
+	 chrs = to - from;
+d921 1
+d1020 2
+a1021 1
+   sprintf(tmp,"SVY:Surveyed PTIMs\n");
+d1036 2
+a1037 1
+   sprintf(tmp,"\nSVY:NotSurveyed PTIMs(Too Fast)\n");
+@
+
+
+1.12
+log
+@*** empty log message ***
+@
+text
+@d16 1
+d106 1
+d161 18
+d999 51
+d1252 9
+d1555 7
+@
+
+
+1.11
+log
+@*** empty log message ***
+@
+text
+@d78 3
+a80 3
+unsigned long psize;
+unsigned long ptimlist[PTIMS];
+unsigned long ptimodes[PTIMS];
+d82 2
+d112 2
+a113 1
+   "Keywords:\n"
+d115 4
+a118 4
+   "   ENB:<enable flag>               Dis,Enb\n"
+   "   STR:<counter start>             Nor,Ext1/2,Chnd,Self,Remt,Pps,C+S\n"
+   "   MDE:<counter mode>              Once,Mult,Brst,M+B\n"
+   "   CLK:<counter clock>             1KHz,10MHz,40MHz,Ext1/2,Chnd\n"
+d122 1
+a122 1
+   "   POL:<polarity>                  TTL,BAR\n"
+d125 1
+a125 1
+   "   MCH:<telegram machine>          CPS,PSB,LEI,ADE,SPS,LHC,SCT,FCT\n"
+d131 1
+a131 1
+   "   DEV:<device type>               CTR,CPS,SPS\n"
+a135 1
+   "   CCV:<counter fields collection> Indicates start of an action row\n"
+d138 5
+a142 2
+   "   EOF                             End of file, last packet in stream\n";
+
+a250 1
+   sprintf(StsStr,"0x%02X ",(int) sts);
+d260 2
+a261 1
+   }
+d542 1
+a542 1
+   sprintf(CcvStr,"ACT=%d ",pln);
+d939 2
+a940 2
+#define ST_DATA_SZ (ST_STR_SZ * 16)
+static char status_data[ST_DATA_SZ];
+d982 2
+a983 2
+#define AC_DATA_SZ (CCV_STR_SZ * 256)
+static char static_data[AC_DATA_SZ];
+d1068 1
+a1068 1
+	       sprintf(tmp,"CCV:%s\n",CcvToStr(ccm,&ccv,pln));
+d1086 2
+a1087 2
+#define DY_DATA_SZ (LN * PTIMS)
+static char dynamic_data[DY_DATA_SZ];
+@
+
+
+1.10
+log
+@Cool - Works a treat
+@
+text
+@d1 27
+a27 4
+/* ========================================================== */
+/* Survey daemon to monitor all hardware and timings on a DSC */
+/* Julian Lewis AB/CO/HT Wed 30th May 2007                    */
+/* ========================================================== */
+d108 30
+a137 1
+   "   If <Module> has value zero, this means all modules\n";
+d547 1
+a547 1
+		     sprintf(tmp,"ENB=%s ",Enable[(int) ccv->Enable]);
+d552 1
+a552 1
+		     sprintf(tmp,"STR=%s ",CounterStart[(int) ccv->Start]);
+d557 1
+a557 1
+		     sprintf(tmp,"MDE=%s ",CounterMode[(int) ccv->Mode]);
+d562 1
+a562 1
+		     sprintf(tmp,"CLK=%s ",CounterClock[(int) ccv->Clock]);
+d566 1
+a566 1
+		     sprintf(tmp,"PWD=%d ",(int) ccv->PulsWidth);
+d570 1
+a570 1
+		     sprintf(tmp,"DLY=%d ",(int) ccv->Delay);
+d574 1
+a574 1
+		     sprintf(tmp,"OMS=%s ",OtmToStr(ccv->OutputMask));
+d579 1
+a579 1
+		     sprintf(tmp,"POL=%s ",Polarity[(int) ccv->Polarity]);
+d584 1
+a584 1
+			sprintf(tmp,"CTM=%s ",(char *) tname);
+d586 1
+a586 1
+			sprintf(tmp,"CTM=%d ",(int) ccv->Ctim);
+d591 1
+a591 1
+		     sprintf(tmp,"PLD=0x%X ",(int) ccv->Payload);
+d597 1
+a597 1
+		     sprintf(tmp,"MCH=%s ",TgmGetMachineName(ccv->Machine));
+d603 1
+a603 1
+			sprintf(tmp,"GRN=%s ",desc.Name);
+d605 1
+a605 1
+			sprintf(tmp,"GRN=%d ",(int) ccv->GrNum);
+d623 1
+a623 1
+			      sprintf(tmp,"GRV=");
+d636 1
+a636 1
+		     sprintf(tmp,"GRV=%d ",(int) ccv->GrVal);
+d657 1
+a657 1
+		     sprintf(tmp,"ENB=%d ",(int) ccv->Enable);
+d661 1
+a661 1
+		     sprintf(tmp,"STR=%d ",(int) ccv->Start);
+d665 1
+a665 1
+		     sprintf(tmp,"MDE=%d ",(int) ccv->Mode);
+d669 1
+a669 1
+		     sprintf(tmp,"CLK=%d ",(int) ccv->Clock);
+d673 1
+a673 1
+		     sprintf(tmp,"PWD=%d ",(int) ccv->PulsWidth);
+d677 1
+a677 1
+		     sprintf(tmp,"DLY=%d ",(int) ccv->Delay);
+d681 1
+a681 1
+		     sprintf(tmp,"OMS=%d ",(int) ccv->OutputMask);
+d685 1
+a685 1
+		     sprintf(tmp,"POL=%d ",(int) ccv->Polarity);
+d689 1
+a689 1
+		     sprintf(tmp,"CTM=%d ",(int) ccv->Ctim);
+d693 1
+a693 1
+		     sprintf(tmp,"PLD=0x%X ",(int) ccv->Payload);
+d698 1
+a698 1
+		     sprintf(tmp,"MCH=%d ",(int) ccv->Machine);
+d703 1
+a703 1
+		     sprintf(tmp,"GRN=%d ",(int) ccv->GrNum);
+d708 1
+a708 1
+		     sprintf(tmp,"GRV=%d ",(int) ccv->GrVal);
+@
+
+
+1.9
+log
+@*** empty log message ***
+@
+text
+@d46 1
+a46 1
+static int domain = PF_INET;
+d48 1
+a48 1
+static unsigned int use_strings = 0;
+a49 1
+static unsigned int run         = 0;
+a62 1
+   RUN,
+a63 1
+   IPADR,
+a65 1
+   STRINGS,
+d69 1
+a69 3
+static char *options[OPTIONS] = { "-run",
+				  "-sport",
+				  "-ip",
+d71 1
+a71 2
+				  "-debug",
+				  "-use_strings" };
+a72 1
+   "   -run                ;Run survey with defaults\n"
+a73 1
+   "   -ip    <IP ADDRESS> ;Sets remote IP address\n"
+d75 1
+a75 2
+   "   -debug              ;Set Debug printing on\n"
+   "   -use_strings        ;Produce strings instead o numbers\n";
+d676 1
+a676 1
+static unsigned short send_port = 2001;
+d678 2
+a679 1
+static char *send_ip = "192.168.000.000";
+d745 1
+a745 1
+static unsigned short recv_port = 2002;
+a788 1
+char               erst[LN];
+d792 1
+a792 3
+      sin.sin_family = domain;
+      sin.sin_port = htons(source_port);
+      sin.sin_addr.s_addr = htonl(INADDR_ANY);
+d803 1
+a803 2
+	 sprintf(erst,"TimSurvey:RecvFromPort:errno:%d",(int) errno);
+	 perror(erst);
+d806 3
+d842 2
+a843 1
+   SendToPort(send_ip, send_port, EndPkt, strlen(EndPkt));
+d1114 2
+a1223 1
+   run         = 1;
+d1225 1
+a1225 1
+   use_strings = 0;
+a1240 5
+      if (strncmp(argv[i],options[RUN],strlen(options[RUN])) == 0) {
+	 run = 1;
+	 continue;
+      }
+
+a1254 7
+      if (strncmp(argv[i],options[IPADR],strlen(options[IPADR])) == 0) {
+	 i++;
+	 cp = argv[i];
+	 if (cp) send_ip = cp;
+	 continue;
+      }
+
+d1260 3
+a1262 4
+      if (strncmp(argv[i],options[STRINGS],strlen(options[STRINGS])) == 0) {
+	 use_strings = 1;
+	 continue;
+      }
+d1264 2
+a1265 1
+      printf("TimSurvey:Main:Error:Fatal:%s (No such option)\n",argv[i]);
+@
+
+
+1.8
+log
+@*** empty log message ***
+@
+text
+@a685 2
+#define FILE_NAME_SIZE 64
+
+d722 1
+a722 1
+int SendToPort(char *ip, unsigned short port, char *pkt) {
+d734 1
+a734 1
+		  strlen(pkt),
+d824 33
+d1125 1
+a1125 1
+	 SendToPort(send_ip,send_port,cmd_hlp);
+d1136 1
+a1136 1
+	 SendToPort(send_ip,send_port,cmd_err);
+d1147 1
+a1147 1
+	 SendToPort(send_ip,send_port,status_data);
+d1158 1
+a1158 1
+	 SendToPort(send_ip,send_port,static_data);
+d1172 1
+a1172 1
+	 SendToPort(send_ip,send_port,dynamic_data);
+d1179 1
+a1179 1
+      SendToPort(send_ip,send_port,cmd_err);
+@
+
+
+1.7
+log
+@*** empty log message ***
+@
+text
+@d53 1
+d103 1
+d112 22
+d140 1
+a140 1
+char *TimeToStr(TimLibTime *t) {
+d162 3
+a164 4
+      sprintf (tbuf, "%s-%s/%s/%s %s"  , dy, md, mn, yr, ti);
+      if (t->Nano) {
+	  sprintf(&tbuf[strlen(tbuf)],".%09lu",t->Nano);
+      }
+d166 1
+a166 1
+      if ((t->Machine != TgmMACHINE_NONE) && (t->CTrain > 0)) {
+d926 14
+d1051 2
+a1052 1
+		    "PTM:%s PLN:%s PLD:0x%04X AQN:%s\n",
+d1056 1
+a1056 1
+		    TimeToStr(&(sconz[si][i])));
+d1205 1
+d1393 3
+a1395 2
+	 strcpy(ScTimeStamp[sci],TimeToStr(&onzt));
+	 if (debug) printf("TimSurvey:Main:Debug:Event:(StartSC:%s)\n",ScTimeStamp);
+d1405 1
+@
+
+
+1.6
+log
+@*** empty log message ***
+@
+text
+@d1 6
+d46 2
+a49 1
+static unsigned int remote      = 0;
+d52 1
+a52 1
+static char ScTimeStamp[LN];
+a66 1
+   DOMAIN,
+a67 1
+   REMOTE,
+a75 1
+				  "-local",
+a76 1
+				  "-allow_remote",
+d79 16
+a94 8
+	     "   -run                ;Run survey with defaults\n"
+	     "   -sport <PORT>       ;Sets the SEND port number\n"
+	     "   -ip    <IP ADDRESS> ;Sets remote IP address\n"
+	     "   -local              ;Force PF_UNIX domain on local host\n"
+	     "   -rport <PORT>       ;Sets the RECEIVE port number\n"
+	     "   -debug              ;Set Debug printing on\n"
+	     "   -allow_remote       ;Allow remote computers to connect to socket\n"
+	     "   -use_strings        ;Produce strings instead o numbers\n";
+a141 1
+
+d340 1
+a349 1
+   sprintf(ptm_name_txt,"%d",(int) eqp);
+d357 1
+a357 3
+	 case TimLibDevice_TG8_SPS: sprintf(ptm_name_txt,"SX.PTIM%d",(int) eqp);
+	 break;
+	 default: break;
+a358 1
+      if (!strlen(ptm_name_txt))    sprintf(ptm_name_txt,"MCR.PTM%d",(int) eqp);
+d364 47
+d555 1
+a555 1
+				 sprintf(tmp,"GRV=%s ",ltab.Table[i].Name);
+a659 14
+/* ================== */
+/* Check error codes. */
+
+int CheckErr(TimLibError err) {
+   if (err == TimLibErrorSUCCESS) return 1;
+   if (err < TimLibERRORS) {
+      fprintf(stderr,"timtest:Error:%s\n",TimLibErrorToString(err));
+      if (err == TimLibErrorIO) perror("TimLib:errno");
+      return 0;
+   }
+   fprintf(stderr,"timtest:Error:Illegal error number:%d\n",(int) err);
+   return 0;
+}
+
+a665 1
+static int domain = PF_INET;
+d667 1
+a670 1
+struct sockaddr_un snm;
+d672 1
+a672 3
+
+int s, size;
+char   fnam[FILE_NAME_SIZE];
+a674 1
+
+d683 10
+a692 25
+      if (domain == PF_INET) {
+	 bzero((void *) &sin, SinSIZE);
+	 sin.sin_family = domain;
+	 sin.sin_port = htons(port);
+	 sin.sin_addr.s_addr = htonl(INADDR_ANY);
+	 if (bind(s,(struct sockaddr *) &sin, SinSIZE) < 0) {
+	    fprintf(stderr,"TimSurvey:OpenSendPort:Error:Cant bind port:%d\n",port);
+	    perror("TimSurvey:OpenSendPort:errno");
+	    close(s);
+	    send_sock = 0;
+	    return 0;
+	 }
+      } else {
+	 sprintf(fnam,"/tmp/SktSnd%d",(int) port);
+	 unlink(fnam);
+	 snm.sun_family = PF_LOCAL;
+	 strncpy(snm.sun_path, fnam, sizeof (snm.sun_path));
+	 size = SUN_LEN(&snm);
+	 if (bind(send_sock,(struct sockaddr *) &snm,size) < 0) {
+	    fprintf(stderr,"TimSurvey:OpenPort:Error:Cant bind port:%d\n",port);
+	    perror("TimSurvey:OpenPort:errno");
+	    close(send_sock);
+	    send_sock = 0;
+	    return 0;
+	 }
+a700 2
+static char *send_ip = "172.18.203.106"; /* cs-ccr-ctm.cern.ch */
+
+d703 1
+a703 4
+int  cc, size;
+char fnam[FILE_NAME_SIZE];
+
+struct sockaddr_un snm;
+d707 10
+a717 23
+      if (domain == PF_INET) {
+	 bzero((void *) &sin, SinSIZE);
+	 sin.sin_family = domain;
+	 sin.sin_port = htons(port);
+	 sin.sin_addr.s_addr = inet_addr(ip);
+	 cc = sendto(send_sock,
+		     pkt,
+		     strlen(pkt),
+		     0,
+		     (struct sockaddr *) &sin,
+		     SinSIZE);
+      } else {
+	 sprintf(fnam,"/tmp/SktRcv%d",(int) port);
+	 snm.sun_family = PF_LOCAL;
+	 strncpy (snm.sun_path, fnam, sizeof (snm.sun_path));
+	 size = SUN_LEN(&snm);
+	 cc = sendto(send_sock,
+		     pkt,
+		     strlen(pkt),
+		     0,
+		     (struct sockaddr *) &snm,
+		     size);
+      }
+a725 1
+      return 1;
+d727 1
+a727 1
+   return 0;
+a737 1
+struct sockaddr_un snm;
+d740 1
+a740 2
+int s, size;
+char   fnam[FILE_NAME_SIZE];
+a742 1
+
+d751 10
+a760 25
+      if (domain == PF_INET) {
+	 bzero((void *) &sin, SinSIZE);
+	 sin.sin_family = domain;
+	 sin.sin_port = htons(port);
+	 sin.sin_addr.s_addr = htonl(INADDR_ANY);
+	 if (bind(s,(struct sockaddr *) &sin, SinSIZE) < 0) {
+	    fprintf(stderr,"TimSurvey:OpenRecvPort:Error:Cant bind port:%d\n",port);
+	    perror("TimSurvey:OpenRecvPort:errno");
+	    close(recv_sock);
+	    recv_sock = 0;
+	    return 0;
+	 }
+      } else {
+	 sprintf(fnam,"/tmp/SktRcv%d",(int) port);
+	 snm.sun_family = PF_LOCAL;
+	 strncpy (snm.sun_path, fnam, sizeof (snm.sun_path));
+	 unlink(fnam);
+	 size = SUN_LEN(&snm);
+	 if (bind(recv_sock,(struct sockaddr *) &snm,size) < 0) {
+	    fprintf(stderr,"TimSurvey:OpenRecvPort:Error:Cant bind port:%d\n",port);
+	    perror("TimSurvey:OpenRecvPort:errno");
+	    close(recv_sock);
+	    recv_sock = 0;
+	    return 0;
+	 }
+d769 2
+a770 2
+#define RBUF_SIZE 32
+static char rbuf[RBUF_SIZE];
+d772 1
+a772 1
+int RecvFromPort(unsigned short source_port, char *pkt) {
+d774 2
+a775 5
+int cc;
+char fnam[FILE_NAME_SIZE];
+socklen_t from;
+
+struct sockaddr_un snm;
+d777 1
+d780 10
+a789 23
+
+      if (domain == PF_INET) {
+	 bzero((void *) &sin, SinSIZE);
+	 sin.sin_family = domain;
+	 sin.sin_port = htons(source_port);
+	 cc = recvfrom(recv_sock,
+		       pkt,
+		       RBUF_SIZE,
+		       0,
+		       (struct sockaddr *) &sin,
+		       &from);
+      } else {
+	 sprintf(fnam,"/tmp/SktSnd%d",(int) source_port);
+	 snm.sun_family = PF_LOCAL;
+	 strncpy (snm.sun_path, fnam, sizeof (snm.sun_path));
+	 from = SUN_LEN(&snm);
+	 cc = recvfrom(recv_sock,
+		       pkt,
+		       RBUF_SIZE,
+		       0,
+		       (struct sockaddr *) &snm,
+		       &from);
+      }
+d794 2
+a795 1
+	 perror("TimSurvey:RecvFromPort:errno");
+d843 1
+a843 1
+int i;
+d848 2
+a849 1
+   sprintf(status_data,"SSC:%s\n",ScTimeStamp);
+d851 4
+a854 4
+   mcn = 1;
+   if (mod == 0) {
+      mod = 1;
+      mcn = TimLibGetInstalledModuleCount();
+d856 2
+d869 1
+d871 1
+a871 1
+	 return NULL;
+d886 2
+a887 2
+int i, j;
+unsigned long ptm, pmd, chn, dim, pln, grn, grv;
+d891 1
+d894 8
+a901 1
+   sprintf(static_data,"SSC:%s\n",ScTimeStamp);
+d912 8
+a919 1
+	    return NULL;
+d921 14
+a935 1
+	 if ((mod == 0) || (mod == pmd)) {
+d943 8
+a950 1
+		  return NULL;
+d957 2
+a958 1
+		  return NULL;
+d977 1
+a977 1
+unsigned long ptm, sts, pmd, chn, dim;
+d980 2
+d984 8
+a991 2
+   sprintf(dynamic_data,"SSC:%s\n",ScTimeStamp);
+   si = sci;
+d1000 8
+a1007 1
+	    return NULL;
+d1011 2
+d1014 3
+a1016 3
+		    "PTM:%s PLN:%d PLD:0x%04X AQN:%s\n",
+		    GetPtmName(ptm,dev),
+		    (int) scpln[si][i],
+d1023 3
+a1025 2
+	       fprintf(stderr,"TimSurvey:BuildStatic:Error:(static_data string too small)");
+	       return NULL;
+d1033 86
+d1127 1
+a1127 1
+pid_t child;
+a1163 1
+   remote      = 0;
+d1166 1
+a1166 1
+   bzero((void *) ScTimeStamp,LN);
+a1204 6
+      if (strncmp(argv[i],options[DOMAIN],strlen(options[DOMAIN])) == 0) {
+	 domain = PF_UNIX;
+	 send_ip = "127.0.0.1";
+	 continue;
+      }
+
+a1209 5
+      if (strncmp(argv[i],options[REMOTE],strlen(options[REMOTE])) == 0) {
+	 remote = 1;
+	 continue;
+      }
+
+d1331 1
+a1331 46
+   child = fork ();
+   if (child == 0) {
+
+      if (OpenSendPort(send_port) == 0) {
+	 fprintf(stderr,"TimSurvey:Thread:Error:(Can't Open Send port:%d)\n",(int) send_port);
+	 exit(127);
+      }
+
+      if (OpenRecvPort(recv_port) == 0) {
+	 fprintf(stderr,"TimSurvey:Thread:Error:(Can't Open receive port:%d)\n",(int) recv_port);
+	 exit(127);
+      }
+
+      while (RecvFromPort(recv_port,rbuf)) {
+
+	 char *dp = NULL;
+
+	 dp = "GetStatus:";
+	 if (strncmp(dp,rbuf,strlen(dp)) == 0) {
+	    cp = &rbuf[strlen(dp)];
+	    mod = strtoul(cp,&ep,0);
+	    BuildStatus(mod);
+	    SendToPort(send_ip,send_port,status_data);
+	    continue;
+	 }
+
+	 dp = "GetStatic:";
+	 if (strncmp(dp,rbuf,strlen(dp)) == 0) {
+	    cp = &rbuf[strlen(dp)];
+	    mod = strtoul(cp,&ep,0);
+	    BuildStatic(mod);
+	    SendToPort(send_ip,send_port,static_data);
+	    continue;
+	 }
+
+	 dp = "GetDynamic:";
+	 if (strncmp(dp,rbuf,strlen(dp)) == 0) {
+	    cp = &rbuf[strlen(dp)];
+	    mod = strtoul(cp,&ep,0);
+	    BuildDynamic(mod);
+	    SendToPort(send_ip,send_port,dynamic_data);
+	    continue;
+	 }
+      }
+      exit(127);
+   }
+d1346 1
+d1354 2
+a1355 1
+	 strcpy(ScTimeStamp,TimeToStr(&onzt));
+@
+
+
+1.5
+log
+@*** empty log message ***
+@
+text
+@d867 1
+a867 1
+#define ST_DATA_SZ (ST_STR_SZ * 2)
+d873 2
+a874 1
+unsigned long sts;
+d880 19
+a898 11
+   sts = TimLibGetStatus(mod,&dev);
+   sprintf(tmp,
+	   "MOD:%d DEV:%s STS:%s\n",
+	   (int) mod,
+	   DeviceToStr(dev),
+	   StatusToStr(sts));
+   if ((strlen(status_data) + strlen(tmp)) < ST_DATA_SZ) {
+      strcat(status_data,tmp);
+   } else {
+      fprintf(stderr,"TimSurvey:BuildStatus:Error:(status_data string too small)");
+      return NULL;
+d933 1
+a933 1
+	 if (mod == pmd) {
+@
+
+
+1.4
+log
+@*** empty log message ***
+@
+text
+@d45 54
+d105 1
+a105 1
+volatile char *TimeToStr(TimLibTime *t) {
+a205 1
+#define PTIMS 256
+d339 1
+d867 25
+a891 3
+static char *status_data = "Status\n";
+void BuildStatus() {
+   return;
+d897 2
+a898 4
+static char *static_data = "Static\n";
+void BuildStatic() {
+   return;
+}
+d900 1
+a900 2
+/* ============================== */
+/* Build the dynamic data strings */
+d902 6
+a907 4
+static char *dynamic_data = "Dynamic\n";
+void BuildDynamic() {
+   return;
+}
+d909 2
+a910 3
+/* ================================================================================ */
+/* Main                                                                             */
+					 /* CPS, PSB, LEI, ADE, SPS, LHC, SCT,  FCT */
+d912 1
+a912 1
+static unsigned long sscs[TgmMACHINES] = {  104, 207, 1,   402, 301, 522, 1104, 0 };
+d914 2
+a915 11
+typedef enum {
+   RUN,
+   SPORT,
+   IPADR,
+   RPORT,
+   DOMAIN,
+   DEBUG,
+   REMOTE,
+   STRINGS,
+   OPTIONS
+ } Options;
+d917 6
+d924 23
+a946 17
+static char *options[OPTIONS] = { "-run",
+				  "-sport",
+				  "-ip",
+				  "-rport",
+				  "-local",
+				  "-debug",
+				  "-allow_remote",
+				  "-use_strings" };
+static char *help =
+	     "   -run                ;Run survey with defaults\n"
+	     "   -sport <PORT>       ;Sets the SEND port number\n"
+	     "   -ip    <IP ADDRESS> ;Sets remote IP address\n"
+	     "   -local              ;Force PF_UNIX domain on local host\n"
+	     "   -rport <PORT>       ;Sets the RECEIVE port number\n"
+	     "   -debug              ;Set Debug printing on\n"
+	     "   -allow_remote       ;Allow remote computers to connect to socket\n"
+	     "   -use_strings        ;Produce strings instead o numbers\n";
+d948 2
+a949 1
+#define MAX_EVENTS 1024
+d951 2
+a952 4
+static unsigned long scptm[2][MAX_EVENTS]; /* PTIM ID */
+static unsigned long scpld[2][MAX_EVENTS]; /* Payload */
+static unsigned long scpln[2][MAX_EVENTS]; /* User PLS Line number */
+static TimLibTime    sconz[2][MAX_EVENTS]; /* Output time */
+d954 1
+a954 2
+static int sci = 0; /* Super-cycle index 0..1 */
+static int evi = 0; /* Event index 0..MAX_EVENTS */
+d956 9
+a964 1
+#define MAX_ERRORS 50
+d966 29
+a994 1
+static int ecnt = 0; /* Error count */
+d996 2
+a997 1
+/* =========================== */
+a1020 4
+unsigned long psize;
+unsigned long ptimlist[PTIMS];
+unsigned long ptimodes[PTIMS];
+
+d1035 2
+d1044 2
+a1121 41
+   child = fork ();
+   if (child == 0) {
+
+      if (OpenSendPort(send_port) == 0) {
+	 fprintf(stderr,"TimSurvey:Thread:Error: (Can't Open Send port:%d)\n",(int) send_port);
+	 exit(127);
+      }
+
+      if (OpenRecvPort(recv_port) == 0) {
+	 fprintf(stderr,"TimSurvey:Thread:Error: (Can't Open receive port:%d)\n",(int) recv_port);
+	 exit(127);
+      }
+
+      while (RecvFromPort(recv_port,rbuf)) {
+
+	 char *dp = NULL;
+
+	 dp = "GetStatus";
+	 if (strncmp(dp,rbuf,strlen(dp)) == 0) {
+	    BuildStatus();
+	    SendToPort(send_ip,send_port,status_data);
+	    continue;
+	 }
+
+	 dp = "GetStatic";
+	 if (strncmp(dp,rbuf,strlen(dp)) == 0) {
+	    BuildStatic();
+	    SendToPort(send_ip,send_port,static_data);
+	    continue;
+	 }
+
+	 dp = "GetDynamic";
+	 if (strncmp(dp,rbuf,strlen(dp)) == 0) {
+	    BuildDynamic();
+	    SendToPort(send_ip,send_port,dynamic_data);
+	    continue;
+	 }
+      }
+      exit(127);
+   }
+
+d1124 1
+a1124 1
+      fprintf(stderr,"TimSurvey:Main:Error: (Can't initialize TimLib)\n");
+d1136 1
+a1136 1
+      fprintf(stderr,"TimSurvey:Main:Error:Fatal: (No installed modules)\n");
+d1142 1
+a1142 1
+      fprintf(stderr,"TimSurvey:Main:Error: (Can't get GMT Cable ID)\n");
+d1148 2
+a1149 2
+      fprintf(stderr,"TimSurvey:Main:Error: (Can't get Tgm machine)\n");
+      fprintf(stderr,"TimSurvey:Main:Error:Fatal: (Bad GMT cable ID)\n");
+d1162 1
+a1162 1
+      fprintf(stderr,"TimSurvey:Main:Error: (Can't get PTIM list)\n");
+d1166 1
+a1166 1
+   if (debug) printf("TimSurvey:Main:Debug: (Found:%d PTIMS)\n",(int) psize);
+d1170 1
+a1170 1
+      fprintf(stderr,"TimSurvey:Main:Error: (Can't connect to CTIM:%d)\n",(int) ctm);
+d1182 1
+a1182 1
+	    fprintf(stderr,"TimSurvey:Main:Error: (Can't get PTIM object:%d)\n",(int) ptm);
+d1195 1
+a1195 1
+	       fprintf(stderr,"TimSurvey:Main:Error: (Can't get PTIM CCV:%d.%d)\n",
+d1213 1
+a1213 1
+	    fprintf(stderr,"TimSurvey:Main:Error: (Can't connect PTIM:%d)\n",(int) ptm);
+d1220 47
+d1276 1
+a1276 1
+	 fprintf(stderr,"TimSurvey:Main:Error: (From TimLibWait)\n");
+d1287 1
+d1300 1
+a1300 1
+   fprintf(stderr,"TimSurvey:Main:Error:Fatal: (Too many errors:%d)\n",(int) ecnt);
+@
+
+
+1.3
+log
+@*** empty log message ***
+@
+text
+@d813 1
+a813 1
+static char *status_data = NULL;
+d821 1
+a821 1
+static char *static_data = NULL;
+d829 1
+a829 1
+static char *dynamic_data = NULL;
+d973 1
+d1179 1
+a1179 1
+      evi++
+@
+
+
+1.2
+log
+@*** empty log message ***
+@
+text
+@a39 2
+static int ssock = 0;
+
+d573 1
+d583 1
+a583 1
+   if (!ssock) {
+d591 1
+a591 1
+      ssock = s;
+d602 1
+a602 1
+	    ssock = 0;
+d611 1
+a611 1
+	 if (bind(ssock,(struct sockaddr *) &snm,size) < 0) {
+d614 2
+a615 2
+	    close(ssock);
+	    ssock = 0;
+d620 1
+a620 1
+   return ssock;
+d636 1
+a636 1
+   if (ssock) {
+d643 1
+a643 1
+	 cc = sendto(ssock,
+d654 1
+a654 1
+	 cc = sendto(ssock,
+a668 1
+      if (debug) printf("TimSurvey:SendToPort:Debug:Sent:%d packets\n",(int) pkt->SequenceNumber);
+d678 1
+d688 1
+a688 1
+   if (!ssock) {
+d696 1
+a696 1
+      ssock = s;
+d706 2
+a707 2
+	    close(ssock);
+	    ssock = 0;
+d716 1
+a716 1
+	 if (bind(ssock,(struct sockaddr *) &snm,size) < 0) {
+d719 2
+a720 2
+	    close(ssock);
+	    ssock = 0;
+d725 1
+a725 1
+   return ssock;
+d731 3
+d743 1
+a743 1
+   if (ssock) {
+d749 1
+a749 1
+	 cc = recvfrom(ssock,
+d751 1
+a751 1
+		       PACKET_STRING_SIZE,
+d760 1
+a760 1
+	 cc = recvfrom(ssock,
+d762 1
+a762 1
+		       PACKET_STRING_SIZE,
+d810 24
+d862 1
+a862 1
+	     "   -run                ;Run survey\n"
+d881 4
+d935 1
+a935 10
+      printf("TimSurvey: Parameters are ...\n\n"
+	     "   -run                ;Run survey\n"
+	     "   -sport <PORT>       ;Sets the SEND port number\n"
+	     "   -ip    <IP ADDRESS> ;Sets remote IP address\n"
+	     "   -local              ;Force PF_UNIX domain on local host\n"
+	     "   -rport <PORT>       ;Sets the RECEIVE port number\n"
+	     "   -debug              ;Set Debug printing on\n"
+	     "   -allow_remote       ;Allow remote computers to connect to socket\n"
+	     "   -use_strings        ;Produce strings instead o numbers\n"
+	    );
+d945 1
+a945 1
+      if (strncmp(argv[i],options[RUN],strlen(options[PORT])) == 0) {
+d1012 9
+a1020 2
+      sendp = OpenSendPort(sport);
+      recvp = OpenRecvPort(rport);
+d1022 1
+a1022 3
+      while (RecvFromPort(recvp, char *pkt)) {
+	 cp = "GetStatus";
+	 if (strncmp(cp,pkt,strlen(cp)) == 0) {
+d1024 5
+d1033 3
+a1035 3
+	 cp = "GetStatic";
+	 if (strncmp(cp,pkt,strlen(cp)) == 0) {
+
+d1040 3
+a1042 3
+	 cp = "GetDynamic";
+	 if (strncmp(cp,pkt,strlen(cp)) == 0) {
+
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 2
+d6 15
+d24 1
+a24 2
+#include <sys/types.h>
+#include <errno.h>        /* Error numbers */
+d33 2
+d38 8
+a45 1
+static int use_strings = 0;
+d568 56
+d625 57
+d683 127
+d814 43
+d860 5
+a864 1
+char *cp;
+a871 1
+unsigned long mod;
+a874 1
+unsigned long pln;
+a877 1
+TgmMachine    mch;
+d883 83
+a965 2
+   for (i=0; i<argc; i++) {
+      if (strcmp(argv[i],"-use_strings") == 0) {
+d967 48
+a1014 1
+	 break;
+d1016 1
+d1019 1
+a1019 1
+   err = TimLibInitialize(TimLibDevice_ANY); /*initialize the hardware*/
+d1021 2
+a1022 1
+      fprintf(stderr,"TimSurvey:Fatal Error:%s\n",TimLibErrorToString(err));
+d1026 1
+d1029 3
+a1031 4
+      for (mod=1; mod<=mcn; mod++) {
+	 sts = TimLibGetStatus(mod,&dev);
+	 printf("<STS=%s MOD=%d DEV=%s>\n",StatusToStr(sts),(int) mod,DeviceToStr(dev));
+      }
+d1033 2
+a1034 2
+      fprintf(stderr,"TimSurvey:Fatal Error:No modules installed\n");
+      exit(TimLibErrorMODULE);
+d1037 16
+d1058 13
+a1070 1
+   if (err) {}
+d1078 9
+a1086 3
+
+	 printf("<PTM=%s MOD=%2d CHN=%1d DEV=%s DIM=%2d>\n",
+		GetPtmName(dev,ptm),(int) mod,(int) chn,DeviceToStr(dev),(int) dim);
+d1092 4
+a1095 2
+	       ptimodes[i]++;
+	       continue;
+d1098 1
+d1100 4
+a1103 3
+	    cp = CcvToStr(ccm, &ccv, pln);
+	    if (strlen(cp) > CCV_STR_SZ) {
+	       continue;
+d1105 8
+a1112 1
+	    printf("<%s>\n",CcvToStr(ccm, &ccv, pln));
+a1113 1
+	 printf("\n");
+d1117 2
+a1118 5
+   mch = 0; mod = 0;
+   err = TimLibGetCableId(mod,&cid);
+   if (err == TimLibErrorSUCCESS)
+      mch = TgvTgvToTgmMachine(TgvFirstMachineForCableId(cid));
+   if ((mch < 0) || (mch > TgmMACHINES)) mch = 0;
+d1120 12
+d1133 6
+a1138 1
+   err = TimLibConnect(TimLibClassCTIM,sscs[(int) mch],mod);
+d1140 1
+a1140 1
+   for (i=0; i<psize; i++) {
+d1142 4
+a1145 3
+      ptm = ptimlist[i];
+      if (ptm) {
+	 if (ptimodes[i]) continue;
+d1147 1
+a1147 6
+	 err = TimLibConnect(TimLibClassPTIM,ptm,mod);
+	 if (err) {
+	    ptimodes[i]++;
+	    continue;
+	 }
+      }
+d1149 2
+a1150 2
+
+   exit(0);
+@

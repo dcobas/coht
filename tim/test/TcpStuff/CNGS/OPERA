@@ -1,0 +1,15 @@
+opera.lngs.infn.it    192.84.135.95   port 1234
+bxmaster.lngs.infn.it 192.135.35.177  port 1235
+lvdaq0.lngs.infn.it  192.135.35.143   port 1236
+
+ABSPS1 172.18.203.173
+PSPC8473 137.138.192.94
+
+account: cngs
+passwd:  cngsclock
+
+SendCNGS ctim 331 port 1234 target 192.84.135.95 &
+SendCNGS ctim 331 port 1235 target 192.135.35.177 &
+SendCNGS ctim 331 port 1236 target 192.135.35.143 &
+SendCNGS ctim 331 port 1237 target 131.154.10.239 &
+

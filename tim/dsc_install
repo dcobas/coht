@@ -1,0 +1,133 @@
+#!/bin/sh
+# ================================================================
+# Shell script to install DSC programs on the various architectures
+# ================================================================
+# This script is used to install a program into a target directory
+# keeping always a backup copy of the program
+#
+if [ `uname -s` = "Linux" ]; then
+    strip68k="/acc/sys/68k/cdk/linux-coff-68k/usr/bin/strip"
+    stripppc="/acc/sys/ppc/cdk/linux-xcoff-ppc/usr/bin/strip"
+    stripppc4="/acc/sys/ppc4/cdk/linux-elf-ppc/usr/bin/strip"
+    stripx86="/acc/sys/x86/cdk/linux-elf-x86/usr/bin/strip"
+    stripl86=strip
+else
+    stripppc=strip
+    stripppc4=strip
+    strip68k=strip
+    stripx86=strip
+    stripl86=strip
+fi
+
+src=""
+dst=""
+while [ x"$1" != x ]; do
+    case $1 in
+     -restore) restore=yes; shift;;
+     -remove) remove=yes;   shift;;
+     -strip) strip=yes;     shift;;
+
+     *) if [ x"$2" != x ];
+	    then src="$src $1";
+	    else dst=$1;
+	fi
+	shift
+    esac
+done
+
+if [ x"$src" = x ]; 
+then
+    echo "Usage: " $0 f1 f2 ... target_dir
+    exit 2
+fi
+
+# Check for existing sources
+for i in $src; do
+    if [ ! -f $i ]; then
+	echo $0: Could not locate file $i
+	exit 2
+    fi
+    if [ ! -s $i ]; then
+	echo $0: file $i is empty
+	exit 2
+    fi
+done
+
+# Check for writeable target directory
+if [ ! -d $dst ] ; then
+    echo $0: Target $dst is not a directory
+fi
+if [ ! -w $dst ]; then
+    echo $0: No write access to directory $dst
+    exit 3
+fi
+
+# do the real work
+for f in $src; do
+    if [ x"$strip" != x ]; then
+	if [ `basename $f .ppc` != `basename $f` ]; then
+	    echo stripping $f
+	    $stripppc $f
+        elif  [ `basename $f .ppc4` != `basename $f` ]; then
+                echo stripping $f
+                $stripppc4 $f
+	elif  [ `basename $f .68k` != `basename $f` ]; then
+		echo stripping $f
+		$strip68k $f
+	elif  [ `basename $f .x86` != `basename $f` ]; then
+		echo stripping $f
+		$stripx86 $f
+	elif  [ `basename $f .l86` != `basename $f` ]; then
+		echo stripping $f
+		$stripl86 $f
+	fi
+    fi
+    i=`basename $f | sed 's@\.ces@@' | sed 's@\.030_M147@@' | sed 's@\.040_MVME@@' | sed 's@\.x86_drm@@' \
+	   | sed 's@\.ppc4@@' |sed 's@\.ppc2@@' | sed 's@\.ppc@@' | sed 's@\.68k@@' | sed 's@\.x86@@' \
+	   | sed 's@\.Linux@@' | sed 's@\.L864@@' | sed 's@\.L86@@' | sed 's@\.l86@@' |sed 's@\.Solaris@@' \
+           | sed 's@\.Lces@@' | sed 's@\.hpux@@' |sed 's@\.pc2@@'`
+    if [ x"$restore" != x ]; then
+	if [ -f $dst/$i.old ]; then
+		echo restoring
+		cp -p $dst/$i.old $dst/$i
+	fi
+    else
+	if [ -f $dst/$i ]; then
+
+	    # Deliver only if target changed
+#	    z=`find $f -newer $dst/$i -print`
+#	    if [ "$z"x != x ]; then
+	    cmp -s $f $dst/$i 
+	    if [ $? -ne 0 ]; then
+
+		# Remove previous backup because of possible owner change
+		if [ -f $dst/$i.old ]; then rm -f $dst/$i.old; fi
+
+		# Always keep a backup copy of the file
+		mv -f $dst/$i $dst/$i.old
+
+		cp $f $dst/$i
+		if [ $? != 0 ]; then exit $? ; fi
+
+		# Keep deliveries always read-only
+		chmod -w    $dst/$i
+	    else
+		echo  $f already installed as $dst/$i
+	    fi
+	else
+
+	    cp $f $dst/$i
+	    if [ $? != 0 ]; then exit $? ; fi
+
+	    # Keep deliveries always read-only
+	    chmod -w    $dst/$i
+	fi
+
+
+	# Remove source if -remove specified
+	if [ x"$remove" != x ]; then
+	    rm -f $f
+	fi
+    fi
+done
+exit 0
