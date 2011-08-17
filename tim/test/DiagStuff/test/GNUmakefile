@@ -2,14 +2,15 @@
 # Makefile to produce TimLib test program
 #================================================================
 
-CPU=L864
+CPU=L865
 
-include /ps/dsc/src/co/Make.auto
+include /acc/dsc/src/co/Make.auto
 
 ACCS=lab oper
 
 CFLAGS := -g -Wall -I. -I.. -I/ps/local/$(CPU)/include
-LDLIBS := /dsrc/co/lib/tim/libtim.$(CPU).a -ldscrt
+LDFLAGS += -L /acc/local/$(CPU)/lib
+LDLIBS := -ldscrt -ltim
 
 ALL  = tsvytest.$(CPU)
 

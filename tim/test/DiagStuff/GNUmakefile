@@ -2,17 +2,17 @@
 # Makefile to produce TimLib test program
 #================================================================
 
-include /ps/dsc/src/co/Make.auto
+include /acc/dsc/src/co/Make.auto
 
 ACCS=oper lab
 
-TIMLIB = /dsrc/co/lib/tim
+TIMLIB = /acc/local/$(CPU)/tim
 
 COMPILE_TIME:=$(shell ./gettime)
 
 CFLAGS := -g -Wall -I. -I$(TIMLIB) -I/ps/local/$(CPU)/include -I/ps/src/dsc/drivers/ctr/src/driver \
 	  -DCOMPILE_TIME=$(COMPILE_TIME)
-LDLIBS := $(TIMLIB)/libtim.$(CPU).a -ldscrt -ltgm -lerr -lerr_dummy -ltgv -lm -lX11 $(XTRALIBS) -lnetinet -lnc
+LDLIBS := $(TIMLIB)/libtim.a -ldscrt -ltgm -lerr -lerr_dummy -ltgv -lm -lX11 $(XTRALIBS) -lnetinet -lnc
 
 ifneq ($(CPU),L864)
 LDLIBS += -mthreads
