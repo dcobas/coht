@@ -50,7 +50,7 @@ char *yr, *ti, *md, *mn, *dy;
 #ifdef __68k__
       ctime_r(&t->Second, tmp, 128);
 #else
-      ctime_r(&t->Second, tmp);
+      ctime_r((time_t *) &t->Second, tmp);
 #endif
       tmp[3] = 0;
       dy = &(tmp[0]);
