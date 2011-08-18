@@ -58,7 +58,7 @@ ncscope.*
 *ppc4/
 
 # Executable
-*.L865
+*.L86[456]
 *.ppc4
 
 # Dont track RCS repos
