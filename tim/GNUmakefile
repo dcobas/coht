@@ -33,6 +33,6 @@ clean:
 	rm -f libtim.$(CPU).a
 
 install: $(INSTFILES)
-	dsc_install libtim.$(CPU).a /acc/local/$(CPU)/tim/libtim.a
+	dsc_install libtim.$(CPU).a /acc/local/$(CPU)/tim
 	rm -f /acc/local/$(CPU)/tim/TimLib.h
 	dsc_install TimLib.h /acc/local/$(CPU)/tim
