@@ -649,8 +649,7 @@ CtrDrvrCtimObjects           ctimo;
 	       break;
 
 	    case TimLibCcvMaskPAYLOAD:
-	       trg->Frame.Struct.Value &= ~0xFFFF;
-	       trg->Frame.Struct.Value |= (0xFFFF & ccv->Payload);
+	       trg->Frame.Struct.Value = ccv->Payload;
 	       break;
 
 	    case TimLibCcvMaskMACHINE:
