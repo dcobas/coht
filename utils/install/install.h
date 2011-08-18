@@ -40,7 +40,6 @@ static inline int makedev(int major, int minor)
 
 #include <string.h>
 #include <errno.h>
-#include <stropts.h>
 #include <sys/dir.h>		/* for dirent */
 #include <sys/file.h>
 #include <sys/types.h>
