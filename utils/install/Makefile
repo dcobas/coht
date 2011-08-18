@@ -1,5 +1,6 @@
 include /acc/src/dsc/co/Make.auto
 
+OBJECTDIR=object
 CFLAGS += -I. -I/acc/local/$(CPU)/include -I/usr/include/libxml2 -I /acc/src/dsc/drivers/coht/include -I ../include
 LDLIBS=-lxml2 -lz
 ifeq ($(CPU),ppc4)
@@ -21,6 +22,9 @@ instprog.$(CPU): instprog.$(CPU).o libutils.$(CPU).a
 
 libutils.$(CPU).a: $(CPU_OBJECTS) libinst.$(CPU).o inst-utils.$(CPU).o
 	ar r $@ $^
+	mkdir -p $(OBJECTDIR)
+	ln -s $(PWD)/$@ $(OBJECTDIR)
 
 clean:
-	rm -f *.L865.o *.L865 *.ppc4.o *.ppc4 *.L865.a *.ppc4.a
+	rm -f *.o *.a *.L865 *.ppc4
+	rm -rf $(OBJECTDIR)
