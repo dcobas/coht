@@ -4,7 +4,7 @@
 
 include /acc/dsc/src/co/Make.auto
 
-CFLAGS := -g -Wall -I. -I.. -I/acc/local/$(CPU)/include -I/acc/src/dsc/drivers/ctr/src/driver
+CFLAGS := -g -Wall -I. -I..
 LDLIBS := ../libtim.$(CPU).a -ltgm -ldtm -lerr -lerr_dummy -ltgv -lm -lX11 $(XTRALIBS) -lnc
 
 ifeq ($(CPU),ppc4)
