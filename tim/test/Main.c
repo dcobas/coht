@@ -322,7 +322,7 @@ TgvName cblnam;
       printf("%s",prompt);
 
       bzero((void *) tmpb,CMD_BUF_SIZE);
-      if (gets(tmpb)==NULL) exit(1);
+      if (fgets(tmpb, CMD_BUF_SIZE, stdin)==NULL) exit(1);
 
       cp = &(tmpb[0]);
 
