@@ -38,7 +38,11 @@ struct dma_channel channels[TSI148_NUM_DMA_CHANNELS];
  * dma_lock mutex to atomically look for an available channel.
  * The @disable flag can be set to disable any further DMA transfers.
  */
+#if LINUX_VERSION_CODE <= KERNEL_VERSION(2,6,31)
 static struct compat_semaphore	dma_semaphore;
+#else
+static struct semaphore		dma_semaphore;
+#endif
 static struct mutex	dma_lock;
 static atomic_t		dma_disable;
 

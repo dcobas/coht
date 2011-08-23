@@ -413,7 +413,7 @@ struct vme_mapping* find_vme_mapping_from_addr(unsigned logaddr)
 		if (mutex_lock_interruptible(&window->lock))
 			return NULL;
 		list_for_each_entry(mapping, &window->mappings, list) {
-			if ((unsigned)mapping->desc.kernel_va == logaddr) {
+			if ((unsigned long)mapping->desc.kernel_va == logaddr) {
 				mutex_unlock(&window->lock);
 				return &mapping->desc; /* bingo */
 			}
