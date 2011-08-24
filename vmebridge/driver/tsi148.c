@@ -1834,7 +1834,7 @@ int __devinit tsi148_setup_crg(unsigned int vme_base,
  * tsi148_disable_crg() - Disable the CRG VME mapping
  *
  */
-void __devexit tsi148_disable_crg(struct tsi148_chip *regs)
+void tsi148_disable_crg(struct tsi148_chip *regs)
 {
 	iowrite32be(0, &regs->lcsr.crgat);
 	iowrite32be(0, &regs->lcsr.cbau);
@@ -1848,7 +1848,7 @@ void __devexit tsi148_disable_crg(struct tsi148_chip *regs)
  * Put VME bridge in quiescent state.  Disable all decoders,
  * clear all interrupts.
  */
-void __devexit tsi148_quiesce(struct tsi148_chip *regs)
+void tsi148_quiesce(struct tsi148_chip *regs)
 {
 	int i;
 	unsigned int val;

@@ -408,7 +408,7 @@ static int __devinit vme_bridge_create_devices(void)
  * vme_bridge_remove_devices() - Remove the device nodes for the bridge
  *
  */
-static void __devexit vme_bridge_remove_devices(void)
+static void vme_bridge_remove_devices(void)
 {
 	int i;
 
@@ -539,7 +539,7 @@ out_destroy_window:
 	return rc;
 }
 
-static int __devexit vme_bridge_unmap_crg(void)
+static int vme_bridge_unmap_crg(void)
 {
 	tsi148_disable_crg(vme_bridge->regs);
 	return vme_destroy_window(crg_desc.window_num);
