@@ -24,7 +24,7 @@ ADDCFLAGS  = $(STDFLAGS) -DDRIVER_NAME=\"$(DRIVER_NAME)\"
 
 # libraries (and their pathes) to link executable file with
 XTRALIBDIRS = ../$(ROOTDIR)/utils/user/object ../$(FINAL_DEST)
-LOADLIBES  := $(addprefix -L,$(XTRALIBDIRS)) $(LOADLIBES) -lutils.$(CPU) \
+LOADLIBES  := $(addprefix -L,$(XTRALIBDIRS)) $(LOADLIBES) -lerr -lutils.$(CPU) \
 		-lxml2 -lz -ltermcap
 
 # Get all local libs (in object_ directory) user wants to compile with
