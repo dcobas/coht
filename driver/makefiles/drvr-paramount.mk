@@ -48,12 +48,12 @@ DRIVER    := $(OBJDIR)/$(DRIVER_NAME)D.ko
 SIMULATOR := $(OBJDIR)/$(DRIVER_NAME)S.ko
 
 ccflags-y := \
-	-I$(M)/../include \
-	-I$(M)/../include/user \
-	-I$(ROOTDIR) \
-	-I$(ROOTDIR)/include \
-	-I$(M)/../../general \
-	-I/acc/local/$(CPU)/include
+	-I $(M)/../include \
+	-I $(M)/../include/user \
+	-I $(ROOTDIR) \
+	-I $(ROOTDIR)/include \
+	-I $(M)/../../general \
+	-I /acc/local/$(CPU)/include
 
 PHONY += all
 _all: all

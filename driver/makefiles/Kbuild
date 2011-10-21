@@ -50,7 +50,7 @@ quiet_cmd_copy_symvers = COPY    $@
 always += Module.symvers
 
 # We need to copy .symvers file locally
-$(obj)/Module.symvers: $(VMEB_D)Module.symvers
+$(obj)/Module.symvers: Module.symvers.vme
 	$(call cmd,copy_symvers)
 endif # CONFIG_BUS_VME
 
