@@ -825,7 +825,8 @@ int cvorb_func_load(int h, int ch, int func, struct fv *fv, int sz)
 {
 	struct sram_params par = { 0 };
 	int i;
-	uint64_t lldt, llt1, llt2; /* for computation */
+	double lldt;
+	uint64_t lldt_int;
 
 	if (!WITHIN_RANGE(1, h, MAX_HNDLS))
 		return -CVORB_BAD_HANDLE;
@@ -860,9 +861,7 @@ int cvorb_func_load(int h, int ch, int func, struct fv *fv, int sz)
 			return -CVORB_OUT_OF_RANGE;
 
 		/* convert to us in order to not lose precision */
-		llt1 = fv[i-1].t * 1000;
-		llt2 = fv[i].t   * 1000;
-		lldt = llt2 - llt1; /* delta t in us */
+		lldt = (fv[i].t - fv[i-1].t) * 1000;	/* delta t in us */
 
 #if 0
 		/* TODO. Should we return wit error if
@@ -878,20 +877,20 @@ int cvorb_func_load(int h, int ch, int func, struct fv *fv, int sz)
 		if (lldt > (uint64_t)((1<<16)-1)*((1<<15)-1)*5)
 			return -CVORB_OUT_OF_RANGE;
 
-		/* first -- round down (if needed) to be multiple of
+		/* first -- round to the nearest multiple of
 		   MIN_STEP (5us) size */
-		lldt -= lldt % MIN_STEP;
+		lldt_int = MIN_STEP * (uint64_t)(lldt / MIN_STEP + 0.5);
 
 		/* get minimum step size needed to hit dt range */
-		par.fv[i].ss = ((lldt-1)/MTMS) + 1;
+		par.fv[i].ss = ((lldt_int-1)/MTMS) + 1;
 
 		/* Round delta t if needed.
 		   Ensure step size (in us) is a factor of dt,
 		   i.e. no remainder */
-		lldt -= lldt % (par.fv[i].ss * MIN_STEP);
+		lldt_int -= lldt_int % (par.fv[i].ss * MIN_STEP);
 
 		/* compute && save number of steps */
-		par.fv[i].nos = lldt/(par.fv[i].ss * MIN_STEP);
+		par.fv[i].nos = lldt_int/(par.fv[i].ss * MIN_STEP);
 	}
 
 	//prnt_vtf(&par); /* For testing only */
