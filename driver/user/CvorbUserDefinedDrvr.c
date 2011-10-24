@@ -398,7 +398,7 @@ char* CvorbUserInst(int *proceed, register DevInfo_t *info,
 	iVec = info->iVector;		/* set up interrupt vector */
 
 	/* map submodule address pointers */
-	usp->md = _m;
+	usp->md = (struct cvorb_module *)sysbrk(sizeof(_m));
 
 	usp->md[0].md = (mod *)sptr->card->block00;
 	usp->md[1].md = (mod *)((long)sptr->card->block00 + 0x200);
@@ -499,7 +499,7 @@ int CvorbUserUnInst(int *proceed, CVORBStatics_t *sptr)
 	kkprintf("OK\n");
 #endif
 
-
+	sysfree((char*)sptr->usrst->md, sizeof(_m));
 	if (proceed)
 		*proceed = TRUE; /* continue standard code execution */
 
