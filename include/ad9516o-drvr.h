@@ -19,34 +19,8 @@
 #ifndef _AD9516O_H_
 #define _AD9516O_H_
 
+#include <CvorbUserDefinedDrvr.h>
 #define OSCILLATOR_FREQ 40000000UL
-
-/**
- * @brief PLL configuration structure
- *
- * @a        -- [0-63]           PLL parameter
- * @b        -- 13 bits [0-8191] PLL parameter
- * @p        -- 16 or 32         PLL parameter
- * @r        --                  PLL parameter
- * @dvco     -- [1,6]  non-PLL divider
- * @d1       -- [1,32] first divider of the output.  non-PLL divider
- * @d2       -- [1,32] second divider of the output. non-PLL divider
- * @force    -- set to 1 to even apply this configuration when there's another
- *              channel currently playing a waveform. 0 to avoid the update in
- *              that case.
- * @external -- set to 0 to use the internal PLL; 1 to use EXTCLK
- */
-struct pll {
-        int a;
-        int b;
-        int p;
-        int r;
-        int dvco;
-        int d1;
-        int d2;
-        int force;
-        int external;
-};
 
 /** @defgroup clock_generator_control Clock Generator Control register layout
  *
@@ -166,10 +140,12 @@ struct pll {
 /* Update All Registers */
 #define AD9516_UPDATE_ALL	0x232
 
-void ad9516o_init(void *);
-void ad9516o_get_pll_conf(struct pll *);
-int  ad9516o_put_pll_conf(struct pll *);
+struct pll;
+
+void ad9516o_init(CVORBUserStatics_t *usp);
+void ad9516o_get_pll_conf(CVORBUserStatics_t *usp, struct pll *);
+int  ad9516o_put_pll_conf(CVORBUserStatics_t *usp, struct pll *);
 int  ad9516o_check_pll(struct pll *);
-int  ad9516o_clkgen_default_conf(void);
+int  ad9516o_clkgen_default_conf(CVORBUserStatics_t *usp);
 
 #endif /* _AD9516O_H_ */

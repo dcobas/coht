@@ -417,7 +417,7 @@ char* CvorbUserInst(int *proceed, register DevInfo_t *info,
 	}
 
 	/* init on-board DAC */
-	ad9516o_init((void *)&usp->md[0].md->CLK_GEN_CNTL);
+	ad9516o_init(usp);
 
 	/* disable on-board clock generator */
 	_wr(0, CLK_GEN_CNTL, AD9516_OFF);

@@ -2,6 +2,7 @@
 #define _CVORB_USER_DEFINED_DRVR_H_INCLUDE_
 
 #include "CvorbDrvr.h"
+#include <ad9516o-drvr.h>
 
 #ifdef __LYNXOS
 #include <dg/port_ops_lynx.h>
@@ -13,6 +14,33 @@
 #if defined(__LYNXOS) || defined(__KERNEL__)
 struct sel; /* preliminary structure declaration to supress warnings during
 	       user code compilation */
+
+/**
+ * @brief PLL configuration structure
+ *
+ * @a        -- [0-63]           PLL parameter
+ * @b        -- 13 bits [0-8191] PLL parameter
+ * @p        -- 16 or 32         PLL parameter
+ * @r        --                  PLL parameter
+ * @dvco     -- [1,6]  non-PLL divider
+ * @d1       -- [1,32] first divider of the output.  non-PLL divider
+ * @d2       -- [1,32] second divider of the output. non-PLL divider
+ * @force    -- set to 1 to even apply this configuration when there's another
+ *              channel currently playing a waveform. 0 to avoid the update in
+ *              that case.
+ * @external -- set to 0 to use the internal PLL; 1 to use EXTCLK
+ */
+struct pll {
+        int a;
+        int b;
+        int p;
+        int r;
+        int dvco;
+        int d1;
+        int d2;
+        int force;
+        int external;
+};
 
 /* enable/disable i/o access debugging printout */
 //#define __DEBUG
@@ -36,6 +64,9 @@ struct cvorb_module {
 /* user-defined statics data table for CVORB module */
 struct CVORBUserStatics_t {
 	struct cvorb_module *md;
+        struct cdcm_mutex clkgen_lock;
+        struct cdcm_mutex pll_lock;
+	struct pll pll;
 };
 
 /** @defgroup Low level r/w operations

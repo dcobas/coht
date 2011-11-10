@@ -17,6 +17,7 @@
 #include <cdcm/cdcmIo.h>
 #include <ad9516o-drvr.h>
 #include <include/general_both.h>
+#include <CvorbUserDefinedDrvr.h>
 
 /*
  * define this if you want to debug the SPI interface with the AD9516
@@ -25,14 +26,6 @@
 
 #define AD9516_CALIB_DIVIDER	2
 #define AD9516_SPI_SLEEP_US	5
-
- /* device */
-static struct ad9516o {
-        void *ba;
-        struct cdcm_mutex clkgen_lock;
-        struct cdcm_mutex pll_lock;
-        struct pll        pll;
-} ad9516o;
 
 /*
  * Note regarding locking: each module has a mutex to manage the access
@@ -69,18 +62,18 @@ static int ad9516o_clkgen_ok(uint32_t rval, unsigned int addr)
  *
  * @return value of the CLKCTL register
  */
-static uint32_t ad9516o_clkgen_rval(unsigned int addr)
+static uint32_t ad9516o_clkgen_rval(CVORBUserStatics_t *usp, unsigned int addr)
 {
 	uint32_t val;
 	int i;
 
-	cdcm_iowrite32be(AD9516_OP_READ | (addr << 8), ad9516o.ba);
+	cdcm_iowrite32be(AD9516_OP_READ | (addr << 8), (void *)&usp->md[0].md->CLK_GEN_CNTL);
 
 	/* try a few times, although normally 5us should be enough */
 	for (i = 0; i < 3; i++) {
 		/* delay to allow the serial transfer to happen */
 		usec_sleep(AD9516_SPI_SLEEP_US);
-		val = cdcm_ioread32be(ad9516o.ba);
+		val = cdcm_ioread32be((void *)&usp->md[0].md->CLK_GEN_CNTL);
 		if (ad9516o_clkgen_ok(val, addr))
 			goto out;
 	}
@@ -88,9 +81,9 @@ out:
 	return val;
 }
 
-static uint32_t ad9516o_clkgen_read(unsigned int addr)
+static uint32_t ad9516o_clkgen_read(CVORBUserStatics_t *usp, unsigned int addr)
 {
-	uint32_t rval = ad9516o_clkgen_rval(addr);
+	uint32_t rval = ad9516o_clkgen_rval(usp, addr);
 
 	return rval & 0xff;
 }
@@ -104,9 +97,9 @@ static uint32_t ad9516o_clkgen_read(unsigned int addr)
  * If we cannot read back the data we've written, then print a debug message
  */
 #ifdef DEBUG_SPI
-static void ad9516o_debug_clkgen_write(unsigned int addr, uint8_t data)
+static void ad9516o_debug_clkgen_write(CVORBUserStatics_t *usp, unsigned int addr, uint8_t data)
 {
-	uint32_t rval = ad9516o_clkgen_rval(addr);
+	uint32_t rval = ad9516o_clkgen_rval(usp, addr);
 
 	if (!ad9516o_clkgen_ok(rval, addr)) {
 		unsigned raddr = (rval & CLKCTL_ADDR) >> 8;
@@ -118,7 +111,7 @@ static void ad9516o_debug_clkgen_write(unsigned int addr, uint8_t data)
 	}
 }
 #else
-static void ad9516o_debug_clkgen_write(unsigned int addr, uint8_t data)
+static void ad9516o_debug_clkgen_write(CVORBUserStatics_t *usp, unsigned int addr, uint8_t data)
 {
 }
 #endif /* DEBUG_SPI */
@@ -129,28 +122,28 @@ static void ad9516o_debug_clkgen_write(unsigned int addr, uint8_t data)
  * @param addr - address of the AD9516-O to write to (10 bits)
  * @param data - data to be written (8 bits)
  */
-static void ad9516o_clkgen_write(unsigned int addr, uint8_t data)
+static void ad9516o_clkgen_write(CVORBUserStatics_t *usp, unsigned int addr, uint8_t data)
 {
 	uint32_t cmd = AD9516_OP_WRITE | (addr << 8) | data;
 
-	cdcm_iowrite32be(cmd, ad9516o.ba);
+	cdcm_iowrite32be(cmd, (void *)&usp->md[0].md->CLK_GEN_CNTL);
 	usec_sleep(AD9516_SPI_SLEEP_US);
 
-	ad9516o_debug_clkgen_write(addr, data);
+	ad9516o_debug_clkgen_write(usp, addr, data);
 }
 
-static void ad9516o_clkgen_or(unsigned int addr, uint8_t data)
+static void ad9516o_clkgen_or(CVORBUserStatics_t *usp, unsigned int addr, uint8_t data)
 {
-	uint32_t oldval = ad9516o_clkgen_read(addr) & 0xff;
+	uint32_t oldval = ad9516o_clkgen_read(usp, addr) & 0xff;
 
-	ad9516o_clkgen_write(addr, oldval | data);
+	ad9516o_clkgen_write(usp, addr, oldval | data);
 }
 
-static void ad9516o_clkgen_and(unsigned int addr, uint8_t data)
+static void ad9516o_clkgen_and(CVORBUserStatics_t *usp, unsigned int addr, uint8_t data)
 {
-	uint32_t oldval = ad9516o_clkgen_read(addr) & 0xff;
+	uint32_t oldval = ad9516o_clkgen_read(usp, addr) & 0xff;
 
-	ad9516o_clkgen_write(addr, oldval & data);
+	ad9516o_clkgen_write(usp, addr, oldval & data);
 }
 
 /**
@@ -173,7 +166,7 @@ static void ad9516o_clkgen_and(unsigned int addr, uint8_t data)
  * @return 0 - if the callibration was successful
  * @return -1 - if the callibration didn't happen in time
  */
-static int ad9516o_calib_vco_sleep(int r, int freqref)
+static int ad9516o_calib_vco_sleep(CVORBUserStatics_t *usp, int r, int freqref)
 {
 	int interval;
 
@@ -196,15 +189,15 @@ static int ad9516o_calib_vco_sleep(int r, int freqref)
 	tswait(NULL, SEM_SIGIGNORE, interval + 1);
 
 	/* check for completion */
-	if (!(ad9516o_clkgen_read(AD9516_PLLREADBACK) & 0x40))
+	if (!(ad9516o_clkgen_read(usp, AD9516_PLLREADBACK) & 0x40))
 			return -1;
 	return 0;
 }
 
-static int ad9516o_clkgen_read_dvco(void)
+static int ad9516o_clkgen_read_dvco(CVORBUserStatics_t *usp)
 {
-	int dvco = ad9516o_clkgen_read(AD9516_VCO_DIVIDER);
-	int inputclks = ad9516o_clkgen_read(AD9516_INPUT_CLKS);
+	int dvco = ad9516o_clkgen_read(usp, AD9516_VCO_DIVIDER);
+	int inputclks = ad9516o_clkgen_read(usp, AD9516_INPUT_CLKS);
 	int retval;
 
 	/* is it bypassed? */
@@ -232,10 +225,10 @@ static int ad9516o_clkgen_read_dvco(void)
  *
  * @return value of the divider
  */
-static int ad9516o_clkgen_read_d(int offset, int nr)
+static int ad9516o_clkgen_read_d(CVORBUserStatics_t *usp, int offset, int nr)
 {
 	int val;
-	int bypass = ad9516o_clkgen_read(offset + 3);
+	int bypass = ad9516o_clkgen_read(usp, offset + 3);
 	int m, n;
 
 	/* sanity check */
@@ -246,7 +239,7 @@ static int ad9516o_clkgen_read_d(int offset, int nr)
 	}
 
 	offset += nr - 1;
-	val = ad9516o_clkgen_read(offset);
+	val = ad9516o_clkgen_read(usp, offset);
 
 	m = (val & 0xf0) >> 4;
 	n = val & 0x0f;
@@ -259,26 +252,26 @@ static int ad9516o_clkgen_read_d(int offset, int nr)
 	return m + n + 2;
 }
 
-static int ad9516o_clkgen_read_a(void)
+static int ad9516o_clkgen_read_a(CVORBUserStatics_t *usp)
 {
-	return ad9516o_clkgen_read(AD9516_ACOUNT) & 0x3f;
+	return ad9516o_clkgen_read(usp, AD9516_ACOUNT) & 0x3f;
 }
 
-static int ad9516o_clkgen_read_b(void)
+static int ad9516o_clkgen_read_b(CVORBUserStatics_t *usp)
 {
-	return ad9516o_clkgen_read(AD9516_BCOUNT_LSB) |
-	     ((ad9516o_clkgen_read(AD9516_BCOUNT_MSB) & 0x1f) << 8);
+	return ad9516o_clkgen_read(usp, AD9516_BCOUNT_LSB) |
+	     ((ad9516o_clkgen_read(usp, AD9516_BCOUNT_MSB) & 0x1f) << 8);
 }
 
-static int ad9516o_clkgen_read_r(void)
+static int ad9516o_clkgen_read_r(CVORBUserStatics_t *usp)
 {
-	return ad9516o_clkgen_read(AD9516_RCOUNT_LSB) |
-	     ((ad9516o_clkgen_read(AD9516_RCOUNT_MSB) & 0x3f) << 8);
+	return ad9516o_clkgen_read(usp, AD9516_RCOUNT_LSB) |
+	     ((ad9516o_clkgen_read(usp, AD9516_RCOUNT_MSB) & 0x3f) << 8);
 }
 
-static int ad9516o_clkgen_read_p(void)
+static int ad9516o_clkgen_read_p(CVORBUserStatics_t *usp)
 {
-	int prescaler = ad9516o_clkgen_read(AD9516_PLL1) & 0x7;
+	int prescaler = ad9516o_clkgen_read(usp, AD9516_PLL1) & 0x7;
 	int ret = 1;
 
 	if (prescaler == 5)
@@ -291,25 +284,25 @@ static int ad9516o_clkgen_read_p(void)
 	return ret;
 }
 
-static void __ad9516o_get_pll_conf(struct pll *pll)
+static void __ad9516o_get_pll_conf(CVORBUserStatics_t *usp, struct pll *pll)
 {
 	/* get the PLL parameters */
-	pll->a = ad9516o_clkgen_read_a();
-	pll->b = ad9516o_clkgen_read_b();
-	pll->r = ad9516o_clkgen_read_r();
-	pll->p = ad9516o_clkgen_read_p();
+	pll->a = ad9516o_clkgen_read_a(usp);
+	pll->b = ad9516o_clkgen_read_b(usp);
+	pll->r = ad9516o_clkgen_read_r(usp);
+	pll->p = ad9516o_clkgen_read_p(usp);
 
 	/* get non-pll dividers */
-	pll->dvco = ad9516o_clkgen_read_dvco();
-	pll->d1 = ad9516o_clkgen_read_d(AD9516_CMOSDIV3_1, 1);
-	pll->d2 = ad9516o_clkgen_read_d(AD9516_CMOSDIV3_1, 2);
+	pll->dvco = ad9516o_clkgen_read_dvco(usp);
+	pll->d1 = ad9516o_clkgen_read_d(usp, AD9516_CMOSDIV3_1, 1);
+	pll->d2 = ad9516o_clkgen_read_d(usp, AD9516_CMOSDIV3_1, 2);
 }
 
-void ad9516o_get_pll_conf(struct pll *pll)
+void ad9516o_get_pll_conf(CVORBUserStatics_t *usp, struct pll *pll)
 {
-	cdcm_mutex_lock(&ad9516o.clkgen_lock);
-	__ad9516o_get_pll_conf(pll);
-	cdcm_mutex_unlock(&ad9516o.clkgen_lock);
+	cdcm_mutex_lock(&usp->clkgen_lock);
+	__ad9516o_get_pll_conf(usp, pll);
+	cdcm_mutex_unlock(&usp->clkgen_lock);
 }
 
 /*
@@ -350,39 +343,39 @@ static void ad9516o_check_pll_dividers(struct pll *pll)
 	}
 }
 
-static void ad9516o_clkgen_write_a(int a)
+static void ad9516o_clkgen_write_a(CVORBUserStatics_t *usp, int a)
 {
-	ad9516o_clkgen_write(AD9516_ACOUNT, a & 0x3f);
+	ad9516o_clkgen_write(usp, AD9516_ACOUNT, a & 0x3f);
 }
 
-static void ad9516o_clkgen_write_b(int b)
+static void ad9516o_clkgen_write_b(CVORBUserStatics_t *usp, int b)
 {
-	ad9516o_clkgen_write(AD9516_BCOUNT_LSB, b & 0xff);
-	ad9516o_clkgen_write(AD9516_BCOUNT_MSB, (b >> 8) & 0x3f);
+	ad9516o_clkgen_write(usp, AD9516_BCOUNT_LSB, b & 0xff);
+	ad9516o_clkgen_write(usp, AD9516_BCOUNT_MSB, (b >> 8) & 0x3f);
 }
 
-static void ad9516o_clkgen_write_r(int r)
+static void ad9516o_clkgen_write_r(CVORBUserStatics_t *usp, int r)
 {
-	ad9516o_clkgen_write(AD9516_RCOUNT_LSB, r & 0xff);
-	ad9516o_clkgen_write(AD9516_RCOUNT_MSB, (r >> 8) & 0x3f);
+	ad9516o_clkgen_write(usp, AD9516_RCOUNT_LSB, r & 0xff);
+	ad9516o_clkgen_write(usp, AD9516_RCOUNT_MSB, (r >> 8) & 0x3f);
 }
 
-static void ad9516o_clkgen_write_p(int p)
+static void ad9516o_clkgen_write_p(CVORBUserStatics_t *usp, int p)
 {
 	int prescaler = p == 16 ? 0x5 : 0x6; /* see the module's docs */
 
 	/* reset P */
-	ad9516o_clkgen_and(AD9516_PLL1, ~0x07);
+	ad9516o_clkgen_and(usp, AD9516_PLL1, ~0x07);
 
 	/* write new P value */
-	ad9516o_clkgen_or(AD9516_PLL1, prescaler);
+	ad9516o_clkgen_or(usp, AD9516_PLL1, prescaler);
 }
 
-static void ad9516o_clkgen_write_dvco(struct pll *pll)
+static void ad9516o_clkgen_write_dvco(CVORBUserStatics_t *usp, struct pll *pll)
 {
 	if (!pll->dvco) {
 		if (pll->external) { /* bypassing is OK */
-			ad9516o_clkgen_or(AD9516_INPUT_CLKS, 0x1);
+			ad9516o_clkgen_or(usp, AD9516_INPUT_CLKS, 0x1);
 			return;
 		} else {
 			kkprintf("[AD9516_WARN] Cannot bypass the VCO divider:"
@@ -398,9 +391,9 @@ static void ad9516o_clkgen_write_dvco(struct pll *pll)
 	}
 
 	/* Note: the (-2) should be there, check the datasheet */
-	ad9516o_clkgen_write(AD9516_VCO_DIVIDER, (pll->dvco - 2) & 0x7);
+	ad9516o_clkgen_write(usp, AD9516_VCO_DIVIDER, (pll->dvco - 2) & 0x7);
 	/* no bypass */
-	ad9516o_clkgen_and(AD9516_INPUT_CLKS, ~0x1);
+	ad9516o_clkgen_and(usp, AD9516_INPUT_CLKS, ~0x1);
 }
 
 /**
@@ -414,7 +407,7 @@ static void ad9516o_clkgen_write_dvco(struct pll *pll)
  * N - High cycles divider
  * More info in the datasheet: pg 44 'Channel Dividers - LVDS/CMOS Outputs'
  */
-static void ad9516o_clkgen_write_d(int divider, int nr, int d)
+static void ad9516o_clkgen_write_d(CVORBUserStatics_t *usp, int divider, int nr, int d)
 {
 	unsigned int m, n;
 	unsigned int divider_addr, bypass_addr, bypass_mask;
@@ -454,16 +447,16 @@ static void ad9516o_clkgen_write_d(int divider, int nr, int d)
 
 	/* bypass? */
 	if (!d) {
-		ad9516o_clkgen_or(bypass_addr, bypass_mask);
+		ad9516o_clkgen_or(usp, bypass_addr, bypass_mask);
 		return;
 	}
 
 	d -= 2; /* D = M + N + 2 */
 	m = d / 2 + d % 2; /* pg. 45: An odd D must be set as M = N + 1 */
 	n = d / 2;
-	ad9516o_clkgen_write(divider_addr, ((m & 0xf) << 4) | (n & 0xf));
+	ad9516o_clkgen_write(usp, divider_addr, ((m & 0xf) << 4) | (n & 0xf));
 	/* clear the bypass bit */
-	ad9516o_clkgen_and(bypass_addr, ~bypass_mask);
+	ad9516o_clkgen_and(usp, bypass_addr, ~bypass_mask);
 }
 
 static int ad9516o_pllcmp(struct pll *pll, struct pll *pll2)
@@ -475,40 +468,40 @@ static int ad9516o_pllcmp(struct pll *pll, struct pll *pll2)
 	return 0;
 }
 
-static int __ad9516o_put_pll_conf(struct pll *pll)
+static int __ad9516o_put_pll_conf(CVORBUserStatics_t *usp, struct pll *pll)
 {
 	int ret = 0;
 
 	ad9516o_check_pll_dividers(pll);
 
 	if (pll->external)
-		ad9516o_clkgen_write(AD9516_INPUT_CLKS, ~0x2);
+		ad9516o_clkgen_write(usp, AD9516_INPUT_CLKS, ~0x2);
 	else
-		ad9516o_clkgen_write(AD9516_INPUT_CLKS, 0x2);
+		ad9516o_clkgen_write(usp, AD9516_INPUT_CLKS, 0x2);
 
-	ad9516o_clkgen_write_a(pll->a);
-	ad9516o_clkgen_write_b(pll->b);
-	ad9516o_clkgen_write_r(pll->r);
-	ad9516o_clkgen_write_p(pll->p);
+	ad9516o_clkgen_write_a(usp, pll->a);
+	ad9516o_clkgen_write_b(usp, pll->b);
+	ad9516o_clkgen_write_r(usp, pll->r);
+	ad9516o_clkgen_write_p(usp, pll->p);
 
-	ad9516o_clkgen_write_dvco(pll);
+	ad9516o_clkgen_write_dvco(usp, pll);
 
-	ad9516o_clkgen_write_d(3, 1, pll->d1);
-	ad9516o_clkgen_write_d(3, 2, pll->d2);
-	ad9516o_clkgen_write_d(4, 1, pll->d1);
-	ad9516o_clkgen_write_d(4, 2, pll->d2);
+	ad9516o_clkgen_write_d(usp, 3, 1, pll->d1);
+	ad9516o_clkgen_write_d(usp, 3, 2, pll->d2);
+	ad9516o_clkgen_write_d(usp, 4, 1, pll->d1);
+	ad9516o_clkgen_write_d(usp, 4, 2, pll->d2);
 
-	ad9516o_clkgen_write(AD9516_PLL3,		0x00);
-	ad9516o_clkgen_write(AD9516_UPDATE_ALL,		0x01);
-	ad9516o_clkgen_write(AD9516_PLL3,		0x01);
-	ad9516o_clkgen_write(AD9516_UPDATE_ALL,		0x01);
+	ad9516o_clkgen_write(usp, AD9516_PLL3,		0x00);
+	ad9516o_clkgen_write(usp, AD9516_UPDATE_ALL,		0x01);
+	ad9516o_clkgen_write(usp, AD9516_PLL3,		0x01);
+	ad9516o_clkgen_write(usp, AD9516_UPDATE_ALL,		0x01);
 
 	/* perform the update in the module context */
-	cdcm_mutex_lock(&ad9516o.pll_lock);
+	cdcm_mutex_lock(&usp->pll_lock);
 
 	/* if the PLL configuration has changed, VCO calibration is needed */
-	if (ad9516o_pllcmp(&ad9516o.pll, pll) && !pll->external) {
-		if (ad9516o_calib_vco_sleep(pll->r, OSCILLATOR_FREQ)) {
+	if (ad9516o_pllcmp(&usp->pll, pll) && !pll->external) {
+		if (ad9516o_calib_vco_sleep(usp, pll->r, OSCILLATOR_FREQ)) {
 			kkprintf("[AD9516_DBG] VCO calibration failed"
 				 " [PLL: A=%d B=%d P=%d "
 				"R=%d d1=%d d2=%d dvco=%d]\n", pll->a, pll->b,
@@ -519,21 +512,21 @@ static int __ad9516o_put_pll_conf(struct pll *pll)
 	}
 
 	/* update the module's PLL description */
-	memcpy(&ad9516o.pll, pll, sizeof(struct pll));
+	memcpy(&usp->pll, pll, sizeof(struct pll));
 
  failed:
-	cdcm_mutex_unlock(&ad9516o.pll_lock);
+	cdcm_mutex_unlock(&usp->pll_lock);
 
 	return ret;
 }
 
-int ad9516o_put_pll_conf(struct pll *pll)
+int ad9516o_put_pll_conf(CVORBUserStatics_t *usp, struct pll *pll)
 {
 	int retval;
 
-	cdcm_mutex_lock(&ad9516o.clkgen_lock);
-	retval = __ad9516o_put_pll_conf(pll);
-	cdcm_mutex_unlock(&ad9516o.clkgen_lock);
+	cdcm_mutex_lock(&usp->clkgen_lock);
+	retval = __ad9516o_put_pll_conf(usp, pll);
+	cdcm_mutex_unlock(&usp->clkgen_lock);
 
 	return retval;
 }
@@ -559,61 +552,61 @@ int ad9516o_check_pll(struct pll *pll)
 /**
  * @brief write default configuration to the AD9516-O Clock Generator
  */
-static void ad9516o_hw_init(void)
+static void ad9516o_hw_init(CVORBUserStatics_t *usp)
 {
 	/*
 	 * PFD polarity 0, CP current 4.8 mA, CP mode: Normal,
 	 * PLL Operating mode: normal
 	 */
-	ad9516o_clkgen_write(AD9516_PDF_CP,	0x7c);
+	ad9516o_clkgen_write(usp, AD9516_PDF_CP,	0x7c);
 
 	/* CP Normal, No reset counters, No B bypass, P = 16 @ DM mode */
-	ad9516o_clkgen_write(AD9516_PLL1,	0x05);
+	ad9516o_clkgen_write(usp, AD9516_PLL1,	0x05);
 
 	/* STATUS: N divider output, Antibackslash pulse width: 2.9ns */
-	ad9516o_clkgen_write(AD9516_PLL2,	0x04);
+	ad9516o_clkgen_write(usp, AD9516_PLL2,	0x04);
 
 	/* Do nothing on !SYNC, PLL Divider delays: 0 ps */
-	ad9516o_clkgen_write(AD9516_PLL4,	0x00);
+	ad9516o_clkgen_write(usp, AD9516_PLL4,	0x00);
 
 	/*
 	 * REF{1,2} frequency threshold: valid if freq is above the higher
 	 * freq threshold, LD pin: Digital lock detech (high = lock)
 	 */
-	ad9516o_clkgen_write(AD9516_PLL5,	0x00);
+	ad9516o_clkgen_write(usp, AD9516_PLL5,	0x00);
 
 	/*
 	 * enable VCO freq monitor, disable REF2 freqmon, enable REF1 freqmon,
 	 * REFMON: status of VCO frequency (active high)
 	 */
-	ad9516o_clkgen_write(AD9516_PLL6,	0xab);
+	ad9516o_clkgen_write(usp, AD9516_PLL6,	0xab);
 
 	/*
 	 * enable switchover deglitch, select REF1 for PLL, manual reference
 	 * switchover, return to REF1 automatically when REF1 status is good
 	 * again, REF2 power on, REF1 power on, differential referente mode
 	 */
-	ad9516o_clkgen_write(AD9516_PLL7,	0x07);
+	ad9516o_clkgen_write(usp, AD9516_PLL7,	0x07);
 
 	/*
 	 * PLL status register enable, disable LD pin comparator, holdover
 	 * disabled, automatic holdover mode
 	 */
-	ad9516o_clkgen_write(AD9516_PLL8,	0x00);
+	ad9516o_clkgen_write(usp, AD9516_PLL8,	0x00);
 
 	/*
 	 * PFD cycles to determine lock: 5, high range lock detect window,
 	 * normal lock detect operation, VCO calibration divider: 2
 	 */
-	ad9516o_clkgen_write(AD9516_PLL3,	0x00);
+	ad9516o_clkgen_write(usp, AD9516_PLL3,	0x00);
 
 	/* power down the LVPECL outputs, they're not used */
-	ad9516o_clkgen_write(AD9516_LVPECL_OUT0,	0x0b);
-	ad9516o_clkgen_write(AD9516_LVPECL_OUT1,	0x0b);
-	ad9516o_clkgen_write(AD9516_LVPECL_OUT2,	0x0b);
-	ad9516o_clkgen_write(AD9516_LVPECL_OUT3,	0x0b);
-	ad9516o_clkgen_write(AD9516_LVPECL_OUT4,	0x0b);
-	ad9516o_clkgen_write(AD9516_LVPECL_OUT5,	0x0b);
+	ad9516o_clkgen_write(usp, AD9516_LVPECL_OUT0,	0x0b);
+	ad9516o_clkgen_write(usp, AD9516_LVPECL_OUT1,	0x0b);
+	ad9516o_clkgen_write(usp, AD9516_LVPECL_OUT2,	0x0b);
+	ad9516o_clkgen_write(usp, AD9516_LVPECL_OUT3,	0x0b);
+	ad9516o_clkgen_write(usp, AD9516_LVPECL_OUT4,	0x0b);
+	ad9516o_clkgen_write(usp, AD9516_LVPECL_OUT5,	0x0b);
 
 	/*
 	 * Configure CMOS outputs
@@ -621,14 +614,14 @@ static void ad9516o_hw_init(void)
 	 * Non-inverting, turn off CMOS B output, LVDS logic level,
 	 * current level: 3.5 mA (100 m-ohm), power on
 	 */
-	ad9516o_clkgen_write(AD9516_LVCMOS_OUT6,	0x42);
-	ad9516o_clkgen_write(AD9516_LVCMOS_OUT7,	0x42);
+	ad9516o_clkgen_write(usp, AD9516_LVCMOS_OUT6,	0x42);
+	ad9516o_clkgen_write(usp, AD9516_LVCMOS_OUT7,	0x42);
 	/*
 	 * Non-inverting, turn off CMOS B output, CMOS logic level,
 	 * current level: 1.75 mA (100 m-ohm), power on
 	 */
-	ad9516o_clkgen_write(AD9516_LVCMOS_OUT8,	0x48);
-	ad9516o_clkgen_write(AD9516_LVCMOS_OUT9,	0x48);
+	ad9516o_clkgen_write(usp, AD9516_LVCMOS_OUT8,	0x48);
+	ad9516o_clkgen_write(usp, AD9516_LVCMOS_OUT9,	0x48);
 }
 
 
@@ -637,7 +630,7 @@ static void ad9516o_hw_init(void)
  *
  * Note. the module's clkgen_lock mutex must be held by the caller
  */
-static int __ad9516o_clkgen_default_config(void)
+static int __ad9516o_clkgen_default_config(CVORBUserStatics_t *usp)
 {
 	/*
 	 * PLL defaults: fvco = 2.7GHz, f_output = 100MHz, for the given
@@ -656,30 +649,29 @@ static int __ad9516o_clkgen_default_config(void)
 	};
 
 	/* re-init HW */
-	ad9516o_hw_init();
+	ad9516o_hw_init(usp);
 
 	/* and configure the PLL */
-	return __ad9516o_put_pll_conf(&pll);
+	return __ad9516o_put_pll_conf(usp, &pll);
 }
 
 /**
  * @brief write default configuration to the AD9516-O Clock Generator
  */
-int ad9516o_clkgen_default_conf(void)
+int ad9516o_clkgen_default_conf(CVORBUserStatics_t *usp)
 {
 	int retval;
 
-	cdcm_mutex_lock(&ad9516o.clkgen_lock);
-	retval = __ad9516o_clkgen_default_config();
-	cdcm_mutex_unlock(&ad9516o.clkgen_lock);
+	cdcm_mutex_lock(&usp->clkgen_lock);
+	retval = __ad9516o_clkgen_default_config(usp);
+	cdcm_mutex_unlock(&usp->clkgen_lock);
 
 	return retval;
 }
 
-void ad9516o_init(void *ba)
+void ad9516o_init(CVORBUserStatics_t *usp)
 {
-	cdcm_mutex_init(&ad9516o.clkgen_lock);
-	cdcm_mutex_init(&ad9516o.pll_lock);
-	ad9516o.ba = ba;
-	ad9516o_hw_init(); /* init HW */
+	cdcm_mutex_init(&usp->clkgen_lock);
+	cdcm_mutex_init(&usp->pll_lock);
+	ad9516o_hw_init(usp); /* init HW */
 }

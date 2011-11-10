@@ -557,14 +557,14 @@ int  dac_on(CVORBUserStatics_t *usp, char *arg)
 
 	/* for now just set a default config */
 	//return ad9516o_clkgen_default_conf();
-	return ad9516o_put_pll_conf(&pll);
+	return ad9516o_put_pll_conf(usp, &pll);
 }
 
 /* get current PLL settings */
 int get_pll(CVORBUserStatics_t *usp, char *arg)
 {
 	struct pll pll;
-	ad9516o_get_pll_conf(&pll);
+	ad9516o_get_pll_conf(usp, &pll);
 	return cdcm_copy_to_user(arg, &pll, sizeof(pll));
 }
 
