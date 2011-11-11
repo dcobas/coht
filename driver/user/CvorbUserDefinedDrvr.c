@@ -24,6 +24,8 @@ enum irqreturn {
 
 struct cvorb_module _m[2];
 
+#define FW_VERSION	0x420317
+
 /**
  * @brief Interrupt Service Routine.
  *
@@ -394,6 +396,7 @@ char* CvorbUserInst(int *proceed, register DevInfo_t *info,
 	CVORBUserStatics_t *usp = sptr->usrst; /* user statistics table */
 	int iVec = 0; /* interrupt vector */
 	int m, c;
+	uint serial;
 
 	iVec = info->iVector;		/* set up interrupt vector */
 
@@ -402,7 +405,16 @@ char* CvorbUserInst(int *proceed, register DevInfo_t *info,
 
 	usp->md[0].md = (mod *)sptr->card->block00;
 	usp->md[1].md = (mod *)((long)sptr->card->block00 + 0x200);
+	
+	serial = _rr(0, VHDL_V);
 
+	if (serial != FW_VERSION) {
+		kkprintf("Board with lun %d has a wrong FW version: 0x%x. Should be 0x%x\n",
+							info->mlun, serial, FW_VERSION);
+		sysfree((char *)usp->md, sizeof(_m));
+		return (char *)SYSERR;
+	}
+		
 	for (m = 0; m < SMAM; m++) {
 		/* reset subModules */
 		_wr(m, SOFT_PULSE, SPR_FGR);
