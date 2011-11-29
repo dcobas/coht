@@ -116,6 +116,29 @@ static void ad9516o_debug_clkgen_write(CVORBUserStatics_t *usp, unsigned int add
 }
 #endif /* DEBUG_SPI */
 
+static int ad9516o_clkgen_check_write(CVORBUserStatics_t *usp)
+{
+	uint32_t val;
+	int times = 10;
+
+	do {
+		val = ad9516o_clkgen_rval(usp, CLKCTL_ADDR);
+		if (val & CLKCTL_UP2DATE) {
+			goto check_ok;
+		}
+		times--;
+		usec_sleep(50);
+
+	} while(times);
+
+	/* Fail waiting for the flag */
+	return -1;
+
+check_ok:
+	return 0;
+
+}
+
 /**
  * @brief write to Clock Generator register
  *
@@ -128,6 +151,11 @@ static void ad9516o_clkgen_write(CVORBUserStatics_t *usp, unsigned int addr, uin
 
 	cdcm_iowrite32be(cmd, (void *)&usp->md[0].md->CLK_GEN_CNTL);
 	usec_sleep(AD9516_SPI_SLEEP_US);
+
+	if (ad9516o_clkgen_check_write(usp)) {
+		kkprintf("clkgen_wr : error writing on 0x%x, data 0x%x", addr, data);
+		return;
+	}
 
 	ad9516o_debug_clkgen_write(usp, addr, data);
 }
