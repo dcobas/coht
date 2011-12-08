@@ -10,8 +10,8 @@
 #ifndef CTRDRVR
 #define CTRDRVR
 
-#include <ctrhard.h>   /* Hardware interface for expert and diagnostic clients */
-#include <hptdc.h>     /* HPTDC (Time to Digital Convertor) definitions */
+#include "ctrhard.h"   /* Hardware interface for expert and diagnostic clients */
+#include "hptdc.h"     /* HPTDC (Time to Digital Convertor) definitions */
 
 /* Maximum number of simultaneous clients for driver */
 

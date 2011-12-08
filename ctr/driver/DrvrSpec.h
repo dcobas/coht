@@ -6,7 +6,7 @@
 #ifndef DRVR_SPEC_H
 #define DRVR_SPEC_H
 
-#include <ctrdrvrP.h>
+#include "ctrdrvrP.h"
 
 /* Linux Module exported symbols */
 #ifdef CTR_PCI

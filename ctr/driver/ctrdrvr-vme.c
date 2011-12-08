@@ -7,22 +7,22 @@
 /*                                                            */
 /* ********************************************************** */
 
-#include <EmulateLynxOs.h>
-#include <DrvrSpec.h>
+#include "EmulateLynxOs.h"
+#include "DrvrSpec.h"
 
-#include <libinstkernel.h>  /* Routines to work with XML tree */
+#include "libinstkernel.h"  /* Routines to work with XML tree */
 
 /* These next defines are needed just here for the emulation */
 
 #define sel LynxSel
 #define enable restore
 
-#include <ctrhard.h>   /* Hardware description               */
-#include <ctrdrvr.h>   /* Public driver interface            */
-#include <ctrdrvrP.h>  /* Private driver structures          */
+#include "ctrhard.h"   /* Hardware description               */
+#include "ctrdrvr.h"   /* Public driver interface            */
+#include "ctrdrvrP.h"  /* Private driver structures          */
 
-#include <ports.h>     /* XILINX Jtag stuff                  */
-#include <hptdc.h>     /* High prescision time to digital convertor */
+#include "ports.h"     /* XILINX Jtag stuff                  */
+#include "hptdc.h"     /* High prescision time to digital convertor */
 
 /* ========================= */
 /* Driver entry points       */
