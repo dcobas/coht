@@ -19,9 +19,15 @@
 /* #define CTR_VME */
 
 /* Under the gcc we use on LynxOs either __LITTLE / BIG_ENDIAN__ is defined. */
-/* Under Linux on the Intel platforms __i386__ is defined */
+/* Under Linux on the Intel platforms __i386__ is defined, but not on 64bit. */
 
 #ifdef __i386__
+#ifndef __LITTLE_ENDIAN__
+#define __LITTLE_ENDIAN__
+#endif
+#endif
+
+#ifdef __x86_64__
 #ifndef __LITTLE_ENDIAN__
 #define __LITTLE_ENDIAN__
 #endif
@@ -631,7 +637,7 @@ typedef enum {
    CtrDrvrIoStatusO6      = 0x2000, /* Lemo output 6 state */
    CtrDrvrIoStatusO7      = 0x4000, /* Lemo output 7 state */
    CtrDrvrIoStatusO8      = 0x8000, /* Lemo output 8 state */
-   
+
    /* Added by pablo */
 
    CtrDrvrIOStatusIDOkP            = 0x10000, /* PCB Id read Ok */
@@ -655,7 +661,7 @@ typedef enum {
    CtrDrvrCommandLATCH_UTC = 0x08,      /* Prior to reading it */
    CtrDrvrCommandSET_UTC   = 0x10,      /* When no timing connected */
    CtrDrvrCommandSET_HPTDC = 0x20,      /* Say HPTDC detected */
-   
+
    /* Added by pablo */
 
    CtrDrvrCommandDISABLE_HPTDC = 0x40,  /* Say HPTDC  disabled */
@@ -703,10 +709,10 @@ typedef struct {
    unsigned int Temperature;           /* Card temperature. Only valid in CTRIs V3 RO */
    unsigned int MsMissedErrs;          /* Number of millisencods missed since last power up. (Latches the time)  RO */
    CtrDrvrTime   LastMsMissed;
-   
+
    unsigned int PllErrors;             /* Number of pll errors since last power up (past threshold ) RO */
    CtrDrvrTime  LastPllError;
-   
+
    unsigned int MissedFrames;          /* Number of missed frames since last power up */
    CtrDrvrTime  LastFrameMissed;
 
@@ -714,8 +720,8 @@ typedef struct {
    unsigned int ReceivedFrames;        /* Number of received frames since last power up */
    unsigned int SentFramesEvent;       /* Last Sent Frames Event */
    unsigned int UtcPllErrs;            /* Number of utc pll errors since last reset */
-   
-   CtrDrvrTime   LastExt1Start;         /* External Start 1 time tag */
+
+   CtrDrvrTime  LastExt1Start;         /* External Start 1 time tag */
  } CtrDrvrModuleStats;
 
 /* ==================================================== */
@@ -772,8 +778,10 @@ typedef struct {
 
    unsigned int IdLSL;          /* ID Chip value Least Sig 32-bits */
    unsigned int IdMSL;          /* ID Chip value Most  Sig 32-bits */
-  
+
    CtrDrvrModuleStats ModStats; /* Module statistics */
+
+   unsigned int SvnId[32];      /* SVN Archive string */
 
  } CtrDrvrMemoryMap;
 

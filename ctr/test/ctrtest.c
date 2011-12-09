@@ -105,7 +105,7 @@ int i, j;
 
    version.HardwareType = CtrDrvrHardwareTypeNONE;
 
-   if (ioctl(ctr,CtrDrvrGET_VERSION,&version) >= 0) {
+   if (ioctl(ctr,CtrIoctlGET_VERSION,&version) >= 0) {
       if (version.HardwareType == CtrDrvrHardwareTypeCTRP) printf("Hardware Type: CTRP PMC (3 Channel)\n");
       if (version.HardwareType == CtrDrvrHardwareTypeCTRI) printf("Hardware Type: CTRI PCI (4 Channel)\n");
       if (version.HardwareType == CtrDrvrHardwareTypeCTRV) printf("Hardware Type: CTRV VME (8 Channel)\n");

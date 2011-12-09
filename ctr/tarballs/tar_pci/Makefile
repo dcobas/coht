@@ -16,14 +16,11 @@ PWD:=$(shell pwd)
 obj-m   := $(SRCS:.c=.o)
 
 default:
-	cp src/Module.c ctrp.c
-	rm -f *.o
 	$(MAKE) -C /lib/modules/$(KVER)/build M=$(PWD) clean
 	$(MAKE) -C /lib/modules/$(KVER)/build M=$(PWD) modules
 
 clean:
 	rm -f *.o
-	rm -f *.c
 	rm -f *.ko
 	rm -f ,*
 	rm -f Module.*

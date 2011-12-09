@@ -2,18 +2,18 @@ echo Launch SPS Super-Cycle video display
 
 /mcr/tgm/video SPS &
 
-echo Build SPS AqLog file in /tmp/Aqlog.txt
+echo Build SPS AqLog file in /dsc/local/data/Aqlog.txt
 
 echo Cleaning up old files
 
-rm -f /ps/dsc/sps/cfv-ba3-ctsrf1/tmp/AqLog
-rm -f /ps/dsc/sps/cfv-ba3-ctsrf2/tmp/AqLog
-rm -f /ps/dsc/sps/cfv-ba3-ctsrf3/tmp/AqLog
-rm -f /ps/dsc/sps/cfv-ba3-ctsrf4/tmp/AqLog
-rm -f /ps/dsc/sps/cfv-ba3-ctsrf5/tmp/AqLog
-rm -f /ps/dsc/sps/cfv-ba3-ctsrf6/tmp/AqLog
-rm -f /ps/dsc/sps/cfv-ba2-ctsrf1/tmp/AqLog
-rm -f /ps/dsc/sps/cfv-ba3-ireph1/tmp/AqLog
+rm -f /acc/dsc/sps/cfv-ba3-ctsrf1/data/AqLog
+rm -f /acc/dsc/sps/cfv-ba3-ctsrf2/data/AqLog
+rm -f /acc/dsc/sps/cfv-ba3-ctsrf3/data/AqLog
+rm -f /acc/dsc/sps/cfv-ba3-ctsrf4/data/AqLog
+rm -f /acc/dsc/sps/cfv-ba3-ctsrf5/data/AqLog
+rm -f /acc/dsc/sps/cfv-ba3-ctsrf6/data/AqLog
+rm -f /acc/dsc/sps/cfv-ba2-ctsrf1/data/AqLog
+rm -f /acc/dsc/sps/cfv-ba3-ireph1/data/AqLog
 rm -f /tmp/AqLog
 rm -f /tmp/AqLog.txt
 
@@ -49,27 +49,27 @@ ssh -x cfv-ba3-allfo1 "echo aqlog q | /usr/local/ces/ctr/ctrptest > /dev/null"
 echo Waiting for NFS Sync
 sleep 60
 
-chmod 666 /ps/dsc/sps/cfv-ba3-ctsrf1/tmp/AqLog
-chmod 666 /ps/dsc/sps/cfv-ba3-ctsrf2/tmp/AqLog
-chmod 666 /ps/dsc/sps/cfv-ba3-ctsrf3/tmp/AqLog
-chmod 666 /ps/dsc/sps/cfv-ba3-ctsrf4/tmp/AqLog
-chmod 666 /ps/dsc/sps/cfv-ba3-ctsrf5/tmp/AqLog
-chmod 666 /ps/dsc/sps/cfv-ba3-ctsrf6/tmp/AqLog
-chmod 666 /ps/dsc/sps/cfv-ba2-ctsrf1/tmp/AqLog
-chmod 666 /ps/dsc/sps/cfv-ba3-ireph1/tmp/AqLog
-chmod 666 /ps/dsc/sps/cfv-ba3-allfo1/tmp/AqLog
+chmod 666 /acc/dsc/sps/cfv-ba3-ctsrf1/data/AqLog
+chmod 666 /acc/dsc/sps/cfv-ba3-ctsrf2/data/AqLog
+chmod 666 /acc/dsc/sps/cfv-ba3-ctsrf3/data/AqLog
+chmod 666 /acc/dsc/sps/cfv-ba3-ctsrf4/data/AqLog
+chmod 666 /acc/dsc/sps/cfv-ba3-ctsrf5/data/AqLog
+chmod 666 /acc/dsc/sps/cfv-ba3-ctsrf6/data/AqLog
+chmod 666 /acc/dsc/sps/cfv-ba2-ctsrf1/data/AqLog
+chmod 666 /acc/dsc/sps/cfv-ba3-ireph1/data/AqLog
+chmod 666 /acc/dsc/sps/cfv-ba3-allfo1/data/AqLog
 
 echo Sorting and combining files
 
-sort -o /tmp/AqLog -n /ps/dsc/sps/cfv-ba3-ctsrf1/tmp/AqLog \
-		      /ps/dsc/sps/cfv-ba3-ctsrf2/tmp/AqLog \
-		      /ps/dsc/sps/cfv-ba3-ctsrf3/tmp/AqLog \
-		      /ps/dsc/sps/cfv-ba3-ctsrf4/tmp/AqLog \
-		      /ps/dsc/sps/cfv-ba3-ctsrf5/tmp/AqLog \
-		      /ps/dsc/sps/cfv-ba3-ctsrf6/tmp/AqLog \
-		      /ps/dsc/sps/cfv-ba2-ctsrf1/tmp/AqLog \
-		      /ps/dsc/sps/cfv-ba3-ireph1/tmp/AqLog \
-		      /ps/dsc/sps/cfv-ba3-allfo1/tmp/AqLog
+sort -o /tmp/AqLog -n /acc/dsc/sps/cfv-ba3-ctsrf1/data/AqLog \
+		      /acc/dsc/sps/cfv-ba3-ctsrf2/data/AqLog \
+		      /acc/dsc/sps/cfv-ba3-ctsrf3/data/AqLog \
+		      /acc/dsc/sps/cfv-ba3-ctsrf4/data/AqLog \
+		      /acc/dsc/sps/cfv-ba3-ctsrf5/data/AqLog \
+		      /acc/dsc/sps/cfv-ba3-ctsrf6/data/AqLog \
+		      /acc/dsc/sps/cfv-ba2-ctsrf1/data/AqLog \
+		      /acc/dsc/sps/cfv-ba3-ireph1/data/AqLog \
+		      /acc/dsc/sps/cfv-ba3-allfo1/data/AqLog
 
 cat /dsrc/drivers/ctr/ctrvme/test/AqLogHdr /tmp/AqLog > /tmp/AqLog.txt
 

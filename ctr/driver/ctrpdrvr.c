@@ -7,11 +7,11 @@
 #include <linux/module.h>   /* Can only be included once */
 #include <linux/version.h>
 
-#include <ModuleLynxOs.c>
-#include <EmulateLynxOs.c>
-#include <cdcmSem.c>
-#include <DrvrSpec.c>
+#include "ModuleLynxOs.c"
+#include "EmulateLynxOs.c"
+#include "cdcmSem.c"
+#include "DrvrSpec.c"
 
-#include <ctrdrvr.c>
+#include "ctrdrvr-pci.c"
 
 /* ===================================================== */

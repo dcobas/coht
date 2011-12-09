@@ -71,6 +71,7 @@ int GetSetInputDelay();
 int GetSetConfig();
 int GetCounterHistory();
 int GetSetPll();
+int SetPllParams();
 int SetBrutalPll();
 int GetTelegram();
 int GetEventHistory();
@@ -197,6 +198,7 @@ typedef enum {
    CmdCBID,    /* Get/Set module cable ID */
    CmdPLL,     /* Edit Phase Locked Loop */
    CmdUPLL,    /* Set UTC PLL On Off */
+   CmdKPLL,    /* Set Pll constants ErrT, DacK, MonK */
    CmdDAC,     /* Set the PLL DAC value directly */
    CmdPLOT,    /* Plot the PLL */
    CmdRTG,     /* Read telegram */
@@ -311,6 +313,8 @@ static Cmd cmds[CmdCMDS] = {
 
    { CmdPLL,     "pll",   "Edit Phase Locked Loop"   ,"0/Ki|Kp|Nav|Phas"      ,GetSetPll },
    { CmdUPLL,    "upll",  "Set UTC PLL On Off"       ,"1/0"                   ,SetBrutalPll },
+   { CmdKPLL,    "kpll",  "Set Pll constants"        ,"ErrT,DacK,MonK"        ,SetPllParams },
+
    { CmdDAC,     "dac",   "Get/Set PLL DAC value"    ,"[-]<value>"            ,GetSetDac },
    { CmdPLOT,    "plot",  "Set PLL and plot curves"  ,"0/Pnts|Ki|Kp|Nav|Phas" ,PlotPll },
 

@@ -40,7 +40,7 @@ CtrDrvrVersion version;
 
    version.HardwareType = CtrDrvrHardwareTypeNONE;
 
-   if (ioctl(ctr,CtrDrvrGET_VERSION,&version) >= 0) {
+   if (ioctl(ctr,CtrIoctlGET_VERSION,&version) >= 0) {
 
       if ((version.HardwareType == CtrDrvrHardwareTypeCTRP)
       ||  (version.HardwareType == CtrDrvrHardwareTypeCTRI)) {

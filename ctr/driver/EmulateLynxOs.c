@@ -6,8 +6,8 @@
 /* Julian Lewis May 2004.                                                     */
 /* ========================================================================== */
 
-#include <EmulateLynxOs.h>
-#include <DrvrSpec.h>
+#include "EmulateLynxOs.h"
+#include "DrvrSpec.h"
 #include <linux/version.h>
 
 #ifndef L864
@@ -74,7 +74,7 @@ void sysfree(char *cp, unsigned long size) {
 typedef struct {
    int               TimerInUse;
    struct timer_list Timer;
-   int             (*TimerCallback)();
+   int             (*TimerCallback)(void *);
    char             *Arg;
  } LynxOsTimer;
 
@@ -124,7 +124,7 @@ int i;
 /* ============================================================================ */
 /* Emulate LynxOs call timeout                                                  */
 
-int timeout(int (*func)(), char *arg, int interval) {
+int timeout(int (*func)(void *), char *arg, int interval) {
 int i;
 
 int interval_jiffies = msecs_to_jiffies(interval * 10); /* 10ms granularity */
@@ -600,7 +600,7 @@ int drm_locate(struct drm_node_s *node) {
 /* ============================================================================ */
 
 int drm_register_isr(struct drm_node_s *node_h,
-		     irqreturn_t       (*isr)(),
+		     irqreturn_t       (*isr)(void *),
 		     void              *arg) {
 
 int i;

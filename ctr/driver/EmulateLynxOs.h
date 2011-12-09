@@ -51,9 +51,9 @@ void sysfree(char *p, unsigned long size);
 /* LynxOs Timeout routines                                                      */
 /* ============================================================================ */
 
-void LynxOsTimersInitialize();
+void LynxOsTimersInitialize(void);
 
-int timeout(int (*func)(), char *arg, int interval);
+int timeout(int (*func)(void *), char *arg, int interval);
 int cancel_timeout(int num);
 
 /* ============================================================================ */
@@ -68,8 +68,8 @@ extern spinlock_t lynxos_cpu_lock;
 /* LynxOs bus error trap mechanism                                              */
 /* ============================================================================ */
 
-int recoset();
-void noreco();
+int recoset(void);
+void noreco(void);
 
 /* ============================================================================ */
 /* LynxOs Memory bound checking                                                 */
@@ -87,7 +87,7 @@ typedef struct {
 
 #define LynxOsMEMORY_ALLOCATIONS 2
 
-void LynxOsMemoryInitialize();
+void LynxOsMemoryInitialize(void);
 char *LynxOsMemoryAllocate(size_t size, int flgs);
 int LynxOsMemoryFree(char *pntr);
 
@@ -108,7 +108,7 @@ int pseterr(int err);
 /* Assorted crap that I have to implement                                       */
 /* ============================================================================ */
 
-int getpid();
+int getpid(void);
 void bzero(void *dst, size_t len);
 void bcopy(void *src, void *dst, size_t len);
 
@@ -127,7 +127,7 @@ typedef struct drm_node_s  *drm_node_handle;
 #define PCI_RESID_BAR1  0x14
 #define PCI_RESID_BAR0  0x10
 
-void LynxOsIsrsInitialize();
+void LynxOsIsrsInitialize(void);
 
 int drm_get_handle(int    buslayer_id,
 		   int    vender_id,
@@ -151,7 +151,7 @@ int drm_device_write(struct drm_node_s *node_h,
 int drm_locate(struct drm_node_s *node);
 
 int drm_register_isr(struct drm_node_s *node_h,
-		     irqreturn_t       (*isr)(),
+		     irqreturn_t       (*isr)(void *),
 		     void              *arg);
 
 int drm_map_resource(struct drm_node_s *node_h,
@@ -170,16 +170,7 @@ int drm_unregister_isr(struct drm_node_s *node_h);
 /* entry points structure. The instance must be called "entry_points".          */
 /* ============================================================================ */
 
-struct dldd {
-  int (*dldd_open)();
-  int (*dldd_close)();
-  int (*dldd_read)();
-  int (*dldd_write)();
-  int (*dldd_select)();
-  int (*dldd_ioctl)();
-  char *(*dldd_install)();
-  int (*dldd_uninstall)();
-};
+#include "ctrdrvrP.h"
 
 struct LynxFile {
    int dev;
@@ -189,11 +180,22 @@ struct LynxSel {
    int *iosem;
 };
 
+struct dldd {
+  int (*dldd_open)(CtrDrvrWorkingArea *, int, struct LynxFile *);
+  int (*dldd_close)(CtrDrvrWorkingArea *, struct LynxFile *);
+  int (*dldd_read)(CtrDrvrWorkingArea *, struct LynxFile *, char *, int);
+  int (*dldd_write)(CtrDrvrWorkingArea *, struct LynxFile *, char *, int);
+  int (*dldd_select)(CtrDrvrWorkingArea *, struct LynxFile *, int, struct LynxSel *);
+  int (*dldd_ioctl)(CtrDrvrWorkingArea *, struct LynxFile *, CtrDrvrControlFunction, char *);
+  char *(*dldd_install)(CtrDrvrInfoTable *);
+  int (*dldd_uninstall)(CtrDrvrWorkingArea *);
+};
+
 #define minor(x) (x & 0xFF)
 
 typedef struct {
    struct drm_node_s *Handle;
-   irqreturn_t   (*Isr)();
+   irqreturn_t   (*Isr)(void *);
    unsigned long Arg;
    unsigned int  Irq;
    unsigned int  Slot;

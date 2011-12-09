@@ -2,25 +2,21 @@
 # Makefile to produce standard CTR-P test program
 #================================================================
 
-CPU=L865
+CPU=L866
 
 include /acc/dsc/src/co/Make.auto
 
-CFLAGS= -g -Wall -I/acc/local/$(CPU)/include/tgm -I../driver -I. \
-	-DCTR_PCI -DPS_VER -DEMULATE_LYNXOS_ON_LINUX
+CFLAGS= -g -Wall -I. -I../driver \
+	-DCTR_PCI -DEMULATE_LYNXOS_ON_LINUX -DNO_PS
 
-LDLIBS= -ltgm -lvmtg -ltgv -lerr -lerr_dummy -lX11 -lm
+LDLIBS= -lm
 
-ALL  = ctrptest.$(CPU) \
-       CtrReadInfo.$(CPU) \
-       CtrWriteInfo.$(CPU)
+ALL  = ctrptest.$(CPU) ctrtest.$(CPU)
 
 SRCS = ctrtest.c CtrCmds.c CtrOpen.c DoCmd.c GetAtoms.c Cmds.c plx9030.c
 HDRS = Cmds.h
 
 TEST = ctrtest.c CtrCmds.c CtrOpen.c DoCmd.c GetAtoms.c Cmds.c plx9030.c
-READ = CtrReadInfo.c CtrOpen.c
-WRIT = CtrWriteInfo.c CtrOpen.c
 
 all: $(ALL)
 
@@ -31,9 +27,10 @@ clean:
 
 ctrptest.$(CPU).o: $(TEST) $(HDRS)
 
-CtrReadInfo.$(CPU).o: $(READ) $(HDRS)
+Launch.$(CPU).o: Launch.c
 
-CtrWriteInfo.$(CPU).o: $(WRIT) $(HDRS)
+ctrtest.$(CPU): Launch.$(CPU)
+	cp Launch.$(CPU) ctrtest.$(CPU)
 
 install: ctrptest.$(CPU)
 	dsc_install $(ALL) /acc/dsc/lab/$(CPU)/ctr

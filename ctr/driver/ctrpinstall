@@ -1,4 +1,4 @@
-#!/etc/sh
+#!/bin/sh
 
 echo "======================================================="
 echo "install CTRP/I driver ../ctrp/ctrp.ko                  "

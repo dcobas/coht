@@ -6,14 +6,14 @@
 /*                                                                                               */
 /* ********************************************************************************************* */
 
-#include <ctrhard.h>
-#include <ctrdrvr.h>
+#include "ctrhard.h"
+#include "ctrdrvr.h"
 
 #ifndef CTR_PRIVATE
 #define CTR_PRIVATE
 
 #ifdef CTR_PCI
-#include <plx9030.h>
+#include "plx9030.h"
 
 #define CERN_VENDOR_ID 0x10DC
 #define CTRP_DEVICE_ID 0x0300

@@ -17,14 +17,14 @@ extern "C" {
 #include <time.h> 	/* for struct timeval */
 
 
-/* 
+/*
    This is a mogic number kept in the drm node to validate the same. This
    is in hex for the characters "lynx"
 */
- 
+
 #define DRM_MAGIC	0x6c796e78
 
-/* Buslayer_id's used in drm_conf.c to statically configure the root node, 
+/* Buslayer_id's used in drm_conf.c to statically configure the root node,
    the PCI HostBridge, ISA hostBridge  and some dummy isa nodes.
 */
 
@@ -62,7 +62,7 @@ extern "C" {
 /* DRM node types and creation type; Only following combinations are
   legal: DRM_STATIC | DRM_DEVICE, DRM_STATIC | DRM_BUS,
          DRM_STATIC | DRM_BUS | DRM_HB
-         DRM_AUTO | DRM_DEVICE, DRM_AUTO | DRM_BUS  
+         DRM_AUTO | DRM_DEVICE, DRM_AUTO | DRM_BUS
          DRM_AUTO | DRM_DEVICE | DRM_HB */
 
 /* indicates this is is a build time configured node */
@@ -113,7 +113,7 @@ struct drm_node_s {
 	drm_id_t	vendor_id;	/* vendor id */
 	int		drm_state;	/* device state (IDLE,SELECTED,READY.ACTIVE) */
 	int		node_type;	/* Auto, Static, Bus, device */
-	struct timespec	drm_tstamp;	/* time stamp */ 
+	struct timespec	drm_tstamp;	/* time stamp */
 
 /* Node IRQ properties */
 
@@ -128,8 +128,8 @@ typedef struct drm_node_s  drm_node_t;
 typedef struct drm_node_s  *drm_node_handle;
 
 /*
-	This structure defines the interface between the DRM and the 
-	bus-layers. drm_conf.c registers the bus-layers statically 
+	This structure defines the interface between the DRM and the
+	bus-layers. drm_conf.c registers the bus-layers statically
 	during kernel build. Each is a pointer to a function, and provides
 	the following facilities to DRM:
 
@@ -145,7 +145,7 @@ struct drm_bushandle_s {
 	int (*alloc_res_dev)();		/* Allocate resource to a dev-node */
 	int (*free_res_bus)();		/* free resource from a bus-node */
 	int (*free_res_dev)();		/* free resource from a dev-node */
-	int (*find_child)();		/* locate a child-node of a bus-node */ 
+	int (*find_child)();		/* locate a child-node of a bus-node */
 	int (*map_resource)();		/* Map a dev resource in kernel virtual address space*/
 	int (*unmap_resource)();	/* unmap a resource for kernel virtual address space */
 	int (*read_device)();		/* read operation on a device resource */

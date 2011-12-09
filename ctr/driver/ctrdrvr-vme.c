@@ -7,41 +7,35 @@
 /*                                                            */
 /* ********************************************************** */
 
-#include <EmulateLynxOs.h>
-#include <DrvrSpec.h>
-
-#include <libinstkernel.h>  /* Routines to work with XML tree */
+#include "EmulateLynxOs.h"
+#include "DrvrSpec.h"
 
 /* These next defines are needed just here for the emulation */
 
 #define sel LynxSel
 #define enable restore
 
-#include <ctrhard.h>   /* Hardware description               */
-#include <ctrdrvr.h>   /* Public driver interface            */
-#include <ctrdrvrP.h>  /* Private driver structures          */
+#include "ctrhard.h"   /* Hardware description               */
+#include "ctrdrvr.h"   /* Public driver interface            */
+#include "ctrdrvrP.h"  /* Private driver structures          */
 
-#include <ports.h>     /* XILINX Jtag stuff                  */
-#include <hptdc.h>     /* High prescision time to digital convertor */
+#include "ports.h"     /* XILINX Jtag stuff                  */
+#include "hptdc.h"     /* High prescision time to digital convertor */
 
 /* ========================= */
 /* Driver entry points       */
 /* ========================= */
 
-irqreturn_t IntrHandler();
-int CtrDrvrOpen();
-int CtrDrvrClose();
-int CtrDrvrRead();
-int CtrDrvrWrite();
-int CtrDrvrSelect();
-char * CtrDrvrInstall();
-int CtrDrvrUninstall();
-int CtrDrvrIoctl();
+irqreturn_t IntrHandler(CtrDrvrModuleContext *);
 
-extern void disable_intr();
-extern void enable_intr();
+/**
+ * These module parameters are handled in ModuleLynxOs.c
+ */
+
+extern int timeout(int (*func)(void *), char *arg, int interval);
 extern int modules;
 extern unsigned long infoaddr;
+extern int first_module;
 
 #include <vmebus.h>
 #include <linux/interrupt.h>
@@ -49,6 +43,51 @@ extern unsigned long infoaddr;
 #ifndef VME_PG_SHARED
 #define VME_PG_SHARED 0
 #endif
+
+/**
+ * Handle new VME module parameters
+ */
+
+/**
+ * Example: /sbin/insmod ctrv.ko luns=1,2 vme1=0xC00000,0xC10000 vme2=0x100,0x200 vecs=0xC8,0xC9
+ */
+
+#define MAX_DEVS CtrDrvrMODULE_CONTEXTS
+
+static int luns[MAX_DEVS];      /* Logical unit numbers */
+static int vme1[MAX_DEVS];      /* First VME base address */
+static int vme2[MAX_DEVS];      /* Second VME base address */
+static int vecs[MAX_DEVS];      /* Interrupt vectors */
+
+static unsigned int luns_num;
+static unsigned int vme1_num;
+static unsigned int vme2_num;
+static unsigned int vecs_num;
+
+module_param_array(luns, int, &luns_num, 0444);        /* Vector */
+module_param_array(vme1, int, &vme1_num, 0444);        /* Vector */
+module_param_array(vme2, int, &vme2_num, 0444);        /* Vector */
+module_param_array(vecs, int, &vecs_num, 0444);        /* Vector */
+
+MODULE_PARM_DESC(luns, "Logical unit numbers");
+MODULE_PARM_DESC(vme1, "First map base addresses");
+MODULE_PARM_DESC(vme2, "Second map base addresses");
+MODULE_PARM_DESC(vecs, "Interrupt vectors");
+
+/**
+ * This next set of parameters must be filled in during initialization
+ * they are not passed as parameters because the driver knows about the
+ * hardware it is controlling.
+ * Set up some typical default values.
+ */
+
+static int win1 = 0x10000; /* VME window size 1..2 */
+static int win2 = 0x100;
+static int amd1 = 0x39;    /* VME address modifier */
+static int amd2 = 0x29;
+static int dwd1 = 4;       /* VME IO access data width D16,D32 etc */
+static int dwd2 = 2;
+static int ilvl = 2;       /* Interrupt level is the same for everyone */
 
 CtrDrvrWorkingArea *Wa       = NULL;
 
@@ -135,7 +174,6 @@ static int AddModule(CtrDrvrModuleContext *mcon,
 		     int                   flag);
 
 
-static int GetClrBusErrCnt();
 static int HRd(void *x);
 static void HWr(int v, void *x);
 
@@ -174,7 +212,7 @@ static void BusErrorHandler(struct vme_bus_error *error) {
 
 /* ==================== */
 
-static int GetClrBusErrCnt() {
+static int GetClrBusErrCnt(void) {
 int res;
 
    res = bus_error_count;
@@ -202,7 +240,6 @@ int res;
 static int HRd(void *x) {
 int res;
 
-// udelay(10);
    res = ioread32be(x);
    if (bus_error_count > last_bus_error) {
 
@@ -221,7 +258,6 @@ int res;
 
 static void HWr(int v, void *x) {
 
-// udelay(10);
    iowrite32be(v,x);
    if (bus_error_count > last_bus_error) {
       if (bus_error_count <= BUS_ERR_PRINT_THRESHOLD) {
@@ -427,8 +463,8 @@ int cc;
 
    vme_unregister_berr_handler(mcon->BerrHandler);
 
-   return_controller((unsigned) moad->VMEAddress,0x10000);
-   return_controller((unsigned) moad->JTGAddress,0x100);
+   return_controller((unsigned long) moad->VMEAddress,0x10000);
+   return_controller((unsigned long) moad->JTGAddress,0x100);
 
 }
 
@@ -469,16 +505,20 @@ void *vmeaddr;
       param.dum[1] = 0;                /* XPC ADP-type */
       param.dum[2] = 0;                /* window is sharable */
 
+      /* Map a window in A16D16 space. The space looks like an array of unsigned shorts */
+      /* and I am asking for 0x100 - one short so that this window will not overlap with */
+      /* the next modules window, i.e. avoid overlapping between windows */
+
       vmeaddr = (void *) find_controller(addr,                    /* Vme base address */
-					(unsigned long) 0x100,    /* Module address space */
-					(unsigned long) 0x29,     /* Address modifier A16 */
+					(unsigned long) win2,     /* Module address space */
+					(unsigned long) amd2,     /* Address modifier A16 */
 					0,                        /* Offset */
-					2,                        /* Size is D16 */
+					dwd2,                        /* Size is D16 */
 					&param);                  /* Parameter block */
       if (vmeaddr == (void *)(-1)) {
-	 cprintf("CtrDrvr: find_controller: ERROR: Module:%d. JTAG Addr:%x\n",
+	 cprintf("CtrDrvr: find_controller: ERROR: Module:%d. JTAG Addr:%p\n",
 		  index+1,
-		  (unsigned int) moad->JTGAddress);
+		  moad->JTGAddress);
 	 vmeaddr = 0;
       }
       moad->JTGAddress = (unsigned short *) vmeaddr;
@@ -497,17 +537,17 @@ void *vmeaddr;
    param.dum[0] = VME_PG_SHARED;    /* window is sharable */
    param.dum[1] = 0;                /* XPC ADP-type */
    param.dum[2] = 0;                /* window is sharable */
-   vmeaddr = (void *) find_controller(addr,                    /* Vme base address */
-				     (unsigned long) 0x10000,  /* Module address space */
-				     (unsigned long) 0x39,     /* Address modifier A24 */
-				     0,                        /* Offset */
-				     4,                        /* Size is D32 */
-				     &param);                  /* Parameter block */
+   vmeaddr = (void *) find_controller(addr,                      /* Vme base address */
+				     (unsigned long) win1,       /* Size: Avoid overlapping longs */
+				     (unsigned long) amd1,       /* Address modifier A24 */
+				     0,                          /* Offset */
+				     dwd1,                       /* Size is D32 */
+				     &param);                    /* Parameter block */
 
    if (vmeaddr == (void *)(-1)) {
-      cprintf("CtrDrvr: find_controller: ERROR: Module:%d. VME Addr:%x\n",
+      cprintf("CtrDrvr: find_controller: ERROR: Module:%d. VME Addr:%p\n",
 	       index+1,
-	       (unsigned int) moad->VMEAddress);
+	       moad->VMEAddress);
       pseterr(ENXIO);        /* No such device or address */
 
       if (moad->JTGAddress == 0) return 1;
@@ -516,11 +556,13 @@ void *vmeaddr;
    moad->VMEAddress = (unsigned int *) vmeaddr;
 
    berr.address = addr;
-   berr.am = 0x39;
-   mcon->BerrHandler = vme_register_berr_handler(&berr,0x10000,BusErrorHandler);
+   berr.am = amd1;
+   mcon->BerrHandler = vme_register_berr_handler(&berr,win1,BusErrorHandler);
    if (IS_ERR(mcon->BerrHandler)) {
-      cprintf("CtrDrvr: vme_register_berr_handler: ERROR: Module:%d. 0x10000 0x39 VME Addr:%x\n",
+      cprintf("CtrDrvr: vme_register_berr_handler: ERROR: Module:%d. win:0x%X amd:0x%X VME Addr:%x\n",
 	       index+1,
+	       win1,
+	       amd1,
 	       (unsigned int) addr);
    }
 
@@ -676,7 +718,7 @@ int interval_jiffies = msecs_to_jiffies(interval * 10); /* 10ms granularity */
 
    sreset(&(mcon->Semaphore));
 
-   mcon->Timer = timeout(ResetTimeout, (char *) mcon, interval_jiffies);
+   mcon->Timer = timeout((void *) ResetTimeout, (char *) mcon, interval_jiffies);
    if (mcon->Timer < 0) mcon->Timer = 0;
    if (mcon->Timer) swait(&(mcon->Semaphore), SEM_SIGABORT);
    if (mcon->Timer) CancelTimeout(&(mcon->Timer));
@@ -1479,10 +1521,7 @@ irqreturn_t ret;
 /* OPEN                                                                   */
 /*========================================================================*/
 
-int CtrDrvrOpen(wa, dnm, flp)
-CtrDrvrWorkingArea * wa;        /* Working area */
-int dnm;                        /* Device number */
-struct LynxFile * flp; {        /* File pointer */
+int CtrDrvrOpen(CtrDrvrWorkingArea *wa, int dnm, struct LynxFile *flp) {
 
 int cnum;                       /* Client number */
 CtrDrvrClientContext * ccon;    /* Client context */
@@ -1527,9 +1566,7 @@ CtrDrvrClientContext * ccon;    /* Client context */
 /* CLOSE                                                                  */
 /*========================================================================*/
 
-int CtrDrvrClose(wa, flp)
-CtrDrvrWorkingArea * wa;    /* Working area */
-struct LynxFile * flp; {        /* File pointer */
+int CtrDrvrClose(CtrDrvrWorkingArea *wa, struct LynxFile *flp) {
 
 int cnum;                   /* Client number */
 CtrDrvrClientContext *ccon; /* Client context */
@@ -1579,11 +1616,7 @@ CtrDrvrClientContext *ccon; /* Client context */
 /* READ                                                                   */
 /*========================================================================*/
 
-int CtrDrvrRead(wa, flp, u_buf, cnt)
-CtrDrvrWorkingArea * wa;       /* Working area */
-struct LynxFile * flp;              /* File pointer */
-char * u_buf;                   /* Users buffer */
-int cnt; {                      /* Byte count in buffer */
+int CtrDrvrRead(CtrDrvrWorkingArea *wa, struct LynxFile *flp, char *u_buf, int cnt) {
 
 CtrDrvrClientContext *ccon;    /* Client context */
 CtrDrvrQueue         *queue;
@@ -1608,7 +1641,7 @@ unsigned long          ps;
    }
 
    if (ccon->Timeout) {
-      ccon->Timer = timeout(ReadTimeout, (char *) ccon, ccon->Timeout);
+      ccon->Timer = timeout((void *) ReadTimeout, (char *) ccon, ccon->Timeout);
       if (ccon->Timer < 0) {
 
 	 ccon->Timer = 0;
@@ -1669,11 +1702,7 @@ unsigned long          ps;
 /* with the supplied CtrDrvrReadBuf.                                     */
 /*========================================================================*/
 
-int CtrDrvrWrite(wa, flp, u_buf, cnt)
-CtrDrvrWorkingArea * wa;       /* Working area */
-struct LynxFile * flp;             /* File pointer */
-char * u_buf;                  /* Users buffer */
-int cnt; {                     /* Byte count in buffer */
+int CtrDrvrWrite(CtrDrvrWorkingArea *wa, struct LynxFile *flp, char *u_buf, int cnt) {
 
 CtrDrvrClientContext *ccon;    /* Client context */
 CtrDrvrModuleContext *mcon;
@@ -1769,11 +1798,7 @@ unsigned int          clients;
 /* SELECT                                                                 */
 /*========================================================================*/
 
-int CtrDrvrSelect(wa, flp, wch, ffs)
-CtrDrvrWorkingArea * wa;        /* Working area */
-struct LynxFile * flp;              /* File pointer */
-int wch;                        /* Read/Write direction */
-struct sel * ffs; {             /* Selection structurs */
+int CtrDrvrSelect(CtrDrvrWorkingArea *wa, struct LynxFile *flp, int wch, struct sel *ffs) {
 
 CtrDrvrClientContext * ccon;
 int cnum;
@@ -1790,86 +1815,105 @@ int cnum;
    return SYSERR;
 }
 
-/* ========================================================= */
-/* Convert the standard XML tree into a module address array */
+/**
+ * =========================================================
+ * @brief Debug routine to print mod par arguments
+ */
 
-static CtrDrvrInfoTable tinfo;
+static void print_args(char *name)
+{
+	int i;
 
-void CtrConvertInfo(InsLibDrvrDesc   *drvrd,
-		    CtrDrvrInfoTable *addresses) {
+	printk("%s:Installation module parameters ...\n",name);
+	for (i=0; i<luns_num; i++) {
+		printk("%s:%02d - [Lun:%02d Vme1:0x%X Vme2:0x%X Vec:0x%X]\n",
+		       name,i,luns[i],vme1[i],vme2[i],vecs[i]);
+	}
+	printk("%s:%02d Luns declared\n",name,luns_num);
+}
 
-InsLibModlDesc         *modld = NULL;
-InsLibVmeModuleAddress *vmema = NULL;
-InsLibVmeAddressSpace  *vmeas = NULL;
-InsLibIntrDesc         *intrd = NULL;
+/**
+ * =========================================================
+ * @brief Validate insmod args
+ * @return 1=OK 0=Bad
+ */
 
-int index;
+static int check_args(char *name)
+{
+	int i, lun;
 
-   bzero((void *) addresses,(size_t) sizeof(CtrDrvrModuleAddress));
+	print_args(name);
 
-   modld = drvrd->Modules;
-   while (modld) {
-      if (modld->BusType != InsLibBusTypeVME) return;
-
-      index = addresses->Modules;
-      addresses->Modules += 1;
-
-      intrd = modld->Isr;
-
-      vmema = modld->ModuleAddress;
-      if (vmema) {
-	 vmeas = vmema->VmeAddressSpace;
-	 while (vmeas) {
-
-	    if (vmeas->AddressModifier == 0x29)
-	       addresses->Addresses[index].JTGAddress = (unsigned short *) vmeas->BaseAddress;
-
-	    if (vmeas->AddressModifier == 0x39)
-	       addresses->Addresses[index].VMEAddress = (unsigned int *)   vmeas->BaseAddress;
-
-	    if (intrd) {
-	       addresses->Addresses[index].InterruptVector = (unsigned int) intrd->Vector;
-	       addresses->Addresses[index].InterruptLevel  = (unsigned int) intrd->Level;
-	    }
-
-	    vmeas = vmeas->Next;
-	 }
-      }
-      modld = modld->Next;
-   }
+	if ((luns_num <= 0)
+	||  (luns_num > MAX_DEVS)) {
+		printk("%s:bad LUN count:%d, out of [1..%d] range\n",
+		       name,
+		       luns_num,
+		       MAX_DEVS);
+		return 0;
+	}
+	if (((vme1_num != 0) && (luns_num != vme1_num))
+	||  ((vme2_num != 0) && (luns_num != vme2_num))
+	||  ((vecs_num != 0) && (luns_num != vecs_num))) {
+		printk("%s:bad VME par count vme1:%d vme2:%d vecs:%d should be:%d\n",
+		       name,
+		       vme1_num,
+		       vme2_num,
+		       vecs_num,
+		       luns_num);
+		return 0;
+	}
+	for (i=0; i<luns_num; i++) {
+		lun = luns[i];
+		if ((lun <= 0) || (lun > MAX_DEVS)) {
+			printk("%s:LUN:%d@%d out of [1..%d]\n",
+			       name,
+			       lun,
+			       i,
+			       MAX_DEVS);
+			return 0;
+		}
+	}
+	return 1;
 }
 
 /* ================================================= */
 /* Build a ctr info object from the pointer infoaddr */
 
-int BuildInfoObject() {
+static CtrDrvrInfoTable tinfo;
 
-InsLibDrvrDesc *drvrd = NULL;
-int rc = 1;
+int BuildInfoObject(void) {
 
-   InsLibSetCopyRoutine((void(*)(void*, const void*, int n)) copy_from_user);
+char *name = "ctrv";
+int i;
+CtrDrvrModuleAddress *moad;
 
-   drvrd = InsLibCloneOneDriver((InsLibDrvrDesc *) infoaddr);
+   if (check_args(name) == 0) return 0;
 
-   if (drvrd) {
-      if ( (strcmp(drvrd->DrvrName,"CTR" ) == 0)
-      ||   (strcmp(drvrd->DrvrName,"CTRV") == 0)
-      ||   (strcmp(drvrd->DrvrName,"ctr" ) == 0)
-      ||   (strcmp(drvrd->DrvrName,"ctrv") == 0) ) {
+   tinfo.Modules = luns_num;
+   for (i=0; i<luns_num; i++) {
+      moad = &(tinfo.Addresses[luns[i] -1]);
 
-	 CtrConvertInfo(drvrd,&tinfo);
-	 rc = 0;
-      }
+      /**
+       * VME addresses are only 32 bits even though they
+       * get declared here as pointers. This changes the
+       * size of moad unnecessarily on 64-bit platforms.
+       */
+
+      moad->VMEAddress      = (unsigned int   *) vme1[i];
+      moad->JTGAddress      = (unsigned short *) vme2[i];
+      moad->InterruptVector = (unsigned int    ) vecs[i];
+      moad->InterruptLevel  = (unsigned int    ) ilvl;
+      moad->CopyAddress     = moad->VMEAddress;
    }
-   InsLibFreeDriver(drvrd);
-   return rc;
+   return 1;
 }
 
 /*========================================================================*/
 /* INSTALL  LynxOS Version 4 VME version                                  */
 /*========================================================================*/
 
-char * CtrDrvrInstall(void *junk) {
+char * CtrDrvrInstall(CtrDrvrInfoTable *junk) {
 
 CtrDrvrWorkingArea *wa;
 
@@ -1897,28 +1941,37 @@ CtrDrvrMemoryMap              *mmap;
 
    bzero((void *) &tinfo, sizeof(CtrDrvrInfoTable));
 
-   if (BuildInfoObject() /* Try to use the XML object tree */ ) {
+   if (BuildInfoObject() == 0) { /* See if parameters were supplied */
 
       /* Failed so do a default install */
 
+      if ((first_module <= 0) || (first_module > CtrDrvrMODULE_CONTEXTS))
+	 first_module = 1;
       if (modules <= 0)
-	      modules = 1;
-      if (modules >  CtrDrvrMODULE_CONTEXTS)
-	      modules = CtrDrvrMODULE_CONTEXTS;
+	 modules = 1;
+      if (modules + (first_module - 1) > CtrDrvrMODULE_CONTEXTS)
+	 modules = 1;
 
+      cprintf("CtrDrvrInstall: Will auto-install:%d CTRV modules, starting at:%d\n",modules,first_module);
 
-      cprintf("CtrDrvrInstall: Will auto-install:%d CTRV modules\n",modules);
       tinfo.Modules = modules;
+      i=first_module -1;
 
-      cprintf("CtrDrvrInstall: Will auto-install:%d CTRV modules\n",tinfo.Modules);
+      for (j=0; j<modules; j++) {
+	 moad = &tinfo.Addresses[j];
 
-
-      for (i=0; i<modules; i++) {
-	 moad = &tinfo.Addresses[i];
-	 moad->VMEAddress      = (unsigned int   *) 0xC00000 + (0x10000 * i);
-	 moad->JTGAddress      = (unsigned short *) 0x100    + (0x100   * i);
-	 moad->InterruptVector = (unsigned char   ) 0xB8     + (0x1     * i);
+	 moad->VMEAddress      = (void *) 0xC00000 + (0x10000 * i);
+	 moad->JTGAddress      = (void *) 0x100    + (0x100   * i);
+	 moad->InterruptVector = 0xB8     + (0x1     * i);
 	 moad->InterruptLevel  = 2;
+
+	 cprintf("CTRV:AUTO:Module:%d VME:0x%p JTAG:0x%p VEC:0x%X LVL:%d\n",
+		 j+1,
+		 moad->VMEAddress,
+		 moad->JTGAddress,
+		 (unsigned int) moad->InterruptVector,
+		 moad->InterruptLevel);
+	 i++;
       }
    }
 
@@ -1929,10 +1982,10 @@ CtrDrvrMemoryMap              *mmap;
       mcon->ModuleIndex = i;
       erlv = AddModule(mcon,i,0);
       if (erlv == 0) {
-	 cprintf("CtrDrvr: Module %d. VME Addr: %x JTAG Addr: %x Vect: %x Level: %x Installed OK\n",
+	 cprintf("CtrDrvr: Module %d. VME Addr: %p JTAG Addr: %p Vect: %x Level: %x Installed OK\n",
 		 i+1,
-		 (unsigned int) moad->VMEAddress,
-		 (unsigned int) moad->JTGAddress,
+		 moad->VMEAddress,
+		 moad->JTGAddress,
 		 (unsigned int) moad->InterruptVector,
 		 (unsigned int) moad->InterruptLevel);
 
@@ -1946,8 +1999,8 @@ CtrDrvrMemoryMap              *mmap;
 	 mcon->InUse = 1;
       } else if (erlv == 2) {
 	 moad->VMEAddress = 0;
-	 cprintf("CtrDrvr: Module: %d WARNING: JTAG Only: JTAG Addr: %x\n",
-		 i+1, (unsigned int) moad->JTGAddress);
+	 cprintf("CtrDrvr: Module: %d WARNING: JTAG Only: JTAG Addr: %p\n",
+		 i+1, moad->JTGAddress);
 
 	 mcon->InUse = 1;
       } else {
@@ -1966,8 +2019,7 @@ CtrDrvrMemoryMap              *mmap;
 /* Uninstall                                                              */
 /*========================================================================*/
 
-int CtrDrvrUninstall(wa)
-CtrDrvrWorkingArea * wa; {     /* Drivers working area pointer */
+int CtrDrvrUninstall(CtrDrvrWorkingArea *wa) {
 
 CtrDrvrClientContext *ccon;
 CtrDrvrModuleContext *mcon;
@@ -1998,11 +2050,7 @@ int i;
 /* IOCTL                                                                  */
 /*========================================================================*/
 
-int CtrDrvrIoctl(wa, flp, cm, arg)
-CtrDrvrWorkingArea * wa;       /* Working area */
-struct LynxFile * flp;             /* File pointer */
-CtrDrvrControlFunction cm;     /* IOCTL command */
-char * arg; {                  /* Data for the IOCTL */
+int CtrDrvrIoctl(CtrDrvrWorkingArea * wa, struct LynxFile *flp, CtrDrvrControlFunction cm, char *arg) {
 
 CtrDrvrModuleContext           *mcon;   /* Module context */
 CtrDrvrClientContext           *ccon;   /* Client context */
@@ -2038,7 +2086,7 @@ CtrDrvrMemoryMap   *mmap;
 int i, j, k, n, msk, pid, hmsk, found, size, start;
 
 int cnum;                 /* Client number */
-int lav, *lap;            /* Long Value pointed to by Arg */
+long lav, *lap;           /* Long Value pointed to by Arg */
 unsigned short sav;       /* Short argument and for Jtag IO */
 int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
 
@@ -2049,17 +2097,17 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
    /* can be read or written to without error. */
 
    if (arg != NULL) {
-      rcnt = rbounds((int)arg);       /* Number of readable bytes without error */
-      wcnt = wbounds((int)arg);       /* Number of writable bytes without error */
-      if (rcnt < sizeof(int)) {       /* We at least need to read one int */
+      rcnt = rbounds((unsigned long) arg); /* Number of readable bytes without error */
+      wcnt = wbounds((unsigned long) arg); /* Number of writable bytes without error */
+      if (rcnt < sizeof(int)) {            /* We at least need to read one int */
 	 pid = getpid();
-	 cprintf("CtrDrvrIoctl:Illegal arg-pntr:0x%X ReadCnt:%d(%d) Pid:%d Cmd:%d\n",
-		 (int) arg,rcnt,sizeof(int),pid,(int) cm);
+	 cprintf("CtrDrvrIoctl:Illegal arg-pntr:0x%p ReadCnt:%d(%d) Pid:%d Cmd:%d\n",
+		 arg,rcnt,(int) sizeof(int),pid,(int) cm);
 	 pseterr(EINVAL);        /* Invalid argument */
 	 return SYSERR;
       }
-      lav = *((int *) arg);       /* Int32 argument value */
-      lap =   (int *) arg ;       /* Int32 argument pointer */
+      lav = *((long *) arg);       /* Int32 argument value */
+      lap =   (long *) arg ;       /* Int32 argument pointer */
    } else {
       rcnt = 0; wcnt = 0; lav = 0; lap = NULL; /* Null arg = zero read/write counts */
    }
@@ -2358,7 +2406,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
 	 if (mcon->FlashOpen) {
 	    sav = HRdJtag(mcon->Address.JTGAddress);
 	    if (ccon->DebugOn == 2)
-	       cprintf("Jtag: Addr: %x Read %x\n",(int) mcon->Address.JTGAddress,(int) sav);
+	       cprintf("Jtag: Addr: %p Read %x\n",mcon->Address.JTGAddress,(int) sav);
 	    *lap = (0x000000FF & (unsigned int) sav);
 	    return OK;
 	 }
@@ -2370,7 +2418,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
 	    sav = (short) lav;
 	    HWrJtag(sav,mcon->Address.JTGAddress);
 	    if (ccon->DebugOn == 2)
-	       cprintf("Jtag: Addr: %x Write %x\n",(int) mcon->Address.JTGAddress,(int) sav);
+	       cprintf("Jtag: Addr: %p Write %x\n",mcon->Address.JTGAddress,(int) sav);
 	    return OK;
 	 }
 	 pseterr(EBUSY);                    /* Device busy, not opened */
@@ -2381,7 +2429,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
 	 /* Wait 1S for the module to settle */
 
 	 sreset(&(mcon->Semaphore));
-	 mcon->Timer = timeout(ResetTimeout, (char *) mcon, 100);
+	 mcon->Timer = timeout((void *) ResetTimeout, (char *) mcon, 100);
 	 if (mcon->Timer < 0) mcon->Timer = 0;
 	 if (mcon->Timer) swait(&(mcon->Semaphore), SEM_SIGABORT);
 	 if (mcon->Timer) CancelTimeout(&(mcon->Timer));
@@ -2917,7 +2965,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
 	    if (mcon->PllAsyncPeriodNs != 0.0)
 	       *asyp = mcon->PllAsyncPeriodNs;
 	    else
-	       *asyp = mcon->PllAsyncPeriodNs = 1000.00/44.736;
+	       *asyp = mcon->PllAsyncPeriodNs = 1000.00/40.000;
 	    return OK;
 	 }
       break;
