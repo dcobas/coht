@@ -80,5 +80,5 @@ if [ -z "$MAJOR" ]; then
 fi
 for MINOR in $MINORS; do
     sh -c "$RUN rm -f /dev/$DEVNAME.$MINOR"
-    sh -c "$RUN mknod /dev/$DEVNAME.$MINOR c $MAJOR $MINOR"
+    sh -c "$RUN mknod -m 0666 /dev/$DEVNAME.$MINOR c $MAJOR $MINOR"
 done
