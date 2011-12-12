@@ -2240,6 +2240,17 @@ int cmd;
 /* Uninstall                                                              */
 /*========================================================================*/
 
+void release_device(struct pci_dev *pdev, void *mem, int bar)
+{
+
+	printk("ctrdebug:release_device: 0x%X Bar:%d\n",(int) mem, bar);
+
+	pci_iounmap(pdev, mem);
+	pci_release_region(pdev, bar);
+	pci_disable_device(pdev);
+	pci_dev_put(pdev);
+}
+
 int CtrDrvrUninstall(CtrDrvrWorkingArea * wa) {
 
 CtrDrvrMemoryMap *mmap;
@@ -2259,13 +2270,16 @@ CtrDrvrModuleContext *mcon;
 	 drm_free_handle(mcon->Handle);
 
 	 if (mcon->Local) {
-	    drm_unmap_resource(mcon->Handle,PCI_RESID_BAR0);
+	    release_device((struct pci_dev *) mcon->Handle, (void *) mcon->Local, 0);
+	    cprintf("CtrDrvrUninstall: Unmap BAR0 Module:%d 0x%X\n",mcon->ModuleIndex+1,(int) (mcon->Local));
+
 	    mcon->LocalOpen = 0;
 	    mcon->Local = NULL;
 	 }
 
 	 if (mcon->Map) {
-	    drm_unmap_resource(mcon->Handle,PCI_RESID_BAR2);
+	    release_device((struct pci_dev *) mcon->Handle, (void *) mcon->Map, 2);
+	    cprintf("CtrDrvrUninstall: Unmap BAR2 Module:%d 0x%X\n",mcon->ModuleIndex+1,(int) (mcon->Map));
 	    mcon->Map = NULL;
 	 }
 
