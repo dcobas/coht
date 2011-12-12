@@ -1892,7 +1892,7 @@ CtrDrvrModuleAddress *moad;
 
    tinfo.Modules = luns_num;
    for (i=0; i<luns_num; i++) {
-      moad = &(tinfo.Addresses[i]);
+      moad = &(tinfo.Addresses[luns[i] -1]);
 
       /**
        * VME addresses are only 32 bits even though they
