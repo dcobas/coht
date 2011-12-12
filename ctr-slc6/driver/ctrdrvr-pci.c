@@ -2242,9 +2242,6 @@ int cmd;
 
 void release_device(struct pci_dev *pdev, void *mem, int bar)
 {
-
-	printk("ctrdebug:release_device: 0x%X Bar:%d\n",(int) mem, bar);
-
 	pci_iounmap(pdev, mem);
 	pci_release_region(pdev, bar);
 	pci_disable_device(pdev);
