@@ -44,9 +44,18 @@
 
 #define CONFIG_BUS_VME
 
+/**
+ * Implement corresponding module parameters according to the BUS
+ * Implement the corresponding BUS logic VME/PCI/Car
+ */
+
 #include <mod_pars_build_tree.c>
 #include <skelvme.c>
 #include <skelpci.c>
 #include <skelcar.c>
+
+/**
+ * Finally the skel driver that callsback the user code
+ */
 
 #include <skeldrvr.c>
