@@ -41,7 +41,7 @@
 /* Extra definitions that allow build_drvr to build the driver */
 /* tree from module parameters.                                */
 
-#define SkelDrvrNAME "VD80"
+#define SkelDrvrNAME "vd80"
 #define SkelDrvrCOMMENT "ADC sampler card from INCA"
 #define SkelDrvrAUTHOR "Julian Lewis BE/CO/HT"
 

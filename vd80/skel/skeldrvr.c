@@ -547,11 +547,11 @@ static int Reset(SkelDrvrModuleContext * mcon)
 		return SYSERR;
 	}
 	sker = SkelUserHardwareReset(mcon);
-	if (sker != SkelUserReturnOK)
+	if (sker == SkelUserReturnFAILED)
 		return SYSERR;
 
 	sker = SkelUserEnableInterrupts(mcon, connected->enabled_ints);
-	if (sker != SkelUserReturnOK)
+	if (sker == SkelUserReturnFAILED)
 		return SYSERR;
 
 	mutex_unlock(&mcon->mutex);
@@ -563,7 +563,7 @@ static int GetStatus(SkelDrvrModuleContext * mcon, SkelDrvrStatus * ssts)
 	SkelUserReturn sker;
 
 	sker = SkelUserGetHardwareStatus(mcon, &ssts->HardwareStatus);
-	if (sker != SkelUserReturnOK)
+	if (sker == SkelUserReturnFAILED)
 		return SYSERR;
 
 	ssts->StandardStatus = mcon->StandardStatus;
@@ -1060,7 +1060,7 @@ static int AddModule(SkelDrvrModuleContext * mcon)
 
 	mod_ok = SkelUserModuleInit(mcon);
 
-	if (mod_ok != SkelUserReturnOK) {
+	if (mod_ok == SkelUserReturnFAILED) {
 
 		/* abort: delete mappings, unregister ISR */
 
@@ -1201,6 +1201,35 @@ static int modules_install(void)
 	return rc;
 }
 
+/**
+ * Provide standard driver entries
+ * ===============================
+ */
+
+int skel_drv_open(struct inode *inode, struct file *filp);
+int skel_drv_close(struct inode *inode, struct file *filp);
+long skel_drv_ioctl_ulck(struct file *filp, unsigned int cmd, unsigned long arg);
+int     skel_drv_ioctl_lck(struct inode *inode, struct file *filp, unsigned int cmd, unsigned long arg);
+ssize_t skel_drv_read(struct file *filp, char *buf, size_t count, loff_t * f_pos);
+ssize_t skel_drv_write(struct file *filp, const char *buf, size_t count, loff_t * f_pos);
+
+/**
+ * Set up fops
+ */
+
+struct file_operations skel_drvr_fops = {
+
+	.owner          = THIS_MODULE,
+	.read           = skel_drv_read,
+	.write          = skel_drv_write,
+	.ioctl          = skel_drv_ioctl_lck,
+	.unlocked_ioctl = skel_drv_ioctl_ulck,
+	.open           = skel_drv_open,
+	.release        = skel_drv_close,
+};
+
+static int skel_major = 0;
+
 int skel_drv_install(void)
 {
 	InsLibDrvrDesc *drvrd;
@@ -1227,6 +1256,12 @@ int skel_drv_install(void)
 		pseterr(ENOMEM);
 		return SYSERR;
 	}
+
+	skel_major = register_chrdev(0, SkelDrvrNAME, &skel_drvr_fops);
+	if (skel_major < 0)
+		return cc;
+
+	printk("%s driver major is:%d\n",SkelDrvrNAME,skel_major);
 
 	if (!wa_init(drvrd)) {
 		printk("Skel: Working Area Initialisation failed\n");
@@ -1279,6 +1314,9 @@ out_err:
 		kfree((void *) Wa);
 		Wa = NULL;
 	}
+
+	printk("%s: Failed to install\n",SkelDrvrNAME);
+
 	return SYSERR;
 }
 
@@ -1371,7 +1409,7 @@ int client_init(SkelDrvrClientContext * ccon, struct file *flp)
 	/* user's client initialisation bottom-half */
 
 	client_ok = SkelUserClientInit(ccon);
-	if (client_ok != SkelUserReturnOK)             /* errno must be set */
+	if (client_ok == SkelUserReturnFAILED)             /* errno must be set */
 		return -1;
 
 	return 0;
@@ -1399,7 +1437,7 @@ static struct client_link *skel_add_ccon(SkelDrvrClientContext * ccon)
  * to LynxOs close
  */
 
-int SkelDrvrOpen(void *wa, int dnm, struct file *flp)
+int SkelDrvrOpen(struct file *flp)
 {
 	SkelDrvrClientContext *ccon = NULL;	/* Client context */
 
@@ -1417,11 +1455,13 @@ int SkelDrvrOpen(void *wa, int dnm, struct file *flp)
 	flp->private_data = ccon;
 
 	if (client_init(ccon, flp)) {
+		printk("%s: client_init failed\n",SkelDrvrNAME);
 		pseterr(EBADF);
 		goto out_free;
 	}
 
 	if (skel_add_ccon(ccon) == NULL) {
+		printk("%s: skel_add_ccon failed\n",SkelDrvrNAME);
 		pseterr(ENOMEM);
 		goto out_free;
 	}
@@ -1431,6 +1471,7 @@ out_free:
 	if (ccon)
 		kfree((void *) ccon);
 
+	printk("%s: Failed to open\n",SkelDrvrNAME);
 	return SYSERR;
 }
 
@@ -1507,6 +1548,7 @@ void skel_drv_uninstall(void)
 	kfree((void *) Wa);
 	Wa = NULL;
 
+	unregister_chrdev(skel_major,SkelDrvrNAME);
 	return;
 }
 
@@ -1713,8 +1755,8 @@ static int get_queue_overflow(SkelDrvrQueue * q)
  */
 
 static int
-skel_fill_client_connections(SkelDrvrModuleContext * mcon,
-			     SkelDrvrClientConnections * ccn)
+skel_fill_client_connections(SkelDrvrModuleContext *mcon,
+			     SkelDrvrClientConnections *ccn)
 {
 	struct list_head *client_list;
 	struct client_link *entry;
@@ -1785,10 +1827,9 @@ skel_get_client_connections(SkelDrvrClientContext * ccon,
 	return OK;
 }
 
-int SkelDrvrIoctl(void *wa,             /* Working area */
-		  struct file *flp,	/* File pointer */
+int SkelDrvrIoctl(struct file *flp,     /* File pointer */
 		  int cm,               /* IOCTL command */
-		  char *arg)            /* Data for the IOCTL */
+		  void *arg)            /* Data for the IOCTL */
 {
 	SkelDrvrModuleContext *mcon;	/* Module context */
 	SkelDrvrClientContext *ccon;	/* Client context */
@@ -1800,12 +1841,12 @@ int SkelDrvrIoctl(void *wa,             /* Working area */
 	SkelDrvrStatus *ssts;
 	SkelDrvrDebug *db;
 
-	long lav, *lap;         /* Long Value pointed to by Arg */
-	short sav;              /* Short argument and for Jtag IO */
+	long lav, *lap; /* Long Value pointed to by Arg */
+	short sav;      /* Short argument and for Jtag IO */
 
-	lap = (long *) arg;     /* Long argument pointer */
-	lav = *lap;             /* Long argument value */
-	sav = lav;              /* Short argument value */
+	lap = arg;      /* Long argument pointer */
+	lav = *lap;     /* Long argument value */
+	sav = lav;      /* Short argument value */
 
 	ccon = flp->private_data;
 	if (ccon == NULL) {
@@ -1926,7 +1967,7 @@ int SkelDrvrIoctl(void *wa,             /* Working area */
 		return skel_get_client_connections(ccon, ccn);
 
 	case SkelDrvrIoctlENABLE:
-		if (SkelUserHardwareEnable(mcon, lav) == SkelUserReturnOK)
+		if (SkelUserHardwareEnable(mcon, lav) != SkelUserReturnFAILED)
 			mcon->StandardStatus &=
 			    ~SkelDrvrStandardStatusDISABLED;
 		else
@@ -2024,38 +2065,6 @@ int SkelDrvrIoctl(void *wa,             /* Working area */
 }
 
 /**
- * Provide standard driver entries
- * ===============================
- */
-
-int skel_drv_open(struct inode *inode, struct file *filp);
-
-int skel_drv_close(struct inode *inode, struct file *filp);
-
-long skel_drv_ioctl_ulck(struct file *filp, unsigned int cmd, unsigned long arg);
-
-int     skel_drv_ioctl_lck(struct inode *inode, struct file *filp, unsigned int cmd, unsigned long arg);
-
-ssize_t skel_drv_read(struct file *filp, char *buf, size_t count, loff_t * f_pos);
-
-ssize_t skel_drv_write(struct file *filp, const char *buf, size_t count, loff_t * f_pos);
-
-/**
- * Set up fops
- */
-
-struct file_operations skel_drvr__fops = {
-
-	.owner          = THIS_MODULE,
-	.read           = skel_drv_read,
-	.write          = skel_drv_write,
-	.ioctl          = skel_drv_ioctl_lck,
-	.unlocked_ioctl = skel_drv_ioctl_ulck,
-	.open           = skel_drv_open,
-	.release        = skel_drv_close,
-};
-
-/**
  * Implement IOCTL
  */
 
@@ -2083,7 +2092,7 @@ skel_drv_ioctl(struct inode *inode, struct file *filp, unsigned int cmd,
 		}
 	}
 
-	cc = SkelDrvrIoctl(Wa, filp, cmd, (char *) arg);
+	cc = SkelDrvrIoctl(filp, cmd, (void *) arg);
 	if (cc) {
 		kfree(arb);
 		return drv_errno;
@@ -2119,7 +2128,7 @@ skel_drv_ioctl_lck(struct inode *inode, struct file *filp,
 
 int skel_drv_open(struct inode *inode, struct file *filp)
 {
-	if (SkelDrvrOpen(Wa,0,filp))
+	if (SkelDrvrOpen(filp))
 		return drv_errno;
 	return OK;
 }
