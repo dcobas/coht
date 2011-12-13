@@ -33,7 +33,7 @@
 #include "DrvrSpec.h"
 
 extern void *LynxOsInfoTable;
-extern int LynxOsInitInfoTable();
+extern int LynxOsInitInfoTable(int);
 extern int LynxOsMemoryGetSize(int cmd, int *dirp);
 
 extern LynxOsIsr lynxos_isrs[LynxOsMAX_DEVICE_COUNT];
@@ -108,7 +108,7 @@ struct file_operations LynxOs_fops = {
 
 extern struct dldd entry_points;
 
-char *LynxOsWorkingArea = NULL;
+CtrDrvrWorkingArea *LynxOsWorkingArea = NULL;
 
 /* ===================================================== */
 /* Open                                                  */
@@ -373,7 +373,7 @@ int cc;
       return cc;
    }
 
-   LynxOsWorkingArea = entry_points.dldd_install(LynxOsInfoTable);
+   LynxOsWorkingArea = (CtrDrvrWorkingArea *)entry_points.dldd_install(LynxOsInfoTable);
    if ((long) LynxOsWorkingArea == SYSERR) {
       LynxOsWorkingArea = NULL;
       return lynxos_error_num;

@@ -29,11 +29,15 @@
 /* Define prototypes and forward references for local driver routines.    */
 /*========================================================================*/
 
+int timeout(int (*func)(void *), char *arg, int interval);
+char *CtrDrvrInstall(CtrDrvrWorkingArea *wa);
+int CtrDrvrUninstall(CtrDrvrWorkingArea * wa);
+
 static void Int32Copy(volatile unsigned int *dst, volatile unsigned int *src, unsigned int size);
 
 static void CancelTimeout(int *t);
 
-static int ReadTimeout(CtrDrvrClientContext *ccon);
+static int ReadTimeout(void *ccon);
 
 static void DebugIoctl(CtrDrvrControlFunction cm, char *arg);
 
@@ -105,7 +109,7 @@ static int DisConnectAll(CtrDrvrClientContext *ccon);
 
 /* ==================================================== */
 
-static void SetEndian();
+static void SetEndian(void);
 
 static void ToLittleEndian(char *from, char *to, int size);
 
@@ -136,23 +140,12 @@ static void ReadEpromWord(CtrDrvrModuleContext *mcon, unsigned int  *word);
 /* Driver entry points       */
 /* ========================= */
 
-irqreturn_t IntrHandler();
-int CtrDrvrOpen();
-int CtrDrvrClose();
-int CtrDrvrRead();
-int CtrDrvrWrite();
-int CtrDrvrSelect();
-char * CtrDrvrInstall();
-int CtrDrvrUninstall();
-int CtrDrvrIoctl();
+irqreturn_t IntrHandler(CtrDrvrModuleContext *);
 
 /* Flash the i/o pipe line */
 
 #define EIEIO
 #define SYNC
-
-extern void disable_intr();
-extern void enable_intr();
 
 CtrDrvrWorkingArea *Wa       = NULL;
 
@@ -206,8 +199,8 @@ int v;
 /* Handel read timeouts                                                   */
 /*========================================================================*/
 
-static int ReadTimeout(CtrDrvrClientContext *ccon) {
-
+static int ReadTimeout(void *cc) {
+   CtrDrvrClientContext *ccon = cc;
    ccon->Timer = 0;
    sreset(&(ccon->Semaphore));
    return 0;
@@ -217,8 +210,8 @@ static int ReadTimeout(CtrDrvrClientContext *ccon) {
 /* Handel reset timeouts                                                  */
 /*========================================================================*/
 
-static int ResetTimeout(CtrDrvrModuleContext *mcon) {
-
+static int ResetTimeout(void *mc) {
+   CtrDrvrModuleContext *mcon = mc;
    mcon->Timer = 0;
    sreset(&(mcon->Semaphore));
    return 0;
@@ -278,7 +271,7 @@ char *iocname;
 /* so this routine finds out which one we are.                */
 /* ========================================================== */
 
-static void SetEndian() {
+static void SetEndian(void) {
 
 static unsigned int str[2] = { 0x41424344, 0x0 };
 
@@ -1516,10 +1509,7 @@ CtrDrvrReadBuf         rbf;
 /* OPEN                                                                   */
 /*========================================================================*/
 
-int CtrDrvrOpen(wa, dnm, flp)
-CtrDrvrWorkingArea * wa;        /* Working area */
-int dnm;                        /* Device number */
-struct LynxFile * flp; {            /* File pointer */
+int CtrDrvrOpen(CtrDrvrWorkingArea *wa, int dnm, struct LynxFile *flp) {
 
 int cnum;                       /* Client number */
 CtrDrvrClientContext * ccon;    /* Client context */
@@ -1564,9 +1554,7 @@ CtrDrvrClientContext * ccon;    /* Client context */
 /* CLOSE                                                                  */
 /*========================================================================*/
 
-int CtrDrvrClose(wa, flp)
-CtrDrvrWorkingArea * wa;    /* Working area */
-struct LynxFile * flp; {    /* File pointer */
+int CtrDrvrClose(CtrDrvrWorkingArea *wa, struct LynxFile *flp) {
 
 int cnum;                   /* Client number */
 CtrDrvrClientContext *ccon; /* Client context */
@@ -1616,11 +1604,7 @@ CtrDrvrClientContext *ccon; /* Client context */
 /* READ                                                                   */
 /*========================================================================*/
 
-int CtrDrvrRead(wa, flp, u_buf, cnt)
-CtrDrvrWorkingArea * wa;       /* Working area */
-struct LynxFile * flp;         /* File pointer */
-char * u_buf;                  /* Users buffer */
-int cnt; {                     /* Byte count in buffer */
+int CtrDrvrRead(CtrDrvrWorkingArea *wa, struct LynxFile *flp, char *u_buf, int cnt) {
 
 CtrDrvrClientContext *ccon;    /* Client context */
 CtrDrvrQueue         *queue;
@@ -1702,11 +1686,7 @@ unsigned long         ps;
 /* with the supplied CtrDrvrReadBuf.                                     */
 /*========================================================================*/
 
-int CtrDrvrWrite(wa, flp, u_buf, cnt)
-CtrDrvrWorkingArea * wa;       /* Working area */
-struct LynxFile * flp;             /* File pointer */
-char * u_buf;                  /* Users buffer */
-int cnt; {                     /* Byte count in buffer */
+int CtrDrvrWrite(CtrDrvrWorkingArea *wa, struct LynxFile *flp, char *u_buf, int cnt) {
 
 CtrDrvrClientContext *ccon;    /* Client context */
 CtrDrvrModuleContext *mcon;
@@ -1803,11 +1783,7 @@ unsigned int          clients;
 /* SELECT                                                                 */
 /*========================================================================*/
 
-int CtrDrvrSelect(wa, flp, wch, ffs)
-CtrDrvrWorkingArea * wa;        /* Working area */
-struct LynxFile * flp;              /* File pointer */
-int wch;                        /* Read/Write direction */
-struct sel * ffs; {             /* Selection structurs */
+int CtrDrvrSelect(CtrDrvrWorkingArea *wa, struct LynxFile *flp, int wch, struct sel *ffs) {
 
 CtrDrvrClientContext * ccon;
 int cnum;
@@ -1829,10 +1805,10 @@ int cnum;
 /* Assumes that all Ctr modules are brothers                              */
 /*========================================================================*/
 
-char * CtrDrvrInstall(info)
-CtrDrvrInfoTable * info; {      /* Driver info table */
+#define CTRP_BARS 0x5
 
-CtrDrvrWorkingArea *wa;
+char *CtrDrvrInstall(CtrDrvrWorkingArea *wa)
+{
 drm_node_handle handle;
 CtrDrvrModuleContext *mcon;
 unsigned long vadr;
@@ -1925,7 +1901,7 @@ int cmd;
       DrmLocalReadWrite(mcon,PLX9030_LAS0BRD,&las0brd,4,1);
 
       /* register the ISR */
-      cc = drm_register_isr(handle,IntrHandler, (void *)mcon);
+      cc = drm_register_isr(handle, (void *)IntrHandler, (void *)mcon);
       if (cc == SYSERR) {
         cprintf("CtrDrvrInstall: Can't register ISR for timing module: %d\n",
           modix + 1);
@@ -1973,8 +1949,7 @@ int cmd;
 /* Uninstall                                                              */
 /*========================================================================*/
 
-int CtrDrvrUninstall(wa)
-CtrDrvrWorkingArea * wa; {     /* Drivers working area pointer */
+int CtrDrvrUninstall(CtrDrvrWorkingArea * wa) {
 
 CtrDrvrMemoryMap *mmap;
 CtrDrvrClientContext *ccon;
@@ -2029,11 +2004,7 @@ CtrDrvrModuleContext *mcon;
 /* IOCTL                                                                  */
 /*========================================================================*/
 
-int CtrDrvrIoctl(wa, flp, cm, arg)
-CtrDrvrWorkingArea * wa;       /* Working area */
-struct LynxFile * flp;         /* File pointer */
-CtrDrvrControlFunction cm;     /* IOCTL command */
-char * arg; {                  /* Data for the IOCTL */
+int CtrDrvrIoctl(CtrDrvrWorkingArea *wa, struct LynxFile *flp, CtrDrvrControlFunction cm, char *arg) {
 
 CtrDrvrModuleContext           *mcon;   /* Module context */
 CtrDrvrClientContext           *ccon;   /* Client context */
