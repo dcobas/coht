@@ -2076,36 +2076,39 @@ skel_drv_ioctl(struct inode *inode, struct file *filp, unsigned int cmd,
 	int iodr;		/* Io Direction */
 	int iosz;		/* Io Size in bytes */
 	int ionr;		/* Io Number */
-	void *arb;              /* Argument buffer area */
+	void *mem;              /* Argument buffer area */
 
 	ionr = _IOC_NR(cmd);
 	iodr = _IOC_DIR(cmd);
 	iosz = _IOC_SIZE(cmd);
 
-	if ((arb = kmalloc(iosz, GFP_KERNEL)) == NULL)
+	if ((mem = kmalloc(iosz, GFP_KERNEL)) == NULL)
 		return -ENOMEM;
 
 	if (iodr & _IOC_WRITE) {
-		if (copy_from_user(arb, (void *) arg, iosz) != 0)  {
-			kfree(arb);
+		if (copy_from_user(mem, (void *) arg, iosz) != 0)  {
+			printk("%s: Failed copy_from_user\n",SkelDrvrNAME);
+			kfree(mem);
 			return -EACCES;
 		}
 	}
 
 	cc = SkelDrvrIoctl(filp, cmd, (void *) arg);
 	if (cc) {
-		kfree(arb);
+		printk("%s: Failed SkelDrvrIoctl\n",SkelDrvrNAME);
+		kfree(mem);
 		return drv_errno;
 	}
 
 	if (iodr & _IOC_READ) {
-		if (copy_to_user((void *) arg, arb, iosz) != 0) {
-			kfree(arb);
+		if (copy_to_user((void *) arg, mem, iosz) != 0) {
+			printk("%s: Failed copy_to_user\n",SkelDrvrNAME);
+			kfree(mem);
 			return -EACCES;
 		}
 	}
 
-	kfree(arb);
+	kfree(mem);
 	return OK;
 }
 
