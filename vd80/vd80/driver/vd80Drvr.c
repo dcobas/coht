@@ -18,6 +18,7 @@
 #include <linux/pagemap.h>
 #include <linux/time.h>
 #include <linux/delay.h>
+#include <asm/io.h>
 
 /* =========================================================== */
 /* Client and module asociated error messages                  */
