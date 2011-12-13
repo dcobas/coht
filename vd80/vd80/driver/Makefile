@@ -23,25 +23,25 @@ modules:
 	rm -rf ./$(CPU)
 	mkdir ./$(CPU)
 	mkdir ./$(CPU)/$(KVER)
-	mv skelmodule.ko ./$(CPU)/$(KVER)/skelmodule.ko
-	chmod 664 ./$(CPU)/$(KVER)/skelmodule.ko
+	mv vd80.ko ./$(CPU)/$(KVER)/vd80.ko
+	chmod 664 ./$(CPU)/$(KVER)/vd80.ko
 	rm -f *.o
 
 clean:
-	rm -f skelmodule.ko
-	rm -f ./$(CPU)/$(KVER)/skelmodule.ko
+	rm -f vd80.ko
+	rm -f ./$(CPU)/$(KVER)/vd80.ko
 	rm -f *.o
 
-install: ./$(CPU)/$(KVER)/skelmodule.ko
+install: ./$(CPU)/$(KVER)/vd80.ko
 	@echo "please specify one of {install-lab|install-oper|install-lhc|install-all}"
 
 install-all: install-lab install-oper install-oplhc
 
-install-lab: ./$(CPU)/$(KVER)/skelmodule.ko
-	dsc_install ./$(CPU)/$(KVER)/skelmodule.ko /acc/dsc/lab/$(CPU)/$(KVER)/skelmodule;
+install-lab: ./$(CPU)/$(KVER)/vd80.ko
+	dsc_install ./$(CPU)/$(KVER)/vd80.ko /acc/dsc/lab/$(CPU)/$(KVER)/vd80;
 
-install-oper: ./$(CPU)/$(KVER)/skelmodule.ko
-	dsc_install ./$(CPU)/$(KVER)/skelmodule.ko /acc/dsc/oper/$(CPU)/$(KVER)/skelmodule;
+install-oper: ./$(CPU)/$(KVER)/vd80.ko
+	dsc_install ./$(CPU)/$(KVER)/vd80.ko /acc/dsc/oper/$(CPU)/$(KVER)/vd80;
 
-install-oplhc: ./$(CPU)/$(KVER)/skelmodule.ko
-	dsc_install ./$(CPU)/$(KVER)/skelmodule.ko /acc/dsc/oplhc/$(CPU)/$(KVER)/skelmodule;
+install-oplhc: ./$(CPU)/$(KVER)/vd80.ko
+	dsc_install ./$(CPU)/$(KVER)/vd80.ko /acc/dsc/oplhc/$(CPU)/$(KVER)/vd80;
