@@ -198,6 +198,9 @@ static void RemoveVmeModule(SkelDrvrModuleContext * mcon)
  * @return 0 - on failure
  * @return 1 - on success
  */
+
+irqreturn_t skel_isr(void *cookie);
+
 static int AddVmeModule(SkelDrvrModuleContext * mcon)
 {
 	InsLibModlDesc *modld = mcon->Modld;

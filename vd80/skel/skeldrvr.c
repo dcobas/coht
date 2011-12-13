@@ -38,6 +38,8 @@
 #include <skeldrvr.h>
 #include <skeldrvrP.h>
 
+
+
 /*
  * Common variables
  * These variables are shared between the user and the generic parts of skel

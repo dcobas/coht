@@ -23,6 +23,9 @@
  * VME/CES Library expects the handler to return int, while Lynx' DRM expects
  * a void return. This wrapper just gets around it.
  */
+
+irqreturn_t skel_isr(void *cookie);
+
 void __pci_isr(void *cookie)
 {
 	skel_isr(cookie);

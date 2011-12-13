@@ -1,3 +1,8 @@
+/**
+ * Main module, built by including all sources
+ * Julian Lewis BE/CO/HT Dec 2011
+ */
+
 #include <linux/kernel.h>
 #include <linux/slab.h>
 #include <linux/vmalloc.h>
@@ -35,11 +40,15 @@
 #include <skeluser.h>
 #include <skeluser_ioctl.h>
 
+#include <libinstkernel.c>
 #include <vd80Names.c>
 #include <vd80Drvr.c>
 
+// #define CONFIG_BUS_PCI
+// #define CONFIG_BUS_CAR
+#define CONFIG_BUS_VME
+
 #include <mod_pars_build_tree.c>
-#include <libinstkernel.c>
 #include <skelvme.c>
 #include <skelpci.c>
 #include <skelcar.c>

@@ -106,9 +106,9 @@ MODULE_PARM_DESC(vme2, "Second map base addresses");
 MODULE_PARM_DESC(vecs, "Interrupt vectors");
 
 #define DRV_NAME_LEN 64
-static char drv_name[DRV_NAME_LEN] = { 0 };
+static char dname[DRV_NAME_LEN] = { 0 };
 
-module_param_string(dname, drv_name, DRV_NAME_LEN, 0);
+module_param_string(dname, dname, DRV_NAME_LEN, 0);
 MODULE_PARM_DESC(dname, "Optional driver name");
 
 MODULE_DESCRIPTION(SkelDrvrCOMMENT);
