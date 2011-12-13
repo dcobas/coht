@@ -32,13 +32,10 @@
 #include <linux/mutex.h>
 #include <asm/current.h>
 
-#include <skeldefs.h>
 #include <skeluser.h>
 #include <skeluser_ioctl.h>
-#include <skeldrvr.h>
+#include <skel.h>
 #include <skeldrvrP.h>
-
-
 
 /*
  * Common variables
@@ -110,8 +107,8 @@ static const char *SkelDrvrDebugNames[] = {
 
 const char *GetDebugFlagName(SkelDrvrDebugFlag debf)
 {
-	S32 i;
-	U32 msk;
+	int i;
+	uint32_t msk;
 
 	for (i = 0; i < SkelDrvrDEBUG_NAMES; i++) {
 		msk = 1 << i;

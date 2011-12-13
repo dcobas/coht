@@ -26,26 +26,37 @@
 #include <linux/time.h>
 #include <linux/delay.h>
 
-#include <skeldefs.h>
-#include <skeldrvr.h>
+/**
+ * InsLib structures, definitions
+ * and kernel routines. All depends
+ * on this.
+ */
 
-#include <skeldefs.h>
 #include <config_data.h>
 #include <libinstkernel.h>
+#include <libinstkernel.c>
 
-#include <skel.h>
-#include <skeldrvr.h>
+/**
+ * Driver definitions
+ */
+
 #include <skeldrvrP.h>
+#include <skel.h>
+
+/**
+ * This is the VD80 driver
+ * User definitions, ioctl numbers and structures
+ * Ioctl names and the driver callbacks
+ */
 
 #include <skeluser.h>
 #include <skeluser_ioctl.h>
-
-#include <libinstkernel.c>
 #include <vd80Names.c>
 #include <vd80Drvr.c>
 
 // #define CONFIG_BUS_PCI
 // #define CONFIG_BUS_CAR
+
 #define CONFIG_BUS_VME
 
 #include <mod_pars_build_tree.c>

@@ -7,12 +7,7 @@
 
 #include <config_data.h>
 
-#if defined (__linux__)
 #include <linux/vmalloc.h>
-#elif defined (__LYNXOS) /* for Lynx kernel only */
-#include <kernel.h>
-#define printk kkprintf
-#endif
 
 void (*InsLibSetCopyRoutine(void (*)(void*, const void*, int)))
 (void*, const void*, int);

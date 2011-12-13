@@ -6,8 +6,8 @@
 #ifndef SKELDRVRP
 #define SKELDRVRP
 
-#include <skeldefs.h>
-#include <skeldrvr.h>
+#include <skeluser.h>
+#include <skel.h>
 
 InsLibDrvrDesc *build_drvr(void);
 void set_tree_defaults(InsLibDrvrDesc * dp);
@@ -22,11 +22,11 @@ void set_tree_defaults(InsLibDrvrDesc * dp);
 
 typedef struct {
 	spinlock_t lock;
-	int QueueOff;
-	U16 Missed;
-	int Size;
-	U32 RdPntr;
-	U32 WrPntr;
+	int        QueueOff;
+	uint16_t   Missed;
+	int        Size;
+	uint32_t   RdPntr;
+	uint32_t   WrPntr;
 	SkelDrvrReadBuf Entries[SkelDrvrQUEUE_SIZE];
 } SkelDrvrQueue;
 
@@ -49,11 +49,11 @@ typedef struct {
 	unsigned int      waitc;
 	SkelDrvrQueue     Queue;
 
-	U32 Pid;
-	U32 Timeout;
+	uint32_t Pid;
+	uint32_t Timeout;
 	SkelDrvrDebugFlag Debug;
-	U32 ModuleNumber;
-	U32 ChannelNr;
+	uint32_t ModuleNumber;
+	uint32_t ChannelNr;
 	void *UserData;
 	struct file *filep;
 } SkelDrvrClientContext;
@@ -89,16 +89,16 @@ typedef struct {
 /* The module context                              */
 
 typedef struct {
-	struct mutex mutex;	/* Module lock */
-	U32 ModuleNumber;	/* Drivers module logical unit number */
-	U32 InUse;		/* Context in Use, module installed */
-	InsLibModlDesc *Modld;	/* Module hardware address */
-	U32 Timeout;		/* Transaction timeout value */
-	S32 Timer;		/* Transaction timer */
+	struct mutex mutex;          /* Module lock */
+	uint32_t ModuleNumber;       /* Drivers module logical unit number */
+	uint32_t InUse;              /* Context in Use, module installed */
+	InsLibModlDesc *Modld;       /* Module hardware address */
+	uint32_t Timeout;            /* Transaction timeout value */
+	int Timer;                   /* Transaction timer */
 	SkelDrvrModConn Connected;
-	U32 Registers[SkelDrvrREGISTERS];	/* Copy of module registers, Emulation and Reset */
-	SkelDrvrDebugFlag Debug;	/* Global debug options */
-	SkelDrvrStandardStatus StandardStatus;	/* Standard status */
+	uint32_t Registers[SkelDrvrREGISTERS]; /* Copy of module registers, Emulation and Reset */
+	SkelDrvrDebugFlag Debug;               /* Global debug options */
+	SkelDrvrStandardStatus StandardStatus; /* Standard status */
 	void *UserData;
 } SkelDrvrModuleContext;
 
@@ -111,7 +111,7 @@ typedef struct {
 typedef struct {
 	InsLibDrvrDesc *Drvrd;
 	InsLibEndian Endian;
-	U32 InstalledModules;
+	uint32_t InstalledModules;
 	SkelDrvrModuleContext Modules[SkelDrvrMODULE_CONTEXTS];
 	void *UserData;
 
@@ -133,71 +133,71 @@ typedef enum {
 /* The module version can be the compilation date for the FPGA */
 /* code or some other identity readable from the hardware.     */
 
-extern SkelUserReturn SkelUserGetModuleVersion(SkelDrvrModuleContext *
-					       mcon, char *mver);
+extern SkelUserReturn SkelUserGetModuleVersion(SkelDrvrModuleContext *mcon,
+					       char *mver);
 
 /* =========================================================== */
 /* The specific hardware status is read here. From this it is  */
 /* possible to build the standard SkelDrvrStatus inthe module  */
 /* context at location mcon->StandardStatus                    */
 
-extern SkelUserReturn SkelUserGetHardwareStatus(SkelDrvrModuleContext *
-						mcon, U32 * hsts);
+extern SkelUserReturn SkelUserGetHardwareStatus(SkelDrvrModuleContext *mcon,
+						uint32_t * hsts);
 
 /* =========================================================== */
 /* Get the UTC time, called from the ISR                       */
 
-extern SkelUserReturn SkelUserGetUtc(SkelDrvrModuleContext * mcon,
+extern SkelUserReturn SkelUserGetUtc(SkelDrvrModuleContext *mcon,
 				     SkelDrvrTime * utc);
 
 /* =========================================================== */
 /* This is the hardware reset routine. Don't forget to copy    */
 /* the registers block in the module context to the hardware.  */
 
-extern SkelUserReturn SkelUserHardwareReset(SkelDrvrModuleContext * mcon);
+extern SkelUserReturn SkelUserHardwareReset(SkelDrvrModuleContext *mcon);
 
 /* =========================================================== */
 /* This routine gets and clears the modules interrupt source   */
 /* register. Try to do this with a Read/Modify/Write cycle.    */
 /* Its a good idea to return the time of interrupt.            */
 
-extern SkelUserReturn SkelUserGetInterruptSource(SkelDrvrModuleContext *
-						 mcon, SkelDrvrTime * itim,
-						 U32 * isrc);
+extern SkelUserReturn SkelUserGetInterruptSource(SkelDrvrModuleContext *mcon,
+						 SkelDrvrTime *itim,
+						 uint32_t *isrc);
 
 /* =========================================================== */
 /* Define howmany interrupt sources you want and provide this  */
 /* routine to enable them.                                     */
 
-extern SkelUserReturn SkelUserEnableInterrupts(SkelDrvrModuleContext *
-					       mcon, U32 imsk);
+extern SkelUserReturn SkelUserEnableInterrupts(SkelDrvrModuleContext *mcon,
+					       uint32_t imsk);
 
 /* =========================================================== */
 /* Provide a way to enable or disable the hardware module.     */
 
-extern SkelUserReturn SkelUserHardwareEnable(SkelDrvrModuleContext * mcon,
-					     U32 flag);
+extern SkelUserReturn SkelUserHardwareEnable(SkelDrvrModuleContext *mcon,
+					     uint32_t flag);
 
 /* =========================================================== */
 /* Standard CO FPGA JTAG IO, Read a byte                       */
 
-extern SkelUserReturn SkelUserJtagReadByte(SkelDrvrModuleContext * mcon,
-					   U32 * byte);
+extern SkelUserReturn SkelUserJtagReadByte(SkelDrvrModuleContext *mcon,
+					   uint32_t *byte);
 
 /* =========================================================== */
 /* Standard CO FPGA JTAG IO, Write a byte                      */
 
-extern SkelUserReturn SkelUserJtagWriteByte(SkelDrvrModuleContext * mcon,
-					    U32 byte);
+extern SkelUserReturn SkelUserJtagWriteByte(SkelDrvrModuleContext *mcon,
+					    uint32_t byte);
 
 /* =========================================================== */
 /* Then decide on howmany IOCTL calls you want, and fill their */
 /* debug name strings.                                         */
 
-extern SkelUserReturn SkelUserIoctls(SkelDrvrClientContext * ccon,	/* Calling clients context */
-				     SkelDrvrModuleContext * mcon,	/* Calling clients selected module */
-				     int cm,	/* Ioctl number */
-				     char *arg);	/* Pointer to argument space */
+extern SkelUserReturn SkelUserIoctls(SkelDrvrClientContext *ccon, /* Calling clients context */
+				     SkelDrvrModuleContext *mcon, /* Calling clients selected module */
+				     int cm,                      /* Ioctl number */
+				     char *arg);                  /* Pointer to argument space */
 
 /*
  * Get the name of an IOCTL
@@ -207,34 +207,27 @@ extern char *SkelUserGetIoctlName(int cmd);
 /*
  * Module initialisation
  */
-extern SkelUserReturn SkelUserModuleInit(SkelDrvrModuleContext * mcon);
+extern SkelUserReturn SkelUserModuleInit(SkelDrvrModuleContext *mcon);
 
 /*
  * Module uninstallation
  */
-extern void SkelUserModuleRelease(SkelDrvrModuleContext * mcon);
+extern void SkelUserModuleRelease(SkelDrvrModuleContext *mcon);
 
 /*
  * Client initialisation
  */
-extern SkelUserReturn SkelUserClientInit(SkelDrvrClientContext * ccon);
+extern SkelUserReturn SkelUserClientInit(SkelDrvrClientContext *ccon);
 
 /*
  * Client's close()
  */
-extern void SkelUserClientRelease(SkelDrvrClientContext * ccon);
+extern void SkelUserClientRelease(SkelDrvrClientContext *ccon);
 
-#ifdef __linux__
 #define SKEL_ERR KERN_ERR
 #define SKEL_WARN KERN_WARNING
 #define SKEL_INFO KERN_INFO
 #define SKEL_DEBUG KERN_DEBUG
-#else				/* lynx */
-#define SKEL_ERR
-#define SKEL_WARN
-#define SKEL_INFO
-#define SKEL_DEBUG
-#endif				/* __linux__ */
 
 /* error printout */
 #define SK_ERROR(format...)						\

@@ -12,7 +12,6 @@
  */
 #include "libinstkernel.h"
 
-#ifdef __linux__
 #include <linux/slab.h>
 #include <linux/vmalloc.h>
 
@@ -42,7 +41,6 @@ static char* getmem(unsigned long size)
 	return mem;
 }
 
-
 /**
  * @brief Free allocated memory
  *
@@ -58,8 +56,6 @@ static void sysfree(char *cp, unsigned long size)
 	else
 		kfree(cp);
 }
-
-#endif
 
 /* =============================================== */
 /* Set the routine to the copy you want            */
@@ -93,7 +89,7 @@ static void (*copy_mem)(void *dest, const void *src, int n) = default_copy;
  * @return previous copy routine.
  */
 void (*InsLibSetCopyRoutine(void (*routine)(void*, const void *, int)))
-(void*, const void*, int)
+      (void*, const void*, int)
 {
 	void (*prev)(void*, const void*, int) = copy_mem; /* save old one */
 	if (routine) copy_mem = routine;

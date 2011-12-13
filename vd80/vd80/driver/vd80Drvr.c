@@ -28,8 +28,8 @@
 /* Given a module context and an address modifier returned the */
 /* corresponding address map pointer.                          */
 
-U32 *GetVmeMappedAddress(SkelDrvrModuleContext *mcon,
-			 int                    am) {
+uint32_t *GetVmeMappedAddress(SkelDrvrModuleContext *mcon,
+			      int                    am) {
 
 InsLibModlDesc         *modld = NULL;   /* Module descriptor linked list */
 InsLibVmeModuleAddress *vmema = NULL;   /* The VD80 VME address space linked list */
@@ -64,8 +64,8 @@ InsLibVmeAddressSpace  *vmeas = NULL;   /* VME address spaces linked list */
 /* =========================================================== */
 /* As above but return the corresponding base address instead  */
 
-U32 *GetVmeBaseAddress(SkelDrvrModuleContext *mcon,
-		       int                    am) {
+uint32_t *GetVmeBaseAddress(SkelDrvrModuleContext *mcon,
+			    int                    am) {
 
 InsLibModlDesc         *modld = NULL;
 InsLibVmeModuleAddress *vmema = NULL;
@@ -88,7 +88,7 @@ InsLibVmeAddressSpace  *vmeas = NULL;
 
    vmeas = vmema->VmeAddressSpace;
    while (vmeas) {
-      if (vmeas->AddressModifier == am) return (U32 *) vmeas->BaseAddress;
+      if (vmeas->AddressModifier == am) return (uint32_t *) vmeas->BaseAddress;
       vmeas = vmeas->Next;
    }
    report_module(mcon, SkelDrvrDebugFlagWARNING, "GetVmeBaseAddress:Address modifier 0x%X not found", am);
@@ -98,24 +98,24 @@ InsLibVmeAddressSpace  *vmeas = NULL;
 /* =========================================================== */
 /* Access hardware/software registers with emulation           */
 
-void SetReg(U32 *map, U32 offset, U32 valu, SkelDrvrModuleContext *mcon) {
+void SetReg(uint32_t *map, uint32_t offset, uint32_t valu, SkelDrvrModuleContext *mcon) {
    mcon->Registers[offset/4] = valu;
    if (mcon->StandardStatus & SkelDrvrStandardStatusEMULATION) return;
-   iowrite32(cpu_to_be32((U32) valu), &(map[offset/4]));
+   iowrite32(cpu_to_be32((uint32_t) valu), &(map[offset/4]));
 }
 
-U32 GetReg(U32 *map, U32 offset, SkelDrvrModuleContext *mcon) {
+uint32_t GetReg(uint32_t *map, uint32_t offset, SkelDrvrModuleContext *mcon) {
    if (mcon->StandardStatus & SkelDrvrStandardStatusEMULATION)
-      return (U32) mcon->Registers[offset/4];
-   return (U32) be32_to_cpu(ioread32(&(map[offset/4])));
+      return (uint32_t) mcon->Registers[offset/4];
+   return (uint32_t) be32_to_cpu(ioread32(&(map[offset/4])));
 }
 
 /* =========================================================== */
 /* Get operational registers                                   */
 
-U32 *GetRegs(SkelDrvrModuleContext *mcon) {
+uint32_t *GetRegs(SkelDrvrModuleContext *mcon) {
 
-U32 *regs;
+uint32_t *regs;
 
    if (mcon->StandardStatus & SkelDrvrStandardStatusEMULATION)
       return mcon->Registers;
@@ -186,9 +186,9 @@ UserData *u;
 /* context at location mcon->StandardStatus                    */
 
 SkelUserReturn SkelUserGetHardwareStatus(SkelDrvrModuleContext *mcon,
-					 U32                   *hsts) {
-U32 *regs = NULL;
-U32 reg;
+					 uint32_t              *hsts) {
+uint32_t *regs = NULL;
+uint32_t reg;
 
    *hsts = mcon->StandardStatus;
 
@@ -241,8 +241,8 @@ SkelUserReturn SkelUserHardwareReset(SkelDrvrModuleContext *mcon) {
 
 SkelUserReturn SkelUserGetInterruptSource(SkelDrvrModuleContext *mcon,
 					  SkelDrvrTime          *itim,
-					  U32                   *isrc) {
-U32 *regs = NULL;
+					  uint32_t              *isrc) {
+uint32_t *regs = NULL;
 
    if ((regs = GetRegs(mcon)) == NULL)
       return SkelUserReturnFAILED;
@@ -261,10 +261,10 @@ U32 *regs = NULL;
 /* routine to enable them.                                     */
 
 SkelUserReturn SkelUserEnableInterrupts(SkelDrvrModuleContext *mcon,
-					U32                    imsk) {
+					uint32_t               imsk) {
 
-U32 *regs = NULL;
-U32 tval;
+uint32_t *regs = NULL;
+uint32_t tval;
 
    if ((regs = GetRegs(mcon)) == NULL) return SkelUserReturnFAILED;
    if (mcon->Debug & SkelDrvrDebugFlagMODULE) {
@@ -280,7 +280,7 @@ U32 tval;
 /* Provide a way to enable or disable the hardware module.     */
 
 SkelUserReturn SkelUserHardwareEnable(SkelDrvrModuleContext *mcon,
-				      U32                    flag) {
+				      uint32_t               flag) {
    return SkelUserReturnNOT_IMPLEMENTED;
 }
 
@@ -288,7 +288,7 @@ SkelUserReturn SkelUserHardwareEnable(SkelDrvrModuleContext *mcon,
 /* Standard CO FPGA JTAG IO, Read a byte                       */
 
 SkelUserReturn SkelUserJtagReadByte(SkelDrvrModuleContext *mcon,
-				    U32                   *byte) {
+				    uint32_t              *byte) {
    return SkelUserReturnNOT_IMPLEMENTED;
 }
 
@@ -296,7 +296,7 @@ SkelUserReturn SkelUserJtagReadByte(SkelDrvrModuleContext *mcon,
 /* Standard CO FPGA JTAG IO, Write a byte                      */
 
 SkelUserReturn SkelUserJtagWriteByte(SkelDrvrModuleContext *mcon,
-				     U32                    byte) {
+				     uint32_t               byte) {
    return SkelUserReturnNOT_IMPLEMENTED;
 }
 
@@ -340,7 +340,7 @@ SkelUserReturn SkelUserIoctls(SkelDrvrClientContext *ccon,
 struct vme_dma dma_desc;    /* Vme driver DMA structure */
 int    tcnt, psze;          /* Transfer count and short page size */
 
-U32 *regs = NULL;   /* Mapped A24D32 address space for Vd80 module */
+uint32_t *regs = NULL;   /* Mapped A24D32 address space for Vd80 module */
 int *lap  = NULL;   /* Long-Value pointer to argument */
 int lval, tval, bms;/* Long-Value from argument, temp-value, bit-mask */
 int i;
@@ -827,10 +827,10 @@ InsLibModlDesc         *modld = NULL;
 InsLibVmeModuleAddress *vmema = NULL;
 InsLibVmeAddressSpace  *vmeas = NULL;
 
-U32 *config = NULL;        /* Always use 32-bit accesses */
+uint32_t *config = NULL;        /* Always use 32-bit accesses */
 
-U32  tval;
-U32  valu[4];
+uint32_t  tval;
+uint32_t  valu[4];
 char *board_id = "VD80"; /* The character board_id in Vd80 configuration ROM */
 
 char revis_id[VD80_CR_REV_ID_LEN +1]; /* The revis_id and terminator byte */
@@ -857,10 +857,10 @@ UserData *u;
 
 	    /* First check we're accessing a configuration ROM */
 
-	    config = (U32 *) vmeas->Mapped;
+	    config = (uint32_t *) vmeas->Mapped;
 
-	    valu[1] = (U32) be32_to_cpu(ioread32(&config[VD80_CR_SIG1/4]));
-	    valu[2] = (U32) be32_to_cpu(ioread32(&config[VD80_CR_SIG2/4]));
+	    valu[1] = (uint32_t) be32_to_cpu(ioread32(&config[VD80_CR_SIG1/4]));
+	    valu[2] = (uint32_t) be32_to_cpu(ioread32(&config[VD80_CR_SIG2/4]));
 
 	    if ( ((valu[1] & 0xFF) != 'C')
 	    ||   ((valu[2] & 0xFF) != 'R') ) {
@@ -912,13 +912,13 @@ UserData *u;
 	    mcon->UserData = u;
 
 	    intrd = mcon->Modld->Isr;
-	    iowrite32(cpu_to_be32((U32) intrd->Vector), &(config[VD80_CSR_IRQ_VECTOR/4]));
-	    iowrite32(cpu_to_be32((U32) intrd->Level),  &(config[VD80_CSR_IRQ_LEVEL /4]));
+	    iowrite32(cpu_to_be32((uint32_t) intrd->Vector), &(config[VD80_CSR_IRQ_VECTOR/4]));
+	    iowrite32(cpu_to_be32((uint32_t) intrd->Level),  &(config[VD80_CSR_IRQ_LEVEL /4]));
 
 	    if (Wa->Endian == InsLibEndianLITTLE)
-	       iowrite32(cpu_to_be32((U32) VD80_CSR_MBLT_LITTLE_ENDIAN), &(config[VD80_CSR_MBLT_ENDIAN /4]));
+	       iowrite32(cpu_to_be32((uint32_t) VD80_CSR_MBLT_LITTLE_ENDIAN), &(config[VD80_CSR_MBLT_ENDIAN /4]));
 	    else
-	       iowrite32(cpu_to_be32((U32) VD80_CSR_MBLT_BIG_ENDIAN),    &(config[VD80_CSR_MBLT_ENDIAN /4]));
+	       iowrite32(cpu_to_be32((uint32_t) VD80_CSR_MBLT_BIG_ENDIAN),    &(config[VD80_CSR_MBLT_ENDIAN /4]));
 
 	    iowrite32(0, &(config[VD80_TCR3 /4])); // Clear trigger delay
 	    iowrite32(0, &(config[VD80_PTCR /4])); // Clear min pre trigger samples
@@ -930,21 +930,21 @@ UserData *u;
 
 	    if (config) {
 
-	       iowrite32(cpu_to_be32((U32) (vmeas->BaseAddress >> 24) & 0xff), &(config[VD80_CSR_ADER0/4   ]));
-	       iowrite32(cpu_to_be32((U32) (vmeas->BaseAddress >> 16) & 0xff), &(config[VD80_CSR_ADER0/4 +1]));
-	       iowrite32(cpu_to_be32((U32) (vmeas->BaseAddress >>  8) & 0xff), &(config[VD80_CSR_ADER0/4 +2]));
+	       iowrite32(cpu_to_be32((uint32_t) (vmeas->BaseAddress >> 24) & 0xff), &(config[VD80_CSR_ADER0/4   ]));
+	       iowrite32(cpu_to_be32((uint32_t) (vmeas->BaseAddress >> 16) & 0xff), &(config[VD80_CSR_ADER0/4 +1]));
+	       iowrite32(cpu_to_be32((uint32_t) (vmeas->BaseAddress >>  8) & 0xff), &(config[VD80_CSR_ADER0/4 +2]));
 
-	       iowrite32(cpu_to_be32((U32) (VME_A24_USER_DATA_SCT * 4)), &(config[VD80_CSR_ADER0/4 +3]));
-	       iowrite32(cpu_to_be32((U32) (VME_A24_USER_MBLT     * 4)), &(config[VD80_CR_FUNC0_AM_MASK/4 +3]));
-	       iowrite32(cpu_to_be32((U32) (VME_A24_USER_MBLT     * 4)), &(config[VD80_CR_FUNC1_AM_MASK/4 +3]));
+	       iowrite32(cpu_to_be32((uint32_t) (VME_A24_USER_DATA_SCT * 4)), &(config[VD80_CSR_ADER0/4 +3]));
+	       iowrite32(cpu_to_be32((uint32_t) (VME_A24_USER_MBLT     * 4)), &(config[VD80_CR_FUNC0_AM_MASK/4 +3]));
+	       iowrite32(cpu_to_be32((uint32_t) (VME_A24_USER_MBLT     * 4)), &(config[VD80_CR_FUNC1_AM_MASK/4 +3]));
 
-	       iowrite32(cpu_to_be32((U32) (vmeas->BaseAddress >> 24) & 0xff), &(config[VD80_CSR_ADER1/4   ]));
-	       iowrite32(cpu_to_be32((U32) (vmeas->BaseAddress >> 16) & 0xff), &(config[VD80_CSR_ADER1/4 +1]));
-	       iowrite32(cpu_to_be32((U32) (vmeas->BaseAddress >>  8) & 0xff), &(config[VD80_CSR_ADER1/4 +2]));
-	       iowrite32(cpu_to_be32((U32) (VME_A24_USER_MBLT * 4)          ), &(config[VD80_CSR_ADER1/4 +3]));
+	       iowrite32(cpu_to_be32((uint32_t) (vmeas->BaseAddress >> 24) & 0xff), &(config[VD80_CSR_ADER1/4   ]));
+	       iowrite32(cpu_to_be32((uint32_t) (vmeas->BaseAddress >> 16) & 0xff), &(config[VD80_CSR_ADER1/4 +1]));
+	       iowrite32(cpu_to_be32((uint32_t) (vmeas->BaseAddress >>  8) & 0xff), &(config[VD80_CSR_ADER1/4 +2]));
+	       iowrite32(cpu_to_be32((uint32_t) (VME_A24_USER_MBLT * 4)          ), &(config[VD80_CSR_ADER1/4 +3]));
 
-	       iowrite32(cpu_to_be32((U32) (0)                              ), &(config[VD80_CSR_FUNC_ACEN/4]));
-	       iowrite32(cpu_to_be32((U32) (VD80_CSR_ENABLE_MODULE)         ), &(config[VD80_CSR_BITSET/4   ]));
+	       iowrite32(cpu_to_be32((uint32_t) (0)                              ), &(config[VD80_CSR_FUNC_ACEN/4]));
+	       iowrite32(cpu_to_be32((uint32_t) (VD80_CSR_ENABLE_MODULE)         ), &(config[VD80_CSR_BITSET/4   ]));
 
 	    } else {
 	       report_module(mcon, SkelDrvrDebugFlagWARNING, "Missing AM=2F can't config A24");
@@ -970,7 +970,7 @@ UserData *u;
 
    /* Enable the module */
 
-   iowrite32(cpu_to_be32((U32) VD80_CSR_ENABLE_MODULE),
+   iowrite32(cpu_to_be32((uint32_t) VD80_CSR_ENABLE_MODULE),
 		  &(config[VD80_CSR_BITSET/4]) );
 
    return SkelUserReturnOK;

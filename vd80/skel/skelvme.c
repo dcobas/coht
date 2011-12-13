@@ -41,11 +41,8 @@ static void *do_vme_mapping(InsLibVmeAddressSpace * v,
  * linux' implementation of find_controller() needs a proper datawidth.
  * Note that it doesn't do a test access to the module.
  */
-#ifdef __linux__
+
 	unsigned long datawidth = v->DataWidth / 8;
-#else
-	unsigned long datawidth = 0;
-#endif
 
 	map =
 	    find_controller(v->BaseAddress, v->WindowSize,
