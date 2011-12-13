@@ -31,7 +31,7 @@
 
 #define MEM_BOUNDARY_128KB (128*1024)
 
-static char* sysbrk(unsigned long size)
+static char* getmem(unsigned long size)
 {
 	char *mem;
 
@@ -109,7 +109,7 @@ InsLibCarAddressSpace *InsLibCloneCarSpace(InsLibCarAddressSpace *caras)
 
 	if (caras) {
 		caras_clone = (InsLibCarAddressSpace *)
-			sysbrk(sizeof(InsLibCarAddressSpace));
+			getmem(sizeof(InsLibCarAddressSpace));
 		if (!caras_clone)
 			return NULL;
 		copy_mem((void *) caras_clone, (void *) caras,
@@ -129,7 +129,7 @@ InsLibVmeAddressSpace *InsLibCloneVmeSpace(InsLibVmeAddressSpace *vmeas)
 
 	if (vmeas) {
 		vmeas_clone = (InsLibVmeAddressSpace *)
-			sysbrk(sizeof(InsLibVmeAddressSpace));
+			getmem(sizeof(InsLibVmeAddressSpace));
 		if (!vmeas_clone)
 			return NULL;
 		copy_mem((void *) vmeas_clone, (void *) vmeas,
@@ -149,7 +149,7 @@ InsLibPciAddressSpace *InsLibClonePciSpace(InsLibPciAddressSpace *pcias)
 
 	if (pcias) {
 		pcias_clone = (InsLibPciAddressSpace *)
-			sysbrk(sizeof(InsLibPciAddressSpace));
+			getmem(sizeof(InsLibPciAddressSpace));
 		if (!pcias_clone)
 			return NULL;
 		copy_mem((void *) pcias_clone, (void *) pcias,
@@ -169,7 +169,7 @@ InsLibCarModuleAddress *InsLibCloneCar(InsLibCarModuleAddress *carma)
 
 	if (carma) {
 		carma_clone = (InsLibCarModuleAddress *)
-			sysbrk(sizeof(InsLibCarModuleAddress));
+			getmem(sizeof(InsLibCarModuleAddress));
 		if (!carma_clone)
 			return NULL;
 		copy_mem((void *) carma_clone, (void *) carma,
@@ -198,7 +198,7 @@ InsLibVmeModuleAddress *InsLibCloneVme(InsLibVmeModuleAddress *vmema)
 
 	if (vmema) {
 		vmema_clone = (InsLibVmeModuleAddress *)
-			sysbrk(sizeof(InsLibVmeModuleAddress));
+			getmem(sizeof(InsLibVmeModuleAddress));
 		if (!vmema_clone) return NULL;
 		copy_mem((void *) vmema_clone, (void *) vmema,
 			 sizeof(InsLibVmeModuleAddress));
@@ -219,7 +219,7 @@ InsLibPciModuleAddress *InsLibClonePci(InsLibPciModuleAddress *pcima)
 
 	if (pcima) {
 		pcima_clone = (InsLibPciModuleAddress *)
-			sysbrk(sizeof(InsLibPciModuleAddress));
+			getmem(sizeof(InsLibPciModuleAddress));
 		if (!pcima_clone)
 			return NULL;
 		copy_mem((void *) pcima_clone, (void *) pcima,
@@ -248,7 +248,7 @@ InsLibModlDesc *InsLibCloneModule(InsLibModlDesc *modld)
 	int sz;
 
 	if (modld) {
-		modld_clone = (InsLibModlDesc *) sysbrk(sizeof(InsLibModlDesc));
+		modld_clone = (InsLibModlDesc *) getmem(sizeof(InsLibModlDesc));
 		if (!modld_clone) {
 			//pseterr(ENOMEM);
 			printk("InsLib: not enough memory for modld_clone\n");
@@ -273,7 +273,7 @@ InsLibModlDesc *InsLibCloneModule(InsLibModlDesc *modld)
 
 		if (modld->Extra) {
 			sz = strlen(modld_clone->Extra) +1;
-			modld_clone->Extra = (char *) sysbrk(sz);
+			modld_clone->Extra = (char *) getmem(sz);
 			if (modld_clone->Extra)
 				copy_mem((void *) modld_clone->Extra,
 					 (void *) modld->Extra, sz);
@@ -281,7 +281,7 @@ InsLibModlDesc *InsLibCloneModule(InsLibModlDesc *modld)
 
 		if (modld->Isr) {
 			modld_clone->Isr = (InsLibIntrDesc *)
-				sysbrk(sizeof(InsLibIntrDesc));
+				getmem(sizeof(InsLibIntrDesc));
 			if (modld_clone->Isr)
 				copy_mem((void *) modld_clone->Isr,
 					 (void *)modld->Isr,
@@ -310,7 +310,7 @@ InsLibDrvrDesc *InsLibCloneDriver(InsLibDrvrDesc *drvrd)
 	InsLibDrvrDesc *drvrd_clone = NULL;
 
 	if (drvrd) {
-		drvrd_clone = (InsLibDrvrDesc *) sysbrk(sizeof(InsLibDrvrDesc));
+		drvrd_clone = (InsLibDrvrDesc *) getmem(sizeof(InsLibDrvrDesc));
 		if (!drvrd_clone)
 			return NULL;
 		copy_mem((void *) drvrd_clone, (void *) drvrd,
@@ -337,7 +337,7 @@ InsLibDrvrDesc *InsLibCloneOneDriver(InsLibDrvrDesc *drvrd)
 	InsLibDrvrDesc *drvrd_clone = NULL;
 
 	if (drvrd) {
-		drvrd_clone = (InsLibDrvrDesc *) sysbrk(sizeof(InsLibDrvrDesc));
+		drvrd_clone = (InsLibDrvrDesc *) getmem(sizeof(InsLibDrvrDesc));
 		if (!drvrd_clone) {
 			printk("InsLib: Not enough memory for drvrd_clone\n");
 			return NULL;
@@ -360,7 +360,7 @@ InsLibHostDesc *InsLibCloneHost(InsLibHostDesc *hostd) {
 InsLibHostDesc *hostd_clone = NULL;
 
    if (hostd) {
-      hostd_clone = (InsLibHostDesc *) sysbrk(sizeof(InsLibHostDesc));
+      hostd_clone = (InsLibHostDesc *) getmem(sizeof(InsLibHostDesc));
       if (!hostd_clone) return NULL;
       copy_mem((void *) hostd_clone, (void *) hostd, sizeof(InsLibHostDesc));
       hostd_clone->Drivers = InsLibCloneDriver(hostd->Drivers);

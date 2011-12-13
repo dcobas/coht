@@ -20,7 +20,8 @@ CFLAGS=-g -Wall
 modules: 
 	cp Module.symvers.vmebus Module.symvers
 	make -C $(KERNELSRC) M=`pwd` KVER=$(KVER) CPU=$(CPU) modules
-	rm -rf ./$(CPU)/$(KVER)
+	rm -rf ./$(CPU)
+	mkdir ./$(CPU)
 	mkdir ./$(CPU)/$(KVER)
 	mv skelmodule.ko ./$(CPU)/$(KVER)/skelmodule.ko
 	chmod 664 ./$(CPU)/$(KVER)/skelmodule.ko

@@ -30,16 +30,13 @@
 #include <linux/interrupt.h>
 #include <linux/version.h>
 #include <linux/mutex.h>
+#include <asm/current.h>
 
 #include <skeldefs.h>
 #include <skeluser.h>
 #include <skeluser_ioctl.h>
 #include <skeldrvr.h>
 #include <skeldrvrP.h>
-
-#include <skelvme.h>
-#include <skelpci.h>
-#include <skelcar.h>
 
 /*
  * Common variables
@@ -129,6 +126,8 @@ const char *GetDebugFlagName(SkelDrvrDebugFlag debf)
  * @return 0 - otherwise
  */
 
+#define WITHIN_RANGE(MIN,ARG,MAX) ( ((MAX) >= (ARG)) && ((MIN) <= (ARG)) )
+
 static int is_user_ioctl(int nr)
 {
 	return WITHIN_RANGE(_IOC_NR(SkelUserIoctlFIRST), _IOC_NR(nr),
@@ -158,7 +157,7 @@ static const char *GetIoctlName(int nr)
 
 	/* cannot recognise the IOCTL number */
 
-	ksprintf(dtxt, "(illegal)");
+	sprintf(dtxt, "(illegal)");
 	return dtxt;
 }
 
@@ -208,16 +207,6 @@ static void client_timeout(SkelDrvrClientContext * ccon)
 	report_client(ccon, SkelDrvrDebugFlagWARNING, "Client Timeout");
 }
 
-/*
- * @brief Handle timeout callback from a module mutex wait
- * @param mcon points to the module context
- */
-
-static void module_timeout(SkelDrvrModuleContext * mcon)
-{
-	report_module(mcon, SkelDrvrDebugFlagMODULE, "Module Timeout");
-}
-
 /**
  * @brief set module context status
  * @param mcon - module context
@@ -249,7 +238,7 @@ static int GetVersion(SkelDrvrModuleContext * mcon, SkelDrvrVersion * ver)
 	ver->DriverVersion = COMPILE_TIME;
 	sker = SkelUserGetModuleVersion(mcon, ver->ModuleVersion);
 	if (sker) {
-		pseterr(EACCESS);
+		pseterr(EACCES);
 		return SYSERR;
 	}
 	return OK;
@@ -273,6 +262,12 @@ static int GetVersion(SkelDrvrModuleContext * mcon, SkelDrvrVersion * ver)
  *
  */
 
+#define iowrite16le iowrite16
+#define iowrite32le iowrite32
+
+#define ioread16le ioread16
+#define ioread32le ioread32
+
 static unsigned int
 RawIoBlock(SkelDrvrModuleContext * mcon,
 	   SkelDrvrRawIoTransferBlock * riob, int flag)
@@ -295,6 +290,8 @@ RawIoBlock(SkelDrvrModuleContext * mcon,
 	void *kbuf;		/* Kernel transfer buffer */
 	void *kp;		/* Running kernel buffer pointer */
 	void *mp;		/* Running modle buffer pointer */
+
+	int cc;
 
 	modld = mcon->Modld;
 	anyas = InsLibGetAddressSpace(modld, riob->SpaceNumber);
@@ -350,8 +347,13 @@ RawIoBlock(SkelDrvrModuleContext * mcon,
 	 * If writing fill up the kernel buffer from user space
 	 */
 
-	if (flag)
-		copy_from_user(kbuf, riob->Data, ksize);   /* Get User memory if writing */
+	if (flag) {
+		cc = copy_from_user(kbuf, riob->Data, ksize);   /* Get User memory if writing */
+		if (cc) {
+			pseterr(EACCES);
+			return SYSERR;
+		}
+	}
 
 	/*
 	 * While transfers remaining loop until all done
@@ -415,9 +417,13 @@ RawIoBlock(SkelDrvrModuleContext * mcon,
 
 		if (kindx >= ksize) {
 			if (flag)
-				copy_from_user(kbuf, &riob->Data[uindx], ksize); /* Flush out data to user */
+				cc = copy_from_user(kbuf, &riob->Data[uindx], ksize); /* Flush out data to user */
 			else
-				copy_to_user(&riob->Data[uindx], kbuf, ksize);   /* Flush in data from user */
+				cc = copy_to_user(&riob->Data[uindx], kbuf, ksize);   /* Flush in data from user */
+			if (cc) {
+				pseterr(EACCES);
+				return SYSERR;
+			}
 
 			uindx += ksize;			   /* Next block to copy */
 			kindx = 0;			   /* Running kernel buffer index reset for next loop or exit */
@@ -429,7 +435,11 @@ RawIoBlock(SkelDrvrModuleContext * mcon,
 	 */
 
 	if ((!flag) && (kindx))
-		copy_to_user(&riob->Data[uindx], kbuf, kindx);
+		cc = copy_to_user(&riob->Data[uindx], kbuf, kindx);
+		if (cc) {
+			pseterr(EACCES);
+			return SYSERR;
+		}
 
 	kfree(kbuf);
 	return OK;
@@ -528,7 +538,7 @@ RawIo(SkelDrvrModuleContext * mcon, SkelDrvrRawIoBlock * riob, int flag)
 	}
 }
 
-static void Reset(SkelDrvrModuleContext * mcon)
+static int Reset(SkelDrvrModuleContext * mcon)
 {
 	SkelDrvrModConn *connected = &mcon->Connected;
 	SkelUserReturn sker;
@@ -538,17 +548,27 @@ static void Reset(SkelDrvrModuleContext * mcon)
 		return SYSERR;
 	}
 	sker = SkelUserHardwareReset(mcon);
+	if (sker != SkelUserReturnOK)
+		return SYSERR;
+
 	sker = SkelUserEnableInterrupts(mcon, connected->enabled_ints);
-	mcon->qsize = 0;
+	if (sker != SkelUserReturnOK)
+		return SYSERR;
+
 	mutex_unlock(&mcon->mutex);
+	return OK;
 }
 
-static void GetStatus(SkelDrvrModuleContext * mcon, SkelDrvrStatus * ssts)
+static int GetStatus(SkelDrvrModuleContext * mcon, SkelDrvrStatus * ssts)
 {
 	SkelUserReturn sker;
 
 	sker = SkelUserGetHardwareStatus(mcon, &ssts->HardwareStatus);
+	if (sker != SkelUserReturnOK)
+		return SYSERR;
+
 	ssts->StandardStatus = mcon->StandardStatus;
+	return OK;
 }
 
 /*
@@ -709,14 +729,12 @@ irqreturn_t skel_isr(void *cookie)
 
 static void RemoveModule(SkelDrvrModuleContext * mcon)
 {
-	SkelUserReturn sker;
-
 	if (mcon->StandardStatus & SkelDrvrStandardStatusEMULATION)
 		return;					   /* no ISR, no mappings.. exit */
 
 	/* unhook user's stuff */
 
-	sker = SkelUserModuleRelease(mcon);
+	SkelUserModuleRelease(mcon);
 
 	switch (mcon->Modld->BusType) {
 	case InsLibBusTypePMC:
@@ -932,7 +950,7 @@ static void DisConnectAll(SkelDrvrClientContext * ccon)
 	}
 }
 
-static int void set_mcon_defaults(SkelDrvrModuleContext * mcon)
+static int set_mcon_defaults(SkelDrvrModuleContext * mcon)
 {
 	int i;
 
@@ -1085,9 +1103,9 @@ static int wa_init(InsLibDrvrDesc * drvrd)
 	/* Allocate the driver working area. */
 
 	wa = (SkelDrvrWorkingArea *) kmalloc(sizeof(SkelDrvrWorkingArea),
-					     GPF_KERNEL);
+					     GFP_KERNEL);
 	if (wa == NULL) {
-		kprintf
+		printk
 		    ("Skel: Cannot allocate enough memory (WorkingArea)");
 		pseterr(ENOMEM);
 		return 0;
@@ -1098,7 +1116,12 @@ static int wa_init(InsLibDrvrDesc * drvrd)
 	/* initialise Wa */
 
 	memset(Wa, 0, sizeof(SkelDrvrWorkingArea));
-	SetEndian();
+
+#ifdef __little_endian__
+	Wa->Endian = InsLibEndianLITTLE;
+#else
+	Wa->Endian = InsLibEndianBIG;
+#endif
 
 	/* hook driver description onto Wa */
 
@@ -1179,9 +1202,8 @@ static int modules_install(void)
 	return rc;
 }
 
-char *skel_drv_install(void *infofile)
+int skel_drv_install(void)
 {
-	InsLibDrvrDesc **drvrinfo = infofile;
 	InsLibDrvrDesc *drvrd;
 	int cc;
 
@@ -1200,19 +1222,15 @@ char *skel_drv_install(void *infofile)
  * extending if this was needed.
  */
 
-	if (infofile)
-		drvrd = InsLibCloneOneDriver(*drvrinfo);   // If info is given use it
-	else
-		drvrd = build_drvr();			   // else from mod_pars_build_tree.c
-
+	drvrd = build_drvr();
 	if (drvrd == NULL) {
-		kprintf("Skel: InsLibCloneOneDriver failed\n");
+		printk("Skel: InsLibCloneOneDriver failed\n");
 		pseterr(ENOMEM);
-		return (char *) SYSERR;
+		return SYSERR;
 	}
 
 	if (!wa_init(drvrd)) {
-		kprintf("Skel: Working Area Initialisation failed\n");
+		printk("Skel: Working Area Initialisation failed\n");
 		pseterr(ENOMEM);
 		goto out_err;
 	}
@@ -1251,7 +1269,7 @@ char *skel_drv_install(void *infofile)
 		SK_INFO("Installed %d (out of %d) modules",
 			Wa->InstalledModules, Wa->Drvrd->ModuleCount);
 	}
-	return (char *) Wa;
+	return OK;
 
 	/** Error exit */
 
@@ -1262,7 +1280,7 @@ out_err:
 		kfree((void *) Wa);
 		Wa = NULL;
 	}
-	return (char *) SYSERR;
+	return SYSERR;
 }
 
 /* Wa->list_lock should be held upon calling this function */
@@ -1285,10 +1303,8 @@ static void __skel_remove_ccon(SkelDrvrClientContext * ccon)
 
 static void __do_close(SkelDrvrClientContext * ccon)
 {
-	SkelUserReturn sker;
-
 	DisConnectAll(ccon);
-	sker = SkelUserClientRelease(ccon);
+	SkelUserClientRelease(ccon);
 	__skel_remove_ccon(ccon);
 	kfree((void *) ccon);
 }
@@ -1339,7 +1355,7 @@ int client_init(SkelDrvrClientContext * ccon, struct file *flp)
 
 	ccon->filep = flp;				   /* save file pointer */
 	ccon->Timeout = SkelDrvrDEFAULT_CLIENT_TIMEOUT;
-	ccon->Pid = getpid();
+	ccon->Pid = current->pid;
 
 	/* select by default the first installed module */
 
@@ -1367,7 +1383,7 @@ static struct client_link *skel_add_ccon(SkelDrvrClientContext * ccon)
 	struct client_link *entry;
 	unsigned long flags;
 
-	entry = (struct client_link *) kmalloc(sizeof(*entry), GPF_KERNEL);
+	entry = (struct client_link *) kmalloc(sizeof(*entry), GFP_KERNEL);
 	if (entry == NULL)
 		return NULL;
 
@@ -1394,7 +1410,7 @@ int SkelDrvrOpen(void *wa, int dnm, struct file *flp)
 	}
 
 	ccon = (SkelDrvrClientContext *)
-	    kmalloc(sizeof(SkelDrvrClientContext), GPF_KERNEL);
+	    kmalloc(sizeof(SkelDrvrClientContext), GFP_KERNEL);
 	if (ccon == NULL) {
 		pseterr(ENOMEM);
 		return SYSERR;
@@ -1461,12 +1477,12 @@ static void modules_uninstall(void)
 	}
 }
 
-int skel_drv_uninstall(void *wa)
+void skel_drv_uninstall(void)
 {
 	unsigned long flags;
 
 	if (Wa == NULL)
-		return OK;
+		return;
 
 	spin_lock_irqsave(&Wa->list_lock, flags);
 
@@ -1477,7 +1493,7 @@ int skel_drv_uninstall(void *wa)
 		pseterr(EBUSY);
 
 		spin_unlock_irqrestore(&Wa->list_lock, flags);
-		return SYSERR;
+		return;
 	}
 
 	spin_unlock_irqrestore(&Wa->list_lock, flags);
@@ -1492,7 +1508,7 @@ int skel_drv_uninstall(void *wa)
 	kfree((void *) Wa);
 	Wa = NULL;
 
-	return OK;
+	return;
 }
 
 /* Note: call with the queue's lock held */
@@ -1526,7 +1542,7 @@ static int SkelDrvrRead(void *wa, struct file *flp, char *u_buf, int len)
 	SkelDrvrQueue *q;
 	SkelDrvrReadBuf *rb;
 	unsigned long flags;
-	unsigned int waitc;
+	unsigned int waitc, cc;
 
 	ccon = flp->private_data;
 	if (ccon == NULL) {
@@ -1548,8 +1564,8 @@ static int SkelDrvrRead(void *wa, struct file *flp, char *u_buf, int len)
 	 * to be sure an interrupt occured.
 	 */
 
-	if ((ccon->Queue->Size == 0)            /* Empty ? */
-	||  (ccon->Queue->QueueOff)) {          /* QueueOff ? */
+	if ((ccon->Queue.Size == 0)            /* Empty ? */
+	||  (ccon->Queue.QueueOff)) {          /* QueueOff ? */
 
 		/* wait for something new in the queue */
 
@@ -1557,7 +1573,7 @@ static int SkelDrvrRead(void *wa, struct file *flp, char *u_buf, int len)
 		if (ccon->Timeout)
 			cc = wait_event_interruptible_timeout(ccon->waitq,
 							      waitc != ccon->waitc,
-							      ccon->timeout);
+							      ccon->Timeout);
 		else
 			cc = wait_event_interruptible(ccon->waitq,
 						      waitc != ccon->waitc);
@@ -1838,19 +1854,19 @@ int SkelDrvrIoctl(void *wa,             /* Working area */
 		break;
 
 	case SkelDrvrIoctlSET_QUEUE_FLAG:
-		ccon->Queue->QueueOff = lav;
+		ccon->Queue.QueueOff = lav;
 		return OK;
 
 	case SkelDrvrIoctlGET_QUEUE_FLAG:
 		if (lap) {
-			*lap = ccon->Queue->QueueOff;
+			*lap = ccon->Queue.QueueOff;
 			return OK;
 		}
 		break;
 
 	case SkelDrvrIoctlGET_QUEUE_SIZE:
 		if (lap) {
-			*lap = ccon->Queue->Size;
+			*lap = ccon->Queue.Size;
 			return OK;
 		}
 		break;
@@ -1866,7 +1882,7 @@ int SkelDrvrIoctl(void *wa,             /* Working area */
 		mcon = get_mcon(lav);
 		if (mcon == NULL) {
 			SK_WARN("SET_MODULE: Module %d doesn't exist",
-				lav);
+				(int) lav);
 			pseterr(ENODEV);
 			return SYSERR;
 		}
@@ -1920,12 +1936,14 @@ int SkelDrvrIoctl(void *wa,             /* Working area */
 		return OK;
 
 	case SkelDrvrIoctlRESET:
-		Reset(mcon);
+		if (Reset(mcon))
+			break;
 		return OK;
 
 	case SkelDrvrIoctlGET_STATUS:
 		ssts = (SkelDrvrStatus *) arg;
-		GetStatus(mcon, ssts);
+		if (GetStatus(mcon, ssts))
+			break;
 		return OK;
 
 	case SkelDrvrIoctlJTAG_OPEN:
@@ -1946,7 +1964,7 @@ int SkelDrvrIoctl(void *wa,             /* Working area */
 	case SkelDrvrIoctlJTAG_READ_BYTE:
 		if (mcon->
 		    StandardStatus & SkelDrvrStandardStatusFLASH_OPEN) {
-			if (SkelUserJtagReadByte(mcon, lap) ==
+			if (SkelUserJtagReadByte(mcon, (unsigned int *) lap) ==
 			    SkelUserReturnOK)
 				return OK;
 		}
@@ -2033,7 +2051,7 @@ struct file_operations skel_drvr__fops = {
 	.read           = skel_drv_read,
 	.write          = skel_drv_write,
 	.ioctl          = skel_drv_ioctl_lck,
-	.unlocked_ioctl = skel_drv_ioctl_ulck
+	.unlocked_ioctl = skel_drv_ioctl_ulck,
 	.open           = skel_drv_open,
 	.release        = skel_drv_close,
 };
@@ -2102,7 +2120,7 @@ skel_drv_ioctl_lck(struct inode *inode, struct file *filp,
 
 int skel_drv_open(struct inode *inode, struct file *filp)
 {
-	if (SkelDrvrOpen(Wa,0,flp))
+	if (SkelDrvrOpen(Wa,0,filp))
 		return drv_errno;
 	return OK;
 }
@@ -2113,7 +2131,7 @@ int skel_drv_open(struct inode *inode, struct file *filp)
 
 int skel_drv_close(struct inode *inode, struct file *filp)
 {
-	if (SkelDrvrClose(void *wa, struct file *flp))
+	if (SkelDrvrClose(Wa, filp))
 		return drv_errno;
 	return OK;
 }
@@ -2133,7 +2151,7 @@ skel_drv_read(struct file *filp, char *buf, size_t count, loff_t * f_pos)
 	if (count < len)
 		len = count;
 
-	if (skel_read(Wa, flp, &rbuf, len) == 0)
+	if (skel_read(Wa, filp, (char *) &rbuf, len) == 0)
 		return drv_errno;
 
 	cc = copy_to_user(buf, &rbuf, len);
@@ -2151,6 +2169,7 @@ skel_drv_write(struct file *filp, const char *buf, size_t count,
 	       loff_t * f_pos)
 {
 	SkelDrvrReadBuf rbuf;
+	int len, cc;
 
 	len = sizeof(SkelDrvrReadBuf);
 	if (count < len)
@@ -2160,7 +2179,7 @@ skel_drv_write(struct file *filp, const char *buf, size_t count,
 	if (cc != 0)
 		return -EACCES;
 
-	if (skel_write(void *wa, struct file *flp, char *u_buf, int len) == 0)
+	if (skel_write(Wa, filp, (char *) &rbuf, len) == 0)
 		return drv_errno;
 
 	return OK;

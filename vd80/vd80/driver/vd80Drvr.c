@@ -16,6 +16,8 @@
 #include <linux/mm.h>
 #include <linux/page-flags.h>
 #include <linux/pagemap.h>
+#include <linux/time.h>
+#include <linux/delay.h>
 
 /* =========================================================== */
 /* Client and module asociated error messages                  */
@@ -212,7 +214,11 @@ U32 reg;
 SkelUserReturn SkelUserGetUtc(SkelDrvrModuleContext *mcon,
 			      SkelDrvrTime          *utc) {
 
-   utc->NanoSecond = nanotime((long *) &(utc->Second));
+   struct timespec curtime;
+   curtime = current_kernel_time();
+
+   utc->NanoSecond = curtime.tv_nsec;
+   utc->Second     = curtime.tv_sec;
    return SkelUserReturnOK;
 }
 
@@ -308,7 +314,7 @@ void wait_for_idle(SkelDrvrModuleContext *mcon, int maxdelay)
 		state = GetReg(GetRegs(mcon), VD80_GSR, mcon) & VD80_STATE_MASK;
 		if (state == VD80_STATE_IDLE)
 			return;
-		usec_sleep(10);
+		udelay(10);
 	}
 	printk("vd80: wait_for_idle timed out after %d us\n", maxdelay);
 }
@@ -853,17 +859,8 @@ UserData *u;
 
 	    config = (U32 *) vmeas->Mapped;
 
-	    if (!recoset()) {
-
-	       valu[1] = (U32) be32_to_cpu(ioread32(&config[VD80_CR_SIG1/4]));
-	       valu[2] = (U32) be32_to_cpu(ioread32(&config[VD80_CR_SIG2/4]));
-
-	    } else {
-	       noreco();
-
-	       SK_WARN("SkelUserModuleInit BUS ERROR\n");
-	       return SkelUserReturnFAILED;
-	    }
+	    valu[1] = (U32) be32_to_cpu(ioread32(&config[VD80_CR_SIG1/4]));
+	    valu[2] = (U32) be32_to_cpu(ioread32(&config[VD80_CR_SIG2/4]));
 
 	    if ( ((valu[1] & 0xFF) != 'C')
 	    ||   ((valu[2] & 0xFF) != 'R') ) {
@@ -908,7 +905,7 @@ UserData *u;
 	       return SkelUserReturnFAILED;
 	    }
 
-	    u = (UserData *) sysbrk(sizeof(UserData));  /* TODO: Leaks on uninstall */
+	    u = (UserData *) kmalloc(sizeof(UserData),GFP_KERNEL);  /* TODO: Leaks on uninstall */
 	    if (u) strncpy(u->revis_id,revis_id,VD80_CR_REV_ID_LEN);
 	    else
 	       report_module(mcon, SkelDrvrDebugFlagWARNING, "No memory in SkelUserConfig:UserData");

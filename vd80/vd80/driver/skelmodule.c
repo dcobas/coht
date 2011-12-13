@@ -15,6 +15,12 @@
 #include <linux/version.h>
 #include <linux/mutex.h>
 #include <linux/list.h>
+#include <linux/mm.h>
+#include <linux/page-flags.h>
+#include <linux/pagemap.h>
+#include <linux/time.h>
+#include <linux/delay.h>
+
 #include <skeldefs.h>
 #include <skeldrvr.h>
 
@@ -29,11 +35,11 @@
 #include <skeluser.h>
 #include <skeluser_ioctl.h>
 
+#include <vd80Names.c>
 #include <vd80Drvr.c>
 
 #include <mod_pars_build_tree.c>
 #include <libinstkernel.c>
-#include <skeluser.c>
 #include <skelvme.c>
 #include <skelpci.c>
 #include <skelcar.c>
