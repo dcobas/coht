@@ -31,8 +31,16 @@
 #include <vd80Names.c>
 #include <vd80Drvr.c>
 
-// #define CONFIG_BUS_PCI
-// #define CONFIG_BUS_CAR
+/**
+ * Trigger the BUS logic you want by defining
+ * its type here. This pulls out the corresponding
+ * implementation.
+ *
+ * #define CONFIG_BUS_PCI
+ * #define CONFIG_BUS_CAR
+ * #define CONFIG_BUS_VME
+ *
+ */
 
 #define CONFIG_BUS_VME
 
