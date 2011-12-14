@@ -1259,7 +1259,7 @@ int skel_drv_install(void)
 
 	skel_major = register_chrdev(0, SkelDrvrNAME, &skel_drvr_fops);
 	if (skel_major < 0)
-		return cc;
+		return skel_major;
 
 	printk("%s driver major is:%d\n",SkelDrvrNAME,skel_major);
 
@@ -1842,11 +1842,8 @@ int SkelDrvrIoctl(struct file *flp,     /* File pointer */
 	SkelDrvrDebug *db;
 
 	long lav, *lap; /* Long Value pointed to by Arg */
-	short sav;      /* Short argument and for Jtag IO */
-
 	lap = arg;      /* Long argument pointer */
 	lav = *lap;     /* Long argument value */
-	sav = lav;      /* Short argument value */
 
 	ccon = flp->private_data;
 	if (ccon == NULL) {
@@ -2082,7 +2079,7 @@ skel_drv_ioctl(struct inode *inode, struct file *filp, unsigned int cmd,
 	iodr = _IOC_DIR(cmd);
 	iosz = _IOC_SIZE(cmd);
 
-	if ((mem = kmalloc(iosz, GFP_KERNEL)) == NULL)
+	if ((mem = kzalloc(iosz, GFP_KERNEL)) == NULL)
 		return -ENOMEM;
 
 	if (iodr & _IOC_WRITE) {
@@ -2093,7 +2090,7 @@ skel_drv_ioctl(struct inode *inode, struct file *filp, unsigned int cmd,
 		}
 	}
 
-	cc = SkelDrvrIoctl(filp, cmd, (void *) arg);
+	cc = SkelDrvrIoctl(filp, cmd, mem);
 	if (cc) {
 		printk("%s: Failed SkelDrvrIoctl\n",SkelDrvrNAME);
 		kfree(mem);
@@ -2162,13 +2159,14 @@ skel_drv_read(struct file *filp, char *buf, size_t count, loff_t * f_pos)
 	if (count < len)
 		len = count;
 
-	if (skel_read(Wa, filp, (char *) &rbuf, len) == 0)
-		return drv_errno;
+	cc = skel_read(Wa, filp, (char *) &rbuf, len);
+	if (cc = 0)
+		return 0; /* Timeout */
 
 	cc = copy_to_user(buf, &rbuf, len);
 	if (cc != 0)
 		return -EACCES;
-	return OK;
+	return len;
 }
 
 /**
@@ -2191,9 +2189,9 @@ skel_drv_write(struct file *filp, const char *buf, size_t count,
 		return -EACCES;
 
 	if (skel_write(Wa, filp, (char *) &rbuf, len) == 0)
-		return drv_errno;
+		return 0;
 
-	return OK;
+	return len;
 }
 
 /**
