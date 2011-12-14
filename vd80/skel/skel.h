@@ -43,7 +43,7 @@ typedef struct {
 /* and whatever from the hardware module.        */
 
 typedef struct {
-   uint32_t   	DriverVersion; 	/* Drvr Compile date */
+   uint32_t     DriverVersion;     /* Drvr Compile date */
    char 	ModuleVersion[64]; /* Whatever we can get */
  } SkelDrvrVersion;
 
