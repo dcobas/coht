@@ -2160,7 +2160,7 @@ skel_drv_read(struct file *filp, char *buf, size_t count, loff_t * f_pos)
 		len = count;
 
 	cc = skel_read(Wa, filp, (char *) &rbuf, len);
-	if (cc = 0)
+	if (cc == 0)
 		return 0; /* Timeout */
 
 	cc = copy_to_user(buf, &rbuf, len);

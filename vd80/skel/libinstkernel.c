@@ -10,7 +10,6 @@
  * @section license_sec License
  *          Released under the GPL
  */
-#include "libinstkernel.h"
 
 #include <linux/slab.h>
 #include <linux/vmalloc.h>

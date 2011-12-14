@@ -5,7 +5,6 @@
  * Julian Lewis BE/CO/HT Tue 22 Nov 2011
  */
 
-#include <libinstkernel.h>
 #include <skeluser.h>
 
 #define MODBUG

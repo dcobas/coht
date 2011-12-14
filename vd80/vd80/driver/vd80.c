@@ -4,17 +4,18 @@
  */
 
 /**
- * InsLib structures, definitions
- * and kernel routines. All depends
- * on this.
+ * InsLib structure definitions and kernel routines. All depends on these
+ * config_data.h contains the structures to build the installation tree
+ * libinstkernel.c implements the tree walk routines
  */
 
 #include <config_data.h>
-#include <libinstkernel.h>
 #include <libinstkernel.c>
 
 /**
  * Driver definitions
+ * skeldrvrP.h contains non exported Private driver structure definitions
+ * skel.h is used by the skel driver implementor and user space libraries
  */
 
 #include <skeldrvrP.h>
@@ -22,8 +23,9 @@
 
 /**
  * This is the VD80 driver
- * User definitions, ioctl numbers and structures
- * Ioctl names and the driver callbacks
+ * skeluser.h contains user definitions used by skel to build the driver
+ * vd80Names.c contains an array of ioctl names used in debug logic
+ * vd80Drvr.c contains the skel callback implementations
  */
 
 #include <skeluser.h>
@@ -55,7 +57,7 @@
 #include <skelcar.c>
 
 /**
- * Finally the skel driver that callsback the user code
+ * Finally the skel driver that calls back the user code
  */
 
 #include <skeldrvr.c>
