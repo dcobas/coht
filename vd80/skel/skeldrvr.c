@@ -1236,23 +1236,17 @@ int skel_drv_install(void)
 	int cc;
 
 /**
- * Skell gets an infofile with a driver tree in it that was built in user space
- * from an xml file that is parsed by instprog. It the clones the tree into kernel
- * space and uses it to install the hardware.
- * If this file is NULL and we are in Linux then build_tree gets called which can
- * build the tree from module parameters. At this time only VME configurations are
+ * Build the tree from module parameters. At this time only VME configurations are
  * supported. Some parameters such as address modifiers, mapping window sizes and
  * data item widths (D8,D16,D32...) must be set in skeluser.h as these values are
  * assumed to be the buisness of the driver implementor.
- * For LynxOs the infofile can be built from a program that looks like the linux
- * insmod program. In this way the XML file is replaced by our standard parameter
- * list. No PCI or CAR skel drivers are currently supported, build_driver would need
+ * No PCI or CAR skel drivers are currently supported, build_driver would need
  * extending if this was needed.
  */
 
 	drvrd = build_drvr();
 	if (drvrd == NULL) {
-		printk("Skel: InsLibCloneOneDriver failed\n");
+		printk("Skel: build_drvr failed\n");
 		pseterr(ENOMEM);
 		return SYSERR;
 	}
@@ -1261,7 +1255,7 @@ int skel_drv_install(void)
 	if (skel_major < 0)
 		return skel_major;
 
-	printk("%s driver major is:%d\n",SkelDrvrNAME,skel_major);
+	printk("%s: driver major is:%d\n",SkelDrvrNAME,skel_major);
 
 	if (!wa_init(drvrd)) {
 		printk("Skel: Working Area Initialisation failed\n");
@@ -1432,9 +1426,9 @@ static struct client_link *skel_add_ccon(SkelDrvrClientContext * ccon)
 	return entry;
 }
 
-/*
- * Open with clean up for dead processes according
- * to LynxOs close
+/**
+ * Main skel Open logic, uses file private data to store
+ * the client context pointer
  */
 
 int SkelDrvrOpen(struct file *flp)
@@ -1577,6 +1571,12 @@ static void q_get(SkelDrvrReadBuf * rb, SkelDrvrClientContext * ccon)
 	spin_unlock_irqrestore(&q->lock, flags);
 }
 
+/**
+ * Main skel read implementation. This logic now uses a wait queue.
+ * Read is blocking and terminates on data on the skel queue or on
+ * a timeout.
+ */
+
 static int SkelDrvrRead(void *wa, struct file *flp, char *u_buf, int len)
 {
 	SkelDrvrClientContext *ccon;
@@ -1656,7 +1656,7 @@ int skel_read(void *wa, struct file *f, char *buf, int len)
 }
 
 /*
- * default write entry point---simulates interrupts
+ * The default write entry point simulates interrupts
  */
 
 static int SkelDrvrWrite(void *wa, struct file *flp, char *u_buf, int len)
@@ -1826,6 +1826,12 @@ skel_get_client_connections(SkelDrvrClientContext * ccon,
 	}
 	return OK;
 }
+
+/**
+ * Main ioctl logic that implements standard skell features
+ * If its not a standard skel ioctl number the user ioctls
+ * defined in skeluser_ioctl.h gets called if in range.
+ */
 
 int SkelDrvrIoctl(struct file *flp,     /* File pointer */
 		  int cm,               /* IOCTL command */
@@ -2062,7 +2068,7 @@ int SkelDrvrIoctl(struct file *flp,     /* File pointer */
 }
 
 /**
- * Implement IOCTL
+ * Implement linux IOCTL common logic used by locked and unlocked calls
  */
 
 int
@@ -2109,11 +2115,19 @@ skel_drv_ioctl(struct inode *inode, struct file *filp, unsigned int cmd,
 	return OK;
 }
 
+/**
+ * Unlocked ioctl call
+ */
+
 long skel_drv_ioctl_ulck(struct file *filp, unsigned int cmd,
 			 unsigned long arg)
 {
 	return skel_drv_ioctl(filp->f_dentry->d_inode, filp, cmd, arg);
 }
+
+/**
+ * Older ioctl interface for locked ioctl calls
+ */
 
 int
 skel_drv_ioctl_lck(struct inode *inode, struct file *filp,
