@@ -941,7 +941,7 @@ int cvorb_func_read(int h, int ch, int func, struct fv *fv, int sz)
 		return -CVORB_OUT_OF_RANGE;
 
 	/* how many vectors do we have */
-	if (sz < MAX_F_VECT+1/* t=0,V0 */)
+	if (sz > MAX_F_VECT+1/* t=0,V0 */)
 		return -CVORB_OUT_OF_RANGE;
 
 	par.module = (ch > CHAM) ? 2 : 1;
