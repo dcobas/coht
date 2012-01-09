@@ -887,19 +887,13 @@ UserData *u;
 	    }
 	    revis_id[i] = '\0';
 	    printk("VD80: Board Revision ID:%s ",revis_id);
-	    if (strcmp("C1A9",revis_id) == 0)
-	       printk("OK - Supported by this driver\n");
-	    else if (strcmp("C2Aa",revis_id) == 0)
-	       printk("OK - Supported by this driver\n");
-	    else if (strcmp("C2Ab",revis_id) == 0)
-	       printk("OK - Supported by this driver\n");
-	    else if (strcmp("C2Ac",revis_id) == 0)
-	       printk("OK - Supported by this driver\n");
-	    else if (strcmp("C2Ad",revis_id) == 0)
-	       printk("OK - Supported by this driver\n");
+	    if (strcmp("C2Ad",revis_id) == 0)
+	       printk("OK - Warning OLD version - Supported by this driver\n");
 	    else if (strcmp("C2Ae",revis_id) == 0)
-	       printk("OK - Supported by this driver\n");
+	       printk("OK - Warning OLD version - Supported by this driver\n");
 	    else if (strcmp("C2Af",revis_id) == 0)
+	       printk("OK - Warning OLD version - Supported by this driver\n");
+	    else if (strcmp("D0Af",revis_id) == 0)
 	       printk("OK - Supported by this driver\n");
 	    else {
 	       printk("ERROR - %s NOT SUPPORTED BY THIS DRIVER\n",revis_id);
