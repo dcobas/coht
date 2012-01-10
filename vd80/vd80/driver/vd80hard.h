@@ -185,6 +185,9 @@
 #define VD80_CLKDIV_SHIFT		16
 #define VD80_CLKDIV_MASK       		(0xffff << VD80_CLKDIV_SHIFT)
 
+#define VD80_CLKVIA_SHIFT               10
+#define VD80_CLKVIA_FRONT               (1 << VD80_CLKVIA_SHIFT)
+
 #define VD80_CLKTERM_SHIFT              9
 #define VD80_CLKTERM_MASK               (1 << VD80_CLKTERM_SHIFT)
 #define VD80_CLKTERM_50OHM              (1 << VD80_CLKTERM_SHIFT)
