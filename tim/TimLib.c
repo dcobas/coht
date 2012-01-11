@@ -22,6 +22,21 @@
 #include <tgv/tgv.h>
 #include <TimLib.h>
 
+/**
+ * When sending messages to the TGM daemon timlib has
+ * to yeild the CPU to let the daemon run. This was
+ * done using sleep(1) which was far too long and was
+ * causing RT problems on multiple attaches. No timlib
+ * yeild the CPU for 10us.
+ */
+
+void yeild(void)
+{
+	unsigned int cc, usecs = 10;
+	cc = usleep(usecs);
+	return;
+}
+
 #include "./ctr/CtrLib.c"
 #if !defined(__i386__) && !defined(__x86_64__)
 /* No support any more for TG8 on MEN A20 and on PC */
@@ -728,7 +743,7 @@ int msk;
    if ((msk & attached) == 0) {
       if (TgmAttach(machine,TgmTELEGRAM) == TgmSUCCESS) {
 	 attached |= msk;
-	 sleep(1);
+	 yeild();
       } else return TimLibErrorINIT;
    }
 
@@ -925,7 +940,7 @@ unsigned long gcytag, gncytag;
    if ((msk & attached) == 0) {
       if (TgmAttach(stamp.Machine,TgmTELEGRAM) == TgmSUCCESS) {
 	 attached |= msk;
-	 sleep(1);
+	 yeild();
       } else return TimLibErrorINIT;
    }
 
@@ -981,7 +996,7 @@ unsigned long msk, g, v;
    if ((msk & attached) == 0) {
       if (TgmAttach(stamp.Machine,TgmTELEGRAM) == TgmSUCCESS) {
 	 attached |= msk;
-	 sleep(1);
+	 yeild();
       } else return TimLibErrorINIT;
    }
 
