@@ -36,7 +36,7 @@ END {
 
 	if (luns) insmod_params = insmod_params "luns=" substr(luns, 2)
 
-	if (vectors) insmod_params = insmod_params " vec=" substr(vectors, 2)
+	if (vectors) insmod_params = insmod_params " vecs=" substr(vectors, 2)
 
 	if (base_address1) insmod_params = insmod_params " vme1=" substr(base_address1, 2)
 
