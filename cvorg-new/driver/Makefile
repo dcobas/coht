@@ -16,7 +16,7 @@ all: driver
 driver: modules
 
 modules: 
-#	cp Module.symvers.vme Module.symvers
+	cp Module.symvers.vme Module.symvers
 	make -C $(KERNELSRC) M=`pwd` KVER=$(KVER) CPU=$(CPU) modules
 	mkdir -p $(OUTPUTDIR)
 	mv *.o *.ko $(OUTPUTDIR)

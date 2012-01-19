@@ -1,0 +1,8 @@
+EXTRA_CFLAGS += \
+             -I$(M) \
+             -I$(M)/../include \
+             -I$(M)/../../include 
+
+obj-m += cvorg.o
+
+cvorg-objs := cvorg-func.o cvorg_sysfs.o clkgen.o cvorgdrv.o 
