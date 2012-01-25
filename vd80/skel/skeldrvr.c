@@ -1378,7 +1378,7 @@ static void reset_queue(SkelDrvrClientContext * ccon)
  * Don't get too confused about wait_queues and skel_queues
  */
 
-int client_init(SkelDrvrClientContext * ccon, struct file *flp)
+int client_init(SkelDrvrClientContext * ccon, struct file *flp, int modnum)
 {
 	int client_ok;
 
@@ -1390,8 +1390,11 @@ int client_init(SkelDrvrClientContext * ccon, struct file *flp)
 
 	/* select by default the first installed module */
 
-	if (Wa->InstalledModules)
-		ccon->ModuleNumber = Wa->Modules[0].ModuleNumber;
+	if (Wa->InstalledModules) {
+		if (!get_mcon(modnum))
+			modnum = Wa->Modules[0].ModuleNumber;
+		ccon->ModuleNumber = modnum;
+	}
 
 	spin_lock_init(&ccon->Queue.lock);
 
@@ -1431,7 +1434,7 @@ static struct client_link *skel_add_ccon(SkelDrvrClientContext * ccon)
  * the client context pointer
  */
 
-int SkelDrvrOpen(struct file *flp)
+int SkelDrvrOpen(struct file *flp, int modnum)
 {
 	SkelDrvrClientContext *ccon = NULL;	/* Client context */
 
@@ -1448,7 +1451,7 @@ int SkelDrvrOpen(struct file *flp)
 	}
 	flp->private_data = ccon;
 
-	if (client_init(ccon, flp)) {
+	if (client_init(ccon, flp, modnum)) {
 		printk("%s: client_init failed\n",SkelDrvrNAME);
 		pseterr(EBADF);
 		goto out_free;
@@ -2142,7 +2145,9 @@ skel_drv_ioctl_lck(struct inode *inode, struct file *filp,
 
 int skel_drv_open(struct inode *inode, struct file *filp)
 {
-	if (SkelDrvrOpen(filp))
+	int modnum = MINOR(inode->i_rdev);;
+
+	if (SkelDrvrOpen(filp,modnum))
 		return drv_errno;
 	return OK;
 }
