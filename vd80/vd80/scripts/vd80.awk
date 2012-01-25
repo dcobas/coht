@@ -1,10 +1,10 @@
 #
-# transfer2insmod.awk - extract insmod parameters from transfer.ref
+# vd80.awk - extract insmod parameters from transfer.ref
 #
-# usage: transfer2insmod.awk DEVICE_NAME [transfer_file]
+# usage: vd80.awk DEVICE_NAME [transfer_file]
 #
 # e.g.:
-#  $ awk -f transfer2insmod.awk VD80 /acc/dsc/tst/cfv-864-cdv28/etc/transfer.ref
+#  $ awk -f vd80.awk VD80 /acc/dsc/tst/cfv-864-cdv28/etc/transfer.ref
 #
 #  produces
 #     insmod vd80.ko dname=vd80 luns=1,2,3
@@ -18,7 +18,7 @@ BEGIN	{
 	delete ARGV[1]
 	luns = ""
 	base_address1 = ""
-	base_address1 = ""
+	base_address2 = ""
 	vectors = ""
 }
 
