@@ -1,0 +1,8 @@
+# generated automatically by encore, date 2012-02-15 10:29:49.901731
+
+EXTRA_CFLAGS += -DCOMPILE_TIME=$(shell date +%s) -g -Wall \
+	'-DDRIVER_NAME=$(DRIVER_NAME)' \
+	-DENCORE_DAL \
+	-I/acc/src/dsc/drivers/vmebridge/driver
+
+obj-m := ctc.o

@@ -1,0 +1,18 @@
+name,rwmode,block,block_address_space,block_offset,register_offset,offset,wordsize,depth,description,data_width
+STATUS,rc,0,1,0x0,0x0,0x0,long,0,Hardware version,32
+CNTR_ENABLE,rw,0,1,0x0,0x4,0x4,long,0,Enable/disable output channel,32
+confChan,rw,1,1,0x8,0x0,0x8,long,0,Select External start (i.e. input channel) and Clock1/Clock2 settings,32
+clock1Delay,rw,1,1,0x8,0x4,0xc,long,0,How many ticks to wait (i.e. delay) for the 1'st counter,32
+clock2Delay,rw,1,1,0x8,0x8,0x10,long,0,How many ticks to wait (i.e. delay) for the 2'nd counter,32
+outputCntr,r,1,1,0x8,0xc,0x14,long,0,Output pulse counter that occured in the channel,32
+cntr1CurVal,r,1,1,0x8,0x10,0x18,long,0,Current value of the 1'st counter,32
+cntr2CurVal,r,1,1,0x8,0x14,0x1c,long,0,Current value of the 2'nd counter,32
+channel_1,rw,2,1,0x8,0x0,0x8,long,6,All registers of channel 1,32
+channel_2,rw,3,1,0x20,0x0,0x20,long,6,All registers of channel 2,32
+channel_3,rw,4,1,0x38,0x0,0x38,long,6,All registers of channel 3,32
+channel_4,rw,5,1,0x50,0x0,0x50,long,6,All registers of channel 4,32
+channel_5,rw,6,1,0x68,0x0,0x68,long,6,All registers of channel 5,32
+channel_6,rw,7,1,0x80,0x0,0x80,long,6,All registers of channel 6,32
+channel_7,rw,8,1,0x98,0x0,0x98,long,6,All registers of channel 7,32
+channel_8,rw,9,1,0xb0,0x0,0xb0,long,6,All registers of channel 8,32
+ALL_CHANNELS,rw,10,1,0x8,0x0,0x8,long,48,All CTC channels to access in one chunk,32

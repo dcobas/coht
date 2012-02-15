@@ -1,0 +1,2 @@
+name,description,level,data_width1,data_width2,size1,size2,am1,am2
+CTC,Control Timing Counter,,32,,0x200,,0x2,
