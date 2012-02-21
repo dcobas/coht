@@ -19,6 +19,10 @@
 #ifndef _LIBVMEBUS_H_INCLUDE_
 #define _LIBVMEBUS_H_INCLUDE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <vmebus.h>
 
 /**
@@ -64,5 +68,9 @@ extern int vme_unmap(struct vme_mapping *, int);
 /* DMA access */
 extern int vme_dma_read(struct vme_dma *);
 extern int vme_dma_write(struct vme_dma *);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	/* _LIBVMEBUS_H_INCLUDE_ */
