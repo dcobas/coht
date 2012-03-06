@@ -45,7 +45,7 @@
  *
  * The ctr_open call returns a pointer to an opeaque structure
  * defined within the library internal implementation. Clients
- * never see what is in the void pointer.
+ * never see what is behind the void pointer.
  *
  * The returned handle is -1 on error otherwise its a valid handle.
  * On error use the standard Linux error functions for details.
@@ -85,7 +85,7 @@ int ctr_get_module_count(void *handle);
 /**
  * @brief Get the corresponding logical unit number for a given module number
  * @param modnum is the module number 1..module_count
- * @param pointer to integer where the lun value will be stored
+ * @param lun is a pointer to integer where the lun value will be stored
  * @return Zero means success else -1 is returned on error, see errno
  */
 
@@ -94,7 +94,7 @@ int ctr_get_logical_unit(int modnum, int *lun);
 /**
  * @brief Get the corresponding module number for a given logical unit number
  * @param lun of the module whose modnum you want
- * @param modnum pointer to integer where the module number will be stored
+ * @param modnum is a pointer to integer where the module number will be stored
  * @return Zero means success else -1 is returned on error, see errno
  */
 
@@ -104,7 +104,7 @@ int ctr_get_module_number(int lun, int *modnum);
  * @brief Connect to a ctr interrupt
  * @param A handle that was allocated in open
  * @param ctr_class see CTR_CLASS, the class of timing to connect
- * @param mask see CTR_MASK, the class specific, hardware mask, event frame or ptim number
+ * @param mask see CTR_MASK, the class specific, hardware mask, event frame or ltim number
  * @param lun is the logical unit number of the module.
  * @return Zero means success else -1 is returned on error, see errno
  *
@@ -148,7 +148,7 @@ int ctr_connect(void *handle, int ctr_class, int mask, int lun);
  * @brief Disconnect from an interrupt
  * @param A handle that was allocated in open
  * @param ctr_class see CTR_CLASS, the calss of timing to connect
- * @param mask see CTR_MASK, the class specific, hardware mask, event_frame or ptim number
+ * @param mask see CTR_MASK, the class specific, hardware mask, event_frame or ltim number
  * @param lun is a valid logical unit number.
  * @return Zero means success else -1 is returned on error, see errno
  *
@@ -184,7 +184,7 @@ int ctr_wait(void *handle, struct ctr_interrupt_s *ctr_interrupt);
  * @brief Set a CCV
  * @param A handle that was allocated in open
  * @param lun is the logical unit number
- * @param ptim number to be set
+ * @param ltim number to be set
  * @param index into ptim action array 0..size-1
  * @param ctr_ccv are the values to be set
  * @param ctr_ccv_fields to be set from ctr_ccv
@@ -221,27 +221,27 @@ typedef enum {
 int ctr_set_ccv(void *handle, int lun, int ptim, int index, struct ctr_ccv_s *ctr_ccv, ctr_ccv_fields_t ctr_ccv_fields);
 
 /**
- * @brief get a ptim action setting
+ * @brief get an ltim action setting
  * @param A handle that was allocated in open
  * @param lun is the logical unit number
- * @param ptim number to get
- * @param index into ptim action array 0..size-1
+ * @param ltim number to get
+ * @param index into ltim action array 0..size-1
  * @param ctr_ccv points to where the values will be stored
  * @return Zero means success else -1 is returned on error, see errno
  */
 
-int ctr_get_ccv(void *handle, int lun, int ptim, int index, struct ctr_ccv_s *ctr_ccv);
+int ctr_get_ccv(void *handle, int lun, int ltim, int index, struct ctr_ccv_s *ctr_ccv);
 
 /**
- * @brief Create an empty PTIM object
+ * @brief Create an empty LTIM object
  * @param A handle that was allocated in open
  * @param lun is the logical unit number
- * @param ptim number to create
- * @param size of ptim action array
+ * @param ltim number to create
+ * @param size of ltim action array (PLS lines)
  * @return Zero means success else -1 is returned on error, see errno
  */
 
-int ctr_create_ptim(void *handle, int lun, int ptim, int size);
+int ctr_create_ltim(void *handle, int lun, int ltim, int size);
 
 /**
  * @brief get a telegram
