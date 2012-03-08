@@ -12,6 +12,7 @@
 
 #include <linux/module.h>
 #include <linux/device.h>
+#include <linux/sched.h>
 #include <asm/byteorder.h>
 
 #include "vme_bridge.h"

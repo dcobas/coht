@@ -19,6 +19,7 @@
 
 #include <linux/list.h>
 #include <linux/pci.h>
+#include <linux/sched.h>
 #include <asm/uaccess.h>
 
 #include "vmebus.h"
