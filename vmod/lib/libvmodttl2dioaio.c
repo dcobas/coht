@@ -14,7 +14,7 @@ int vmodttl_open(int lun)
 		fprintf(stderr, "libvmodttl2dioaio : Invalid lun %d\n", lun);
 		return -1;
 	}
-	return 0;
+	return lun;
 }
 
 int vmodttl_close(int lun)
@@ -59,9 +59,6 @@ int vmodttl_io_chan_config(int lun, enum vmodttl_channel chan, struct vmodttl_co
 	case VMOD_TTL_CHANNEL_B:
 		ret = DioChannelSet(IocVMODTTL, lun, 1, 1, conf.dir_b, conf.inverting_logic, conf.inverting_logic);
 		break;
-	case VMOD_TTL_CHANNELS_AB:
-		ret = vmodttl_io_config(lun, conf);
-		break;
 	default:
 		fprintf(stderr, "libvmodttl2dioaio : Invalid channel (%d) to configure\n", chan);
 	}
@@ -75,14 +72,21 @@ int vmodttl_io_chan_config(int lun, enum vmodttl_channel chan, struct vmodttl_co
 
 int vmodttl_write(int lun, enum vmodttl_channel chan, int val)
 {
+	int ret;
+	
 	if (chan != VMOD_TTL_CHANNELS_AB){
-		DioChannelWrite(IocVMODTTL, lun, chan, 1, val);
+		ret = DioChannelWrite(IocVMODTTL, lun, chan, 1, val);
 	} else {
-		DioChannelWrite(IocVMODTTL, lun, 0, 1, val & 0xff);
-		DioChannelWrite(IocVMODTTL, lun, 1, 1, (val >> 8) & 0xff);
+		ret = DioChannelWrite(IocVMODTTL, lun, 0, 1, val & 0xff);
+		ret = DioChannelWrite(IocVMODTTL, lun, 1, 1, (val >> 8) & 0xff);
 	}
 
-	return 0;
+	if (ret < 0)
+	{
+		print_error(ret);
+	}	
+
+	return ret;
 }
 
 int vmodttl_read(int lun, enum vmodttl_channel chan, int *val)
@@ -106,19 +110,22 @@ int vmodttl_read(int lun, enum vmodttl_channel chan, int *val)
 int vmodttl_pattern(int lun, enum vmodttl_channel chan, int pos, enum vmodttl_conf_pattern bit_pattern)
 {
 	/* Not implemented */
-	return 0;
+	fprintf(stderr, "libvmodttl2diaoio : vmodttl_pattern not implemented in PPC4\n"); 
+	return -1;
 }
 
 int vmodttl_read_config(int lun, struct vmodttl_config *conf)
 {
 	/* Not implemented */
-	return 0;
+	fprintf(stderr, "libvmodttl2diaoio : vmodttl_read_config not implemented in PPC4\n"); 
+	return -1;
 }
 
 int vmodttl_read_device(int lun, unsigned char buffer[2])
 {
 	/* Not implemented */
-	return 0;
+	fprintf(stderr, "libvmodttl2diaoio : vmodttl_read_device not implemented in PPC4\n"); 
+	return -1;
 }
 
 

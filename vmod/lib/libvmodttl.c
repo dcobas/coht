@@ -106,11 +106,12 @@ int vmodttl_read(int lun, enum vmodttl_channel chan, int *val)
 	ret = ioctl(luns_to_fd[lun], VMODTTL_READ_CHAN, (char *)&buf);
 
 	if(ret){
-		fprintf(stderr, "libvmodttl: Failed to get data from channel %d: %s", chan, strerror(errno));
+		fprintf(stderr, "libvmodttl: Failed to get data from channel %d. Error %s", chan, strerror(errno));
 		return -1;
 	}
+
 	if (chan == VMOD_TTL_CHANNELS_AB)
-		*val = buf.val & 0xffff;
+		*val = buf.val;
 	else
 		*val = buf.val & 0x00ff;
 
@@ -181,7 +182,7 @@ int vmodttl_io_chan_config(int lun, enum vmodttl_channel chan, struct vmodttl_co
 		
 		break;
 	case VMOD_TTL_CHANNELS_AB:
-		ttl_conf = conf;
+		return vmodttl_io_config(lun, conf);
 		break;
 	default:
 		
@@ -228,8 +229,16 @@ int vmodttl_read_config(int lun, struct vmodttl_config *conf)
 }
 
 int vmodttl_read_device(int lun, unsigned char buffer[2])
-{
-	return 0;
+{	
+	int fd = luns_to_fd[lun];
+	int ret;
+
+	ret = read(fd, buffer, 2);
+
+	if(ret < 0)
+		fprintf(stderr, "libvmodttl: Failed to read the device %d : %s\n", lun, strerror(errno));
+	
+	return ret;
 }
 
 static void vmodttl_get_from_bit_pattern(enum vmodttl_conf_pattern *bit_pattern, unsigned char pmr, 
@@ -294,7 +303,7 @@ static void vmodttl_get_bit_pattern(enum vmodttl_conf_pattern bit_pattern, unsig
 
 }
 int vmodttl_pattern(int lun, enum vmodttl_channel port, int pos, enum vmodttl_conf_pattern bit_pattern)
-{	
+{
 	struct vmodttl_pattern buf;
 	int ret = 0;
 

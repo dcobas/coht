@@ -9,6 +9,7 @@
 #include <linux/wait.h>
 #include <asm/uaccess.h>        /* copy_*_user */
 #include <asm/semaphore.h>
+#include <asm/atomic.h>
 #include "vmodttl.h"
 #include "cio8536.h"
 #include "modulbus_register.h"
@@ -17,10 +18,11 @@
 #define DRIVER_NAME	"vmodttl"
 #define PFX		DRIVER_NAME ": "
 
+//#define MAX_IRQ		1
+
 struct message_list {
-	struct list_head list;
-	int dev;
-	int val;
+	unsigned char dev;
+	unsigned char val;
 };
 
 enum vmodttl_channel{
@@ -31,17 +33,20 @@ enum vmodttl_channel{
 
 struct vmodttl_dev{
 	int			created;        /* flag initialize      */
+	struct vmod_dev         *config;
 	int			dev;
 	int			OpenCount;      /* open count */
+	atomic_t		nr_readers;
 	int			io_flag;
 	int			us_pulse;	/* Time being up of the data strobe pulse */
 	int			open_collector;
 	spinlock_t		vmodttl_spinlock;
 	spinlock_t		vmodttl_read;
-	struct message_list	*messages;	
-	struct vmod_dev         *config;
+	int			irq;
 	wait_queue_head_t	wait;
+	wait_queue_head_t	wait_readers;
 	struct vmodttlconfig 	ioconfig;
+	struct message_list	messages;	
 };
 
 
@@ -56,7 +61,6 @@ static dev_t devno;
 
 static struct vmodttl_dev       *pvmodttlDv[VMODTTL_MAX_BOARDS];
 
-
 /* 
  * I/O operations
  *
@@ -70,25 +74,39 @@ static uint16_t vmodttl_read_word(struct vmodttl_dev *pd, int offset)
 	uint16_t val = 0;
 
 	ioaddr = pd->config->address + offset;
+
 	if (pd->config->is_big_endian)
 		val = ioread16be((u16 *)(ioaddr));
 	else
 		val = ioread16((u16 *)(ioaddr));
 
 	mb();
+	//udelay(1);
 	return val;
 }
 
-	
 static void vmodttl_write_word(struct vmodttl_dev *pd, int offset, uint16_t value)
 {
 	unsigned long ioaddr = pd->config->address + offset;
+
 	if(pd->config->is_big_endian)
 		iowrite16be(value, (u16 *)ioaddr);
 	else
 		iowrite16(value, (u16 *)ioaddr);
-
 	mb();
+	//udelay(1);
+}
+
+static void vmodttl_write_reg(struct vmodttl_dev *pd, int offset, uint16_t value)
+{
+	vmodttl_write_word(pd, VMODTTL_CONTROL, offset);
+	vmodttl_write_word(pd, VMODTTL_CONTROL, value);
+}
+
+static uint16_t vmodttl_read_reg(struct vmodttl_dev *pd, int offset)
+{
+	vmodttl_write_word(pd, VMODTTL_CONTROL, offset);
+	return vmodttl_read_word(pd, VMODTTL_CONTROL);
 }
 
 /* Init the ports with the desired setup */
@@ -98,131 +116,101 @@ static void vmodttl_def_io(struct vmodttl_dev	*pd)
 
 	/* It has been needed reset MCCR with 0 to avoid a missing configuration of the register DDR_A */
 	/* Do not delete this two lines! */
-	vmodttl_write_word(pd, VMODTTL_CONTROL, MCCR);
-	vmodttl_write_word(pd, VMODTTL_CONTROL, 0);
+	vmodttl_write_reg(pd, MCCR, 0);
 
 	/* port A		*/
 	/* -------------------- */
 	/* disable interrupt	*/
-	vmodttl_write_word(pd, VMODTTL_CONTROL, PCSR_A);
-	vmodttl_write_word(pd, VMODTTL_CONTROL, CLEAR_IE);
+	vmodttl_write_reg(pd, PCSR_A, CLEAR_IE);
 	/* clear ip/ius		*/
-	vmodttl_write_word(pd, VMODTTL_CONTROL, PCSR_A);
-	vmodttl_write_word(pd, VMODTTL_CONTROL, CLEAR_IP_IUS);
+	vmodttl_write_reg(pd, PCSR_A, CLEAR_IP_IUS);
 
-	vmodttl_write_word(pd, VMODTTL_CONTROL, PMSR_A);
-	vmodttl_write_word(pd, VMODTTL_CONTROL, 0x14);		/* /LPM	Latch on Pattern Match	*/
+	vmodttl_write_reg(pd, PMSR_A, 0x14); /* /LPM	Latch on Pattern Match	*/
 
 	if((pd->open_collector & A_CHAN_OPEN_COLLECTOR) == A_CHAN_OPEN_COLLECTOR) {
 		/* open collector connection mode */
 		if(pd->io_flag & A_CHAN_OUT) {
-			vmodttl_write_word(pd, VMODTTL_CONTROL, DDR_A);
-			vmodttl_write_word(pd, VMODTTL_CONTROL, 0x00);	 	/* output	*/
-			vmodttl_write_word(pd, VMODTTL_CONTROL, DPPR_A);
-			vmodttl_write_word(pd, VMODTTL_CONTROL, 0x00);
+			vmodttl_write_reg(pd, DDR_A, 0x00); 	/* output	*/
+			vmodttl_write_reg(pd, DPPR_A, 0x00);
 		} else {
-			vmodttl_write_word(pd, VMODTTL_CONTROL, DDR_A);
-			vmodttl_write_word(pd, VMODTTL_CONTROL, 0xff);		/* input 	*/
-			vmodttl_write_word(pd, VMODTTL_CONTROL, DPPR_A);
+			vmodttl_write_reg(pd, DDR_A, 0xff);	/* input 	*/
 
 			if(pd->io_flag & VMODTTL_O)
-				vmodttl_write_word(pd, VMODTTL_CONTROL, 0xff);	/* invert! 	*/
+				vmodttl_write_reg(pd, DPPR_A, 0xff);	/* invert! 	*/
 			else
-				vmodttl_write_word(pd, VMODTTL_CONTROL, 0x00);
+				vmodttl_write_reg(pd, DPPR_A, 0x00);
 		}
 	} else {
 		/* normal TTL connection mode */
 		if(pd->io_flag & A_CHAN_OUT) {
-			vmodttl_write_word(pd, VMODTTL_CONTROL, DDR_A);
-			vmodttl_write_word(pd, VMODTTL_CONTROL, 0x00);		/* output	*/
+			vmodttl_write_reg(pd, DDR_A, 0x00);	/* output	*/ 
 		} else {
-			vmodttl_write_word(pd, VMODTTL_CONTROL, DDR_A);
-			vmodttl_write_word(pd, VMODTTL_CONTROL, 0xff);		/* input 	*/
+			vmodttl_write_reg(pd, DDR_A, 0xff); /* input */
 		}
 
-		vmodttl_write_word(pd, VMODTTL_CONTROL, DPPR_A);
 		if(pd->io_flag & VMODTTL_O)
-	 		vmodttl_write_word(pd, VMODTTL_CONTROL, 0xff);		/* invert! 	*/
+	 		vmodttl_write_reg(pd, DPPR_A, 0xff);		/* invert! 	*/
 		else
-			vmodttl_write_word(pd, VMODTTL_CONTROL, 0x00);
+			vmodttl_write_reg(pd, DPPR_A, 0x00);
 	}
 
-	vmodttl_write_word(pd, VMODTTL_CONTROL, SIOCR_A);
-	vmodttl_write_word(pd, VMODTTL_CONTROL, 0x00);
+	vmodttl_write_reg(pd, SIOCR_A, 0x00);
 
 	/* port B		*/
 	/* -------------------- */
 	/* disable interrupt	*/
-	vmodttl_write_word(pd, VMODTTL_CONTROL, PCSR_B);
-	vmodttl_write_word(pd, VMODTTL_CONTROL, CLEAR_IE);
+	vmodttl_write_reg(pd, PCSR_B, CLEAR_IE);
 	/* clear ip/ius		*/
-	vmodttl_write_word(pd, VMODTTL_CONTROL, PCSR_B);
-	vmodttl_write_word(pd, VMODTTL_CONTROL, CLEAR_IP_IUS);
+	vmodttl_write_reg(pd, PCSR_B, CLEAR_IP_IUS);
 
-	vmodttl_write_word(pd, VMODTTL_CONTROL ,PMSR_B);
-	vmodttl_write_word(pd, VMODTTL_CONTROL, 0x14);		/* /LPM	 Latch on Pattern Match */
+	vmodttl_write_reg(pd ,PMSR_B, 0x14);     /* /LPM	 Latch on Pattern Match */ 
 
 	if((pd->open_collector & B_CHAN_OPEN_COLLECTOR) == B_CHAN_OPEN_COLLECTOR) {
 		/* open collector connection mode */
 		if(pd->io_flag & B_CHAN_OUT) {
-			vmodttl_write_word(pd, VMODTTL_CONTROL, DDR_B);
-			vmodttl_write_word(pd, VMODTTL_CONTROL, 0x00);	/* output	 	*/
-			vmodttl_write_word(pd, VMODTTL_CONTROL, DPPR_B);
-			vmodttl_write_word(pd, VMODTTL_CONTROL, 0x00);
+			vmodttl_write_reg(pd, DDR_B, 0x00);	/* output	 	*/
+			vmodttl_write_reg(pd, DPPR_B, 0x00);
 		} else {
-			vmodttl_write_word(pd, VMODTTL_CONTROL, DDR_B);
-			vmodttl_write_word(pd, VMODTTL_CONTROL, 0xff);	/* input 	 	*/
-			vmodttl_write_word(pd, VMODTTL_CONTROL, DPPR_B);
+			vmodttl_write_reg(pd, DDR_B, 0xff);	/* input 	 	*/
 			if(pd->io_flag & VMODTTL_O)
-				vmodttl_write_word(pd, VMODTTL_CONTROL, 0xff);	/* invert! 	*/
+				vmodttl_write_reg(pd, DPPR_B, 0xff);	/* invert! 	*/
 			else
-				vmodttl_write_word(pd, VMODTTL_CONTROL, 0x00);
+				vmodttl_write_reg(pd, DPPR_B, 0x00);
 		}
 	} else {
 		/* normal TTL connection mode */
 		if(pd->io_flag & B_CHAN_OUT) {
-			vmodttl_write_word(pd, VMODTTL_CONTROL, DDR_B);
-			vmodttl_write_word(pd, VMODTTL_CONTROL, 0x00);		/* output 	*/
+			vmodttl_write_reg(pd, DDR_B, 0x00);		/* output 	*/
 		} else {
-			vmodttl_write_word(pd, VMODTTL_CONTROL, DDR_B);
-			vmodttl_write_word(pd, VMODTTL_CONTROL, 0xff);		/* input  	*/
+			vmodttl_write_reg(pd, DDR_B, 0xff);		/* input  	*/
 		}
-		vmodttl_write_word(pd, VMODTTL_CONTROL, DPPR_B);
 		if(pd->io_flag & VMODTTL_O)
-			vmodttl_write_word(pd, VMODTTL_CONTROL, 0xff);		/* invert! 	*/
+			vmodttl_write_reg(pd, DPPR_B, 0xff);		/* invert! 	*/
 		else
-			vmodttl_write_word(pd, VMODTTL_CONTROL, 0x00);
+			vmodttl_write_reg(pd, DPPR_B, 0x00);
 	}
 
-	vmodttl_write_word(pd, VMODTTL_CONTROL, SIOCR_B);
-	vmodttl_write_word(pd, VMODTTL_CONTROL, 0x00);
+	vmodttl_write_reg(pd, SIOCR_B, 0x00);
 
 	/* port C	generates data strobe (Output) */
 	if((pd->open_collector & C_CHAN_OPEN_COLLECTOR) == C_CHAN_OPEN_COLLECTOR) {
 		/* open collector connection mode */
-		vmodttl_write_word(pd, VMODTTL_CONTROL, DDR_C);
-		vmodttl_write_word(pd, VMODTTL_CONTROL, 0x00);		/* output 	*/
-		vmodttl_write_word(pd, VMODTTL_CONTROL, DPPR_C);
-		vmodttl_write_word(pd, VMODTTL_CONTROL, 0x00);
+		vmodttl_write_reg(pd, DDR_C, 0x00);		/* output 	*/
+		vmodttl_write_reg(pd, DPPR_C, 0x00);
 	} else {
 		/* normal TTL connection mode */
-		vmodttl_write_word(pd, VMODTTL_CONTROL, DDR_C);
-		vmodttl_write_word(pd, VMODTTL_CONTROL, 0x00);		/* output 	*/
+		vmodttl_write_reg(pd, DDR_C, 0x00);		/* output 	*/
 
-		vmodttl_write_word(pd, VMODTTL_CONTROL, DPPR_C);
 		if(pd->io_flag & VMODTTL_O)
-			vmodttl_write_word(pd, VMODTTL_CONTROL, 0x0f);		/* invert!	*/
+			vmodttl_write_reg(pd, DPPR_C, 0x0f);		/* invert!	*/
 		else
-			vmodttl_write_word(pd, VMODTTL_CONTROL, 0x00);
+			vmodttl_write_reg(pd, DPPR_C, 0x00);
 	}
 
-	vmodttl_write_word(pd, VMODTTL_CONTROL, SIOCR_C);
-	vmodttl_write_word(pd, VMODTTL_CONTROL, 0x00);
+	vmodttl_write_reg(pd, SIOCR_C, 0x00);
 
-	vmodttl_write_word(pd, VMODTTL_CONTROL, MCCR);
-	tmp  = vmodttl_read_word(pd, VMODTTL_CONTROL) | PAE | PBE | PCE; 
-	vmodttl_write_word(pd, VMODTTL_CONTROL, MCCR);
-	vmodttl_write_word(pd, VMODTTL_CONTROL, tmp);
+	tmp  = vmodttl_read_reg(pd, MCCR) | PAE | PBE | PCE; 
+	vmodttl_write_reg(pd, MCCR, tmp);
 }
 
 /* Configure the Zilog Z8536 CIO */
@@ -236,24 +224,18 @@ static void vmodttl_default(struct vmodttl_dev  *pd)
 
 	/* Prepare the Zilog Z8536 CIO to be configured */
 	dummy = vmodttl_read_word(pd, VMODTTL_CONTROL);	
-	vmodttl_write_word(pd, VMODTTL_CONTROL, MCCR);
-	vmodttl_write_word(pd, VMODTTL_CONTROL, 0);
-	vmodttl_write_word(pd, VMODTTL_CONTROL, MICR);	
-	dummy = vmodttl_read_word(pd, VMODTTL_CONTROL);	
-	vmodttl_write_word(pd, VMODTTL_CONTROL, MICR);	
-	vmodttl_write_word(pd, VMODTTL_CONTROL, 0);		
+	vmodttl_write_reg(pd, MCCR, 0);
+	dummy = vmodttl_read_reg(pd, MICR);	
+	vmodttl_write_reg(pd, MICR, 0);		
 
-	vmodttl_write_word(pd, VMODTTL_CONTROL, MICR);	/* reset cio			*/
-	vmodttl_write_word(pd, VMODTTL_CONTROL, RESET);
+	vmodttl_write_reg(pd, MICR, RESET);
 	vmodttl_write_word(pd, VMODTTL_CONTROL,0);
 
 	vmodttl_def_io(pd);
 
 	/* enable master interrupts	*/
-	vmodttl_write_word(pd, VMODTTL_CONTROL, MICR);
-	i = (vmodttl_read_word(pd, VMODTTL_CONTROL) | MIE | NV);
-	vmodttl_write_word(pd, VMODTTL_CONTROL, MICR);
-	vmodttl_write_word(pd, VMODTTL_CONTROL, i);
+	i = vmodttl_read_reg(pd, MICR) | MIE | NV;
+	vmodttl_write_reg(pd, MICR, i);
 
 	spin_unlock_irqrestore(&pd->vmodttl_spinlock, flags);
 	printk(KERN_INFO PFX "board %d initialized\n", pd->dev);
@@ -275,6 +257,284 @@ int vmodttl_release(struct inode *inode, struct file *filp)
 
 	pd->OpenCount--;
 	return 0;
+}
+
+int vmodttl_interrupt(void *device, void *extra)
+{
+	int			dev = CHAN_A;
+	unsigned char		val = -1;
+	struct vmodttl_dev	*pd = (struct vmodttl_dev *) device;
+	unsigned long		flags;
+	int num = 0;
+	int ret = 0;
+
+
+	/* It's needed to do this loop, in order to catch the source of the IRQ
+	 * Sometimes the registers are not ready at the time we check them.
+	 */
+	do {
+		if(vmodttl_read_reg(pd, PCSR_A) & IP) {
+			dev = CHAN_A;
+			goto device_found;
+		} 
+
+		if(vmodttl_read_reg(pd, PCSR_B) & IP) {
+			dev = CHAN_B;
+			goto device_found;
+		}
+		num ++;
+	} while(num < 10);
+	printk(KERN_WARNING PFX "vmodttl_interrupt: device not found.\n");
+	vmodttl_write_reg(pd, PCSR_A, CLEAR_IP_IUS);
+	vmodttl_write_reg(pd, PCSR_B, CLEAR_IP_IUS);
+	return -1;
+
+device_found:
+
+	spin_lock_irqsave(&pd->vmodttl_read, flags);
+	/* interrupt from channel A, B or timer */
+	switch(dev) {
+	case CHAN_A:	/* channel A */
+		val = vmodttl_read_word(pd, VMODTTL_PORTA);
+		vmodttl_write_reg(pd, PCSR_A, CLEAR_IP_IUS);
+		break;
+
+	case CHAN_B: 	/* channel B */
+		val = vmodttl_read_word(pd, VMODTTL_PORTB);
+		vmodttl_write_reg(pd, PCSR_B, CLEAR_IP_IUS);
+		break;
+	default:
+		printk(KERN_ERR PFX "Interrupt unknown. This cannot happen.");
+		ret = -1;
+		goto out;
+	}
+
+	pd->messages.dev = dev;
+	pd->messages.val = val;
+	pd->irq = 1;
+	wake_up_interruptible(&pd->wait);
+
+out:
+	spin_unlock_irqrestore(&pd->vmodttl_read, flags);
+	return ret;
+}
+
+static void vmodttl_change_bit(int *reg, unsigned bit,  unsigned char pos)
+{
+	unsigned char mask;
+	unsigned char value;
+
+	*reg = *reg & 0xff;
+	value = (bit << pos);
+
+	/* Change the corresponding bit and keep the value of the rest */
+	mask = ~(1 << pos);
+	*reg &= mask; 
+	*reg |= value;
+
+}
+
+static int vmodttl_pattern(struct vmodttl_pattern buf, struct vmodttl_dev *pd)
+{ 
+
+	int dev = -1;
+	int byte;
+	unsigned long flags;
+	int tmp;
+
+	dev = buf.port;
+	/* Check invalid channel */ 
+	if(dev < CHAN_A || dev > CHAN_B){
+		printk(KERN_ERR PFX "Invalid channel: 0x%x.\n", dev);
+		return -EINVAL;
+	}
+
+	spin_lock_irqsave(&pd->vmodttl_spinlock, flags);
+	/* Disable interrupts */
+	tmp = vmodttl_read_reg(pd, MICR) & ~MIE;
+	vmodttl_write_reg(pd, MICR, tmp);
+
+	switch(dev) {
+	case CHAN_A:
+	{
+		if(pd->io_flag & A_CHAN_OUT) {
+			spin_unlock_irqrestore(&pd->vmodttl_spinlock, flags);
+			return -EIO;
+		}
+		/* Copy the configuration to ioconfig */
+		pd->ioconfig.bit_pattern_a[buf.pos] = buf;
+
+		/* port A		*/
+		/* -------------------- */
+		/* disable interrupt	*/
+		vmodttl_write_reg(pd, PCSR_A, CLEAR_IE);
+		/* clear ip/ius	*/
+		vmodttl_write_reg(pd, PCSR_A, CLEAR_IP_IUS);
+		/* disable port	*/
+		vmodttl_write_word(pd, VMODTTL_CONTROL, MCCR);
+		byte = vmodttl_read_word(pd, VMODTTL_CONTROL) & ~(PAE);
+		vmodttl_write_reg(pd, MCCR, byte);
+		/* bit port */
+		if(pd->ioconfig.pattern_mode_a)
+			vmodttl_write_reg(pd, PMSR_A, 0x12);	/* Pattern AND */
+		else
+			vmodttl_write_reg(pd, PMSR_A, 0x14);	/* Pattern OR */
+
+
+		if(pd->io_flag & VMODTTL_O)
+			vmodttl_write_reg(pd, DPPR_A, 0xff);	/* invert! */
+		else
+			vmodttl_write_reg(pd, DPPR_A, 0x00);
+
+		vmodttl_write_reg(pd, DDR_A, 0xff);
+		vmodttl_write_reg(pd, SIOCR_A, 0x00);
+
+		/* PPR */
+		byte = vmodttl_read_reg(pd, PPR_A);
+		vmodttl_change_bit(&byte, buf.ppr, buf.pos);
+		vmodttl_write_reg(pd, PPR_A, byte);
+		/* PTR */
+		byte = vmodttl_read_reg(pd, PTR_A);
+		vmodttl_change_bit(&byte, buf.ptr, buf.pos);
+		vmodttl_write_reg(pd, PTR_A, byte);
+		/* PMR */
+		byte = vmodttl_read_reg(pd, PMR_A);
+		vmodttl_change_bit(&byte, buf.pmr, buf.pos);
+		vmodttl_write_reg(pd, PMR_A, byte);
+
+		/* enable port	 	*/
+		byte = vmodttl_read_reg(pd, MCCR) | PAE;
+		vmodttl_write_reg(pd, MCCR, byte);
+		/* enable interrupt	*/
+		vmodttl_write_reg(pd, PCSR_A, SET_IE);
+	}
+	break;
+	case CHAN_B:
+	{
+
+		if(pd->io_flag & B_CHAN_OUT){
+			spin_unlock_irqrestore(&pd->vmodttl_spinlock, flags);
+			return -EIO;
+		}
+	
+		/* Copy the configuration to ioconfig */
+		pd->ioconfig.bit_pattern_a[buf.pos] = buf;
+
+		/* port B		*/
+		/* -------------------- */
+		/* disable interrupt	*/
+		vmodttl_write_reg(pd, PCSR_B, CLEAR_IE);
+		/* clear ip/ius		*/
+		vmodttl_write_reg(pd, PCSR_B, CLEAR_IP_IUS);
+		/* disable port 	*/
+		byte = vmodttl_read_reg(pd, MCCR) & ~PBE;
+		vmodttl_write_reg(pd, MCCR, byte);
+		/* bit port		*/
+		if(pd->ioconfig.pattern_mode_b)
+			vmodttl_write_reg(pd, PMSR_B, 0x12);	/* Pattern AND */
+		else
+			vmodttl_write_reg(pd, PMSR_B, 0x14);	/* Pattern OR */
+	    
+		if(pd->io_flag & VMODTTL_O)
+			vmodttl_write_reg(pd, DPPR_B, 0xff);	/* invert! */
+		else
+			vmodttl_write_reg(pd, DPPR_B, 0x00);
+
+		vmodttl_write_reg(pd, DDR_B, 0xff);
+		vmodttl_write_reg(pd, SIOCR_B, 0x00);
+
+		/* PPR */
+		byte = vmodttl_read_reg(pd, PPR_B);
+		vmodttl_change_bit(&byte, buf.ppr, buf.pos);
+		vmodttl_write_reg(pd, PPR_B, byte);
+		/* PTR */
+		byte = vmodttl_read_reg(pd, PTR_B);
+		vmodttl_change_bit(&byte, buf.ptr, buf.pos);
+		vmodttl_write_reg(pd, PTR_B, byte);
+		/* PMR */
+		byte = vmodttl_read_reg(pd, PMR_B);
+		vmodttl_change_bit(&byte, buf.pmr, buf.pos);
+		vmodttl_write_reg(pd, PMR_B, byte);
+
+		/* enable port	 	*/
+		byte = vmodttl_read_reg(pd, MCCR) | PBE;
+		vmodttl_write_reg(pd, MCCR, byte);
+		/* enable interrupt	*/
+		vmodttl_write_reg(pd, PCSR_B, SET_IE);
+
+	}
+	break;
+	
+	default:
+		printk(KERN_ERR PFX "vmodttl_pattern: Invalid port to configure.\n");
+		spin_unlock_irqrestore(&pd->vmodttl_spinlock, flags);
+		return -EINVAL;
+	}
+	/* enable master interrupts	*/
+	tmp = vmodttl_read_reg(pd, MICR) | MIE | NV;
+	vmodttl_write_reg(pd, MICR, tmp);
+	spin_unlock_irqrestore(&pd->vmodttl_spinlock, flags);
+	return 0;
+}
+
+/*
+ * vmodttl_read : wait for an IRQ and give the value of the channel to user space.
+ *
+ * We have a queue of readers for each device. They should read the same IRQ event.
+ * For this case, it is implemented a new wait queue (wait_readers) that forces the
+ * readers to wait until the last one picks the data. This wait has a timeout, just
+ * in case
+ */
+
+ssize_t vmodttl_read (struct file *file, char *buf, size_t count, loff_t *f_pos)
+{
+	int minor = iminor(file->f_dentry->d_inode);
+    	struct vmodttl_dev *pd =  (struct vmodttl_dev *)pvmodttlDv[minor];
+	int count_read = 0;
+	unsigned long flags;
+
+	// Counting the number of readers waiting for a IRQ on such device.
+	atomic_inc(&pd->nr_readers);
+    
+	if(wait_event_interruptible(pd->wait, (pd->irq == 1))) {
+		atomic_dec(&pd->nr_readers);
+		count_read = -ERESTARTSYS;
+		goto out;
+	}
+
+	spin_lock_irqsave(&pd->vmodttl_read, flags);
+
+	if(copy_to_user(buf, (void *)&pd->messages, 2*sizeof(unsigned char)) != 0){
+		atomic_dec(&pd->nr_readers);
+		spin_unlock_irqrestore(&pd->vmodttl_read, flags);
+		count_read = -EFAULT;
+		goto out;
+	}
+
+	count_read += 2*sizeof(unsigned char);
+
+	if (atomic_dec_and_test(&pd->nr_readers)) {
+		atomic_set(&pd->nr_readers, 0);
+		pd->irq = 0;
+		spin_unlock_irqrestore(&pd->vmodttl_read, flags);
+		// As this is the last reader, switch off the lights when it leaves.
+		wake_up_interruptible_all(&pd->wait_readers);
+	} else {
+
+		spin_unlock_irqrestore(&pd->vmodttl_read, flags);
+
+		/*
+		 * Wait until the rest of readers have got the same IRQ. If not, timeout of 1 ms.
+		 * Don't care if a signal arrives or it is timeout, the reader has the IRQ value, 
+		 * so continue.
+		 */
+		wait_event_interruptible_timeout(pd->wait_readers, (atomic_read(&pd->nr_readers) == 0), 0.001*HZ);
+	}
+
+out:
+	return count_read;	
+
+
 }
 
 static int vmodttl_config(struct vmodttlconfig conf, struct vmodttl_dev *pd)
@@ -313,18 +573,18 @@ static int vmodttl_read_chan(struct vmodttlarg buf, struct vmodttl_dev *pd)
 
 	switch(buf.dev){
 		case VMOD_TTL_CHANNEL_A:
-			val = vmodttl_read_word(pd, VMODTTL_PORTA);
+			val = (int) vmodttl_read_word(pd, VMODTTL_PORTA);
 			strobe_value = 0x04;
 			break;
 
 		case VMOD_TTL_CHANNEL_B:
-			val = vmodttl_read_word(pd, VMODTTL_PORTB);		
+			val = (int) vmodttl_read_word(pd, VMODTTL_PORTB);		
 			strobe_value = 0x08;
 			break;
 
 		case VMOD_TTL_CHANNELS_AB:
-			val = vmodttl_read_word(pd, VMODTTL_PORTA) & 0x00ff;
-			val += (vmodttl_read_word(pd, VMODTTL_PORTB) & 0x00ff) << 8;
+			val = (int) vmodttl_read_word(pd, VMODTTL_PORTA);
+			val += ((int) vmodttl_read_word(pd, VMODTTL_PORTB)) << 8;
 
 		default:
 			break;
@@ -363,11 +623,9 @@ static int vmodttl_write_chan(struct vmodttlarg buf, struct vmodttl_dev *pd)
 		}
 
 		vmodttl_write_word(pd, VMODTTL_PORTA, data);
-		vmodttl_write_word(pd, VMODTTL_CONTROL, MCCR);
-		tmp = vmodttl_read_word(pd, VMODTTL_CONTROL);
+		tmp = vmodttl_read_reg(pd, MCCR);
 
-		vmodttl_write_word(pd, VMODTTL_CONTROL, MCCR);
-		vmodttl_write_word(pd, VMODTTL_CONTROL, (tmp | PAE));
+		vmodttl_write_reg(pd, MCCR, (tmp | PAE));
 		strobe_value = 0x01;
 		break;
 
@@ -379,11 +637,9 @@ static int vmodttl_write_chan(struct vmodttlarg buf, struct vmodttl_dev *pd)
 		}
 
 		vmodttl_write_word(pd, VMODTTL_PORTB, data);
-		vmodttl_write_word(pd, VMODTTL_CONTROL, MCCR);
-		tmp = vmodttl_read_word(pd, VMODTTL_CONTROL);
+		tmp = vmodttl_read_reg(pd, MCCR);
 
-		vmodttl_write_word(pd, VMODTTL_CONTROL, MCCR);
-		vmodttl_write_word(pd, VMODTTL_CONTROL, (tmp | PBE));
+		vmodttl_write_reg(pd, MCCR, (tmp | PBE));
 		strobe_value = 0x02;
 		break;
 
@@ -396,15 +652,12 @@ static int vmodttl_write_chan(struct vmodttlarg buf, struct vmodttl_dev *pd)
 		}
 
 		vmodttl_write_word(pd, VMODTTL_PORTA, data & 0xff);
-		vmodttl_write_word(pd, VMODTTL_CONTROL, MCCR);
-		tmp = vmodttl_read_word(pd, VMODTTL_CONTROL);
+		tmp = vmodttl_read_reg(pd, MCCR);
 
 		vmodttl_write_word(pd, VMODTTL_PORTB, (data >> 8) & 0xff); 	
-		vmodttl_write_word(pd, VMODTTL_CONTROL, MCCR);	
-		tmp = vmodttl_read_word(pd, VMODTTL_CONTROL);
+		tmp = vmodttl_read_reg(pd, MCCR);
 
-		vmodttl_write_word(pd, VMODTTL_CONTROL, MCCR);
-		vmodttl_write_word(pd, VMODTTL_CONTROL, (tmp | PAE | PBE));
+		vmodttl_write_reg(pd, MCCR, (tmp | PAE | PBE));
 		strobe_value = 0x03;
 		break;
 	default:
@@ -458,7 +711,10 @@ static int vmodttl_ioctl(struct inode *inode, struct file *fp, unsigned op, unsi
 
 		if(copy_from_user((char *)&buf, (char *)arg, sizeof(struct vmodttl_pattern))) 
 			return -EFAULT;
-		pd->ioconfig.bit_pattern_a[buf.pos] = buf;
+
+		ret = vmodttl_pattern(buf, pd);
+		if (ret < 0)
+			return ret;
 		break;
 	}
 	case VMODTTL_READ_CHAN:
@@ -501,7 +757,7 @@ static int vmodttl_ioctl(struct inode *inode, struct file *fp, unsigned op, unsi
 }
 struct file_operations vmodttl_fops = {
         .owner 		= THIS_MODULE,
-	.read 		= NULL,
+	.read 		= vmodttl_read,
         .ioctl 		= vmodttl_ioctl,
         .open 		= vmodttl_open,
         .release 	= vmodttl_release
@@ -575,19 +831,21 @@ static int __init vmodttl_init(void)
 
 		pvmodttlDv[mod->lun] = (void *)pd;
 		pd->config = mod;
+
 		pd->dev = lun_to_index(dev_table, mod->lun);
 		pd->OpenCount = 0;
+		atomic_set(&pd->nr_readers, 0);
 		pd->io_flag = 0; /* All channels are inputs by default */
 		pd->open_collector = 0; /* All channels are TTL by default */
 		pd->created = 1;
 		spin_lock_init(&pd->vmodttl_spinlock);
 		spin_lock_init(&pd->vmodttl_read);
 		init_waitqueue_head(&pd->wait);
-		pd->messages = kzalloc(sizeof(struct message_list), GFP_KERNEL);
-		if (pd->messages == 0)
-			goto fail_messages;
+		init_waitqueue_head(&pd->wait_readers);
+		pd->irq = 0;
+		if (register_module_isr(pd, vmodttl_interrupt) < 0)
+                	goto fail_messages;
 
-		INIT_LIST_HEAD(&pd->messages->list);
 		vmodttl_default(pd);
 	}
 
@@ -614,14 +872,9 @@ fail_chrdev:    return -1;
 static void __exit vmodttl_exit(void)
 {
 	int i;
-	struct message_list *entry, *next_entry;
 
 	for(i =0; i < dev_table->num_modules; i++){
 		if(pvmodttlDv[i] != 0){
-			list_for_each_entry_safe(entry, next_entry, &pvmodttlDv[i]->messages->list, list) {
-				list_del(&entry->list);
-				kfree(entry);
-			}
 			unregister_module_isr(pvmodttlDv[i]);
 			kfree(pvmodttlDv[i]);
 		}
@@ -638,4 +891,4 @@ module_exit(vmodttl_exit);
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Samuel Iglesias Gonsalvez");
 MODULE_DESCRIPTION("VMOD-TTL device driver");
-MODULE_VERSION("1.0");
+MODULE_VERSION("1.1");
