@@ -6,8 +6,8 @@
 /* Julian Lewis May 2004.                                                     */
 /* ========================================================================== */
 
-#include <EmulateLynxOs.h>
-#include <DrvrSpec.h>
+#include "EmulateLynxOs.h"
+#include "DrvrSpec.h"
 #include <linux/version.h>
 
 #ifndef L864

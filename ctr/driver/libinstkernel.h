@@ -5,7 +5,7 @@
 #ifndef LIBINST_KERNEL
 #define LIBINST_KERNEL
 
-#include <config_data.h>
+#include "config_data.h"
 
 #if defined (__linux__)
 #include <linux/vmalloc.h>

@@ -7,9 +7,9 @@
 /*                                                            */
 /* ********************************************************** */
 
-#include <EmulateLynxOs.h>
-#include <DrvrSpec.h>
-#include <plx9030.h>   /* PLX9030 Registers and definition   */
+#include "EmulateLynxOs.h"
+#include "DrvrSpec.h"
+#include "plx9030.h"   /* PLX9030 Registers and definition   */
 
 #include <linux/interrupt.h>	/* enable_irq, disable_irq */
 
@@ -18,12 +18,12 @@
 #define sel LynxSel
 #define enable restore
 
-#include <ctrhard.h>   /* Hardware description               */
-#include <ctrdrvr.h>   /* Public driver interface            */
-#include <ctrdrvrP.h>  /* Private driver structures          */
+#include "ctrhard.h"   /* Hardware description               */
+#include "ctrdrvr.h"   /* Public driver interface            */
+#include "ctrdrvrP.h"  /* Private driver structures          */
 
-#include <ports.h>     /* XILINX Jtag stuff                  */
-#include <hptdc.h>     /* High prescision time to digital convertor */
+#include "ports.h"     /* XILINX Jtag stuff                  */
+#include "hptdc.h"     /* High prescision time to digital convertor */
 
 /*========================================================================*/
 /* Define prototypes and forward references for local driver routines.    */

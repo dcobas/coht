@@ -1,4 +1,4 @@
-#include <EmulateLynxOs.h>
+#include "EmulateLynxOs.h"
 #include <linux/delay.h>
 
 static DEFINE_SPINLOCK(sem_list_lock); /* protect access to cdcm_sem_list */

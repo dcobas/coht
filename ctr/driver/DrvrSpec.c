@@ -4,8 +4,8 @@
 /* ===================================================== */
 
 #include <linux/errno.h>
-#include <EmulateLynxOs.h>
-#include <DrvrSpec.h>
+#include "EmulateLynxOs.h"
+#include "DrvrSpec.h"
 
 /* ===================================================== */
 

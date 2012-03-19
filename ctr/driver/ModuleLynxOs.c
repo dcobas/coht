@@ -29,8 +29,8 @@
 #include <linux/version.h>
 #include <linux/mutex.h>
 
-#include <EmulateLynxOs.h>
-#include <DrvrSpec.h>
+#include "EmulateLynxOs.h"
+#include "DrvrSpec.h"
 
 extern CtrDrvrInfoTable *LynxOsInfoTable;
 extern int LynxOsInitInfoTable(int);
@@ -105,9 +105,6 @@ struct file_operations LynxOs_fops = {
    open:           LynxOsOpen,
    release:        LynxOsClose
 };
-
-#include <EmulateLynxOs.h>
-#include <DrvrSpec.h>
 
 extern struct dldd entry_points;
 
