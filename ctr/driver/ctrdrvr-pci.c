@@ -171,7 +171,7 @@ int hunt_lun(int bus, int slot)
 
 static int used_luns = 0;
 
-int get_unused_lun()
+int get_unused_lun(void)
 {
 
 	int i, lun, bit;
