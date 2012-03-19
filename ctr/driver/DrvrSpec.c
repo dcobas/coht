@@ -10,7 +10,7 @@
 /* ===================================================== */
 
 static CtrDrvrInfoTable info_table;
-void *LynxOsInfoTable = (void *) &info_table;
+CtrDrvrInfoTable *LynxOsInfoTable = &info_table;
 
 /* ===================================================== */
 /* Initialize info table, returns 0 if ok                */

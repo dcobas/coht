@@ -28,18 +28,8 @@
 /* Driver entry points       */
 /* ========================= */
 
-irqreturn_t IntrHandler();
-int CtrDrvrOpen();
-int CtrDrvrClose();
-int CtrDrvrRead();
-int CtrDrvrWrite();
-int CtrDrvrSelect();
-char * CtrDrvrInstall();
-int CtrDrvrUninstall();
-int CtrDrvrIoctl();
-
-extern void disable_intr();
-extern void enable_intr();
+extern void disable_intr(void);
+extern void enable_intr(void);
 extern int modules;
 extern unsigned long infoaddr;
 
@@ -134,8 +124,10 @@ static int AddModule(CtrDrvrModuleContext *mcon,
 		     int                   index,
 		     int                   flag);
 
+irqreturn_t IntrHandler(CtrDrvrModuleContext *);
 
-static int GetClrBusErrCnt();
+
+static int GetClrBusErrCnt(void);
 static int HRd(void *x);
 static void HWr(int v, void *x);
 
@@ -174,7 +166,7 @@ static void BusErrorHandler(struct vme_bus_error *error) {
 
 /* ==================== */
 
-static int GetClrBusErrCnt() {
+static int GetClrBusErrCnt(void) {
 int res;
 
    res = bus_error_count;
@@ -676,7 +668,7 @@ int interval_jiffies = msecs_to_jiffies(interval * 10); /* 10ms granularity */
 
    sreset(&(mcon->Semaphore));
 
-   mcon->Timer = timeout(ResetTimeout, (char *) mcon, interval_jiffies);
+   mcon->Timer = timeout((void *)ResetTimeout, (char *) mcon, interval_jiffies);
    if (mcon->Timer < 0) mcon->Timer = 0;
    if (mcon->Timer) swait(&(mcon->Semaphore), SEM_SIGABORT);
    if (mcon->Timer) CancelTimeout(&(mcon->Timer));
@@ -1479,10 +1471,8 @@ irqreturn_t ret;
 /* OPEN                                                                   */
 /*========================================================================*/
 
-int CtrDrvrOpen(wa, dnm, flp)
-CtrDrvrWorkingArea * wa;        /* Working area */
-int dnm;                        /* Device number */
-struct LynxFile * flp; {        /* File pointer */
+int CtrDrvrOpen(CtrDrvrWorkingArea *wa, int dnm, struct LynxFile *flp)
+{
 
 int cnum;                       /* Client number */
 CtrDrvrClientContext * ccon;    /* Client context */
@@ -1527,9 +1517,8 @@ CtrDrvrClientContext * ccon;    /* Client context */
 /* CLOSE                                                                  */
 /*========================================================================*/
 
-int CtrDrvrClose(wa, flp)
-CtrDrvrWorkingArea * wa;    /* Working area */
-struct LynxFile * flp; {        /* File pointer */
+int CtrDrvrClose(CtrDrvrWorkingArea *wa, struct LynxFile *flp)
+{
 
 int cnum;                   /* Client number */
 CtrDrvrClientContext *ccon; /* Client context */
@@ -1579,11 +1568,8 @@ CtrDrvrClientContext *ccon; /* Client context */
 /* READ                                                                   */
 /*========================================================================*/
 
-int CtrDrvrRead(wa, flp, u_buf, cnt)
-CtrDrvrWorkingArea * wa;       /* Working area */
-struct LynxFile * flp;              /* File pointer */
-char * u_buf;                   /* Users buffer */
-int cnt; {                      /* Byte count in buffer */
+int CtrDrvrRead(CtrDrvrWorkingArea *wa, struct LynxFile *flp, char *u_buf, int cnt)
+{                   
 
 CtrDrvrClientContext *ccon;    /* Client context */
 CtrDrvrQueue         *queue;
@@ -1608,7 +1594,7 @@ unsigned long          ps;
    }
 
    if (ccon->Timeout) {
-      ccon->Timer = timeout(ReadTimeout, (char *) ccon, ccon->Timeout);
+      ccon->Timer = timeout((int (*)(void *))ReadTimeout, (char *) ccon, ccon->Timeout);
       if (ccon->Timer < 0) {
 
 	 ccon->Timer = 0;
@@ -1669,11 +1655,8 @@ unsigned long          ps;
 /* with the supplied CtrDrvrReadBuf.                                     */
 /*========================================================================*/
 
-int CtrDrvrWrite(wa, flp, u_buf, cnt)
-CtrDrvrWorkingArea * wa;       /* Working area */
-struct LynxFile * flp;             /* File pointer */
-char * u_buf;                  /* Users buffer */
-int cnt; {                     /* Byte count in buffer */
+int CtrDrvrWrite(CtrDrvrWorkingArea *wa, struct LynxFile *flp, char *u_buf, int cnt)
+{ 
 
 CtrDrvrClientContext *ccon;    /* Client context */
 CtrDrvrModuleContext *mcon;
@@ -1769,11 +1752,8 @@ unsigned int          clients;
 /* SELECT                                                                 */
 /*========================================================================*/
 
-int CtrDrvrSelect(wa, flp, wch, ffs)
-CtrDrvrWorkingArea * wa;        /* Working area */
-struct LynxFile * flp;              /* File pointer */
-int wch;                        /* Read/Write direction */
-struct sel * ffs; {             /* Selection structurs */
+int CtrDrvrSelect(CtrDrvrWorkingArea *wa, struct LynxFile *flp, int wch, struct sel *ffs)
+{
 
 CtrDrvrClientContext * ccon;
 int cnum;
@@ -1842,7 +1822,8 @@ int index;
 /* ================================================= */
 /* Build a ctr info object from the pointer infoaddr */
 
-int BuildInfoObject() {
+int BuildInfoObject(void)
+{
 
 InsLibDrvrDesc *drvrd = NULL;
 int rc = 1;
@@ -1869,7 +1850,7 @@ int rc = 1;
 /* INSTALL  LynxOS Version 4 VME version                                  */
 /*========================================================================*/
 
-char * CtrDrvrInstall(void *junk) {
+void *CtrDrvrInstall(CtrDrvrWorkingArea *junk) {
 
 CtrDrvrWorkingArea *wa;
 
@@ -1966,8 +1947,8 @@ CtrDrvrMemoryMap              *mmap;
 /* Uninstall                                                              */
 /*========================================================================*/
 
-int CtrDrvrUninstall(wa)
-CtrDrvrWorkingArea * wa; {     /* Drivers working area pointer */
+int CtrDrvrUninstall(CtrDrvrWorkingArea *wa)
+{
 
 CtrDrvrClientContext *ccon;
 CtrDrvrModuleContext *mcon;
@@ -1998,11 +1979,8 @@ int i;
 /* IOCTL                                                                  */
 /*========================================================================*/
 
-int CtrDrvrIoctl(wa, flp, cm, arg)
-CtrDrvrWorkingArea * wa;       /* Working area */
-struct LynxFile * flp;             /* File pointer */
-CtrDrvrControlFunction cm;     /* IOCTL command */
-char * arg; {                  /* Data for the IOCTL */
+int CtrDrvrIoctl(CtrDrvrWorkingArea *wa, struct LynxFile *flp, CtrDrvrControlFunction cm, char *arg)
+{
 
 CtrDrvrModuleContext           *mcon;   /* Module context */
 CtrDrvrClientContext           *ccon;   /* Client context */
@@ -2381,7 +2359,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
 	 /* Wait 1S for the module to settle */
 
 	 sreset(&(mcon->Semaphore));
-	 mcon->Timer = timeout(ResetTimeout, (char *) mcon, 100);
+	 mcon->Timer = timeout((int (*)(void *))ResetTimeout, (char *) mcon, 100);
 	 if (mcon->Timer < 0) mcon->Timer = 0;
 	 if (mcon->Timer) swait(&(mcon->Semaphore), SEM_SIGABORT);
 	 if (mcon->Timer) CancelTimeout(&(mcon->Timer));
@@ -3001,6 +2979,7 @@ struct dldd entry_points = {
    CtrDrvrRead, CtrDrvrWrite,
    CtrDrvrSelect,
    CtrDrvrIoctl,
-   CtrDrvrInstall, CtrDrvrUninstall
+   CtrDrvrInstall,
+   CtrDrvrUninstall,
 };
 
