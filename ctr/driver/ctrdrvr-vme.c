@@ -37,7 +37,7 @@ extern int modules;
 extern unsigned long infoaddr;
 extern int first_module;
 
-#include <vmebus.h>
+#include "vmebus.h"
 #include <linux/interrupt.h>
 
 #ifndef VME_PG_SHARED
