@@ -71,13 +71,7 @@ static inline int __cdcm_down_common(struct cdcm_sem *sem, long state,
 		spin_unlock_irq(&sem->lock);
 		timeout = schedule_timeout(timeout);
 		spin_lock_irq(&sem->lock);
-		/*
-		 * In Lynx a kthread might want to wait on a semaphore;
-		 * we check here for the case where the sleeping thread
-		 * has been marked to be stopped. If that's the case,
-		 * we wake up the thread (which will be then killed).
-		 */
-		if (waiter.up || kthread_should_stop())
+		if (waiter.up)
 			return 0;
 	}
 
