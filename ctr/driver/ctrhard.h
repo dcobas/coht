@@ -19,9 +19,15 @@
 /* #define CTR_VME */
 
 /* Under the gcc we use on LynxOs either __LITTLE / BIG_ENDIAN__ is defined. */
-/* Under Linux on the Intel platforms __i386__ is defined */
+/* Under Linux on the Intel platforms __i386__ is defined, but not on 64bit. */
 
 #ifdef __i386__
+#ifndef __LITTLE_ENDIAN__
+#define __LITTLE_ENDIAN__
+#endif
+#endif
+
+#ifdef __x86_64__
 #ifndef __LITTLE_ENDIAN__
 #define __LITTLE_ENDIAN__
 #endif
@@ -772,8 +778,10 @@ typedef struct {
 
    unsigned int IdLSL;          /* ID Chip value Least Sig 32-bits */
    unsigned int IdMSL;          /* ID Chip value Most  Sig 32-bits */
-  
+
    CtrDrvrModuleStats ModStats; /* Module statistics */
+
+   unsigned int SvnId[32];      /* SVN Archive string */
 
  } CtrDrvrMemoryMap;
 
