@@ -32,6 +32,7 @@ extern void disable_intr(void);
 extern void enable_intr(void);
 extern int modules;
 extern unsigned long infoaddr;
+extern int first_module;
 
 #include "vmebus.h"
 #include <linux/interrupt.h>
@@ -1882,14 +1883,17 @@ CtrDrvrMemoryMap              *mmap;
 
       /* Failed so do a default install */
 
+      if ((first_module <= 0) || (first_module > CtrDrvrMODULE_CONTEXTS))
+	 first_module = 1;
       if (modules <= 0)
-	      modules = 1;
-      if (modules >  CtrDrvrMODULE_CONTEXTS)
-	      modules = CtrDrvrMODULE_CONTEXTS;
+	 modules = 1;
+      if (modules + (first_module - 1) > CtrDrvrMODULE_CONTEXTS)
+	 modules = 1;
 
+      cprintf("CtrDrvrInstall: Will auto-install:%d CTRV modules, starting at:%d\n",modules,first_module);
 
-      cprintf("CtrDrvrInstall: Will auto-install:%d CTRV modules\n",modules);
       tinfo.Modules = modules;
+      i=first_module -1;
 
       cprintf("CtrDrvrInstall: Will auto-install:%d CTRV modules\n",tinfo.Modules);
 

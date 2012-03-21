@@ -41,6 +41,7 @@ extern LynxOsIsr lynxos_isrs[LynxOsMAX_DEVICE_COUNT];
 int debug              = 0;
 int recover            = 0;
 int modules            = 1;
+int first_module       = 1;
 unsigned long infoaddr = 0;
 static char dname[64]  = { 0 };
 
@@ -55,10 +56,11 @@ MODULE_SUPPORTED_DEVICE(LynxOsSUPPORTED_DEVICE);
 /* To get instalation full debug info:  insmod <module> debug=7 */
 /* Then look to: /var/log/messeage for the install debug output */
 
-module_param(debug,     int,   0644);
-module_param(recover,   int,   0644);
-module_param(modules,   int,   0644);
-module_param(infoaddr,  ulong, 0644);
+module_param(debug,        int,   0644);
+module_param(recover,      int,   0644);
+module_param(modules,      int,   0644);
+module_param(first_module, int,   0644);
+module_param(infoaddr,     ulong, 0644);
 
 module_param(LynxOs_major,int,0644);
 MODULE_PARM_DESC(LynxOs_major,"Major device number");
