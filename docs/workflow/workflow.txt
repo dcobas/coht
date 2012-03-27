@@ -1,0 +1,46 @@
+Driver development workflow
+===========================
+BE/CO/HT drivers team <dcobas@cern.ch>
+
+Our central repo, COHT, consists of a single linear history stored
+in the master branch. At the very least, the commits corresponding
+to a particular operational deployment of a driver+libs+test must
+be there, suitably tagged.
+
+Binaries deployed operationally are tagged so that their sources are
+easily traced back to the COHT commmit they came from.
+
+Patches coming from private repositories should ideally apply cleanly
+on top of (the current tip of the master branch of) COHT. If a patch
+set was submitted that did not comply with this rule, it should be easy
+for the repository manager to apply: changes restricted to a single
+directory are assumed then.
+
+Patches will be reviewed. When no one could do so, the repository manager
+will appoint a victim to do so.
+
+The flow of code is as follows:
+
+- Fixes, new features or entire operating systems are developed, tested,
+  delivered into lab and nicely wrapped up from each developer local
+  repo, whatever its shape.
+- Items ready for review (tested and stamped by the author) are
+  submitted in patch form to ht-drivers@cern.ch, and reviewed as
+  was said above.
+- When approved, the repository manager stamps his OK and this goes to
+  COHT.
+- From there, binaries are deployed in the indicated fashion.
+
+Addenda:
+
+1. A simple tool (script) will be provided to install binaries in a
+   traceable manner, avoiding any manual intervention.
+2. A simple tool (script) will be provided to do the same, on a
+   per-DSC basis, to be used in testing binaries in lab and
+   _only very exceptionally_ in operational
+   environments. A mechanism will be installed so that the reversion of
+   this perversion is automatic and no time bomb results of this devious
+   procedure.
+3. _Important_:  The repository manager is in charge of the operational
+   deployments. Exceptions require notify, agree, and feedback (give me what,
+   where, and which md5sums have the deployed binaries).
