@@ -46,7 +46,6 @@
  *          perror("ctr_open error");
  *
  */
-
 void *ctr_open();
 
 /**
@@ -57,7 +56,6 @@ void *ctr_open();
  * This routine disconnects from all interrupts, frees up memory and
  * closes the ctr driver. It should be called once for each ctr_open.
  */
-
 int ctr_close(void *handle);
 
 /**
@@ -65,7 +63,6 @@ int ctr_close(void *handle);
  * @param A handle that was allocated in open
  * @return The installed module count or -1 on error
  */
-
 int ctr_get_module_count(void *handle);
 
 /**
@@ -79,7 +76,6 @@ int ctr_get_module_count(void *handle);
  * to call set_module for your handle. All subsequent calls will work
  * using the set module number.
  */
-
 int ctr_set_module(void *handle, int modnum);
 
 /**
@@ -87,7 +83,6 @@ int ctr_set_module(void *handle, int modnum);
  * @param A handle that was allocated in open
  * @return module number 1..n or -1 on error
  */
-
 int ctr_get_module(void *handle);
 
 /**
@@ -109,7 +104,6 @@ int ctr_get_module(void *handle);
  *  if (ctr_set_module(handle,modnum) < 0) ...
  *  if (ctr_connect(handle,ctr_class,(int) hmask) < 0) ...
  */
-
 int ctr_connect(void *handle, CtrDrvrConnectionClass ctr_class, int equip);
 
 /**
@@ -131,7 +125,6 @@ int ctr_connect(void *handle, CtrDrvrConnectionClass ctr_class, int equip);
  *  if (ctr_set_module(handle,modnum) < 0) ...
  *  if (ctr_connect_payload(handle,ctim,payload) < 0) ...
  */
-
 int ctr_connect_payload(void *handle, int ctim, int payload);
 
 /**
@@ -143,15 +136,7 @@ int ctr_connect_payload(void *handle, int ctim, int payload);
  *
  * The client code must remember what it is connected to in order to disconnect.
  */
-
 int ctr_disconnect(void *handle, CtrDrvrConnectionClass ctr_class, int mask);
-
-/**
- * @brief Wait for an interrupt
- * @param A handle that was allocated in open
- * @param Pointer to an interrupt structure
- * @return Zero means success else -1 is returned on error, see errno
- */
 
 struct ctr_time_s {
 	struct timeval time;    /** Standard Linux time value */
@@ -169,6 +154,12 @@ struct ctr_interrupt_s {
 	ctr_time_s start;                  /** Counter start time */
 };
 
+/**
+ * @brief Wait for an interrupt
+ * @param A handle that was allocated in open
+ * @param Pointer to an interrupt structure
+ * @return Zero means success else -1 is returned on error, see errno
+ */
 int ctr_wait(void *handle, struct ctr_interrupt_s *ctr_interrupt);
 
 /**
@@ -228,7 +219,6 @@ typedef enum {
  * @param ctr_ccv_fields to be set from ctr_ccv
  * @return Zero means success else -1 is returned on error, see errno
  */
-
 int ctr_set_ccv(void *handle, int ptim, int index, struct ctr_ccv_s *ctr_ccv, ctr_ccv_fields_t ctr_ccv_fields);
 
 /**
@@ -239,7 +229,6 @@ int ctr_set_ccv(void *handle, int ptim, int index, struct ctr_ccv_s *ctr_ccv, ct
  * @param ctr_ccv points to where the values will be stored
  * @return Zero means success else -1 is returned on error, see errno
  */
-
 int ctr_get_ccv(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv);
 
 /**
@@ -249,7 +238,6 @@ int ctr_get_ccv(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv);
  * @param size of ltim action array (PLS lines)
  * @return Zero means success else -1 is returned on error, see errno
  */
-
 int ctr_create_ltim(void *handle, int ltim, int size);
 
 /**
@@ -258,7 +246,6 @@ int ctr_create_ltim(void *handle, int ltim, int size);
  * @param telegram point to a short array of at least size 32
  * @return Zero means success else -1 is returned on error, see errno
  */
-
 int ctr_get_telegram(void *handle, int index, short *telegram);
 
 /**
@@ -267,8 +254,18 @@ int ctr_get_telegram(void *handle, int index, short *telegram);
  * @param ctr_time point to where time will be stored
  * @return Zero means success else -1 is returned on error, see errno
  */
-
 int ctr_get_time(void *handle, ctr_time_s *ctr_time);
+
+/**
+ * @brief Set the time on the current module
+ * @param A handle that was allocated in open
+ * @param The time to set
+ * @return Zero means success else -1 is returned on error, see errno
+ *
+ * Note this time will be overwritten within 1 second if the
+ * current module is enabled and connected to the timing network.
+ */
+int ctr_set_time(void *handle, struct ctr_time_s *ctr_time);
 
 /**
  * @brief Get cable ID
@@ -276,8 +273,18 @@ int ctr_get_time(void *handle, ctr_time_s *ctr_time);
  * @param cid points to where id will be stored
  * @return Zero means success else -1 is returned on error, see errno
  */
-
 int ctr_get_cid(void *handle, int *cid);
+
+/**
+ * @brief Set the cable ID of a module
+ * @param A handle that was allocated in open
+ * @param The cable ID to set
+ * @return Zero means success else -1 is returned on error, see errno
+ *
+ * Note this cable ID will be overwritten within 1 second if the
+ * current module is enabled and connected to the timing network.
+ */
+int ctr_set_cable_id(void *handle, int cable_id);
 
 /**
  * @brief Get firmware version
@@ -285,7 +292,6 @@ int ctr_get_cid(void *handle, int *cid);
  * @param version points to where version will be stored
  * @return Zero means success else -1 is returned on error, see errno
  */
-
 int ctr_get_fw_version(void *handle, int *version);
 
 /**
@@ -294,7 +300,6 @@ int ctr_get_fw_version(void *handle, int *version);
  * @param version points to where version will be stored
  * @return Zero means success else -1 is returned on error, see errno
  */
-
 int ctr_get_dvr_version(void *handle, int *version);
 
 /**
@@ -304,7 +309,6 @@ int ctr_get_dvr_version(void *handle, int *version);
  * @param mask event frame, like 0x2438FFFF (if there is a payload, set FFFF at the end)
  * @return Zero means success else -1 is returned on error, see errno
  */
-
 int ctr_create_ctim(void *handle, int ctim, int mask);
 
 /**
@@ -313,7 +317,6 @@ int ctr_create_ctim(void *handle, int ctim, int mask);
  * @param ctim event Id to destroy
  * @return Zero means success else -1 is returned on error, see errno
  */
-
 int ctr_destroy_ctim(void *handle, int ctim);
 
 /**
@@ -321,8 +324,7 @@ int ctr_destroy_ctim(void *handle, int ctim);
  * @param A handle that was allocated in open
  * @return Queue size or -1 on error
  */
-
-int ctr_queue_size(void *handle);
+int ctr_get_queue_size(void *handle);
 
 /**
  * @brief Turn your queue on or off
@@ -330,7 +332,6 @@ int ctr_queue_size(void *handle);
  * @param flag 1=>queuing is off, 0=>queuing is on
  * @return Zero means success else -1 is returned on error, see errno
  */
-
 int ctr_set_queue_flag(void *handle, int flag);
 
 /**
@@ -338,25 +339,87 @@ int ctr_set_queue_flag(void *handle, int flag);
  * @param A handle that was allocated in open
  * @return The queue flag 0..1 (QOFF..QON)  else -1 on error
  */
-
 int ctr_get_queue_flag(void *handle);
 
-int ctr_SetTime(int lun, ctr_Time timeToSet);
-int ctr_SetCableId(int lun, unsigned long ulId);
+/**
+ * @brief Enable/Disable timing reception on current module
+ * @param A handle that was allocated in open
+ * @param Enable flag (1=enabled 0=disabled)
+ * @return Zero means success else -1 is returned on error, see errno
+ */
+int ctr_set_enable(void *handle, int flag);
+
+/**
+ * @brief Get the Enable/Disable flag value
+ * @param A handle that was allocated in open
+ * @return The enable/Disable flag value or -1 on error
+ */
+int ctr_get_enable(void *handle);
+
+/**
+ * @brief Set the CTR timing input delay value
+ * @param A handle that was allocated in open
+ * @param The new delay value in 40MHz (25ns) Ticks (24-Bit)
+ * @return Zero means success else -1 is returned on error, see errno
+ */
+int ctr_set_input_delay(void *handle, int delay);
+
+/**
+ * @brief Get the CTR timing input delay value
+ * @param A handle that was allocated in open
+ * @return The input delay value in 40MHz ticks value or -1 on error
+ */
+int ctr_get_input_delay(void *handle);
+
+/**
+ * @brief Set the CTR driver debug print out level
+ * @param A handle that was allocated in open
+ * @param The level to be set 0=None ..7 Up to level 7
+ * @return Zero means success else -1 is returned on error, see errno
+ */
+int ctr_set_debug_level(void *handle, int level);
+
+/**
+ * @brief Get the CTR driver debug print out level
+ * @param A handle that was allocated in open
+ * @return The debug level 0..7 (0=Off) else -1 for error
+ */
+int ctr_get_debug_level(void *handle);
+
+/**
+ * @brief Get the CTR module status
+ * @param A handle that was allocated in open
+ * @param Pointer to where the status will be stored of type CtrDrvrStatus
+ * @return Zero means success else -1 is returned on error, see errno
+ */
+int ctr_get_status(void *handle, CtrDrvrStatus *stat);
+
+/**
+ * @brief Set up a counter remotley from user code rather than from a CTIM
+ *
+ * Set a counter under full remote control (IE under DSC tasks control)
+ * This feature permits you to do what you like with counters even if
+ * there is no timing cable attached. With this you can drive stepper
+ * motors, wire scanners or whatever. No PTIM or CTIM is involved, the
+ * configuration is loaded directly by the application. Note that when
+ * the argument remflg is set to 1, the counter can not be written to
+ * by incomming triggers so all PTIM objects using the counter stop
+ * overwriting the counter configuration and are effectivley disabled.
+ * Setting the remflg 0 permits PTIM triggers to write to the counter
+ * configuration, the write block is removed. Also note that in some
+ * cases it is useful to perform remote actions, such as remoteSTOP,
+ * even if the remflg is set to zero. The remflg simply blocks PTIM
+ * overwrites, the counter configuration can still be accessed !
+
+
 int ctr_SetP2(int lun, unsigned long ulEnable, ctr_P2Bits outputBits);
 int ctr_GetP2(int lun, unsigned long* pulEnable, ctr_P2Bits* pOutputBits);
-int ctr_GetModuleEnable(int lun, unsigned long* pulEnable);
-int ctr_SetModuleEnable(int lun, unsigned long ulEnable);
-int ctr_SetInputDelay(int lun, unsigned long ulDelayTick);
-int ctr_GetInputDelay(int lun, unsigned long* pulDelayTick);
 int ctr_Memtest(int lun, unsigned long* pulMemtest);
 int ctr_SetPllLocking(int lun, unsigned long lockflag);
 int ctr_GetPllLocking(int lun, unsigned long* pulLockflag);
 int ctr_GetClientsHandle(unsigned long* pulPidList, void** pHandleList, unsigned long* pulListSize, unsigned long ulMaxSize);//(all clients processes connected to the driver and the associated handle)
 int ctr_GetConnected(void *handle, unsigned long* pulIdList, ctr_Class* pclassList, unsigned long* pulModuleList, unsigned long* pulListSize, unsigned long ulMaxSize);//(get all events connected to a handle: class and equipment id)
 int ctr_GetModuleStats(int lun, ctr_ModuleStats* resStats);
-int ctr_SetDebug(unsigned long level);
-int ctr_GetStatus(int lun, ctr_Status* pStatus);
 int ctr_Simulate(ctr_Class iclss, unsigned long equip, unsigned long module, unsigned long grnum, unsigned long grval);
 int ctr_RemoteControl(unsigned long remflg, unsigned long module, unsigned long cntr, ctr_Remote rcmd, ctr_CcvMask ccvm, ctr_Ccv *ccv);
 int ctr_GetRemote(int lun, unsigned long cntr, unsigned long *remflg, ctr_CcvMask *ccvm, ctr_Ccv *ccv);
