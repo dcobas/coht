@@ -1,5 +1,5 @@
 /**
- * Julian Lewis Wed 28th March 2012 BE/CO/HT
+ * Julian Lewis Fri-30th March 2012 BE/CO/HT
  * julian.lewis@cern.ch
  *
  * CTR timing library definitions.
@@ -10,6 +10,52 @@
 
 #include <sys/time.h>
 #include <ctrdrvr.h>
+
+typedef struct {
+	int enable;                         /* Enable = 1, Disable = 0 */
+	CtrDrvrCounterStart start;          /* The counters start. */
+	CtrDrvrCounterMode mode;            /* The counters operating mode. */
+	CtrDrvrCounterClock clock;          /* Clock specification. */
+	int pulse_width;                    /* Number of 40MHz ticks, 0 = as fast as possible. */
+	int delay;                          /* 32 bit delay to load into counter. */
+	CtrDrvrCounterMask counter_mask;    /* Output lemo connectors mask, invited signals */
+	CtrDrvrPolarity polarity;           /* Polarity of output */
+	int ctim;                           /* CTIM triggering event of this action */
+	int payload;                        /* 16-Bit Payload */
+	CtrDrvrTriggerCondition cmp_method; /* Payload compare method */
+	CtrDrvrCounter ch;                  /* Counter number 1..8 (0 is a special hardware counter) */
+} ctr_ccv_s;
+
+typedef enum {
+	CTR_CCV_ENABLE       = 0x001,
+	CTR_CCV_START        = 0x002,
+	CTR_CCV_MODE         = 0x004,
+	CTR_CCV_CLOCK        = 0x008,
+	CTR_CCV_PULSE_WIDTH  = 0x010,
+	CTR_CCV_DELAY        = 0x020,
+	CTR_CCV_COUNTER_MASK = 0x040,
+	CTR_CCV_POLARITY     = 0x080,
+	CTR_CCV_CTIM         = 0x100,
+	CTR_CCV_PAYLOAD      = 0x200,
+	CTR_CCV_CMP_METHOD   = 0x400,
+	CTR_CCV_COUNTER      = 0x800
+} ctr_ccv_fields_t;
+
+struct ctr_time_s {
+	struct timeval time;    /** Standard Linux time value */
+	int ctrain;             /** Corresponding ctrain value */
+	int machine;            /** Machine of ctrain */
+};
+
+struct ctr_interrupt_s {
+	CtrDrvrConnectionClass  ctr_class; /** CTR interrupt class */
+	int equip;                         /** LTIM id, hardware mask, CTIM id */
+	int payload;                       /** 16-Bit payload of the event if CTIM */
+	int modnum;                        /** Module number of interrupting device */
+	ctr_time_s end;                    /** Time of end of action */
+	ctr_time_s trigger;                /** Trigger time of action */
+	ctr_time_s start;                  /** Counter start time */
+};
 
 /**
  * As this library runs exclusivley on Linux I use standard kernel coding
@@ -139,22 +185,6 @@ int ctr_connect_payload(void *handle, int ctim, int payload);
  */
 int ctr_disconnect(void *handle, int modnum, CtrDrvrConnectionClass ctr_class, int mask);
 
-struct ctr_time_s {
-	struct timeval time;    /** Standard Linux time value */
-	int ctrain;             /** Corresponding ctrain value */
-	int machine;            /** Machine of ctrain */
-};
-
-struct ctr_interrupt_s {
-	CtrDrvrConnectionClass  ctr_class; /** CTR interrupt class */
-	int equip;                         /** LTIM id, hardware mask, CTIM id */
-	int payload;                       /** 16-Bit payload of the event if CTIM */
-	int modnum;                        /** Module number of interrupting device */
-	ctr_time_s end;                    /** Time of end of action */
-	ctr_time_s trigger;                /** Trigger time of action */
-	ctr_time_s start;                  /** Counter start time */
-};
-
 /**
  * @brief Wait for an interrupt
  * @param A handle that was allocated in open
@@ -162,54 +192,6 @@ struct ctr_interrupt_s {
  * @return Zero means success else -1 is returned on error, see errno
  */
 int ctr_wait(void *handle, struct ctr_interrupt_s *ctr_interrupt);
-
-/**
- * Go to a lemo connector 1..8 and invite signals from this list
- */
-
-typedef enum {
-	CTR_LEMO_OUT_1 = 0x001, /* Output:  Counter 1        Lemo state */
-	CTR_LEMO_OUT_2 = 0x002, /* Output:  Counter 2        Lemo state */
-	CTR_LEMO_OUT_3 = 0x004, /* Output:  Counter 3        Lemo state */
-	CTR_LEMO_OUT_4 = 0x008, /* Output:  Counter 4        Lemo state */
-	CTR_LEMO_OUT_5 = 0x010, /* Output:  Counter 5        Lemo state */
-	CTR_LEMO_OUT_6 = 0x020, /* Output:  Counter 6        Lemo state */
-	CTR_LEMO_OUT_7 = 0x040, /* Output:  Counter 7        Lemo state */
-	CTR_LEMO_OUT_8 = 0x080, /* Output:  Counter 8        Lemo state */
-	CTR_LEMO_XST_1 = 0x100, /* Input:   External Start 1 Lemo state */
-	CTR_LEMO_XST_2 = 0x200, /* Input:   External Start 2 Lemo state */
-	CTR_LEMO_XCL_1 = 0x400, /* Input:   External Clock 1 Lemo state */
-	CTR_LEMO_XCL_2 = 0x800  /* Input:   External Clock 2 Lemo state */
- } ctr_lemo_mask_t;
-
-typedef struct {
-	int enable;                         /* Enable = 1, Disable = 0 */
-	CtrDrvrCounterStart start;          /* The counters start. */
-	CtrDrvrCounterMode mode;            /* The counters operating mode. */
-	CtrDrvrCounterClock clock;          /* Clock specification. */
-	int pulse_width;                    /* Number of 40MHz ticks, 0 = as fast as possible. */
-	int delay;                          /* 32 bit delay to load into counter. */
-	ctr_lemo_mask_t lemo_mask;          /* Output lemo connectors mask, invited signals */
-	CtrDrvrPolarity polarity;           /* Polarity of output */
-	int ctim;                           /* CTIM triggering event of this action */
-	int payload;                        /* 16-Bit Payload */
-	CtrDrvrTriggerCondition cmp_method; /* Payload compare method */
-	int counter;                        /* Counter number 1..8 (0 is a special hardware counter) */
-} ctr_ccv_s;
-
-typedef enum {
-	CTR_CCV_ENABLE      = 0x001,
-	CTR_CCV_START       = 0x002,
-	CTR_CCV_CLOCK       = 0x004,
-	CTR_CCV_PULSE_WIDTH = 0x008,
-	CTR_CCV_DELAY       = 0x010,
-	CTR_CCV_OUTPUT_MASK = 0x020,
-	CTR_CCV_POLARITY    = 0x040,
-	CTR_CCV_CTIM        = 0x080,
-	CTR_CCV_PAYLOAD     = 0x100,
-	CTR_CCV_CMP_METHOD  = 0x200,
-	CTR_CCV_COUNTER     = 0x400
-} ctr_ccv_fields_t;
 
 /**
  * @brief Set a CCV
