@@ -93,7 +93,8 @@ int ctr_get_module(void *handle);
  * @return Zero means success else -1 is returned on error, see errno
  *
  * In the case of connecting to a ctim event you create the ctim first and 
- * pass this id in parameter here
+ * pass this id in parameter equip. To connect to an LTIM you must use the
+ * module number on which the LTIM exists.
  *
  *  Connect to the PPS hardware event on module 2
  *
@@ -104,7 +105,7 @@ int ctr_get_module(void *handle);
  *  if (ctr_set_module(handle,modnum) < 0) ...
  *  if (ctr_connect(handle,ctr_class,(int) hmask) < 0) ...
  */
-int ctr_connect(void *handle, CtrDrvrConnectionClass ctr_class, int equip);
+int ctr_connect(void *handle, int modnum, CtrDrvrConnectionClass ctr_class, int equip);
 
 /**
  * @brief Connect to a ctr interrupt with a given payload
@@ -136,7 +137,7 @@ int ctr_connect_payload(void *handle, int ctim, int payload);
  *
  * The client code must remember what it is connected to in order to disconnect.
  */
-int ctr_disconnect(void *handle, CtrDrvrConnectionClass ctr_class, int mask);
+int ctr_disconnect(void *handle, int modnum, CtrDrvrConnectionClass ctr_class, int mask);
 
 struct ctr_time_s {
 	struct timeval time;    /** Standard Linux time value */
@@ -219,7 +220,7 @@ typedef enum {
  * @param ctr_ccv_fields to be set from ctr_ccv
  * @return Zero means success else -1 is returned on error, see errno
  */
-int ctr_set_ccv(void *handle, int ptim, int index, struct ctr_ccv_s *ctr_ccv, ctr_ccv_fields_t ctr_ccv_fields);
+int ctr_set_ccv(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv, ctr_ccv_fields_t ctr_ccv_fields);
 
 /**
  * @brief get an ltim action setting
@@ -396,6 +397,13 @@ int ctr_get_status(void *handle, CtrDrvrStatus *stat);
 
 /**
  * @brief Set up a counter remotley from user code rather than from a CTIM
+ * @param A handle that was allocated in open
+ * @param remote flag 0=normal, 1=remote control by user
+ * @param ch is the channel 1..3 for ctri, 1..4 for ctrp, 1..8 for ctrv.
+ * @param rcmd is the command see CtrDrvrRemote
+ * @param ctr_ccv are the values to be set
+ * @param ctr_ccv_fields to be set from ctr_ccv
+ * @return Zero means success else -1 is returned on error, see errno
  *
  * Set a counter under full remote control (IE under DSC tasks control)
  * This feature permits you to do what you like with counters even if
@@ -410,18 +418,112 @@ int ctr_get_status(void *handle, CtrDrvrStatus *stat);
  * cases it is useful to perform remote actions, such as remoteSTOP,
  * even if the remflg is set to zero. The remflg simply blocks PTIM
  * overwrites, the counter configuration can still be accessed !
+ */
+int ctr_set_remote(void *handle,
+		   int remote_flag,
+		   CtrDrvrCounter ch,
+		   CtrDrvrRemote rcmd,
+		   struct ctr_ccv_s *ctr_ccv,
+		   ctr_ccv_fields_t ctr_ccv_fields);
 
+/**
+ * @brief Get the remote counter flag and config
+ * @param A handle that was allocated in open
+ * @param ch is the channel 1..3 for ctri, 1..4 for ctrp, 1..8 for ctrv.
+ * @param ctr_ccv are the values of the counter
+ * @return The remote flag 0=normal, 1=remote or -1 on error
+ */
+int ctr_get_remote(void *handle, CtrDrvrCounter ch, struct ctr_ccv_s *ctr_ccv);
 
-int ctr_SetP2(int lun, unsigned long ulEnable, ctr_P2Bits outputBits);
-int ctr_GetP2(int lun, unsigned long* pulEnable, ctr_P2Bits* pOutputBits);
-int ctr_Memtest(int lun, unsigned long* pulMemtest);
-int ctr_SetPllLocking(int lun, unsigned long lockflag);
-int ctr_GetPllLocking(int lun, unsigned long* pulLockflag);
-int ctr_GetClientsHandle(unsigned long* pulPidList, void** pHandleList, unsigned long* pulListSize, unsigned long ulMaxSize);//(all clients processes connected to the driver and the associated handle)
-int ctr_GetConnected(void *handle, unsigned long* pulIdList, ctr_Class* pclassList, unsigned long* pulModuleList, unsigned long* pulListSize, unsigned long ulMaxSize);//(get all events connected to a handle: class and equipment id)
-int ctr_GetModuleStats(int lun, ctr_ModuleStats* resStats);
-int ctr_Simulate(ctr_Class iclss, unsigned long equip, unsigned long module, unsigned long grnum, unsigned long grval);
-int ctr_RemoteControl(unsigned long remflg, unsigned long module, unsigned long cntr, ctr_Remote rcmd, ctr_CcvMask ccvm, ctr_Ccv *ccv);
-int ctr_GetRemote(int lun, unsigned long cntr, unsigned long *remflg, ctr_CcvMask *ccvm, ctr_Ccv *ccv);
-int ctr_GetIoStatus(ctr_Lemo *input);
+/**
+ * @brief Choose PLL locking method, brutal or slow
+ * @param A handle that was allocated in open
+ * @param The lock flag 0=Brutal 1= slow
+ * @return Zero means success else -1 is returned on error, see errno
+ */
+int ctr_set_pll_lock_method(void *handle, int lock_method);
 
+/**
+ * @brief Get Pll locking method
+ * @param A handle that was allocated in open
+ * @return The lock flag or -1 on error
+ */
+int ctr_get_pll_lock_method(void *handle);
+
+/**
+ * @brief Read the io status
+ * @param A handle that was allocated in open
+ * @param Pointer to where the iostatus will be stored
+ * @return Zero means success else -1 is returned on error, see errno
+ */
+int ctr_get_io_status(void *handle, CtrDrvrIoStatus *io_stat);
+
+/**
+ * @brief Get module statistics
+ * @param A handle that was allocated in open
+ * @param Pointer to where the statistics will be stored
+ * @return Zero means success else -1 is returned on error, see errno
+ */
+int ctr_get_stats(void *handle, CtrDrvrModuleStats *stats);
+
+/**
+ * @brief Perform a memory test
+ * @param A handle that was allocated in open
+ * @param points to where a bad address will be stored
+ * @param points to the data written
+ * @param points to the data read back
+ * @return Zero success (no mem error) else -1 errno is set 0 (mem error)
+ *
+ * The Module must have been disabled for this test to run
+ * This routine will return -1 with errno set zero if there is a memory error
+ * in this case the address where the error happened, the write and read data
+ * are available to see what went wrong.
+ */
+int ctr_memory_test(void *handle, int *address, int *wpat, int *rpat);
+
+/**
+ * @brief Get the list of all driver clients
+ * @param A handle that was allocated in open
+ * @param Pointer to the client list
+ * @return Zero means success else -1 is returned on error, see errno
+ */
+int ctr_get_client_pids(void *handle, CtrDrvrClientList *client_pids);
+
+/**
+ * @brief Get a clients connections
+ * @param A handle that was allocated in open
+ * @param Pointer to where clients connections will be stored
+ * @return Zero means success else -1 is returned on error, see errno
+ */
+int ctr_get_client_connections(void *handle, CtrDrvrClientConnections *connections);
+
+/**
+ * @brief simulate an interrupt
+ * @param A handle that was allocated in open
+ * @param Class of interrupt to simulate
+ * @param Class value
+ * @return Zero means success else -1 is returned on error, see errno
+ */
+int ctr_simulate_interrupt(void *handle, CtrDrvrConnectionClass ctr_class, int equip);
+
+/**
+ * @brief Select the P2 output byte number for current module
+ * @param A handle that was allocated in open
+ * @param The output byte number or zero
+ * @return Zero means success else -1 is returned on error, see errno
+ *
+ * OutputByte: In the VME version of the CTR, the eight counter outputs
+ * can be placed on one byte of the P2 connector. If this value is zero
+ * the CTR does not drive the P2 connector, a value between 1..8 selects
+ * the byte number in the 64bit P2 VME bus.
+ */
+int ctr_set_p2_output_byte(void *handle, int p2byte);
+
+/**
+ * @brief Get the P2 output byte number
+ * @param A handle that was allocated in open
+ * @return The output byte number or -1 on error
+ *
+ * If a value of 0 is returned, no output byte is set
+ */
+int ctr_get_p2_output_byte(void *handle);
