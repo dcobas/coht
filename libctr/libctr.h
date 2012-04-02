@@ -57,6 +57,13 @@ struct ctr_interrupt_s {
 	ctr_time_s start;                  /** Counter start time */
 };
 
+struct ctr_module_address_s {
+	CtrDrvrModuleType device_type;     /** Which kind of device PCI/VME */
+	void *memory_map;                  /** Main FPGA address (VME A24/BAR2) */
+	void *jtag_address;                /** JTAG IO address (VME D16/BAR0) */
+	void *vector;                      /** If VME else 0 (The level is always 2) */
+};
+
 /**
  * As this library runs exclusivley on Linux I use standard kernel coding
  * style and error reporting where possible. It is available both as a shared
@@ -130,6 +137,26 @@ int ctr_set_module(void *handle, int modnum);
  * @return module number 1..n or -1 on error
  */
 int ctr_get_module(void *handle);
+
+/**
+ * @brief Get the device type handled by the driver CTRV, CTRP, CTRI, CTRE
+ * @param A handle that was allocated in open
+ * @param Pointer to where the device type will be stored
+ * @return Zero means success else -1 is returned on error, see errno
+ *
+ * Different device types implement different features.
+ * In any case where the device type is important, say setting the P2 byte, then
+ * the routine will check and return an error if its not supported.
+ */
+int ctr_get_type(void *handle, CtrDrvrDevice *type);
+
+/**
+ * @brief Get the addresses of a module
+ * @param A handle that was allocated in open
+ * @param Pointer to where the module address will be stored
+ * @return Zero means success else -1 is returned on error, see errno
+ */
+int_get_module_address(void *handle, struct ctr_modlue_address_s *module_address);
 
 /**
  * @brief Connect to a ctr interrupt
