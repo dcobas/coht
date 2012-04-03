@@ -102,6 +102,7 @@ void *ctr_open(char *version)
 	dvr_version.HardwareType = CtrDrvrHardwareTypeNONE;
 	if (ioctl(fd,CtrIoctlGET_VERSION,&dvr_version) < 0) {
 		errsv = errno;
+		close(fd);
 		free(h);
 		errno = errsv;
 		return (void *) -1;
@@ -115,15 +116,22 @@ void *ctr_open(char *version)
 		cp = "ctrv";
 
 	if (!cp) {
+		close(fd);
+		free(h);
 		errno = ENODEV;     /** No such device */
 		return (void *) -1;
 	}
 
-	sprintf(path,"/usr/local/drivers/ctr/lib%s.so.%s",cp,version);
+	if ((version == NULL) || (strlen(version) < strlen("1.0")))
+		sprintf(path,"/usr/local/drivers/ctr/lib%s.so",cp);
+	else
+		sprintf(path,"/usr/local/drivers/ctr/lib%s.so.%s",cp,version);
+
 	h->dll_handle = dlopen(path, RTLD_LOCAL | RTLD_LAZY);
 	if (!h->dll_handle) {
 		errsv = errno;
 		fprintf(stderr,"ctr_open:%s\n",dlerror());
+		close(fd);
 		free(h);
 		errno = errsv;
 		return (void *) -1;
@@ -150,10 +158,9 @@ void *ctr_open(char *version)
  */
 int ctr_close(void *handle)
 {
-	struct ctr_handle_s *h;
+	struct ctr_handle_s *h = handle;
 	int errsv;
 
-	h = handle;
 	if (h) {
 		if (!dlclose(h->dll_handle)) {
 			errsv = errno;
