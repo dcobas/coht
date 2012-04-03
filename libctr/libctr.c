@@ -25,6 +25,7 @@
 #include <dlfcn.h>
 
 #include <libctr.h>
+#include <libctrP.h>
 
 /**
  * @brief This routine gets called when a function is not implemented
@@ -35,7 +36,7 @@
 
 int ctr_not_implemented()
 {
-	errno = ENOTIMPL;
+	errno = ENOTSUP; /** Operation not supported */
 	return -1;
 }
 
@@ -78,8 +79,8 @@ void *ctr_open(char *version)
 	struct ctr_handle_s *h;
 	char *cp = NULL, path[CTR_PATH_SIZE];
 	int  i, fd = -1, errsv;
-	CtrDrvrVersion version;
-	void *ptr;
+	CtrDrvrVersion dvr_version;
+	unsigned long *ptr;
 
 	h = (struct ctr_handle_s*) malloc(sizeof(struct ctr_handle_s));
 	if (!h)
@@ -98,29 +99,28 @@ void *ctr_open(char *version)
 	}
 	h->fd = fd;
 
-	version.HardwareType = CtrDrvrHardwareTypeNONE;
-	if (ioctl(fd,CtrIoctlGET_VERSION,&version) < 0) {
+	dvr_version.HardwareType = CtrDrvrHardwareTypeNONE;
+	if (ioctl(fd,CtrIoctlGET_VERSION,&dvr_version) < 0) {
 		errsv = errno;
 		free(h);
 		errno = errsv;
 		return (void *) -1;
 	}
 
-	if ((version.HardwareType == CtrDrvrHardwareTypeCTRP)
-	||  (version.HardwareType == CtrDrvrHardwareTypeCTRI))
+	if ((dvr_version.HardwareType == CtrDrvrHardwareTypeCTRP)
+	||  (dvr_version.HardwareType == CtrDrvrHardwareTypeCTRI))
 		cp = "ctrp";
 
-	if ((version.HardwareType == CtrDrvrHardwareTypeCTRV)
-	||  (version.HardwareType == CtrDrvrHardwareTypeCTRE))
+	if (dvr_version.HardwareType == CtrDrvrHardwareTypeCTRV)
 		cp = "ctrv";
 
 	if (!cp) {
-		errno = ENODEV;
+		errno = ENODEV;     /** No such device */
 		return (void *) -1;
 	}
 
 	sprintf(path,"/usr/local/drivers/ctr/lib%s.so.%s",cp,version);
-	h->dll_handle = dlopen(sopath, RTLD_LOCAL | RTLD_LAZY);
+	h->dll_handle = dlopen(path, RTLD_LOCAL | RTLD_LAZY);
 	if (!h->dll_handle) {
 		errsv = errno;
 		fprintf(stderr,"ctr_open:%s\n",dlerror());
@@ -129,12 +129,12 @@ void *ctr_open(char *version)
 		return (void *) -1;
 	}
 
-	ptr = &h->api;
+	ptr = (unsigned long *) &h->api;
 	for (i=0; i<CTR_INDEX_LAST; i++) {
-		ptr[i] = dlsym(h->dll_handle, api_names[i]);
+		ptr[i] = (unsigned long) dlsym(h->dll_handle, ctr_api_names[i]);
 		if (!ptr[i]) {
 			fprintf(stderr,"ctr_open:%s\n",dlerror());
-			ptr[i] = ctr_not_implemented;
+			ptr[i] = (unsigned long) ctr_not_implemented;
 		}
 	}
 	return h;
@@ -159,17 +159,17 @@ int ctr_close(void *handle)
 			errsv = errno;
 			fprintf(stderr,"ctr_close:%s\n",dlerror());
 			errno = errsv;
-			return (void *) -1;
+			return -1;
 		}
 
 		if (close(h->fd))
-			return (void *) -1;
+			return -1;
 
 		free(h);
 		return 0;
 	}
-	errno = EBADFD;
-	return (void *) -1;
+	errno = EBADFD;     /** File descriptor in bad state */
+	return -1;
 }
 /**
  * @brief Get the number of installed CTR modules
@@ -220,7 +220,7 @@ int ctr_get_module(void *handle)
  * In any case where the device type is important, say setting the P2 byte, then
  * the routine will check and return an error if its not supported.
  */
-int ctr_get_type(void *handle, CtrDrvrDevice *type)
+int ctr_get_type(void *handle, CtrDrvrHardwareType *type)
 {
 	struct ctr_handle_s *h = handle;
 	return h->api.ctr_get_type(handle, type);
@@ -232,10 +232,10 @@ int ctr_get_type(void *handle, CtrDrvrDevice *type)
  * @param Pointer to where the module address will be stored
  * @return Zero means success else -1 is returned on error, see errno
  */
-int ctr_get_module_address(void *handle, struct ctr_modlue_address_s *module_address);
+int ctr_get_module_address(void *handle, struct ctr_module_address_s *module_address)
 {
 	struct ctr_handle_s *h = handle;
-	return ctr_get_module_address(handle, module_address);
+	return h->api.ctr_get_module_address(handle, module_address);
 }
 
 /**
@@ -276,9 +276,9 @@ int ctr_connect(void *handle, int modnum, CtrDrvrConnectionClass ctr_class, int 
  *
  *  Connect to the millisecond CTIM at C100 on module 1
  *
- *  int ctim    = 911; /* (0x0100FFFF) Millisecond C-Event with wildcard */
- *  int payload = 100; /* C-time to be woken up at i.e. C100 */
- *  int modnum  = 1;   /* Module 1 */
+ *  int ctim    = 911; # (0x0100FFFF) Millisecond C-Event with wildcard
+ *  int payload = 100; # C-time to be woken up at i.e. C100
+ *  int modnum  = 1;   # Module 1
  *
  *  if (ctr_set_module(handle,modnum) < 0) ...
  *  if (ctr_connect_payload(handle,ctim,payload) < 0) ...
@@ -286,7 +286,7 @@ int ctr_connect(void *handle, int modnum, CtrDrvrConnectionClass ctr_class, int 
 int ctr_connect_payload(void *handle, int ctim, int payload)
 {
 	struct ctr_handle_s *h = handle;
-	return ctr_connect_payload(handle, ctim, payload);
+	return h->api.ctr_connect_payload(handle, ctim, payload);
 }
 
 /**
@@ -301,7 +301,7 @@ int ctr_connect_payload(void *handle, int ctim, int payload)
 int ctr_disconnect(void *handle, int modnum, CtrDrvrConnectionClass ctr_class, int mask)
 {
 	struct ctr_handle_s *h = handle;
-	return ctr_disconnect(handle, modnum, ctr_class, mask);
+	return h->api.ctr_disconnect(handle, modnum, ctr_class, mask);
 }
 
 /**
@@ -328,7 +328,7 @@ int ctr_wait(void *handle, struct ctr_interrupt_s *ctr_interrupt)
 int ctr_set_ccv(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv, ctr_ccv_fields_t ctr_ccv_fields)
 {
 	struct ctr_handle_s *h = handle;
-	return ctr_set_ccv(handle, ltim, index, ctr_ccv, ctr_ccv_fields);
+	return h->api.ctr_set_ccv(handle, ltim, index, ctr_ccv, ctr_ccv_fields);
 }
 
 /**
@@ -355,7 +355,7 @@ int ctr_get_ccv(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv)
 int ctr_create_ltim(void *handle, int ltim, int size)
 {
 	struct ctr_handle_s *h = handle;
-	return h-api.ctr_create_ltim(handle, ltim, size);
+	return h->api.ctr_create_ltim(handle, ltim, size);
 }
 
 /**
@@ -376,7 +376,7 @@ int ctr_get_telegram(void *handle, int index, short *telegram)
  * @param ctr_time point to where time will be stored
  * @return Zero means success else -1 is returned on error, see errno
  */
-int ctr_get_time(void *handle, ctr_time_s *ctr_time)
+int ctr_get_time(void *handle, struct ctr_time_s *ctr_time)
 {
 	struct ctr_handle_s *h = handle;
 	return h->api.ctr_get_time(handle, ctr_time);
@@ -400,13 +400,13 @@ int ctr_set_time(void *handle, struct ctr_time_s *ctr_time)
 /**
  * @brief Get cable ID
  * @param A handle that was allocated in open
- * @param cid points to where id will be stored
+ * @param cable_id points to where id will be stored
  * @return Zero means success else -1 is returned on error, see errno
  */
-int ctr_get_cid(void *handle, int *cid)
+int ctr_get_cable_id(void *handle, int *cable_id)
 {
 	struct ctr_handle_s *h = handle;
-	return h->api.ctr_get_cid(handle, cid);
+	return h->api.ctr_get_cable_id(handle, cable_id);
 }
 
 /**
@@ -708,7 +708,7 @@ int ctr_memory_test(void *handle, int *address, int *wpat, int *rpat)
  * @param Pointer to the client list
  * @return Zero means success else -1 is returned on error, see errno
  */
-int ctr_get_client_pids(void *handle, CtrDrvrClientList *client_pids) {
+int ctr_get_client_pids(void *handle, CtrDrvrClientList *client_pids)
 {
 	struct ctr_handle_s *h = handle;
 	return h->api.ctr_get_client_pids(handle, client_pids);
@@ -753,7 +753,7 @@ int ctr_simulate_interrupt(void *handle, CtrDrvrConnectionClass ctr_class, int e
 int ctr_set_p2_output_byte(void *handle, int p2byte)
 {
 	struct ctr_handle_s *h = handle;
-	return h->api.ctr_set_p2_output_byte(void *handle, int p2byte);
+	return h->api.ctr_set_p2_output_byte(handle, p2byte);
 }
 
 /**

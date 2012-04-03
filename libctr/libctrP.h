@@ -1,3 +1,17 @@
+/**
+ * Julian Lewis Fri-30th March 2012 BE/CO/HT
+ * julian.lewis@cern.ch
+ *
+ * CTR timing library definitions (PRIVATE).
+ * This library is to be used exclusivlely by the new open CBCM timing library.
+ * It is up to the implementers of the open CBCM timing library to provide any
+ * abstraction layers and to hide this completely from user code.
+ */
+
+
+#ifndef LIBCTRP
+#define LIBCTRP
+
 #include <libctr.h>
 
 #define CTR_PATH_SIZE 64
@@ -18,7 +32,7 @@ typedef enum {
 	CTR_INDEX_get_telegram,
 	CTR_INDEX_get_time,
 	CTR_INDEX_set_time,
-	CTR_INDEX_get_cid,
+	CTR_INDEX_get_cable_id,
 	CTR_INDEX_set_cable_id,
 	CTR_INDEX_get_fw_version,
 	CTR_INDEX_get_dvr_version,
@@ -54,8 +68,8 @@ struct ctr_api_s {
 	int   (*ctr_get_module_count)(void *handle);
 	int   (*ctr_set_module)(void *handle, int modnum);
 	int   (*ctr_get_module)(void *handle);
-	int   (*ctr_get_type)(void *handle, CtrDrvrDevice *type);
-	int   (*ctr_get_module_address)(void *handle, struct ctr_modlue_address_s *module_address);
+	int   (*ctr_get_type)(void *handle, CtrDrvrHardwareType *type);
+	int   (*ctr_get_module_address)(void *handle, struct ctr_module_address_s *module_address);
 	int   (*ctr_connect)(void *handle, int modnum, CtrDrvrConnectionClass ctr_class, int equip);
 	int   (*ctr_connect_payload)(void *handle, int ctim, int payload);
 	int   (*ctr_disconnect)(void *handle, int modnum, CtrDrvrConnectionClass ctr_class, int mask);
@@ -64,9 +78,9 @@ struct ctr_api_s {
 	int   (*ctr_get_ccv)(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv);
 	int   (*ctr_create_ltim)(void *handle, int ltim, int size);
 	int   (*ctr_get_telegram)(void *handle, int index, short *telegram);
-	int   (*ctr_get_time)(void *handle, ctr_time_s *ctr_time);
+	int   (*ctr_get_time)(void *handle, struct ctr_time_s *ctr_time);
 	int   (*ctr_set_time)(void *handle, struct ctr_time_s *ctr_time);
-	int   (*ctr_get_cid)(void *handle, int *cid);
+	int   (*ctr_get_cable_id)(void *handle, int *cable_id);
 	int   (*ctr_set_cable_id)(void *handle, int cable_id);
 	int   (*ctr_get_fw_version)(void *handle, int *version);
 	int   (*ctr_get_dvr_version)(void *handle, int *version);
@@ -112,7 +126,7 @@ char *ctr_api_names[CTR_INDEX_LAST] = {
 	"ctr_get_telegram",
 	"ctr_get_time",
 	"ctr_set_time",
-	"ctr_get_cid",
+	"ctr_get_cable_id",
 	"ctr_set_cable_id",
 	"ctr_get_fw_version",
 	"ctr_get_dvr_version",
@@ -142,7 +156,9 @@ char *ctr_api_names[CTR_INDEX_LAST] = {
 	"ctr_get_p2_output_byte" };
 
 struct ctr_handle_s {
-	fd;                     /** CTR driver file descriptor */
+	int fd;                 /** CTR driver file descriptor */
 	void *dll_handle;       /** The Dll handle */
 	struct ctr_api_s api;   /** The api function pointers */
 };
+
+#endif

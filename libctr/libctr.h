@@ -8,10 +8,14 @@
  * abstraction layers and to hide this completely from user code.
  */
 
+#ifndef LIBCTR
+#define LIBCTR
+
 #include <sys/time.h>
 #include <ctrdrvr.h>
+#include <ctrhard.h>
 
-typedef struct {
+struct ctr_ccv_s {
 	int enable;                         /* Enable = 1, Disable = 0 */
 	CtrDrvrCounterStart start;          /* The counters start. */
 	CtrDrvrCounterMode mode;            /* The counters operating mode. */
@@ -24,7 +28,7 @@ typedef struct {
 	int payload;                        /* 16-Bit Payload */
 	CtrDrvrTriggerCondition cmp_method; /* Payload compare method */
 	CtrDrvrCounter ch;                  /* Counter number 1..8 (0 is a special hardware counter) */
-} ctr_ccv_s;
+};
 
 typedef enum {
 	CTR_CCV_ENABLE       = 0x001,
@@ -48,20 +52,20 @@ struct ctr_time_s {
 };
 
 struct ctr_interrupt_s {
-	CtrDrvrConnectionClass  ctr_class; /** CTR interrupt class */
-	int equip;                         /** LTIM id, hardware mask, CTIM id */
-	int payload;                       /** 16-Bit payload of the event if CTIM */
-	int modnum;                        /** Module number of interrupting device */
-	ctr_time_s end;                    /** Time of end of action */
-	ctr_time_s trigger;                /** Trigger time of action */
-	ctr_time_s start;                  /** Counter start time */
+	CtrDrvrConnectionClass ctr_class; /** CTR interrupt class */
+	int equip;                        /** LTIM id, hardware mask, CTIM id */
+	int payload;                      /** 16-Bit payload of the event if CTIM */
+	int modnum;                       /** Module number of interrupting device */
+	struct ctr_time_s onzero;         /** Time of end of action */
+	struct ctr_time_s trigger;        /** Trigger time of action */
+	struct ctr_time_s start;          /** Counter start time */
 };
 
 struct ctr_module_address_s {
-	CtrDrvrModuleType device_type;     /** Which kind of device PCI/VME */
-	void *memory_map;                  /** Main FPGA address (VME A24/BAR2) */
-	void *jtag_address;                /** JTAG IO address (VME D16/BAR0) */
-	void *vector;                      /** If VME else 0 (The level is always 2) */
+	CtrDrvrDevice device_type;        /** Which kind of device PCI/VME */
+	void *memory_map;                 /** Main FPGA address (VME A24/BAR2) */
+	void *jtag_address;               /** JTAG IO address (VME D16/BAR0) */
+	void *vector;                     /** If VME else 0 (The level is always 2) */
 };
 
 /**
@@ -160,7 +164,7 @@ int ctr_get_module(void *handle);
  * In any case where the device type is important, say setting the P2 byte, then
  * the routine will check and return an error if its not supported.
  */
-int ctr_get_type(void *handle, CtrDrvrDevice *type);
+int ctr_get_type(void *handle, CtrDrvrHardwareType *type);
 
 /**
  * @brief Get the addresses of a module
@@ -168,7 +172,7 @@ int ctr_get_type(void *handle, CtrDrvrDevice *type);
  * @param Pointer to where the module address will be stored
  * @return Zero means success else -1 is returned on error, see errno
  */
-int ctr_get_module_address(void *handle, struct ctr_modlue_address_s *module_address);
+int ctr_get_module_address(void *handle, struct ctr_module_address_s *module_address);
 
 /**
  * @brief Connect to a ctr interrupt
@@ -276,7 +280,7 @@ int ctr_get_telegram(void *handle, int index, short *telegram);
  * @param ctr_time point to where time will be stored
  * @return Zero means success else -1 is returned on error, see errno
  */
-int ctr_get_time(void *handle, ctr_time_s *ctr_time);
+int ctr_get_time(void *handle, struct ctr_time_s *ctr_time);
 
 /**
  * @brief Set the time on the current module
@@ -292,10 +296,10 @@ int ctr_set_time(void *handle, struct ctr_time_s *ctr_time);
 /**
  * @brief Get cable ID
  * @param A handle that was allocated in open
- * @param cid points to where id will be stored
+ * @param cable_id points to where id will be stored
  * @return Zero means success else -1 is returned on error, see errno
  */
-int ctr_get_cid(void *handle, int *cid);
+int ctr_get_cable_id(void *handle, int *cable_id);
 
 /**
  * @brief Set the cable ID of a module
@@ -548,3 +552,5 @@ int ctr_set_p2_output_byte(void *handle, int p2byte);
  * If a value of 0 is returned, no output byte is set
  */
 int ctr_get_p2_output_byte(void *handle);
+
+#endif
