@@ -80,11 +80,23 @@ struct ctr_module_address_s {
 
 /**
  * @brief Get a handle to be used in subsequent library calls
+ * @param Version string or NULL for the latest
  * @return The handle to be used in subsequent calls or -1
  *
  * The ctr_open call returns a pointer to an opeaque structure
  * defined within the library internal implementation. Clients
  * never see what is behind the void pointer.
+ *
+ * If a version string is specified and shared objects are in use,
+ * then the specified version will be loaded, else a NULL or empty
+ * string points to the installed version. Version strings consits
+ * of two integers seperated by a point eg "3.1" or "1.0" these
+ * numbers are the major and minor version numbers.
+ *
+ * Implementation hint:
+ * NEVER hard code the version number into the source!! Its part
+ * of the environment, suggest CTR_LIB_VERSION environment variable.
+ * If it's not defined, use the default NULL string.
  *
  * The returned handle is -1 on error otherwise its a valid handle.
  * On error use the standard Linux error functions for details.
@@ -94,12 +106,12 @@ struct ctr_module_address_s {
  * 16 open handles at any one time (this limitation should be removed).
  *
  *  void *my_handle;
- *  my_handle = ctr_open();
+ *  my_handle = ctr_open(NULL);
  *  if ((int) my_handle == CTR_ERROR)
  *          perror("ctr_open error");
  *
  */
-void *ctr_open();
+void *ctr_open(char *version);
 
 /**
  * @brief Close a handle and free up resources
@@ -156,7 +168,7 @@ int ctr_get_type(void *handle, CtrDrvrDevice *type);
  * @param Pointer to where the module address will be stored
  * @return Zero means success else -1 is returned on error, see errno
  */
-int_get_module_address(void *handle, struct ctr_modlue_address_s *module_address);
+int ctr_get_module_address(void *handle, struct ctr_modlue_address_s *module_address);
 
 /**
  * @brief Connect to a ctr interrupt
