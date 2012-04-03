@@ -204,9 +204,9 @@ int ctr_connect(void *handle, int modnum, CtrDrvrConnectionClass ctr_class, int 
  *
  *  Connect to the millisecond CTIM at C100 on module 1
  *
- *  int ctim    = 911; /* (0x0100FFFF) Millisecond C-Event with wildcard */
- *  int payload = 100; /* C-time to be woken up at i.e. C100 */
- *  int modnum  = 1;   /* Module 1 */
+ *  int ctim    = 911; # (0x0100FFFF) Millisecond C-Event with wildcard
+ *  int payload = 100; # C-time to be woken up at i.e. C100
+ *  int modnum  = 1;   # Module 1
  *
  *  if (ctr_set_module(handle,modnum) < 0) ...
  *  if (ctr_connect_payload(handle,ctim,payload) < 0) ...
