@@ -11,3 +11,16 @@
 #define CTR_PCI
 
 #include <libctr.h>
+
+#include <libctr_common.c>
+
+/**
+ * @brief Get the addresses of a module
+ * @param A handle that was allocated in open
+ * @param Pointer to where the module address will be stored
+ * @return Zero means success else -1 is returned on error, see errno
+ */
+int ctr_get_module_address(void *handle, struct ctr_module_address_s *module_address)
+{
+	return -1;
+}
