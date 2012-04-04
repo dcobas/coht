@@ -27,22 +27,26 @@ struct ctr_ccv_s {
 	int ctim;                           /* CTIM triggering event of this action */
 	int payload;                        /* 16-Bit Payload */
 	CtrDrvrTriggerCondition cmp_method; /* Payload compare method */
-	CtrDrvrCounter ch;                  /* Counter number 1..8 (0 is a special hardware counter) */
+	int grnum;                          /* Telegram group number or zero */
+	int grval;                          /* Telegram group value */
+	int tgnum;                          /* Telegram number or zero */
 };
 
 typedef enum {
-	CTR_CCV_ENABLE       = 0x001,
-	CTR_CCV_START        = 0x002,
-	CTR_CCV_MODE         = 0x004,
-	CTR_CCV_CLOCK        = 0x008,
-	CTR_CCV_PULSE_WIDTH  = 0x010,
-	CTR_CCV_DELAY        = 0x020,
-	CTR_CCV_COUNTER_MASK = 0x040,
-	CTR_CCV_POLARITY     = 0x080,
-	CTR_CCV_CTIM         = 0x100,
-	CTR_CCV_PAYLOAD      = 0x200,
-	CTR_CCV_CMP_METHOD   = 0x400,
-	CTR_CCV_COUNTER      = 0x800
+	CTR_CCV_ENABLE       = 0x0001,
+	CTR_CCV_START        = 0x0002,
+	CTR_CCV_MODE         = 0x0004,
+	CTR_CCV_CLOCK        = 0x0008,
+	CTR_CCV_PULSE_WIDTH  = 0x0010,
+	CTR_CCV_DELAY        = 0x0020,
+	CTR_CCV_COUNTER_MASK = 0x0040,
+	CTR_CCV_POLARITY     = 0x0080,
+	CTR_CCV_CTIM         = 0x0100,
+	CTR_CCV_PAYLOAD      = 0x0200,
+	CTR_CCV_CMP_METHOD   = 0x0400,
+	CTR_CCV_GRNUM        = 0x0800,
+	CTR_CCV_GRVAL        = 0x1000,
+	CTR_CCV_TGNUM        = 0x2000,
 } ctr_ccv_fields_t;
 
 struct ctr_interrupt_s {
@@ -61,6 +65,22 @@ struct ctr_module_address_s {
 	void *jtag_address;               /** JTAG IO address (VME D16/BAR0) */
 	void *vector;                     /** If VME else 0 (The level is always 2) */
 };
+
+/**
+ * @brief Convert the CTR driver time to standard unix time
+ * @param ctime points to the CtrDrvrTime value  to be converted
+ * @param utime points to the unix timeval struct where conversion will be stored
+ * @return Always returns zero
+ */
+int ctr_ctime_to_unix(CtrDrvrTime *ctime, struct timeval *utime);
+
+/**
+ * @brief Convert the standard unix time to CTR driver time
+ * @param utime points to the unix timeval to be converted
+ * @param ctime points to the CtrDrvrTime value where conversion will be stored
+ * @return Always returns zero
+ */
+int ctr_unix_to_ctime(struct timeval *utime, CtrDrvrTime *ctime);
 
 /**
  * As this library runs exclusivley on Linux I use standard kernel coding
@@ -255,10 +275,11 @@ int ctr_get_ccv(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv);
  * @brief Create an empty LTIM object on the current module
  * @param A handle that was allocated in open
  * @param ltim number to create
+ * @param channel number for ltim
  * @param size of ltim action array (PLS lines)
  * @return Zero means success else -1 is returned on error, see errno
  */
-int ctr_create_ltim(void *handle, int ltim, int size);
+int ctr_create_ltim(void *handle, int ltim, int ch, int size);
 
 /**
  * @brief get a telegram

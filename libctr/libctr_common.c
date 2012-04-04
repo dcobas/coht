@@ -27,6 +27,36 @@
 #include <libctrP.h>
 
 /**
+ * @brief Convert the CTR driver time to standard unix time
+ * @param ctime points to the CtrDrvrTime value  to be converted
+ * @param utime points to the unix timeval struct where conversion will be stored
+ * @return Always returns zero
+ */
+int ctr_ctime_to_unix(CtrDrvrTime *ctime, struct timeval *utime)
+{
+	float fus;
+	fus  = (ctime->TicksHPTDC / 0.256) * 1000.0;
+	utime->tv_sec = ctime->Second;
+	utime->tv_usec = (suseconds_t) fus;
+	return 0;
+}
+
+/**
+ * @brief Convert the standard unix time to CTR driver time
+ * @param utime points to the unix timeval to be converted
+ * @param ctime points to the CtrDrvrTime value where conversion will be stored
+ * @return Always returns zero
+ */
+int ctr_unix_to_ctime(struct timeval *utime, CtrDrvrTime *ctime)
+{
+	float ftdc;
+	ftdc = (utime->tv_usec * 0.256) / 1000.0;
+	ctime->TicksHPTDC = (unsigned int) ftdc;
+	ctime->Second = utime->tv_sec;
+	return 0;
+}
+
+/**
  * @brief Get the number of installed CTR modules
  * @param A handle that was allocated in open
  * @return The installed module count or -1 on error
@@ -264,7 +294,111 @@ int ctr_wait(void *handle, struct ctr_interrupt_s *ctr_interrupt)
  */
 int ctr_set_ccv(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv, ctr_ccv_fields_t ctr_ccv_fields)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+
+	CtrDrvrPtimBinding           ob;
+	CtrDrvrAction                act;
+	CtrDrvrTrigger              *trg;
+	CtrDrvrCounterConfiguration *cnf;
+	CtrDrvrTgmGroup             *grp;
+	CtrDrvrCounterMaskBuf        cmsb;
+	CtrDrvrCtimObjects           ctimo;
+
+	unsigned long mod;
+	int anm, i, ok;
+
+	trg = &(act.Trigger);
+	cnf = &(act.Config);
+	grp = &(trg->Group);
+
+	ob.EqpNum = ltim;
+	if (ioctl(h->fd,CtrIoctlGET_PTIM_BINDING,&ob) < 0)
+		return -1;
+
+	mod = ob.ModuleIndex +1;
+	if (ioctl(h->fd,CtrIoctlSET_MODULE,&mod) < 0)
+		return -1;
+
+	anm = ob.StartIndex + index + 1;
+	act.TriggerNumber = anm;
+	if (ioctl(h->fd,CtrIoctlGET_ACTION,&act) < 0)
+		return -1;
+
+	if (ctr_ccv_fields & CTR_CCV_ENABLE) {
+		if (ctr_ccv)
+			cnf->OnZero |= CtrDrvrCounterOnZeroOUT;
+		else
+			cnf->OnZero &= ~CtrDrvrCounterOnZeroOUT;
+	}
+
+	if (ctr_ccv_fields & CTR_CCV_START)
+		cnf->Start = ctr_ccv->start;
+
+	if (ctr_ccv_fields & CTR_CCV_MODE)
+		cnf->Start = ctr_ccv->mode;
+
+	if (ctr_ccv_fields & CTR_CCV_CLOCK)
+		cnf->Clock = ctr_ccv->clock;
+
+	if (ctr_ccv_fields & CTR_CCV_PULSE_WIDTH)
+		cnf->PulsWidth = ctr_ccv->pulse_width;
+
+	if (ctr_ccv_fields & CTR_CCV_DELAY)
+		cnf->Delay = ctr_ccv->delay;
+
+	if (ctr_ccv_fields & CTR_CCV_COUNTER_MASK) {
+		cmsb.Counter = trg->Counter;
+		if (ioctl(h->fd,CtrIoctlGET_OUT_MASK,&cmsb) < 0)
+			return -1;
+		cmsb.Mask = ctr_ccv->counter_mask;
+		if (ioctl(h->fd,CtrIoctlSET_OUT_MASK,&cmsb) < 0)
+			return -1;
+	}
+
+	if (ctr_ccv_fields & CTR_CCV_POLARITY) {
+		cmsb.Counter = trg->Counter;
+		if (ioctl(h->fd,CtrIoctlGET_OUT_MASK,&cmsb) < 0)
+			return -1;
+		cmsb.Polarity = ctr_ccv->polarity;
+		if (ioctl(h->fd,CtrIoctlSET_OUT_MASK,&cmsb) < 0)
+			return -1;
+	}
+
+	if (ctr_ccv_fields & CTR_CCV_CTIM) {
+		if (ioctl(h->fd,CtrIoctlLIST_CTIM_OBJECTS,&ctimo) < 0)
+			return -1;
+
+		ok = 0;
+		for (i=0; i<ctimo.Size; i++) {
+			if (ctimo.Objects[i].EqpNum == ctr_ccv->ctim) {
+				trg->Ctim = ctr_ccv->ctim;
+				trg->Frame = ctimo.Objects[i].Frame;
+				ok = 1;
+				break;
+			}
+		}
+		if (!ok) {
+			errno = EADDRNOTAVAIL; /* Address not available */
+			return -1;
+		}
+	}
+
+	if (ctr_ccv_fields & CTR_CCV_PAYLOAD)
+		trg->Frame.Struct.Value = ctr_ccv->payload;
+
+	if (ctr_ccv_fields & CTR_CCV_CMP_METHOD)
+		trg->TriggerCondition = ctr_ccv->cmp_method;
+
+	if (ctr_ccv_fields & CTR_CCV_GRNUM)
+		grp->GroupNumber = ctr_ccv->grnum;
+
+	if (ctr_ccv_fields & CTR_CCV_GRVAL)
+		grp->GroupValue = ctr_ccv->grval;
+
+	if (ctr_ccv_fields & CTR_CCV_TGNUM)
+		trg->Machine = ctr_ccv->tgnum;
+
+	return 0;
 }
 
 /**
@@ -284,10 +418,11 @@ int ctr_get_ccv(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv)
  * @brief Create an empty LTIM object on the current module
  * @param A handle that was allocated in open
  * @param ltim number to create
+ * @param channel number for ltim
  * @param size of ltim action array (PLS lines)
  * @return Zero means success else -1 is returned on error, see errno
  */
-int ctr_create_ltim(void *handle, int ltim, int size)
+int ctr_create_ltim(void *handle, int ltim, int ch, int size)
 {
 	return -1;
 }

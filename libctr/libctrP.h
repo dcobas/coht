@@ -78,7 +78,7 @@ struct ctr_api_s {
 	int   (*ctr_wait)(void *handle, struct ctr_interrupt_s *ctr_interrupt);
 	int   (*ctr_set_ccv)(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv, ctr_ccv_fields_t ctr_ccv_fields);
 	int   (*ctr_get_ccv)(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv);
-	int   (*ctr_create_ltim)(void *handle, int ltim, int size);
+	int   (*ctr_create_ltim)(void *handle, int ltim, int ch, int size);
 	int   (*ctr_get_telegram)(void *handle, int index, short *telegram);
 	int   (*ctr_get_time)(void *handle, CtrDrvrTime *ctr_time);
 	int   (*ctr_set_time)(void *handle, CtrDrvrTime *ctr_time);
