@@ -72,6 +72,14 @@ int ctr_not_implemented()
  *  if ((int) my_handle == CTR_ERROR)
  *          perror("ctr_open error");
  *
+ * This function does the following things ...
+ * Allocated a libctr handle structure
+ * Open the ctr driver at /dev/ctr.[0..15]
+ * Call the GET_VERSION ioctl to find out if a ctrv or ctrp is installed
+ * Load the corresponding shared object at /usr/local/drivers/ctr[v|p]/ctr[v|p].so.<version>
+ *    N.B. If version is either Null or an empty string its not used
+ *         If the library is already open only a dlopen handle is returned
+ * Bind symbols in the loaded library to the libctr handels API function pointers
  */
 void *ctr_open(char *version)
 {
@@ -123,9 +131,9 @@ void *ctr_open(char *version)
 	}
 
 	if ((version == NULL) || (strlen(version) < strlen("1.0")))
-		sprintf(path,"/usr/local/drivers/ctr/lib%s.so",cp);
+		sprintf(path,"/usr/local/drivers/%s/lib%s.so",cp,cp);
 	else
-		sprintf(path,"/usr/local/drivers/ctr/lib%s.so.%s",cp,version);
+		sprintf(path,"/usr/local/drivers/%s/lib%s.so.%s",cp,cp,version);
 
 	h->dll_handle = dlopen(path, RTLD_LOCAL | RTLD_LAZY);
 	if (!h->dll_handle) {
@@ -155,6 +163,7 @@ void *ctr_open(char *version)
  *
  * This routine disconnects from all interrupts, frees up memory and
  * closes the ctr driver. It should be called once for each ctr_open.
+ * The shared object will be unloaded when the last client closes.
  */
 int ctr_close(void *handle)
 {
