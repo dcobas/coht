@@ -40,10 +40,10 @@ libctrv.$(CPU).so: libctrv.$(CPU).o
 clean:
 	rm -f libctr.$(CPU).o
 	rm -f libctr.$(CPU).a
-	rm -f libctrp.o
-	rm -f libctrp.so
-	rm -f libctrv.o
-	rm -f libctrv.so
+	rm -f libctrp.$(CPU).o
+	rm -f libctrp.$(CPU).so
+	rm -f libctrv.$(CPU).o
+	rm -f libctrv.$(CPU).so
 
 install: $(INSTFILES)
 	dsc_install libctr.$(CPU).a /acc/local/$(CPU)/tim
