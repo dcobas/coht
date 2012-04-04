@@ -8,7 +8,23 @@
  * abstraction layers and to hide this completely from user code.
  */
 
+#ifndef LIBCTR_COMMON
+#define LIBCTR_COMMON
+
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <sys/types.h>
+#include <errno.h>        /* Error numbers */
+#include <sys/file.h>
+#include <a.out.h>
+#include <ctype.h>
+
 #include <libctr.h>
+#include <libctrP.h>
 
 /**
  * @brief Get the number of installed CTR modules
@@ -17,7 +33,12 @@
  */
 int ctr_get_module_count(void *handle)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+	unsigned long arg = 0;
+
+	if (ioctl(h->fd,CtrIoctlGET_MODULE_COUNT,&arg) < 0)
+		return -1;
+	return (int) arg;
 }
 
 /**
@@ -33,7 +54,12 @@ int ctr_get_module_count(void *handle)
  */
 int ctr_set_module(void *handle, int modnum)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+	unsigned long arg = modnum;
+
+	if (ioctl(h->fd,CtrIoctlSET_MODULE,&arg) < 0)
+		return -1;
+	return 0;
 }
 
 /**
@@ -43,7 +69,12 @@ int ctr_set_module(void *handle, int modnum)
  */
 int ctr_get_module(void *handle)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+	unsigned long arg = 0;
+
+	if (ioctl(h->fd,CtrIoctlGET_MODULE,&arg) < 0)
+		return -1;
+	return arg;
 }
 
 /**
@@ -58,7 +89,13 @@ int ctr_get_module(void *handle)
  */
 int ctr_get_type(void *handle, CtrDrvrHardwareType *type)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+	CtrDrvrVersion version;
+
+	if (ioctl(h->fd,CtrIoctlGET_VERSION,&version) < 0)
+		return -1;
+	*type = version.HardwareType;
+	return 0;
 }
 
 /**
@@ -81,9 +118,22 @@ int ctr_get_type(void *handle, CtrDrvrHardwareType *type)
  *  if (ctr_set_module(handle,modnum) < 0) ...
  *  if (ctr_connect(handle,ctr_class,(int) hmask) < 0) ...
  */
-int ctr_connect(void *handle, int modnum, CtrDrvrConnectionClass ctr_class, int equip)
+int ctr_connect(void *handle, CtrDrvrConnectionClass ctr_class, int equip)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+	CtrDrvrConnection con;
+	int mod;
+
+	mod = ctr_get_module(handle);
+	if (mod < 0)
+		return -1;
+
+	con.Module = mod;
+	con.EqpNum = equip;
+	con.EqpClass = ctr_class;
+	if (ioctl(h->fd,CtrIoctlCONNECT,&con) < 0)
+		return -1;
+	return 0;
 }
 
 /**
@@ -107,6 +157,45 @@ int ctr_connect(void *handle, int modnum, CtrDrvrConnectionClass ctr_class, int 
  */
 int ctr_connect_payload(void *handle, int ctim, int payload)
 {
+	struct ctr_handle_s *h = handle;
+	CtrDrvrAction act;
+	CtrDrvrCtimObjects ctimo;
+	CtrDrvrTrigger *trg;
+	int i ,j, mod;
+
+	trg = &(act.Trigger);
+	mod = ctr_get_module(handle);
+	if (mod < 0)
+		return -1;
+
+	if (ioctl(h->fd,CtrIoctlLIST_CTIM_OBJECTS,&ctimo) < 0)
+		return -1;
+
+	for (i=0; i<ctimo.Size; i++) {
+		if (ctimo.Objects[i].EqpNum == ctim) {
+			if (ctr_connect(handle,CtrDrvrConnectionClassCTIM,ctim) < 0)
+				return -1;
+
+			for (j=1; j<=CtrDrvrRamTableSIZE; j++) {
+				act.TriggerNumber = j;
+				if (ioctl(h->fd,CtrIoctlGET_ACTION,&act) < 0)
+					return -1;
+
+				if (act.EqpClass == CtrDrvrConnectionClassCTIM) {
+					if (trg->Ctim == ctim) {
+						trg->Frame.Long = ((ctimo.Objects[i].Frame.Long & 0xFFFF0000)
+								|  (payload & 0x0000FFFF));
+
+						if (ioctl(h->fd,CtrIoctlSET_ACTION,&act) < 0)
+							return -1;
+						else
+							return 0;
+					}
+				}
+			}
+		}
+	}
+	errno = ENODEV; /* No such device */
 	return -1;
 }
 
@@ -119,9 +208,22 @@ int ctr_connect_payload(void *handle, int ctim, int payload)
  *
  * The client code must remember what it is connected to in order to disconnect.
  */
-int ctr_disconnect(void *handle, int modnum, CtrDrvrConnectionClass ctr_class, int mask)
+int ctr_disconnect(void *handle, CtrDrvrConnectionClass ctr_class, int mask)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+	CtrDrvrConnection con;
+	int mod;
+
+	mod = ctr_get_module(handle);
+	if (mod < 0)
+		return -1;
+
+	con.Module = mod;
+	con.EqpNum = mask;
+	con.EqpClass = ctr_class;
+	if (ioctl(h->fd,CtrIoctlDISCONNECT,&con) < 0)
+		return -1;
+	return 0;
 }
 
 /**
@@ -132,7 +234,23 @@ int ctr_disconnect(void *handle, int modnum, CtrDrvrConnectionClass ctr_class, i
  */
 int ctr_wait(void *handle, struct ctr_interrupt_s *ctr_interrupt)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+	CtrDrvrReadBuf rbf;
+
+	if (read(h->fd,&rbf,sizeof(CtrDrvrReadBuf)) <= 0) {
+		errno = ETIME; /* Timer expired */
+		return -1;
+	}
+
+	ctr_interrupt->ctr_class = rbf.Connection.EqpClass;
+	ctr_interrupt->equip     = rbf.Connection.EqpNum;
+	ctr_interrupt->payload   = rbf.Frame.Long & 0xFFFF;
+	ctr_interrupt->modnum    = rbf.Connection.Module;
+	ctr_interrupt->onzero    = rbf.OnZeroTime;
+	ctr_interrupt->trigger   = rbf.TriggerTime;
+	ctr_interrupt->start     = rbf.OnZeroTime;
+
+	return 0;
 }
 
 /**
@@ -191,7 +309,7 @@ int ctr_get_telegram(void *handle, int index, short *telegram)
  * @param ctr_time point to where time will be stored
  * @return Zero means success else -1 is returned on error, see errno
  */
-int ctr_get_time(void *handle, struct ctr_time_s *ctr_time)
+int ctr_get_time(void *handle, CtrDrvrTime *ctr_time)
 {
 	return -1;
 }
@@ -205,7 +323,7 @@ int ctr_get_time(void *handle, struct ctr_time_s *ctr_time)
  * Note this time will be overwritten within 1 second if the
  * current module is enabled and connected to the timing network.
  */
-int ctr_set_time(void *handle, struct ctr_time_s *ctr_time)
+int ctr_set_time(void *handle, CtrDrvrTime *ctr_time)
 {
 	return -1;
 }
@@ -526,3 +644,5 @@ int ctr_simulate_interrupt(void *handle, CtrDrvrConnectionClass ctr_class, int e
 {
 	return -1;
 }
+
+#endif

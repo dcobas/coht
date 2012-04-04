@@ -45,20 +45,14 @@ typedef enum {
 	CTR_CCV_COUNTER      = 0x800
 } ctr_ccv_fields_t;
 
-struct ctr_time_s {
-	struct timeval time;    /** Standard Linux time value */
-	int ctrain;             /** Corresponding ctrain value */
-	int machine;            /** Machine of ctrain */
-};
-
 struct ctr_interrupt_s {
 	CtrDrvrConnectionClass ctr_class; /** CTR interrupt class */
 	int equip;                        /** LTIM id, hardware mask, CTIM id */
 	int payload;                      /** 16-Bit payload of the event if CTIM */
 	int modnum;                       /** Module number of interrupting device */
-	struct ctr_time_s onzero;         /** Time of end of action */
-	struct ctr_time_s trigger;        /** Trigger time of action */
-	struct ctr_time_s start;          /** Counter start time */
+	CtrDrvrCTime onzero;              /** Time of end of action */
+	CtrDrvrCTime trigger;             /** Trigger time of action */
+	CtrDrvrCTime start;               /** Counter start time */
 };
 
 struct ctr_module_address_s {
@@ -194,7 +188,7 @@ int ctr_get_module_address(void *handle, struct ctr_module_address_s *module_add
  *  if (ctr_set_module(handle,modnum) < 0) ...
  *  if (ctr_connect(handle,ctr_class,(int) hmask) < 0) ...
  */
-int ctr_connect(void *handle, int modnum, CtrDrvrConnectionClass ctr_class, int equip);
+int ctr_connect(void *handle, CtrDrvrConnectionClass ctr_class, int equip);
 
 /**
  * @brief Connect to a ctr interrupt with a given payload
@@ -226,7 +220,7 @@ int ctr_connect_payload(void *handle, int ctim, int payload);
  *
  * The client code must remember what it is connected to in order to disconnect.
  */
-int ctr_disconnect(void *handle, int modnum, CtrDrvrConnectionClass ctr_class, int mask);
+int ctr_disconnect(void *handle, CtrDrvrConnectionClass ctr_class, int mask);
 
 /**
  * @brief Wait for an interrupt
@@ -280,7 +274,7 @@ int ctr_get_telegram(void *handle, int index, short *telegram);
  * @param ctr_time point to where time will be stored
  * @return Zero means success else -1 is returned on error, see errno
  */
-int ctr_get_time(void *handle, struct ctr_time_s *ctr_time);
+int ctr_get_time(void *handle, CtrDrvrTime *ctr_time);
 
 /**
  * @brief Set the time on the current module
@@ -291,7 +285,7 @@ int ctr_get_time(void *handle, struct ctr_time_s *ctr_time);
  * Note this time will be overwritten within 1 second if the
  * current module is enabled and connected to the timing network.
  */
-int ctr_set_time(void *handle, struct ctr_time_s *ctr_time);
+int ctr_set_time(void *handle, CtrDrvrTime *ctr_time);
 
 /**
  * @brief Get cable ID
