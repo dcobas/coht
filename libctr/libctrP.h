@@ -47,6 +47,8 @@ typedef enum {
 	CTR_INDEX_get_input_delay,
 	CTR_INDEX_set_debug_level,
 	CTR_INDEX_get_debug_level,
+	CTR_INDEX_set_timeout,
+	CTR_INDEX_get_timeout,
 	CTR_INDEX_get_status,
 	CTR_INDEX_set_remote,
 	CTR_INDEX_get_remote,
@@ -95,6 +97,8 @@ struct ctr_api_s {
 	int   (*ctr_get_input_delay)(void *handle);
 	int   (*ctr_set_debug_level)(void *handle, int level);
 	int   (*ctr_get_debug_level)(void *handle);
+	int   (*ctr_set_timeout)(void *handle, int timeout);
+	int   (*ctr_get_timeout)(void *handle);
 	int   (*ctr_get_status)(void *handle, CtrDrvrStatus *stat);
 	int   (*ctr_set_remote)(void *handle, int remote_flag, CtrDrvrCounter ch, CtrDrvrRemote rcmd, struct ctr_ccv_s *ctr_ccv, ctr_ccv_fields_t ctr_ccv_fields);
 	int   (*ctr_get_remote)(void *handle, CtrDrvrCounter ch, struct ctr_ccv_s *ctr_ccv);
@@ -141,6 +145,8 @@ char *ctr_api_names[CTR_INDEX_LAST] = {
 	"ctr_get_input_delay",
 	"ctr_set_debug_level",
 	"ctr_get_debug_level",
+	"ctr_set_timeout",
+	"ctr_get_timeout",
 	"ctr_get_status",
 	"ctr_set_remote",
 	"ctr_get_remote",

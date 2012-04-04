@@ -274,10 +274,10 @@ int ctr_get_module_address(void *handle, struct ctr_module_address_s *module_add
  *  if (ctr_set_module(handle,modnum) < 0) ...
  *  if (ctr_connect(handle,ctr_class,(int) hmask) < 0) ...
  */
-int ctr_connect(void *handle, int modnum, CtrDrvrConnectionClass ctr_class, int equip)
+int ctr_connect(void *handle, CtrDrvrConnectionClass ctr_class, int equip)
 {
 	struct ctr_handle_s *h = handle;
-	return h->api.ctr_connect(handle, modnum, ctr_class, equip);
+	return h->api.ctr_connect(handle, ctr_class, equip);
 }
 
 /**
@@ -314,10 +314,10 @@ int ctr_connect_payload(void *handle, int ctim, int payload)
  *
  * The client code must remember what it is connected to in order to disconnect.
  */
-int ctr_disconnect(void *handle, int modnum, CtrDrvrConnectionClass ctr_class, int mask)
+int ctr_disconnect(void *handle, CtrDrvrConnectionClass ctr_class, int mask)
 {
 	struct ctr_handle_s *h = handle;
-	return h->api.ctr_disconnect(handle, modnum, ctr_class, mask);
+	return h->api.ctr_disconnect(handle, ctr_class, mask);
 }
 
 /**
@@ -392,7 +392,7 @@ int ctr_get_telegram(void *handle, int index, short *telegram)
  * @param ctr_time point to where time will be stored
  * @return Zero means success else -1 is returned on error, see errno
  */
-int ctr_get_time(void *handle, struct ctr_time_s *ctr_time)
+int ctr_get_time(void *handle, CtrDrvrTime *ctr_time)
 {
 	struct ctr_handle_s *h = handle;
 	return h->api.ctr_get_time(handle, ctr_time);
@@ -407,7 +407,7 @@ int ctr_get_time(void *handle, struct ctr_time_s *ctr_time)
  * Note this time will be overwritten within 1 second if the
  * current module is enabled and connected to the timing network.
  */
-int ctr_set_time(void *handle, struct ctr_time_s *ctr_time)
+int ctr_set_time(void *handle, CtrDrvrTime *ctr_time)
 {
 	struct ctr_handle_s *h = handle;
 	return h->api.ctr_set_time(handle, ctr_time);
@@ -590,6 +590,29 @@ int ctr_get_debug_level(void *handle)
 {
 	struct ctr_handle_s *h = handle;
 	return h->api.ctr_get_debug_level(handle);
+}
+
+/**
+ * @brief Set your timeout in milliseconds
+ * @param A handle that was allocated in open
+ * @param The timeout im milliseconds, zero means no timeout
+ * @return Zero means success else -1 is returned on error, see errno
+ */
+int ctr_set_timeout(void *handle, int timeout)
+{
+	struct ctr_handle_s *h = handle;
+	return h->api.ctr_set_timeout(handle, timeout);
+}
+
+/**
+ * @brief Get your timeout in milliseconds
+ * @param A handle that was allocated in open
+ * @return The timeout in millisecond else -1 for error
+ */
+int ctr_get_timeout(void *handle)
+{
+	struct ctr_handle_s *h = handle;
+	return h->api.ctr_get_timeout(handle);
 }
 
 /**

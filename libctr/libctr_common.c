@@ -493,6 +493,27 @@ int ctr_get_debug_level(void *handle)
 }
 
 /**
+ * @brief Set your timeout in milliseconds
+ * @param A handle that was allocated in open
+ * @param The timeout im milliseconds, zero means no timeout
+ * @return Zero means success else -1 is returned on error, see errno
+ */
+int ctr_set_timeout(void *handle, int timeout)
+{
+	return -1;
+}
+
+/**
+ * @brief Get your timeout in milliseconds
+ * @param A handle that was allocated in open
+ * @return The timeout in millisecond else -1 for error
+ */
+int ctr_get_timeout(void *handle)
+{
+	return -1;
+}
+
+/**
  * @brief Get the CTR module status
  * @param A handle that was allocated in open
  * @param Pointer to where the status will be stored of type CtrDrvrStatus
