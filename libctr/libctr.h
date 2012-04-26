@@ -63,7 +63,7 @@ struct ctr_module_address_s {
 	CtrDrvrDevice device_type;        /** Which kind of device PCI/VME */
 	void *memory_map;                 /** Main FPGA address (VME A24/BAR2) */
 	void *jtag_address;               /** JTAG IO address (VME D16/BAR0) */
-	void *vector;                     /** If VME else 0 (The level is always 2) */
+	unsigned int specific[4];         /** If VME vec-level. If PCI pci_slot-module-vid-did */
 };
 
 /**
