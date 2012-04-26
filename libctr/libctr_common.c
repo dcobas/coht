@@ -541,18 +541,17 @@ int ctr_get_time(void *handle, CtrDrvrCTime *ctr_time)
 /**
  * @brief Set the time on the current module
  * @param A handle that was allocated in open
- * @param The time to set (Unix second)
+ * @param ctr_time the time to be set
  * @return Zero means success else -1 is returned on error, see errno
  *
  * Note this time will be overwritten within 1 second if the
  * current module is enabled and connected to the timing network.
  */
-int ctr_set_time(void *handle, int second)
+int ctr_set_time(void *handle, CtrDrvrTime ctr_time)
 {
 	struct ctr_handle_s *h = handle;
-	unsigned long sec = second;
 
-	if (ioctl(h->fd,CtrIoctlSET_UTC,&sec) < 0)
+	if (ioctl(h->fd,CtrIoctlSET_UTC,&ctr_time) < 0)
 		return -1;
 	return 0;
 }
@@ -982,12 +981,20 @@ int ctr_set_pll_lock_method(void *handle, int lock_method)
 /**
  * @brief Get Pll locking method
  * @param A handle that was allocated in open
- * @return The lock flag or -1 on error
+ * @return The lock flag (0=Brutal 1=Slow) or -1 on error
  */
 int ctr_get_pll_lock_method(void *handle)
 {
 	struct ctr_handle_s *h = handle;
-	return -1;
+	unsigned long stat;
+
+	if (ioctl(h->fd,CtrIoctlGET_IO_STATUS,&stat) < 0)
+		return -1;
+
+	if (CtrDrvrIOStatusUtcPllEnabled & stat)   /* Slow lock */
+		return 1;
+
+	return 0;                                  /* Brutal lock */
 }
 
 /**
@@ -999,7 +1006,13 @@ int ctr_get_pll_lock_method(void *handle)
 int ctr_get_io_status(void *handle, CtrDrvrIoStatus *io_stat)
 {
 	struct ctr_handle_s *h = handle;
-	return -1;
+	unsigned long stat;
+
+	if (ioctl(h->fd,CtrIoctlGET_IO_STATUS,&stat) < 0)
+		return -1;
+
+	*io_stat = (CtrDrvrIoStatus) stat;
+	return 0;
 }
 
 /**
@@ -1011,6 +1024,20 @@ int ctr_get_io_status(void *handle, CtrDrvrIoStatus *io_stat)
 int ctr_get_stats(void *handle, CtrDrvrModuleStats *stats)
 {
 	struct ctr_handle_s *h = handle;
+	unsigned long stat;
+	CtrDrvrModuleStats mstat;
+
+	if (ioctl(h->fd,CtrIoctlGET_IO_STATUS,&stat) < 0)
+		return -1;
+
+	if (stat & CtrDrvrIOStatusExtendedMemory) {
+		if (ioctl(h->fd,CtrIoctlGET_MODULE_STATS,&mstat) < 0)
+			return -1;
+
+		*stats = mstat;
+		return 0;
+	}
+	errno = ENOSYS; /* Function not supported. (On this hardware version) */
 	return -1;
 }
 
@@ -1029,8 +1056,47 @@ int ctr_get_stats(void *handle, CtrDrvrModuleStats *stats)
  */
 int ctr_memory_test(void *handle, int *address, int *wpat, int *rpat)
 {
+
+#define RAMAD 389
+#define RAMSZ 12288
+
 	struct ctr_handle_s *h = handle;
-	return -1;
+	unsigned long stat;
+	unsigned int i, data, addr;
+	CtrDrvrRawIoBlock iob;
+
+	if (ioctl(h->fd,CtrIoctlGET_STATUS,&stat) < 0)
+		return -1;
+
+	if (stat & CtrDrvrStatusENABLED) {
+		errno = EBUSY;      /* Device or resource busy. Must disable first */
+		return -1;
+	}
+
+	iob.UserArray = &data;
+	iob.Size = 1;
+
+	for (i=0; i<RAMSZ; i++) {
+		addr = i + RAMAD;
+		iob.Offset = addr;
+
+		data = addr;
+		if (ioctl(h->fd,CtrIoctlRAW_WRITE,&iob) < 0)
+			return -1;
+
+		data = 0;
+		if (ioctl(h->fd,CtrIoctlRAW_READ,&iob) < 0)
+			return -1;
+
+		if (data != addr) {
+			errno = 0;      /* I am using "0" to say memory error */
+			*address = addr;
+			*wpat = addr;
+			*rpat = data;
+			return -1;
+		}
+	}
+	return 0;
 }
 
 /**
@@ -1042,19 +1108,33 @@ int ctr_memory_test(void *handle, int *address, int *wpat, int *rpat)
 int ctr_get_client_pids(void *handle, CtrDrvrClientList *client_pids)
 {
 	struct ctr_handle_s *h = handle;
-	return -1;
+	CtrDrvrClientList clist;
+
+	if (ioctl(h->fd,CtrIoctlGET_CLIENT_LIST,&clist) < 0)
+		return -1;
+
+	*client_pids = clist;
+	return 0;
 }
 
 /**
  * @brief Get a clients connections
  * @param A handle that was allocated in open
+ * @param Pid of the client whose connections you want
  * @param Pointer to where clients connections will be stored
  * @return Zero means success else -1 is returned on error, see errno
  */
-int ctr_get_client_connections(void *handle, CtrDrvrClientConnections *connections)
+int ctr_get_client_connections(void *handle, int pid, CtrDrvrClientConnections *connections)
 {
 	struct ctr_handle_s *h = handle;
-	return -1;
+	CtrDrvrClientConnections cons;
+
+	cons.Pid = pid;
+	if (ioctl(h->fd,CtrIoctlGET_CLIENT_CONNECTIONS,&cons) < 0)
+		return -1;
+
+	*connections = cons;
+	return 0;
 }
 
 /**
@@ -1067,6 +1147,25 @@ int ctr_get_client_connections(void *handle, CtrDrvrClientConnections *connectio
 int ctr_simulate_interrupt(void *handle, CtrDrvrConnectionClass ctr_class, int equip)
 {
 	struct ctr_handle_s *h = handle;
+	CtrDrvrConnection con;
+	CtrDrvrWriteBuf wbf;
+	int cc, mod;
+
+	mod = ctr_get_module(handle);
+	if (mod < 0)
+		return -1;
+
+	con.Module = mod;
+	con.EqpNum = equip;
+	con.EqpClass = ctr_class;
+
+	wbf.TriggerNumber = 0;
+	wbf.Connection = con;
+	wbf.Payload = 0;
+
+	cc = write(h->fd,&wbf,sizeof(CtrDrvrReadBuf));
+	if (cc > 0)
+		return 0;
 	return -1;
 }
 

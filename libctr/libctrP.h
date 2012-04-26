@@ -61,6 +61,8 @@ typedef enum {
 	CTR_INDEX_simulate_interrupt,
 	CTR_INDEX_set_p2_output_byte,
 	CTR_INDEX_get_p2_output_byte,
+	CTR_INDEX_get_fw_version,
+	CTR_INDEX_get_dvr_version,
 
 	CTR_INDEX_LAST
 } ctr_index_t;
@@ -80,7 +82,7 @@ struct ctr_api_s {
 	int   (*ctr_create_ltim)(void *handle, int ltim, int ch, int size);
 	int   (*ctr_get_telegram)(void *handle, int index, short *telegram);
 	int   (*ctr_get_time)(void *handle, CtrDrvrCTime *ctr_time);
-	int   (*ctr_set_time)(void *handle, int second);
+	int   (*ctr_set_time)(void *handle, CtrDrvrTime ctr_time);
 	int   (*ctr_get_cable_id)(void *handle, int *cable_id);
 	int   (*ctr_set_cable_id)(void *handle, int cable_id);
 	int   (*ctr_get_version)(void *handle, CtrDrvrVersion *version);
@@ -106,10 +108,12 @@ struct ctr_api_s {
 	int   (*ctr_get_stats)(void *handle, CtrDrvrModuleStats *stats);
 	int   (*ctr_memory_test)(void *handle, int *address, int *wpat, int *rpat);
 	int   (*ctr_get_client_pids)(void *handle, CtrDrvrClientList *client_pids);
-	int   (*ctr_get_client_connections)(void *handle, CtrDrvrClientConnections *connections);
+	int   (*ctr_get_client_connections)(void *handle, int pid, CtrDrvrClientConnections *connections);
 	int   (*ctr_simulate_interrupt)(void *handle, CtrDrvrConnectionClass ctr_class, int equip);
 	int   (*ctr_set_p2_output_byte)(void *handle, int p2byte);
 	int   (*ctr_get_p2_output_byte)(void *handle);
+	int   (*ctr_get_fw_version)(void *handle, int *version);
+	int   (*ctr_get_dvr_version)(void *handle, int *version);
 };
 
 char *ctr_api_names[CTR_INDEX_LAST] = {
@@ -156,7 +160,9 @@ char *ctr_api_names[CTR_INDEX_LAST] = {
 	"ctr_get_client_connections",
 	"ctr_simulate_interrupt",
 	"ctr_set_p2_output_byte",
-	"ctr_get_p2_output_byte" };
+	"ctr_get_p2_output_byte",
+	"ctr_get_fw_version",
+	"ctr_get_dvr_version" };
 
 struct ctr_handle_s {
 	int fd;                 /** CTR driver file descriptor */

@@ -171,7 +171,7 @@ int ctr_close(void *handle)
 	int errsv;
 
 	if (h) {
-		if (!dlclose(h->dll_handle)) {
+		if (dlclose(h->dll_handle)) {
 			errsv = errno;
 			fprintf(stderr,"ctr_close:%s\n",dlerror());
 			errno = errsv;
@@ -187,6 +187,7 @@ int ctr_close(void *handle)
 	errno = EBADFD;     /** File descriptor in bad state */
 	return -1;
 }
+
 /**
  * @brief Get the number of installed CTR modules
  * @param A handle that was allocated in open
@@ -365,13 +366,14 @@ int ctr_get_ccv(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv)
  * @brief Create an empty LTIM object on the current module
  * @param A handle that was allocated in open
  * @param ltim number to create
+ * @param channel number for ltim
  * @param size of ltim action array (PLS lines)
  * @return Zero means success else -1 is returned on error, see errno
  */
-int ctr_create_ltim(void *handle, int ltim, int size)
+int ctr_create_ltim(void *handle, int ltim, int ch, int size)
 {
 	struct ctr_handle_s *h = handle;
-	return h->api.ctr_create_ltim(handle, ltim, size);
+	return h->api.ctr_create_ltim(handle, ltim, ch, size);
 }
 
 /**
@@ -392,7 +394,7 @@ int ctr_get_telegram(void *handle, int index, short *telegram)
  * @param ctr_time point to where time will be stored
  * @return Zero means success else -1 is returned on error, see errno
  */
-int ctr_get_time(void *handle, CtrDrvrTime *ctr_time)
+int ctr_get_time(void *handle, CtrDrvrCTime *ctr_time)
 {
 	struct ctr_handle_s *h = handle;
 	return h->api.ctr_get_time(handle, ctr_time);
@@ -407,7 +409,7 @@ int ctr_get_time(void *handle, CtrDrvrTime *ctr_time)
  * Note this time will be overwritten within 1 second if the
  * current module is enabled and connected to the timing network.
  */
-int ctr_set_time(void *handle, CtrDrvrTime *ctr_time)
+int ctr_set_time(void *handle, CtrDrvrTime ctr_time)
 {
 	struct ctr_handle_s *h = handle;
 	return h->api.ctr_set_time(handle, ctr_time);
@@ -756,13 +758,14 @@ int ctr_get_client_pids(void *handle, CtrDrvrClientList *client_pids)
 /**
  * @brief Get a clients connections
  * @param A handle that was allocated in open
+ * @param Pid of the client whose connections you want
  * @param Pointer to where clients connections will be stored
  * @return Zero means success else -1 is returned on error, see errno
  */
-int ctr_get_client_connections(void *handle, CtrDrvrClientConnections *connections)
+int ctr_get_client_connections(void *handle, int pid, CtrDrvrClientConnections *connections)
 {
 	struct ctr_handle_s *h = handle;
-	return h->api.ctr_get_client_connections(handle, connections);
+	return h->api.ctr_get_client_connections(handle, pid, connections);
 }
 
 /**

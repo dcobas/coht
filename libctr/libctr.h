@@ -300,13 +300,13 @@ int ctr_get_time(void *handle, CtrDrvrCTime *ctr_time);
 /**
  * @brief Set the time on the current module
  * @param A handle that was allocated in open
- * @param The time to set (Unix time)
+ * @param ctr_time the time to be set
  * @return Zero means success else -1 is returned on error, see errno
  *
  * Note this time will be overwritten within 1 second if the
  * current module is enabled and connected to the timing network.
  */
-int ctr_set_time(void *handle, int second);
+int ctr_set_time(void *handle, CtrDrvrTime ctr_time);
 
 /**
  * @brief Get cable ID
@@ -493,7 +493,7 @@ int ctr_set_pll_lock_method(void *handle, int lock_method);
 /**
  * @brief Get Pll locking method
  * @param A handle that was allocated in open
- * @return The lock flag or -1 on error
+ * @return The lock flag (0=Brutal 1=Slow) or -1 on error
  */
 int ctr_get_pll_lock_method(void *handle);
 
@@ -539,10 +539,11 @@ int ctr_get_client_pids(void *handle, CtrDrvrClientList *client_pids);
 /**
  * @brief Get a clients connections
  * @param A handle that was allocated in open
+ * @param Pid of the client whose connections you want
  * @param Pointer to where clients connections will be stored
  * @return Zero means success else -1 is returned on error, see errno
  */
-int ctr_get_client_connections(void *handle, CtrDrvrClientConnections *connections);
+int ctr_get_client_connections(void *handle, int pid, CtrDrvrClientConnections *connections);
 
 /**
  * @brief simulate an interrupt
