@@ -325,7 +325,7 @@ int ctr_set_ccv(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv, ct
 		return -1;
 
 	if (ctr_ccv_fields & CTR_CCV_ENABLE) {
-		if (ctr_ccv)
+		if (ctr_ccv->enable)
 			cnf->OnZero |= CtrDrvrCounterOnZeroOUT;
 		else
 			cnf->OnZero &= ~CtrDrvrCounterOnZeroOUT;
@@ -411,7 +411,62 @@ int ctr_set_ccv(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv, ct
  */
 int ctr_get_ccv(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+
+	CtrDrvrPtimBinding           ob;
+	CtrDrvrAction                act;
+	CtrDrvrTrigger              *trg;
+	CtrDrvrCounterConfiguration *cnf;
+	CtrDrvrTgmGroup             *grp;
+	CtrDrvrCounterMaskBuf        cmsb;
+
+	unsigned long mod;
+	int anm;
+
+	trg = &(act.Trigger);
+	cnf = &(act.Config);
+	grp = &(trg->Group);
+
+	ob.EqpNum = ltim;
+	if (ioctl(h->fd,CtrIoctlGET_PTIM_BINDING,&ob) < 0)
+		return -1;
+
+	mod = ob.ModuleIndex +1;
+	if (ioctl(h->fd,CtrIoctlSET_MODULE,&mod) < 0)
+		return -1;
+
+	anm = ob.StartIndex + index + 1;
+	act.TriggerNumber = anm;
+	if (ioctl(h->fd,CtrIoctlGET_ACTION,&act) < 0)
+		return -1;
+
+	if (cnf->OnZero & CtrDrvrCounterOnZeroOUT)
+		ctr_ccv->enable = 1;
+	else
+		ctr_ccv->enable = 0;
+
+	ctr_ccv->start       = cnf->Start;
+	ctr_ccv->mode        = cnf->Start;
+	ctr_ccv->clock       = cnf->Clock;
+	ctr_ccv->pulse_width = cnf->PulsWidth;
+	ctr_ccv->delay       = cnf->Delay;
+
+	cmsb.Counter = trg->Counter;
+	if (ioctl(h->fd,CtrIoctlGET_OUT_MASK,&cmsb) < 0)
+		return -1;
+
+	ctr_ccv->counter_mask  = cmsb.Mask;
+	ctr_ccv->polarity      = cmsb.Polarity;
+
+	ctr_ccv->ctim          = trg->Ctim;
+	ctr_ccv->payload       = trg->Frame.Struct.Value;
+	ctr_ccv->cmp_method    = trg->TriggerCondition;
+
+	ctr_ccv->grnum         = grp->GroupNumber;
+	ctr_ccv->grval         = grp->GroupValue;
+	ctr_ccv->tgnum         = trg->Machine;
+
+	return 0;
 }
 
 /**
@@ -424,7 +479,23 @@ int ctr_get_ccv(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv)
  */
 int ctr_create_ltim(void *handle, int ltim, int ch, int size)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+	CtrDrvrPtimBinding ptim;
+	int mod;
+
+	mod = ctr_get_module(handle);
+	if (mod < 0)
+		return -1;
+
+	ptim.EqpNum = ltim;
+	ptim.ModuleIndex = mod;
+	ptim.Counter = ch;
+	ptim.Size = size;
+	ptim.StartIndex = 0;
+
+	if (ioctl(h->fd,CtrIoctlCREATE_PTIM_OBJECT,&ptim) < 0)
+		return -1;
+	return 0;
 }
 
 /**
@@ -435,7 +506,18 @@ int ctr_create_ltim(void *handle, int ltim, int ch, int size)
  */
 int ctr_get_telegram(void *handle, int index, short *telegram)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+	CtrDrvrTgmBuf tgmb;
+	int i;
+
+	tgmb.Machine = index;
+	if (ioctl(h->fd,CtrIoctlREAD_TELEGRAM,&tgmb) < 0)
+		return -1;
+
+	for (i=0; i<32; i++)
+		telegram[i] = tgmb.Telegram[i];
+
+	return 0;
 }
 
 /**
@@ -444,23 +526,35 @@ int ctr_get_telegram(void *handle, int index, short *telegram)
  * @param ctr_time point to where time will be stored
  * @return Zero means success else -1 is returned on error, see errno
  */
-int ctr_get_time(void *handle, CtrDrvrTime *ctr_time)
+int ctr_get_time(void *handle, CtrDrvrCTime *ctr_time)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+	CtrDrvrCTime ct;
+
+	if (ioctl(h->fd,CtrIoctlGET_UTC,&ct) < 0)
+		return -1;
+
+	*ctr_time = ct;
+	return 0;
 }
 
 /**
  * @brief Set the time on the current module
  * @param A handle that was allocated in open
- * @param The time to set
+ * @param The time to set (Unix second)
  * @return Zero means success else -1 is returned on error, see errno
  *
  * Note this time will be overwritten within 1 second if the
  * current module is enabled and connected to the timing network.
  */
-int ctr_set_time(void *handle, CtrDrvrTime *ctr_time)
+int ctr_set_time(void *handle, int second)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+	unsigned long sec = second;
+
+	if (ioctl(h->fd,CtrIoctlSET_UTC,&sec) < 0)
+		return -1;
+	return 0;
 }
 
 /**
@@ -471,7 +565,14 @@ int ctr_set_time(void *handle, CtrDrvrTime *ctr_time)
  */
 int ctr_get_cable_id(void *handle, int *cable_id)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+	unsigned long cid;
+
+	if (ioctl(h->fd,CtrIoctlGET_CABLE_ID,&cid) < 0)
+		return -1;
+
+	*cable_id = (int) cid;
+	return 0;
 }
 
 /**
@@ -485,29 +586,30 @@ int ctr_get_cable_id(void *handle, int *cable_id)
  */
 int ctr_set_cable_id(void *handle, int cable_id)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+	unsigned long cid = cable_id;
+
+	if (ioctl(h->fd,CtrIoctlSET_CABLE_ID,&cid) < 0)
+		return -1;
+	return 0;
 }
 
 /**
- * @brief Get firmware version
+ * @brief Get driver and firmware version
  * @param A handle that was allocated in open
  * @param version points to where version will be stored
  * @return Zero means success else -1 is returned on error, see errno
  */
-int ctr_get_fw_version(void *handle, int *version)
+int ctr_get_version(void *handle, CtrDrvrVersion *version)
 {
-	return -1;
-}
+	struct ctr_handle_s *h = handle;
+	CtrDrvrVersion ver;
 
-/**
- * @brief Get driver version
- * @param A handle that was allocated in open
- * @param version points to where version will be stored
- * @return Zero means success else -1 is returned on error, see errno
- */
-int ctr_get_dvr_version(void *handle, int *version)
-{
-	return -1;
+	if (ioctl(h->fd,CtrIoctlGET_VERSION,&ver) < 0)
+		return -1;
+
+	*version = ver;
+	return 0;
 }
 
 /**
@@ -519,7 +621,15 @@ int ctr_get_dvr_version(void *handle, int *version)
  */
 int ctr_create_ctim(void *handle, int ctim, int mask)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+	CtrDrvrCtimBinding cb;
+
+	cb.EqpNum     = ctim;
+	cb.Frame.Long = mask;
+
+	if (ioctl(h->fd,CtrIoctlCREATE_CTIM_OBJECT,&cb) < 0)
+		return -1;
+	return 0;
 }
 
 /**
@@ -530,7 +640,15 @@ int ctr_create_ctim(void *handle, int ctim, int mask)
  */
 int ctr_destroy_ctim(void *handle, int ctim)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+	CtrDrvrCtimBinding cb;
+
+	cb.EqpNum     = ctim;
+	cb.Frame.Long = 0;
+
+	if (ioctl(h->fd,CtrIoctlDESTROY_CTIM_OBJECT,&cb) < 0)
+		return -1;
+	return 0;
 }
 
 /**
@@ -540,7 +658,12 @@ int ctr_destroy_ctim(void *handle, int ctim)
  */
 int ctr_get_queue_size(void *handle)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+	unsigned long qs;
+
+	if (ioctl(h->fd,CtrIoctlGET_QUEUE_SIZE,&qs) < 0)
+		return -1;
+	return (int) qs;
 }
 
 /**
@@ -551,7 +674,12 @@ int ctr_get_queue_size(void *handle)
  */
 int ctr_set_queue_flag(void *handle, int flag)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+	unsigned long qf = flag;
+
+	if (ioctl(h->fd,CtrIoctlSET_QUEUE_FLAG,&qf) < 0)
+		return -1;
+	return 0;
 }
 
 /**
@@ -561,7 +689,12 @@ int ctr_set_queue_flag(void *handle, int flag)
  */
 int ctr_get_queue_flag(void *handle)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+	unsigned long qf;
+
+	if (ioctl(h->fd,CtrIoctlGET_QUEUE_FLAG,&qf) < 0)
+		return -1;
+	return (int) qf;
 }
 
 /**
@@ -572,7 +705,12 @@ int ctr_get_queue_flag(void *handle)
  */
 int ctr_set_enable(void *handle, int flag)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+	unsigned long en = flag;
+
+	if (ioctl(h->fd,CtrIoctlENABLE,&en) < 0)
+		return -1;
+	return 0;
 }
 
 /**
@@ -582,7 +720,15 @@ int ctr_set_enable(void *handle, int flag)
  */
 int ctr_get_enable(void *handle)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+	unsigned long st;
+
+	if (ioctl(h->fd,CtrIoctlGET_STATUS,&st) < 0)
+		return -1;
+
+	if (st & CtrDrvrStatusENABLED)
+		return 1;
+	return 0;
 }
 
 /**
@@ -593,7 +739,12 @@ int ctr_get_enable(void *handle)
  */
 int ctr_set_input_delay(void *handle, int delay)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+	unsigned long dly = delay;
+
+	if (ioctl(h->fd,CtrIoctlSET_INPUT_DELAY,&dly) < 0)
+		return -1;
+	return 0;
 }
 
 /**
@@ -603,7 +754,12 @@ int ctr_set_input_delay(void *handle, int delay)
  */
 int ctr_get_input_delay(void *handle)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+	unsigned long dly;
+
+	if (ioctl(h->fd,CtrIoctlGET_INPUT_DELAY,&dly) < 0)
+		return -1;
+	return (int) dly;
 }
 
 /**
@@ -614,7 +770,12 @@ int ctr_get_input_delay(void *handle)
  */
 int ctr_set_debug_level(void *handle, int level)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+	unsigned long deb = level;
+
+	if (ioctl(h->fd,CtrIoctlSET_SW_DEBUG,&deb) < 0)
+		return -1;
+	return 0;
 }
 
 /**
@@ -624,7 +785,12 @@ int ctr_set_debug_level(void *handle, int level)
  */
 int ctr_get_debug_level(void *handle)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+	unsigned long deb;
+
+	if (ioctl(h->fd,CtrIoctlGET_SW_DEBUG,&deb) < 0)
+		return -1;
+	return (int) deb;
 }
 
 /**
@@ -635,7 +801,12 @@ int ctr_get_debug_level(void *handle)
  */
 int ctr_set_timeout(void *handle, int timeout)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+	unsigned long tmo = timeout;
+
+	if (ioctl(h->fd,CtrIoctlSET_TIMEOUT,&tmo) < 0)
+		return -1;
+	return 0;
 }
 
 /**
@@ -645,7 +816,12 @@ int ctr_set_timeout(void *handle, int timeout)
  */
 int ctr_get_timeout(void *handle)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+	unsigned long tmo;
+
+	if (ioctl(h->fd,CtrIoctlGET_TIMEOUT,&tmo) < 0)
+		return -1;
+	return (int) tmo;
 }
 
 /**
@@ -656,7 +832,13 @@ int ctr_get_timeout(void *handle)
  */
 int ctr_get_status(void *handle, CtrDrvrStatus *stat)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+	CtrDrvrStatus st;
+
+	if (ioctl(h->fd,CtrIoctlGET_STATUS,&st) < 0)
+		return -1;
+	*stat = st;
+	return 0;
 }
 
 /**
@@ -691,7 +873,73 @@ int ctr_set_remote(void *handle,
 		   ctr_ccv_fields_t ctr_ccv_fields)
 
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+	CtrDrvrCounterConfiguration *cnf;
+	CtrDrvrCounterConfigurationBuf cnfb;
+	CtrdrvrRemoteCommandBuf crmb;
+	CtrDrvrCounterMaskBuf cmsb;
+
+	cnf = &cnfb.Config;
+
+	crmb.Counter = ch;
+	crmb.Remote = remote_flag;
+
+	if (ioctl(h->fd,CtrIoctlSET_REMOTE,&crmb) < 0)
+		return -1;
+
+	cnfb.Counter = ch;
+	if (ioctl(h->fd,CtrIoctlGET_CONFIG,&cnfb) < 0)
+		return -1;
+
+	if (ctr_ccv_fields & CTR_CCV_ENABLE) {
+		if (ctr_ccv->enable)
+			cnf->OnZero |= CtrDrvrCounterOnZeroOUT;
+		else
+			cnf->OnZero &= ~CtrDrvrCounterOnZeroOUT;
+	}
+
+	if (ctr_ccv_fields & CTR_CCV_START)
+		cnf->Start = ctr_ccv->start;
+
+	if (ctr_ccv_fields & CTR_CCV_MODE)
+		cnf->Start = ctr_ccv->mode;
+
+	if (ctr_ccv_fields & CTR_CCV_CLOCK)
+		cnf->Clock = ctr_ccv->clock;
+
+	if (ctr_ccv_fields & CTR_CCV_PULSE_WIDTH)
+		cnf->PulsWidth = ctr_ccv->pulse_width;
+
+	if (ctr_ccv_fields & CTR_CCV_DELAY)
+		cnf->Delay = ctr_ccv->delay;
+
+	if (ctr_ccv_fields & CTR_CCV_COUNTER_MASK) {
+		cmsb.Counter = ch;
+		if (ioctl(h->fd,CtrIoctlGET_OUT_MASK,&cmsb) < 0)
+			return -1;
+		cmsb.Mask = ctr_ccv->counter_mask;
+		if (ioctl(h->fd,CtrIoctlSET_OUT_MASK,&cmsb) < 0)
+			return -1;
+	}
+
+	if (ctr_ccv_fields & CTR_CCV_POLARITY) {
+		cmsb.Counter = ch;
+		if (ioctl(h->fd,CtrIoctlGET_OUT_MASK,&cmsb) < 0)
+			return -1;
+		cmsb.Polarity = ctr_ccv->polarity;
+		if (ioctl(h->fd,CtrIoctlSET_OUT_MASK,&cmsb) < 0)
+			return -1;
+	}
+
+	if (ioctl(h->fd,CtrIoctlSET_CONFIG,&cnfb) < 0)
+		return -1;
+
+	if (rcmd) {
+		crmb.Remote = rcmd;
+		if (ioctl(h->fd,CtrIoctlREMOTE,&crmb) < 0)
+			return -1;
+	}
+	return 0;
 }
 
 /**
@@ -703,7 +951,16 @@ int ctr_set_remote(void *handle,
  */
 int ctr_get_remote(void *handle, CtrDrvrCounter ch, struct ctr_ccv_s *ctr_ccv)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+	CtrdrvrRemoteCommandBuf crmb;
+
+	crmb.Counter = ch;
+	crmb.Remote = 0;
+
+	if (ioctl(h->fd,CtrIoctlSET_REMOTE,&crmb) < 0)
+		return -1;
+
+	return (int) crmb.Remote;
 }
 
 /**
@@ -714,7 +971,12 @@ int ctr_get_remote(void *handle, CtrDrvrCounter ch, struct ctr_ccv_s *ctr_ccv)
  */
 int ctr_set_pll_lock_method(void *handle, int lock_method)
 {
-	return -1;
+	struct ctr_handle_s *h = handle;
+	unsigned long lkf = lock_method;
+
+	if (ioctl(h->fd,CtrIoctlSET_BRUTAL_PLL,&lkf) < 0)
+		return -1;
+	return 0;
 }
 
 /**
@@ -724,6 +986,7 @@ int ctr_set_pll_lock_method(void *handle, int lock_method)
  */
 int ctr_get_pll_lock_method(void *handle)
 {
+	struct ctr_handle_s *h = handle;
 	return -1;
 }
 
@@ -735,6 +998,7 @@ int ctr_get_pll_lock_method(void *handle)
  */
 int ctr_get_io_status(void *handle, CtrDrvrIoStatus *io_stat)
 {
+	struct ctr_handle_s *h = handle;
 	return -1;
 }
 
@@ -746,6 +1010,7 @@ int ctr_get_io_status(void *handle, CtrDrvrIoStatus *io_stat)
  */
 int ctr_get_stats(void *handle, CtrDrvrModuleStats *stats)
 {
+	struct ctr_handle_s *h = handle;
 	return -1;
 }
 
@@ -764,6 +1029,7 @@ int ctr_get_stats(void *handle, CtrDrvrModuleStats *stats)
  */
 int ctr_memory_test(void *handle, int *address, int *wpat, int *rpat)
 {
+	struct ctr_handle_s *h = handle;
 	return -1;
 }
 
@@ -775,6 +1041,7 @@ int ctr_memory_test(void *handle, int *address, int *wpat, int *rpat)
  */
 int ctr_get_client_pids(void *handle, CtrDrvrClientList *client_pids)
 {
+	struct ctr_handle_s *h = handle;
 	return -1;
 }
 
@@ -786,6 +1053,7 @@ int ctr_get_client_pids(void *handle, CtrDrvrClientList *client_pids)
  */
 int ctr_get_client_connections(void *handle, CtrDrvrClientConnections *connections)
 {
+	struct ctr_handle_s *h = handle;
 	return -1;
 }
 
@@ -798,6 +1066,7 @@ int ctr_get_client_connections(void *handle, CtrDrvrClientConnections *connectio
  */
 int ctr_simulate_interrupt(void *handle, CtrDrvrConnectionClass ctr_class, int equip)
 {
+	struct ctr_handle_s *h = handle;
 	return -1;
 }
 

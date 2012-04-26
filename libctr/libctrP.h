@@ -34,8 +34,7 @@ typedef enum {
 	CTR_INDEX_set_time,
 	CTR_INDEX_get_cable_id,
 	CTR_INDEX_set_cable_id,
-	CTR_INDEX_get_fw_version,
-	CTR_INDEX_get_dvr_version,
+	CTR_INDEX_get_version,
 	CTR_INDEX_create_ctim,
 	CTR_INDEX_destroy_ctim,
 	CTR_INDEX_get_queue_size,
@@ -80,12 +79,11 @@ struct ctr_api_s {
 	int   (*ctr_get_ccv)(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv);
 	int   (*ctr_create_ltim)(void *handle, int ltim, int ch, int size);
 	int   (*ctr_get_telegram)(void *handle, int index, short *telegram);
-	int   (*ctr_get_time)(void *handle, CtrDrvrTime *ctr_time);
-	int   (*ctr_set_time)(void *handle, CtrDrvrTime *ctr_time);
+	int   (*ctr_get_time)(void *handle, CtrDrvrCTime *ctr_time);
+	int   (*ctr_set_time)(void *handle, int second);
 	int   (*ctr_get_cable_id)(void *handle, int *cable_id);
 	int   (*ctr_set_cable_id)(void *handle, int cable_id);
-	int   (*ctr_get_fw_version)(void *handle, int *version);
-	int   (*ctr_get_dvr_version)(void *handle, int *version);
+	int   (*ctr_get_version)(void *handle, CtrDrvrVersion *version);
 	int   (*ctr_create_ctim)(void *handle, int ctim, int mask);
 	int   (*ctr_destroy_ctim)(void *handle, int ctim);
 	int   (*ctr_get_queue_size)(void *handle);
@@ -132,8 +130,7 @@ char *ctr_api_names[CTR_INDEX_LAST] = {
 	"ctr_set_time",
 	"ctr_get_cable_id",
 	"ctr_set_cable_id",
-	"ctr_get_fw_version",
-	"ctr_get_dvr_version",
+	"ctr_get_version",
 	"ctr_create_ctim",
 	"ctr_destroy_ctim",
 	"ctr_get_queue_size",

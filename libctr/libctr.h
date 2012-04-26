@@ -295,18 +295,18 @@ int ctr_get_telegram(void *handle, int index, short *telegram);
  * @param ctr_time point to where time will be stored
  * @return Zero means success else -1 is returned on error, see errno
  */
-int ctr_get_time(void *handle, CtrDrvrTime *ctr_time);
+int ctr_get_time(void *handle, CtrDrvrCTime *ctr_time);
 
 /**
  * @brief Set the time on the current module
  * @param A handle that was allocated in open
- * @param The time to set
+ * @param The time to set (Unix time)
  * @return Zero means success else -1 is returned on error, see errno
  *
  * Note this time will be overwritten within 1 second if the
  * current module is enabled and connected to the timing network.
  */
-int ctr_set_time(void *handle, CtrDrvrTime *ctr_time);
+int ctr_set_time(void *handle, int second);
 
 /**
  * @brief Get cable ID
@@ -328,20 +328,12 @@ int ctr_get_cable_id(void *handle, int *cable_id);
 int ctr_set_cable_id(void *handle, int cable_id);
 
 /**
- * @brief Get firmware version
+ * @brief Get driver and firmware version
  * @param A handle that was allocated in open
  * @param version points to where version will be stored
  * @return Zero means success else -1 is returned on error, see errno
  */
-int ctr_get_fw_version(void *handle, int *version);
-
-/**
- * @brief Get driver version
- * @param A handle that was allocated in open
- * @param version points to where version will be stored
- * @return Zero means success else -1 is returned on error, see errno
- */
-int ctr_get_dvr_version(void *handle, int *version);
+int ctr_get_version(void *handle, CtrDrvrVersion *version);
 
 /**
  * @brief Associate a CTIM number to a Frame
