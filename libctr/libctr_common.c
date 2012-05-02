@@ -319,6 +319,11 @@ int ctr_set_ccv(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv, ct
 	if (ioctl(h->fd,CtrIoctlSET_MODULE,&mod) < 0)
 		return -1;
 
+	if (index >= ob.Size) {
+		errno = ERANGE;
+		return -1;
+	}
+
 	anm = ob.StartIndex + index + 1;
 	act.TriggerNumber = anm;
 	if (ioctl(h->fd,CtrIoctlGET_ACTION,&act) < 0)
@@ -434,6 +439,11 @@ int ctr_get_ccv(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv)
 	mod = ob.ModuleIndex +1;
 	if (ioctl(h->fd,CtrIoctlSET_MODULE,&mod) < 0)
 		return -1;
+
+	if (index >= ob.Size) {
+		errno = ERANGE;
+		return -1;
+	}
 
 	anm = ob.StartIndex + index + 1;
 	act.TriggerNumber = anm;
