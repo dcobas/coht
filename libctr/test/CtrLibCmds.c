@@ -919,52 +919,81 @@ static char *eccv_help =
 "q<outmask>             Change output mask          1<<cntr 0x200/40MHz 0x400/ExCk1 0x800/ExCk2    \n";
 
 
-void EditCcvs(int ltim) {
+void edit_ccvs(int ltim) {
 
-struct ctr_ccv_s ccv[32];
+struct ctr_ccv_s ccv[64];
 int n, sze, idx, ctim, pyld, tnum, gnum, gval, strt, clck, pwdt, dlay, enbl;
 char c, *cp, *ep, txt[128];
 
+CtrDrvrPtimObjects obs;
+CtrDrvrPtimBinding *ob = NULL;
 
-   for (idx=0; idx<32; idx++) {
+ctr_ccv_fields_t cf = 0;
+
+   if (ctr_list_ltim_objects(h, &obs) < 0) {
+      perror("ctr_list_ltim_objects");
+      return;
+   }
+
+   for (i=0; i<obs.Size; i++) {
+      ob = &obs.Objects[i];
+      if (ob->EqpNum == ltim) break;
+      else ob = NULL;
+   }
+
+   if (!ob) {
+      fprintf(stderr,"edit_ccvs:Ltim:%d Not found\n");
+      return;
+   }
+
+   sze = ob->Size;  if (sze > 64) sze = 64;
+   for (idx=0; idx<sze; idx++) {
       if (ctr_get_ccv(h,ltim,idx,&ccv[idx]) < 0) {
-	 if (errno == ERANGE) break;
 	 perror("ctr_get_ccv");
 	 return;
       }
    }
 
-   sze = idx + 1;
-   idx = 0;
-
+   cf = 0; idx = 0;
    while (1) {
+
+      if (cf) {
+	 if (ctr_set_ccv(h,ltim,idx,&ccv[idx],cf) < 0)
+	    perror("ctr_set_ccv");
+	    return;
+	 }
+	 cf = 0;
+	 if (ctr_get_ccv(h,ltim,idx,&ccv[idx]) < 0) {
+	    perror("ctr_get_ccv");
+	    return;
+	 }
+      }
+
       printf("%s :",ccv_to_str(&ccv[idx]));
       fflush(stdout);
 
-      bzero((void *) txt, TXT_SZ); n = 0; c = 0;
+      bzero((void *) txt,128); n = 0; c = 0;
       cp = ep = txt;
-      while ((c != '\n') && (n < 128)) c = txt[n++] = (char) getchar();
+      while ((c != '\n') && (n < 128)) {
+	 c = (char) getchar();
+	 txt[n++] = c;
+      }
 
       while (1) {
+
+	 if ((*cp == '\n') || (*cp == 0)) {
+	    if (idx++ >= sze) {
+	       idx = 0;
+	       printf("\n");
+	    }
+	    break;
+	 }
+
 	 switch (*cp++) {
 
-	    case '\n':
-	       if (ctr_set_ccv(h,ltim,idx,&ccv[idx],0x3FFF) < 0)
-		  perror("ctr_set_ccv");
-		  return;
-	       }
-	       if (idx++ >= sze) {
-		  idx = 0;
-		  printf("\n");
-	       }
-	    break;
-
 	    case '/':
-	       idx = strtoul(cp,&ep,0);
-	       if (cp != ep) {
-		  cp = ep;
-		  if (idx++ >= sze) idx = 0;
-	       }
+	       idx = strtoul(cp,&ep,0); cp = ep;
+	       if (idx >= sze) idx = 0;
 	    break;
 
 	    case '?':
@@ -976,66 +1005,79 @@ char c, *cp, *ep, txt[128];
 	    case 'i':
 	       ctim = strtoul(cp,&ep,0); cp = ep;
 	       if (ctim) ccv[idx].ctim = ctim;
+	       cf |= CTR_CCV_CTIM;
 	    break;
 
 	    case 'f':
 	       pyld = strtoul(cp,&ep,0); cp = ep;
 	       ccv[idx] = pyld;
+	       cf |= CTR_CCV_PAYLOAD;
 	    break;
 
 	    case 't':
 	       tnum = strtoul(cp,&ep,0); cp = ep;
 	       ccv[idx].tgnum = tnum;
+	       cf |= CTR_CCV_TGNUM;
 	    break;
 
 	    case 'n':
 	       gnum = strtoul(cp,&ep,0); cp = ep;
 	       ccv[idx].grnum = gnum;
+	       cf |= CTR_CCV_GRNUM;
 	    break;
 
 	    case 'g':
 	       gval = strtoul(cp,&ep,0); cp = ep;
 	       ccv[idx].grval = gval;
+	       cf |= CTR_CCV_GRVAL;
 	    break;
 
 	    case 's':
 	       strt = strtoul(cp,&ep,0); cp = ep;
 	       ccv[idx].start = strt;
+	       cf |= CTR_CCV_START;
 	    break;
 
 	    case 'k':
 	       clck = strtoul(cp,&ep,0); cp = ep;
 	       ccv[idx].clock = clck;
+	       cf |= CTR_CCV_CLOCK;
 	    break;
 
 	    case 'o':
 	       mode = strtoul(cp,&ep,0); cp = ep;
 	       ccv[idx].mode = mode;
+	       cf |= CTR_CCV_MODE;
 	    break;
 
 	    case 'w':
 	       pwdt = strtoul(cp,&ep,0); cp = ep;
 	       ccv[idx].pulse_width = pwdt;
+	       cf |= CTR_CCV_PULSE_WIDTH;
 	    break;
 
 	    case 'v':
 	       dlay = strtoul(cp,&ep,0); cp = ep;
 	       ccv[idx].delay = dlay;
+	       cf |= CTR_CCV_DELAY;
 	    break;
 
 	    case 'e':
 	       enbl = strtoul(cp,&ep,0); cp = ep;
 	       ccv[idx].enable = enbl;
+	       cf |= CTR_CCV_ENABLE;
 	    break;
 
 	    case 'p':
 	       poly = strtoul(cp,&ep,0); cp = ep;
 	       ccv[idx].polarity = poly;
+	       cf |= CTR_CCV_POLARITY;
 	    break;
 
 	    case 'q':
 	       cmsk = strtoul(cp,&ep,0); cp = ep;
 	       ccv[idx].counter_mask = cmsk;
+	       cf |= CTR_CCV_COUNTER_MASK;
 	    break;
 
 	    default: break;
@@ -1055,173 +1097,136 @@ static char *eptim_help =
 "a                        Edit actions          \n"
 "y<Id>,<Mod><Cntr>,<Size> Create PTIM equipment \n";
 
-#define PSIZE 256
+void edit_ltim(int ltim) {
 
-void EditPtim(int id) {
+int i, idx, nid, mod, cnt, dim;
+char c, *cp, *ep, txt[128];
 
-unsigned long ptimlist[PSIZE];
-int i, n, ix;
-unsigned long psize, mod, cnt, dim, nid;
-char str[128], c, *cp, *ep;
-ctr_Ccv ccv;
-ctr_CcvMask ccm;
+CtrDrvrPtimObjects obs;
+CtrDrvrPtimBinding *ob = NULL;
 
-   bzero((void *) &ccv, sizeof(ctr_Ccv));
-   ccm = 0;
-   psize = 0;
+ctr_ccv_fields_t cf = 0;
 
-   if (CheckErr(ctr_GetAllPtimObjects(ptimlist,&psize,PSIZE))) {
+   if (ctr_list_ltim_objects(h, &obs) < 0) {
+      perror("ctr_list_ltim_objects");
+      return;
+   }
 
-      if (id == 0) {
-	 ix = 0;
-	 id = ptimlist[ix];
-      } else {
-	 for (ix=0; ix<psize; ix++) {
-	    if (id == ptimlist[ix]) break;
-	 }
-	 if (ix >= psize) {
-	    printf("No such PTIM: %d\n",id);
-	    return;
-	 }
+   for (i=0; i<obs.Size; i++) {
+      ob = &obs.Objects[i];
+      if (ob->EqpNum == ltim) break;
+      else ob = NULL;
+   }
+
+   idx = 0;
+   if (ltim) {
+      if (!ob) {
+	 fprintf(stderr,"edit_ccvs:Ltim:%d Not found\n");
+	 return;
       }
+   } else ob = &obs[idx];
+
+   while (1) {
+
+      if (obs.Size == 0) printf(">>>Ltim:None defined : ");
+      else {
+	 printf("%02d:Ptm:%d Mo:%d Ch:%d Sz:%d Si:%d: ",
+		idx+1,
+		(int) ob->EqpNum,
+		(int) ob->ModuleIndex+1,
+		(int) ob->Counter,
+		(int) ob->Size,
+		(int) ob->StartIndex);
+
+	 fflush(stdout);
+      }
+
+      bzero((void *) txt,128); n = 0; c = 0;
+      cp = ep = txt;
+      while ((c != '\n') && (n < 128)) {
+	 c = (char) getchar();
+	 txt[n++] = c;
+      }
+
       while (1) {
 
-	 if (psize == 0) printf(">>>Ptm:None defined : ");
-	 else {
-	    if (CheckErr(ctr_GetPtimObject(id,&mod,&cnt,&dim)) == 0) {
-	       printf("Error:%d:Ptm:%d Mo:%d Ch:%d Sz:%d : ",
-		      ix+1,id,(int) mod,(int) cnt,(int) dim);
+	 if ((*cp == '\n') || (*cp == 0)) {
+	    if (idx++ >= obs.Size) {
+	       idx = 0;
 	       printf("\n");
-	       return;
 	    }
-	    printf("%02d:Ptm:%d:%s [%s] Mo:%d Ch:%d Sz:%d : ",
-		   ix+1,
-		   id,
-		   GetPtmName(id,1),
-		   ptm_comment_txt,
-		   (int) mod,
-		   (int) cnt,
-		   (int) dim);
-	    fflush(stdout);
+	    ob = &obs[idx];
+	    break;
 	 }
 
-	 bzero((void *) str, 128); n = 0; c = 0;
-	 cp = ep = str;
-	 while ((c != '\n') && (n < 128)) c = str[n++] = (char) getchar();
+	 switch (*cp++) {
 
-	 while (*cp != 0) {
+	    case '/':
+	       idx = strtoul(cp,&ep,0); cp = ep;
+	       if (idx > obs.Size) idx = 0;
+	    break;
 
-	    switch (*cp++) {
+	    case '.': return;
 
-	       case '\n':
-		  ix++;
-		  if (ix>=psize) {
-		     ix = 0;
-		     printf("\n");
-		  }
-		  id = ptimlist[ix];
-	       break;
+	    case '?':
+	       printf("%s\n",eptim_help);
+	    break;
 
-	       case '/':
-		  nid = strtoul(cp,&ep,0);
-		  for (i=0; i<psize; i++) {
-		     if (ptimlist[i] == nid) {
-			ix = i;
-			id = nid;
-			break;
-		     }
-		  }
-		  if (cp != ep) {
-		     cp = ep; *cp = 0;
-		  }
-	       break;
+	    case 'a':
+	       edit_ccvs(ob->EqpNum);
+	    break;
 
-	       case '.': return;
+	    case 'y':
+	       nid = strtoul(cp,&ep,0);
+	       if (cp == ep) {
+		  fprintf(stderr,"libctrtest:Error:No PTIM ID defined\n");
+		  break;
+	       }
+	       cp = ep;
 
-	       case '?':
-		  printf("%s\n",eptim_help);
-	       break;
+	       mod = strtoul(cp,&ep,0);
+	       if (cp == ep) {
+		  fprintf(stderr,"libctrtest:Error:No Mod defined\n");
+		  break;
+	       }
+	       cp = ep;
+	       if (mod == 0) mod = module;
 
-	       case 'a':
-		  EditCcvs(id);
-	       break;
+	       cnt = strtoul(cp,&ep,0);
+	       if (cp == ep) {
+		  fprintf(stderr,"libctrtest:Error:No Cntr defined\n");
+		  break;
+	       }
+	       cp = ep;
 
+	       dim = strtoul(cp,&ep,0);
+	       if (cp == ep) dim = 1;
+	       cp = ep;
 
-	       case 'y':
-		  nid = strtoul(cp,&ep,0);
-		  if (cp == ep) {
-		     fprintf(stderr,"libctrtest:Error:No PTIM ID defined\n");
-		     break;
-		  }
-		  cp = ep;
-
-		  mod = strtoul(cp,&ep,0);
-		  if (cp == ep) {
-		     fprintf(stderr,"libctrtest:Error:No Mod defined\n");
-		     break;
-		  }
-		  cp = ep;
-		  if (mod == 0) mod = module;
-
-		  cnt = strtoul(cp,&ep,0);
-		  if (cp == ep) {
-		     fprintf(stderr,"libctrtest:Error:No Cntr defined\n");
-		     break;
-		  }
-		  cp = ep;
-
-		  dim = strtoul(cp,&ep,0);
-		  if (cp == ep) dim = 1;
-		  cp = ep;
-
-		  for (i=0; i<psize; i++) {
-		     if (nid == ptimlist[i]) {
-			fprintf(stderr,"libctrtest:Error:That PTIM:%d already exists\n",(int) nid);
-			return;
-		     }
-		  }
-
-		  if (CheckErr(ctr_CreatePtimObject(nid,mod,cnt,dim))) {
-		     printf(">>>Ptm:%d Mo:%d Ch:%d Sz:%d Created\n",
-			    (int) nid,(int) mod,(int) cnt,(int) dim);
-		     ptimlist[psize] = nid;
-		     psize++;
-		     ix++;
-		     id = ptimlist[ix];
-
-		     CheckErr(ctr_Get(nid,1,0,0,&ccm,&ccv));
-		     ccv.Enable     = ctr_CcvDEFAULT_ENABLE;
-		     ccv.Start      = ctr_CcvDEFAULT_START;
-		     ccv.Mode       = ctr_CcvDEFAULT_MODE;
-		     ccv.Clock      = ctr_CcvDEFAULT_CLOCK;
-		     ccv.PulsWidth  = ctr_CcvDEFAULT_PULSE_WIDTH;
-		     ccv.Delay      = ctr_CcvDEFAULT_DELAY;
-		     ccv.OutputMask = 1<<cnt;
-		     ccv.Polarity   = ctr_CcvDEFAULT_POLARITY;
-		     ccv.Ctim       = 0;
-		     ccv.Payload    = ctr_CcvDEFAULT_PAYLOAD;
-
-		     ccv.Machine    = ctr_CcvDEFAULT_MACHINE;
-		     ccv.GrNum      = 0;
-		     ccv.GrVal      = ctr_CcvDEFAULT_GRVAL;
-
-		     for (i=0; i<dim; i++) {
-			if (CheckErr(ctr_Set(nid,i+1,0,0,ccm,&ccv))) {
-			   ccv.GrVal++;
-			} else {
-			   fprintf(stderr,"libctrtest:Error:Can't set ccv for PTIM:%d Line%d\n",(int) nid,i+1);
-			   break;
-			}
-		     }
-		  } else {
-		     fprintf(stderr,"libctrtest:Error:Cant create PTIM:%d\n",(int) nid);
+	       for (i=0; i<obs.Size; i++) {
+		  if (nid == obs.Objects[i].EqpNum) {
+		     fprintf(stderr,"libctrtest:Error:That PTIM:%d already exists\n",(int) nid);
 		     return;
 		  }
-	       break;
+	       }
 
-	       default: ;
-	    }
+	       if (ctr_create_ltim(h,nid,cnt,dim) < 0) {
+		  perror("ctr_create_ltim");
+		  return;
+	       }
+	       if (ctr_list_ltim_objects(h, &obs) < 0) {
+		  perror("ctr_list_ltim_objects");
+		  return;
+	       }
+	       for (i=0; i<obs.Size; i++) {
+		  ob = &obs.Objects[i];
+		  if (ob->EqpNum == nid) break;
+	       }
+	    break;
+
+	    default: ;
 	 }
+      }
       }
    }
 }
@@ -1509,7 +1514,7 @@ int ptim;
       arg++;
       ptim = v->Number;
    }
-   EditPtim(ptim);
+   edit_ltim(ptim);
    return arg;
 }
 
@@ -1531,7 +1536,7 @@ static char *ectim_help =
 void EditCtim(int id) {
 
 char c, *cp, *ep, str[128];
-int n, i, ix, nadr;
+int n, i, idx, nadr;
 unsigned long eqp, frm, xfrm;
 char comment[128];
 
@@ -1541,20 +1546,20 @@ char comment[128];
    }
 
    if (id) {
-      ix = -1;
+      idx = -1;
       for (i=0; i<csize; i++) {
 	 if (id == ctimlist[i]) {
-	    ix = i;
+	    idx = i;
 	    break;
 	 }
       }
-      if (ix < 0) {
+      if (idx < 0) {
 	 printf("Error: No such CTIM equipment: %d\n",id);
 	 return;
       }
-   } else ix = 0;
+   } else idx = 0;
 
-   i = ix;
+   i = idx;
 
    while (1) {
 
@@ -1610,14 +1615,14 @@ char comment[128];
 	       if (n<=1) {
 		  i++;
 		  if (i>=csize) {
-		     i = ix;
+		     i = idx;
 		     printf("\n------------\n");
 		  }
 	       }
 	    break;
 
 	    case '/':
-	       i = ix;
+	       i = idx;
 	       nadr = strtoul(cp,&ep,0);
 	       if (cp != ep) {
 		  if (nadr < csize) i = nadr;
@@ -1652,8 +1657,8 @@ char comment[128];
 	       printf(">>>Ctm:%d Fr:0x%08X : Disabled\n",
 		      (int) eqp,
 		      (int) frm);
-	       if (ix>=(csize-1)) ix=0;
-	       i = ix;
+	       if (idx>=(csize-1)) idx=0;
+	       i = idx;
 	    break;
 
 	    case 'y':
