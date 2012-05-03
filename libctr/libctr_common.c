@@ -629,6 +629,13 @@ int ctr_get_version(void *handle, CtrDrvrVersion *version)
  */
 int ctr_list_ltim_objects(void *handle, CtrDrvrPtimObjects *ltims)
 {
+	struct ctr_handle_s *h = handle;
+	CtrDrvrPtimObjects ptimo;
+
+	if (ioctl(h->fd,CtrIoctlLIST_PTIM_OBJECTS,&ptimo) < 0)
+		return -1;
+
+	*ltims = ptimo;
 	return 0;
 }
 
@@ -640,6 +647,12 @@ int ctr_list_ltim_objects(void *handle, CtrDrvrPtimObjects *ltims)
  */
 int ctr_list_ctim_objects(void *handle, CtrDrvrCtimObjects *ctims)
 {
+	struct ctr_handle_s *h = handle;
+	CtrDrvrCtimObjects ctimo;
+
+	if (ioctl(h->fd,CtrIoctlLIST_CTIM_OBJECTS,&ctimo) < 0)
+		return -1;
+	*ctims = ctimo;
 	return 0;
 }
 
