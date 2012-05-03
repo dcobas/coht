@@ -166,7 +166,9 @@ char *ctr_api_names[CTR_INDEX_LAST] = {
 	"ctr_set_p2_output_byte",
 	"ctr_get_p2_output_byte",
 	"ctr_get_fw_version",
-	"ctr_get_dvr_version" };
+	"ctr_get_dvr_version",
+	"ctr_list_ltim_objects",
+	"ctr_list_ctim_objects" };
 
 struct ctr_handle_s {
 	int fd;                 /** CTR driver file descriptor */
