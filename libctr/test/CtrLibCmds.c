@@ -312,6 +312,16 @@ static char tcon_names[CtrDrvrTriggerCONDITIONS] = {"NoChk", "Equ", "LAnd"};
 
 /*****************************************************************/
 
+#define REMC_FIELDS (CTR_CCV_ENABLE       | CTR_CCV_START       | CTR_CCV_MODE  |
+		     CTR_CCV_CLOCK        | CTR_CCV_PULSE_WIDTH | CTR_CCV_DELAY |
+		     CTR_CCV_COUNTER_MASK | CTR_CCV_POLARITY)
+
+#define PTIM_FIELDS (CTR_CCV_ENABLE       | CTR_CCV_START       | CTR_CCV_MODE  |
+		     CTR_CCV_CLOCK        | CTR_CCV_PULSE_WIDTH | CTR_CCV_DELAY |
+		     CTR_CCV_COUNTER_MASK | CTR_CCV_POLARITY    | CTR_CCV_CTIM  |
+		     CTR_CCV_PAYLOAD      | CTR_CCV_CMP_METHOD  | CTR_CCV_GRNUM |
+		     CTR_CCV_GRVAL        | CTR_CCV_TGNUM)
+
 char * ccv_to_str(ctr_ccv_s *ccv, ctr_ccv_fields_t flds) {
 
 #define CCV_FIELDS 14
@@ -326,7 +336,7 @@ static char res[512];
 
    for (i=0; i<CCV_FIELDS; i++) {
       msk = 1 << i;
-      if (msk & ccm) {
+      if (msk & flds) {
 	 switch (msk) {
 	    case CTR_CCV_ENABLE:
 	       if (ccv->enable) sprintf(tmp,"Enb");
@@ -968,8 +978,7 @@ ctr_ccv_fields_t cf = 0;
 	    return;
 	 }
       }
-
-      printf("%s :",ccv_to_str(&ccv[idx]));
+      printf("%s :",ccv_to_str(&ccv[idx],PTIM_FIELDS));
       fflush(stdout);
 
       bzero((void *) txt,128); n = 0; c = 0;
@@ -1105,32 +1114,30 @@ char c, *cp, *ep, txt[128];
 CtrDrvrPtimObjects obs;
 CtrDrvrPtimBinding *ob = NULL;
 
-ctr_ccv_fields_t cf = 0;
-
    if (ctr_list_ltim_objects(h, &obs) < 0) {
       perror("ctr_list_ltim_objects");
       return;
    }
 
-   for (i=0; i<obs.Size; i++) {
-      ob = &obs.Objects[i];
-      if (ob->EqpNum == ltim) break;
-      else ob = NULL;
-   }
-
-   idx = 0;
    if (ltim) {
+      for (idx=0; idx<obs.Size; idx++) {
+	 ob = &obs.Objects[idx];
+	 if (ob->EqpNum == ltim) break;
+	 else ob = NULL;
+      }
       if (!ob) {
 	 fprintf(stderr,"edit_ccvs:Ltim:%d Not found\n");
 	 return;
       }
-   } else ob = &obs[idx];
+   } else {
+      idx = 0;
+      ob = &obs[idx];
+   }
 
    while (1) {
-
       if (obs.Size == 0) printf(">>>Ltim:None defined : ");
       else {
-	 printf("%02d:Ptm:%d Mo:%d Ch:%d Sz:%d Si:%d: ",
+	 printf("%02d:Ptm:%d Mo:%d Ch:%d Sz:%d Ix:%d: ",
 		idx+1,
 		(int) ob->EqpNum,
 		(int) ob->ModuleIndex+1,
@@ -1149,8 +1156,8 @@ ctr_ccv_fields_t cf = 0;
       }
 
       while (1) {
-
-	 if ((*cp == '\n') || (*cp == 0)) {
+	 c = *cp++;
+	 if ((c == '\n') || (c == 0)) {
 	    if (idx++ >= obs.Size) {
 	       idx = 0;
 	       printf("\n");
@@ -1158,75 +1165,58 @@ ctr_ccv_fields_t cf = 0;
 	    ob = &obs[idx];
 	    break;
 	 }
-
-	 switch (*cp++) {
-
-	    case '/':
-	       idx = strtoul(cp,&ep,0); cp = ep;
-	       if (idx > obs.Size) idx = 0;
-	    break;
-
-	    case '.': return;
-
-	    case '?':
-	       printf("%s\n",eptim_help);
-	    break;
-
-	    case 'a':
-	       edit_ccvs(ob->EqpNum);
-	    break;
-
-	    case 'y':
-	       nid = strtoul(cp,&ep,0);
-	       if (cp == ep) {
-		  fprintf(stderr,"libctrtest:Error:No PTIM ID defined\n");
-		  break;
-	       }
-	       cp = ep;
-
-	       mod = strtoul(cp,&ep,0);
-	       if (cp == ep) {
-		  fprintf(stderr,"libctrtest:Error:No Mod defined\n");
-		  break;
-	       }
-	       cp = ep;
-	       if (mod == 0) mod = module;
-
-	       cnt = strtoul(cp,&ep,0);
-	       if (cp == ep) {
-		  fprintf(stderr,"libctrtest:Error:No Cntr defined\n");
-		  break;
-	       }
-	       cp = ep;
-
-	       dim = strtoul(cp,&ep,0);
-	       if (cp == ep) dim = 1;
-	       cp = ep;
-
-	       for (i=0; i<obs.Size; i++) {
-		  if (nid == obs.Objects[i].EqpNum) {
-		     fprintf(stderr,"libctrtest:Error:That PTIM:%d already exists\n",(int) nid);
-		     return;
-		  }
-	       }
-
-	       if (ctr_create_ltim(h,nid,cnt,dim) < 0) {
-		  perror("ctr_create_ltim");
-		  return;
-	       }
-	       if (ctr_list_ltim_objects(h, &obs) < 0) {
-		  perror("ctr_list_ltim_objects");
-		  return;
-	       }
-	       for (i=0; i<obs.Size; i++) {
-		  ob = &obs.Objects[i];
-		  if (ob->EqpNum == nid) break;
-	       }
-	    break;
-
-	    default: ;
+	 else if (c == '/') {
+	    idx = strtoul(cp,&ep,0); cp = ep;
+	    if (idx > obs.Size) idx = 0;
 	 }
-      }
+	 else if (c == '.') return;
+	 else if (c == '?') printf("%s\n",eptim_help);
+	 else if (c == 'a') edit_ccvs(ob->EqpNum);
+	 else if (c == 'y') {
+	    nid = strtoul(cp,&ep,0);
+	    if (cp == ep) {
+	       fprintf(stderr,"libctrtest:Error:No PTIM ID defined\n");
+	       break;
+	    } cp = ep;
+
+	    mod = strtoul(cp,&ep,0);
+	    if (cp == ep) {
+	       fprintf(stderr,"libctrtest:Error:No Mod defined\n");
+	       break;
+	    } cp = ep;
+	    if (mod == 0) mod = module;
+
+	    cnt = strtoul(cp,&ep,0);
+	    if (cp == ep) {
+	       fprintf(stderr,"libctrtest:Error:No Cntr defined\n");
+	       break;
+	    } cp = ep;
+
+	    dim = strtoul(cp,&ep,0);
+	    if (cp == ep) dim = 1;
+	    cp = ep;
+
+	    for (i=0; i<obs.Size; i++) {
+	       if (nid == obs.Objects[i].EqpNum) {
+		  fprintf(stderr,"libctrtest:Error:That PTIM:%d already exists\n",(int) nid);
+		  return;
+	       }
+	    }
+
+	    if (ctr_create_ltim(h,nid,cnt,dim) < 0) {
+	       perror("ctr_create_ltim");
+	       return;
+	    }
+	    if (ctr_list_ltim_objects(h,&obs) < 0) {
+	       perror("ctr_list_ltim_objects");
+	       return;
+	    }
+	    for (idx=0; idx<obs.Size; idx++) {
+	       ob = &obs.Objects[i];
+	       if (ob->EqpNum == nid) break;
+	    }
+	    break;
+	 }
       }
    }
 }
@@ -1248,127 +1238,104 @@ static char *erem_help =
 "p<polarity>            Change polarity             TTL/TTL_BAR/TTL                             \n"
 "q<outmask>             Change output mask          1<<cntr 0x200/40MHz 0x400/ExCk1 0x800/ExCk2 \n";
 
-static void EditRemote(unsigned long mod, unsigned long cnt) {
+static void edit_remote(int cnt) {
 
-ctr_CcvMask ccm;
-ctr_Ccv ccv;
+struct ctr_ccv_s ccv;
+ctr_ccv_fields_t cf = 0;
 
-int i, n;
-char c, *cp, *ep;
-char txt[TXT_SZ];
-unsigned long str, clk, mde, plw, dly, enb, pol, oms, rfl;
+int rfl, ch;
+char c, *cp, *ep, txt[128];
+
+   if (cnt) ch = cnt;
+   else     ch = 1;
+
+   rfl = ctr_get_remote(h,ch,&ccv);
+   if (rfl < 0) {
+      perror("ctr_get_remote");
+      return;
+   }
+   if (!rfl) {
+      printf("Ch:%d Not in remote\n");
+      return;
+   }
 
    while (1) {
-      if (CheckErr(ctr_GetRemote(mod,cnt,&rfl,&ccm,&ccv))) {
-	 if (rfl) {
-	    if (ccv_to_str(ccm,&ccv,0)) {
-	       printf("Cntr:%d %s : ",(int) cnt, res);
-	       fflush(stdout);
-	    } else return;
-	 } else {
-	    printf("Cntr:%d Mod:%d Under CTR-Trigger control\n",(int) cnt,(int) module);
-	    cnt++;
-	    if (cnt>8) return;
-	    continue;
+      if (cf) {
+	 if (ctr_set_ccv(h,ltim,idx,&ccv[idx],cf) < 0)
+	    perror("ctr_set_ccv");
+	    return;
 	 }
+	 cf = 0;
+	 if (ctr_get_ccv(h,ltim,idx,&ccv[idx]) < 0) {
+	    perror("ctr_get_ccv");
+	    return;
+	 }
+      }
+      ccv_to_str(&ccv,REMC_FIELDS);
 
-	 bzero((void *) txt, TXT_SZ); n = 0; c = 0;
-	 cp = ep = txt;
-	 while ((c != '\n') && (n < TXT_SZ -1)) c = txt[n++] = (char) getchar();
+      bzero((void *) txt,128); n = 0; c = 0;
+      cp = ep = txt;
+      while ((c != '\n') && (n < 128)) {
+	 c = (char) getchar();
+	 txt[n++] = c;
+      }
 
-	 ccm = 0;
-	 while (*cp != 0) {
-	    switch (*cp++) {
-
-	       case '\n':
-		  if (ccm) if (!CheckErr(ctr_RemoteControl(rfl,mod,cnt,0,ccm,&ccv))) return;
-		  if (n==1) {
-		     cnt++;
-		     if (cnt > 8) {
-			cnt = 1;
-			printf("\n");
-		     }
-		  }
-	       break;
-
-	       case '/':
-		  i = strtoul(cp,&ep,0);
-		  if (cp != ep) {
-		     cp = ep;
-		     if ((i>0) && (i<=8)) cnt = i;
-		  }
-	       break;
-
-	       case '?':
-		  printf("%s\n",erem_help);
-	       break;
-
-	       case '.': return;
-
-	       case 's':
-		  str = strtoul(cp,&ep,0); cp = ep;
-		  if (str < ctr_STARTS) {
-		     ccv.Start = str;
-		     ccm |= ctr_CcvMaskSTART;
-		     break;
-		  }
-	       break;
-
-	       case 'k':
-		  clk = strtoul(cp,&ep,0); cp = ep;
-		  if (clk < ctr_CLOCKS) {
-		     ccv.Clock = clk;
-		     ccm |= ctr_CcvMaskCLOCK;
-		     break;
-		  }
-	       break;
-
-	       case 'o':
-		  mde = strtoul(cp,&ep,0); cp = ep;
-		  if (mde < ctr_MODES) {
-		     ccv.Mode = mde;
-		     ccm |= ctr_CcvMaskMODE;
-		     break;
-		  }
-	       break;
-
-	       case 'w':
-		  plw = strtoul(cp,&ep,0); cp = ep;
-		  ccv.PulsWidth = plw;
-		  ccm |= ctr_CcvMaskPWIDTH;
-	       break;
-
-	       case 'v':
-		  dly = strtoul(cp,&ep,0); cp = ep;
-		  ccv.Delay = dly;
-		  ccm |= ctr_CcvMaskDELAY;
-	       break;
-
-	       case 'e':
-		  enb = strtoul(cp,&ep,0); cp = ep;
-		  ccv.Enable = enb;
-		  ccm |= ctr_CcvMaskENABLE;
-	       break;
-
-	       case 'p':
-		  pol = strtoul(cp,&ep,0); cp = ep;
-		  if (pol == 1) ccv.Polarity = ctr_PolarityTTL_BAR;
-		  else          ccv.Polarity = ctr_PolarityTTL;
-		  ccm |= ctr_CcvMaskPOLARITY;
-	       break;
-
-	       case 'q':
-		  oms = strtoul(cp,&ep,0);
-		  if (cp == ep) oms = 1 << cnt;
-		  cp = ep;
-		  ccv.OutputMask = oms & 0xFFF;
-		  ccm |= ctr_CcvMaskOMASK;
-	       break;
-
-	       default: break;
+      while (1) {
+	 c = *cp++;
+	 if ((c == '\n') || (c == 0)) {
+	    if (ch++ >= max_ch) {
+	       ch = 1;
+	       printf("\n");
 	    }
+	    break;
 	 }
-      } else break;
+	 else if (c == '/') {
+	    ch = strtoul(cp,&ep,0); cp = ep;
+	    if (ch > max_ch) ch = 1;
+	 }
+	 else if (c == '?') printf("%s\n",erem_help);
+	 else if (c == '.') return;
+	 else if (c == 's') {
+	    strt = strtoul(cp,&ep,0); cp = ep;
+	    ccv.start = strt;
+	    cf |= CTR_CCV_START;
+	 }
+	 else if (c == 'k') {
+	    clck = strtoul(cp,&ep,0); cp = ep;
+	    ccv.clock = clck;
+	    cf |= CTR_CCV_CLOCK;
+	 }
+	 elseif (c == 'o') {
+	    mode = strtoul(cp,&ep,0); cp = ep;
+	    ccv.mode = mode;
+	    cf |= CTR_CCV_MODE;
+	 }
+	 else if (c == 'w') {
+	    pwdt = strtoul(cp,&ep,0); cp = ep;
+	    ccv.pulse_width = pwdt;
+	    cf |= CTR_CCV_PULSE_WIDTH;
+	 }
+	 else if (c == 'v') {
+	    dlay = strtoul(cp,&ep,0); cp = ep;
+	    ccv.delay = dlay;
+	    cf |= CTR_CCV_DELAY;
+	 }
+	 else if (c == 'e') {
+	    enbl = strtoul(cp,&ep,0); cp = ep;
+	    ccv.enable = enbl;
+	    cf |= CTR_CCV_ENABLE;
+	 }
+	 else if (c == 'p') {
+	    poly = strtoul(cp,&ep,0); cp = ep;
+	    ccv.polarity = poly;
+	    cf |= CTR_CCV_POLARITY;
+	 }
+	 else if (c == 'q') {
+	    cmsk = strtoul(cp,&ep,0); cp = ep;
+	    ccv.counter_mask = cmsk;
+	    cf |= CTR_CCV_COUNTER_MASK;
+	 }
+      }
    }
 }
 
@@ -1378,7 +1345,7 @@ int Config(int arg) { /* Remote flag */
 
    arg++;
 
-   EditRemote(module,counter);
+   edit_remote(counter);
    return arg;
 }
 
