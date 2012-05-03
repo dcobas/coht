@@ -282,6 +282,22 @@ int ctr_get_ccv(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv);
 int ctr_create_ltim(void *handle, int ltim, int ch, int size);
 
 /**
+ * @brief List LTIM objects
+ * @param A handle that was allocated in open
+ * @param Place where the list will be stored
+ * @return Zero means success else -1 is returned on error, see errno
+ */
+int ctr_list_ltim_objects(void *handle, CtrDrvrPtimObjects *ltims);
+
+/**
+ * @brief List CTIM objects
+ * @param A handle that was allocated in open
+ * @param Place where the list will be stored
+ * @return Zero means success else -1 is returned on error, see errno
+ */
+int ctr_list_ctim_objects(void *handle, CtrDrvrCtimObjects *ctims);
+
+/**
  * @brief get a telegram
  * @param index into the array of telegrams 0..7
  * @param telegram point to a short array of at least size 32

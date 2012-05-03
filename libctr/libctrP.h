@@ -63,6 +63,8 @@ typedef enum {
 	CTR_INDEX_get_p2_output_byte,
 	CTR_INDEX_get_fw_version,
 	CTR_INDEX_get_dvr_version,
+	CTR_INDEX_list_ltim_objects,
+	CTR_INDEX_list_ctim_objects,
 
 	CTR_INDEX_LAST
 } ctr_index_t;
@@ -114,6 +116,8 @@ struct ctr_api_s {
 	int   (*ctr_get_p2_output_byte)(void *handle);
 	int   (*ctr_get_fw_version)(void *handle, int *version);
 	int   (*ctr_get_dvr_version)(void *handle, int *version);
+	int   (*ctr_list_ltim_objects)(void *handle, CtrDrvrPtimObjects *ltims);
+	int   (*ctr_list_ctim_objects)(void *handle, CtrDrvrCtimObjects *ctims);
 };
 
 char *ctr_api_names[CTR_INDEX_LAST] = {

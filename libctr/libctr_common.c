@@ -622,6 +622,28 @@ int ctr_get_version(void *handle, CtrDrvrVersion *version)
 }
 
 /**
+ * @brief List LTIM objects
+ * @param A handle that was allocated in open
+ * @param Place where the list will be stored
+ * @return Zero means success else -1 is returned on error, see errno
+ */
+int ctr_list_ltim_objects(void *handle, CtrDrvrPtimObjects *ltims)
+{
+	return 0;
+}
+
+/**
+ * @brief List CTIM objects
+ * @param A handle that was allocated in open
+ * @param Place where the list will be stored
+ * @return Zero means success else -1 is returned on error, see errno
+ */
+int ctr_list_ctim_objects(void *handle, CtrDrvrCtimObjects *ctims)
+{
+	return 0;
+}
+
+/**
  * @brief Associate a CTIM number to a Frame
  * @param A handle that was allocated in open
  * @param ctim event Id to create

@@ -810,3 +810,27 @@ int ctr_get_p2_output_byte(void *handle)
 	struct ctr_handle_s *h = handle;
 	return h->api.ctr_get_p2_output_byte(handle);
 }
+
+/**
+ * @brief List LTIM objects
+ * @param A handle that was allocated in open
+ * @param Place where the list will be stored
+ * @return Zero means success else -1 is returned on error, see errno
+ */
+int ctr_list_ltim_objects(void *handle, CtrDrvrPtimObjects *ltims)
+{
+	struct ctr_handle_s *h = handle;
+	return h->api.ctr_list_ltim_objects(handle,ltims);
+}
+
+/**
+ * @brief List CTIM objects
+ * @param A handle that was allocated in open
+ * @param Place where the list will be stored
+ * @return Zero means success else -1 is returned on error, see errno
+ */
+int ctr_list_ctim_objects(void *handle, CtrDrvrCtimObjects *ctims)
+{
+	struct ctr_handle_s *h = handle;
+	return h->api.ctr_list_ltim_objects(handle,ctims);
+}
