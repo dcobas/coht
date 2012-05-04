@@ -1355,7 +1355,7 @@ int GetSetRemote(int arg) { /* Remote flag */
 ArgVal   *v;
 AtomType  at;
 
-unsigned long rfl;
+int rfl;
 
    arg++;
    v = &(vals[arg]);
@@ -1374,14 +1374,19 @@ unsigned long rfl;
    if (at == Numeric) {
       arg++;
       rfl = v->Number;
-      CheckErr(ctr_RemoteControl(rfl,module,counter,0,0,NULL));
+      if (ctr_set_remote(h,rfl,counter,0,NULL,0) < 0) {
+	 perror("ctr_set_remote");
+	 return arg;
+      }
    }
 
-   if (CheckErr(ctr_GetRemote(module,counter,&rfl,NULL,NULL))) {
-      if (rfl == 0) printf("Cntr:%d Mod:%d Under CTR-Trigger control\n",(int) counter,(int) module);
-      else          printf("Cntr:%d Mod:%d Under Remote control\n",(int) counter,(int) module);
+   if ((rfl = ctr_get_remote(h,counter,NULL)) < 0) {
+      perror("ctr_get_remote");
       return arg;
    }
+
+   if (rfl == 0) printf("Cntr:%d Mod:%d Under CTR-Trigger control\n",(int) counter,(int) module);
+   else          printf("Cntr:%d Mod:%d Under Remote control\n",(int) counter,(int) module);
    return arg;
 }
 

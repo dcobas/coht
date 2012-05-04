@@ -942,41 +942,43 @@ int ctr_set_remote(void *handle,
 			cnf->OnZero &= ~CtrDrvrCounterOnZeroOUT;
 	}
 
-	if (ctr_ccv_fields & CTR_CCV_START)
-		cnf->Start = ctr_ccv->start;
+	if ((ctr_ccv) && (ctr_ccv_fields)) {
+		if (ctr_ccv_fields & CTR_CCV_START)
+			cnf->Start = ctr_ccv->start;
 
-	if (ctr_ccv_fields & CTR_CCV_MODE)
-		cnf->Start = ctr_ccv->mode;
+		if (ctr_ccv_fields & CTR_CCV_MODE)
+			cnf->Mode = ctr_ccv->mode;
 
-	if (ctr_ccv_fields & CTR_CCV_CLOCK)
-		cnf->Clock = ctr_ccv->clock;
+		if (ctr_ccv_fields & CTR_CCV_CLOCK)
+			cnf->Clock = ctr_ccv->clock;
 
-	if (ctr_ccv_fields & CTR_CCV_PULSE_WIDTH)
-		cnf->PulsWidth = ctr_ccv->pulse_width;
+		if (ctr_ccv_fields & CTR_CCV_PULSE_WIDTH)
+			cnf->PulsWidth = ctr_ccv->pulse_width;
 
-	if (ctr_ccv_fields & CTR_CCV_DELAY)
-		cnf->Delay = ctr_ccv->delay;
+		if (ctr_ccv_fields & CTR_CCV_DELAY)
+			cnf->Delay = ctr_ccv->delay;
 
-	if (ctr_ccv_fields & CTR_CCV_COUNTER_MASK) {
-		cmsb.Counter = ch;
-		if (ioctl(h->fd,CtrIoctlGET_OUT_MASK,&cmsb) < 0)
-			return -1;
-		cmsb.Mask = ctr_ccv->counter_mask;
-		if (ioctl(h->fd,CtrIoctlSET_OUT_MASK,&cmsb) < 0)
+		if (ctr_ccv_fields & CTR_CCV_COUNTER_MASK) {
+			cmsb.Counter = ch;
+			if (ioctl(h->fd,CtrIoctlGET_OUT_MASK,&cmsb) < 0)
+				return -1;
+			cmsb.Mask = ctr_ccv->counter_mask;
+			if (ioctl(h->fd,CtrIoctlSET_OUT_MASK,&cmsb) < 0)
+				return -1;
+		}
+
+		if (ctr_ccv_fields & CTR_CCV_POLARITY) {
+			cmsb.Counter = ch;
+			if (ioctl(h->fd,CtrIoctlGET_OUT_MASK,&cmsb) < 0)
+				return -1;
+			cmsb.Polarity = ctr_ccv->polarity;
+			if (ioctl(h->fd,CtrIoctlSET_OUT_MASK,&cmsb) < 0)
+				return -1;
+		}
+
+		if (ioctl(h->fd,CtrIoctlSET_CONFIG,&cnfb) < 0)
 			return -1;
 	}
-
-	if (ctr_ccv_fields & CTR_CCV_POLARITY) {
-		cmsb.Counter = ch;
-		if (ioctl(h->fd,CtrIoctlGET_OUT_MASK,&cmsb) < 0)
-			return -1;
-		cmsb.Polarity = ctr_ccv->polarity;
-		if (ioctl(h->fd,CtrIoctlSET_OUT_MASK,&cmsb) < 0)
-			return -1;
-	}
-
-	if (ioctl(h->fd,CtrIoctlSET_CONFIG,&cnfb) < 0)
-		return -1;
 
 	if (rcmd) {
 		crmb.Remote = rcmd;
@@ -997,13 +999,41 @@ int ctr_get_remote(void *handle, CtrDrvrCounter ch, struct ctr_ccv_s *ctr_ccv)
 {
 	struct ctr_handle_s *h = handle;
 	CtrdrvrRemoteCommandBuf crmb;
+	CtrDrvrCounterConfigurationBuf cnfb;
+	CtrDrvrCounterConfiguration *cnf;
+	CtrDrvrCounterMaskBuf cmsb;
 
 	crmb.Counter = ch;
 	crmb.Remote = 0;
 
-	if (ioctl(h->fd,CtrIoctlSET_REMOTE,&crmb) < 0)
+	if (ioctl(h->fd,CtrIoctlGET_REMOTE,&crmb) < 0)
 		return -1;
 
+	if (ctr_ccv) {
+		cnf = &cnfb.Config;
+
+		cnfb.Counter = ch;
+		if (ioctl(h->fd,CtrIoctlGET_CONFIG,&cnfb) < 0)
+			return -1;
+
+		cmsb.Counter = ch;
+		if (ioctl(h->fd,CtrIoctlGET_OUT_MASK,&cmsb) < 0)
+			return -1;
+
+		bzero((void *) ctr_ccv, sizeof(struct ctr_ccv_s));
+
+		if (cnf->OnZero & CtrDrvrCounterOnZeroOUT)
+			ctr_ccv->enable = 1;
+
+		ctr_ccv->start       = cnf->Start;
+		ctr_ccv->mode        = cnf->Mode;
+		ctr_ccv->clock       = cnf->Clock;
+		ctr_ccv->pulse_width = cnf->PulsWidth;
+		ctr_ccv->delay       = cnf->Delay;
+
+		ctr_ccv->counter_mask = cmsb.Mask;
+		ctr_ccv->polarity     = cmsb.Polarity;
+	}
 	return (int) crmb.Remote;
 }
 
