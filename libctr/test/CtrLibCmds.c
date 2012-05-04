@@ -7,7 +7,7 @@
 
 /**************************************************************************/
 
-static int counter = 1;
+static CtrDrvrCounter counter = CtrDrvrCounter1;
 static int module = 1;
 static char *editor = "e";
 
@@ -109,21 +109,6 @@ int yn, c;
 }
 
 /**************************************************************************/
-/* Launch a task                                                          */
-
-static void launch_process(char *txt) {
-pid_t child;
-
-   if ((child = fork()) == 0) {
-      if ((child = fork()) == 0) {
-	 system(txt);
-	 exit (127);
-      }
-      exit (0);
-   }
-}
-
-/**************************************************************************/
 /* Convert a ctr_ time in milliseconds to a string routine.             */
 /* Result is a pointer to a static string representing the time.          */
 /*    the format is: Thu-18/Jan/2001 08:25:14.967                         */
@@ -174,10 +159,7 @@ int i;
 static char res[128];
 
    bzero((void *) res,128);
-   if (idx < sze) {
-      strcat(res,names[idx]);
-      strcat(res,":");
-   }
+   if (idx < sze) strcat(res,names[idx]);
    strcat(res,":");
    return res;
 }
@@ -196,7 +178,7 @@ static char res[128];
 	 strcat(res,":");
       }
    }
-   strcat(res,":");
+   if (!strlen(res)) strcat(res,":");
    return res;
 }
 
@@ -210,7 +192,8 @@ static char *stat_names[CtrDrvrSTATAE] = {"Gmt", "Pll", "XCk1","XCk2",
 					  "Ctrp","Ctrv","Intr","Bus"};
    bzero((void *) res,256);
    sprintf(res,
-	   "SET=> %s\nCLR=> %s",
+	   "SET=> %s\n"
+	   "CLR=> %s\n",
 	   enum_to_str((int)  sts,CtrDrvrSTATAE,stat_names)
 	   enum_to_str((int) ~sts,CtrDrvrSTATAE,stat_names)
    return res;
@@ -482,21 +465,30 @@ int n, earg;
 
 /*****************************************************************/
 
-int NextCounter(int arg) {
+int get_max_ch() {
 
 CtrDrvrHardwareType ht;
 int max_ch = 4;
 
-   arg++;
-   if (ctr_get_type(h,&ht) < 0)
+   if (ctr_get_type(h,&ht) < 0) {
       perror("ctr_get_type");
-      return arg;
+      return max_ch;
    }
-   if (ht == CtrDrvrHardwareTypeCTRV) max_ch = 8;
+
+   if      (ht == CtrDrvrHardwareTypeCTRV) max_ch = 8;
    else if (ht == CtrDrvrHardwareTypeCTRP) max_ch = 3;
 
+   return max_ch;
+}
+
+/*****************************************************************/
+
+int NextCounter(int arg) {
+
+   arg++;
+
    counter++;
-   if (counter > max_ch) counter = 1;
+   if (counter > get_max_ch()) counter = 1;
    return arg;
 }
 
@@ -537,24 +529,14 @@ int GetSetCounter(int arg) {
 ArgVal   *v;
 AtomType  at;
 
-CtrDrvrHardwareType ht;
-int max_ch = 4;
-
    arg++;
-
-   if (ctr_get_type(h,&ht) < 0)
-      perror("ctr_get_type");
-      return arg;
-   }
-   if (ht == CtrDrvrHardwareTypeCTRV) max_ch = 8;
-   else if (ht == CtrDrvrHardwareTypeCTRP) max_ch = 3;
 
    v = &(vals[arg]);
    at = v->Type;
    if (at == Numeric) {
       arg++;
       cnt = v->Number;
-      if ((cnt>0) && (cnt<=max_ch)) counter = cnt;
+      if (cnt<=get_max_ch()) counter = cnt;
    }
    printf("Cntr:%d Selected\n",counter);
    return arg;
@@ -1283,7 +1265,7 @@ char c, *cp, *ep, txt[128];
       while (1) {
 	 c = *cp++;
 	 if ((c == '\n') || (c == 0)) {
-	    if (ch++ >= max_ch) {
+	    if (ch++ >= get_max_ch()) {
 	       ch = 1;
 	       printf("\n");
 	    }
@@ -1291,7 +1273,7 @@ char c, *cp, *ep, txt[128];
 	 }
 	 else if (c == '/') {
 	    ch = strtoul(cp,&ep,0); cp = ep;
-	    if (ch > max_ch) ch = 1;
+	    if (ch > get_max_ch()) ch = 1;
 	 }
 	 else if (c == '?') printf("%s\n",erem_help);
 	 else if (c == '.') return;
@@ -1392,15 +1374,16 @@ int rfl;
 
 /*****************************************************************/
 
-#define REM_CMDS 5
-static char *RemNames[REM_CMDS] = {"Load","Stop","Start","OutNow","BusNow"};
+static char *RemNames[CtrDrvrREMOTES] = {"Load","Stop","Start","OutNow","BusNow"};
+#define RBITS ((1<<CtrDrvrREMOTES)-1)
 
 int SetRemoteCmd(int arg) { /* Remote flag */
 ArgVal   *v;
 AtomType  at;
 
 int i;
-unsigned long msk, rcm, rfl;
+unsigned long msk, rfl;
+CtrDrvrRemote rcm;
 
    arg++;
    v = &(vals[arg]);
@@ -1425,20 +1408,24 @@ unsigned long msk, rcm, rfl;
 
    rcm = 0;
    if (at == Numeric) {
-      rcm = v->Number & ctr_RemoteBITS;
+      rcm = v->Number & RBITS;
       arg++;
       v = &(vals[arg]);
       at = v->Type;
    }
 
-   if (CheckErr(ctr_GetRemote(module,counter,&rfl,NULL,NULL))) {
-      if (rfl) {
-	 if (CheckErr(ctr_RemoteControl(rfl,module,counter,rcm,0,NULL))) {
-	    printf("Send:Cntr:%d Mod:%d Cmd:0x%02X OK\n",(int) counter,(int) module,(int) rcm);
-	    return arg;
-	 }
-      } else fprintf(stderr,"libctrtest:Error:Cntr:%d Mod:%d Not in REMOTE\n",(int) counter,(int) module);
+   if ((rfl = ctr_get_remote(h,counter,NULL)) < 0) {
+      perror("ctr_get_remote");
+      return arg;
    }
+   if (rlf) {
+      if (ctr_set_remote(h,rfl,counter,rcmd,NULL,0) < 0) {
+	 perror("ctr_set_remote");
+	 return arg;
+      }
+      return arg;
+   }
+   printf("Counter:%d Not in remote\n",counter);
    return arg;
 }
 
@@ -1461,10 +1448,12 @@ int ctime;
       arg++;
       ctime = v->Number;
    }
-   if (CheckErr(ctr_ConnectPayload(C_EVENT,ctime,module))) {
-      connected++;
-      printf("Connected to C-%d\n",ctime);
+   if (ctr_connect_payload(h,C_EVENT,ctime) < 0) {
+      perror("ctr_connect_payload");
+      return arg;
    }
+   connected++;
+   printf("Connected to C-%d\n",ctime);
 
    return arg;
 }
@@ -1492,165 +1481,88 @@ int ptim;
 
 /*****************************************************************/
 
-#define CSIZE 1024
-unsigned long ctimlist[CSIZE], csize;
-
 static char *ectim_help =
 
-"<CrLf>        Next CTIM equipment    \n"
-"/<Index>      Go to entry Index      \n"
-"?             Print this help text   \n"
-".             Exit from the editor   \n"
-"f<Frame>      Change  CTIM Frame     \n"
-"x             Disable CTIM equipment \n"
-"y<Id>,<Frame> Create  CTIM equipment \n";
+"<CrLf>        Next \n"
+"/<Index>      Goto \n"
+"?             Help \n"
+".             Exit \n"
+"x             Destroy \n"
+"y<Id>,<Frame> Create  \n";
 
-void EditCtim(int id) {
+void edit_ctim(int ctim) {
 
-char c, *cp, *ep, str[128];
+char c, *cp, *ep, txt[128];
 int n, i, idx, nadr;
-unsigned long eqp, frm, xfrm;
-char comment[128];
 
-   if (!CheckErr(ctr_GetAllCtimObjects(ctimlist,&csize,CSIZE))) {
-       printf("Error: Can't get CTIM list\n");
-       return;
+CtrDrvrCtimObjects ctims;
+CtrDrvrCtimBinding *cb = NULL;
+
+   if (ctr_list_ctim_objects(h,&ctims) < 0) {
+      perror("ctr_list_ctim_objects");
+      return;
    }
-
-   if (id) {
-      idx = -1;
-      for (i=0; i<csize; i++) {
-	 if (id == ctimlist[i]) {
-	    idx = i;
-	    break;
-	 }
+   if (ctim) {
+      for (idx=0; idx<ctims.Size; idx++) {
+	 cb = &ctims.Objects[idx];
+	 if (ctim == cb->EqpNum) break;
+	 cb = NULL;
       }
-      if (idx < 0) {
-	 printf("Error: No such CTIM equipment: %d\n",id);
+   }
+   if (ctim) {
+      if (!cb) {
+	 printf("No such ctim:%d\n",ctim);
 	 return;
       }
-   } else idx = 0;
-
-   i = idx;
+   } else {
+      idx = 0;
+      cb = &ctims.Objects[idx];
+   }
 
    while (1) {
 
-      if (!CheckErr(ctr_GetAllCtimObjects(ctimlist,&csize,CSIZE))) {
-	  printf("Error: Can't get CTIM list\n");
-	  return;
-      }
-
-      if (csize) {
-
-	 eqp = ctimlist[i];
-	 if (!CheckErr(ctr_GetCtimObject(eqp,&frm))) {
-	    printf("Error: Cant get CTIM Object: %d\n",(int) eqp);
-	    return;
-	 }
-
-	 bzero((void *) comment,128);
-	 if ((frm & 0xFFFF0000) == 0x01000000) {
-	    strcpy(comment,"Millisecond C-Event");
-	 } else {
-	    if (frm == 0) strcpy(comment,"Disabled");
-	    else if ((xfrm = TgvGetFrameForMember(eqp))) {
-	       if (frm == xfrm) TgvFrameExplanation(frm,comment);
-	       else {
-		  sprintf(comment,
-			  "%s: Modified",
-			  TgvFrameExplanation(xfrm,str));
-	       }
-	    } else {
-	       strcpy(comment,"Locally Defined");
-	    }
-	 }
-	 printf("[%d]Ctm:%d Fr:0x%08X ;%s\t: ",
-		      i,
-		(int) eqp,
-		(int) frm,
-		      comment);
-
-      } else
-	 printf(">>>Ctm:None defined : ");
-
+      printf("%04d:ctim:%03d frame:0x%08X: ",ob->EqpNum,ob->Frame);
       fflush(stdout);
 
-      bzero((void *) str, 128); n = 0; c = 0;
-      cp = ep = str;
-      while ((c != '\n') && (n < 128)) c = str[n++] = (char) getchar();
+      bzero((void *) txt,128); n = 0; c = 0;
+      cp = ep = txt;
+      while ((c != '\n') && (n < 128)) {
+	 c = (char) getchar();
+	 txt[n++] = c;
+      }
 
-      while (*cp != 0) {
-
-	 switch (*cp++) {
-
-	    case '\n':
-	       if (n<=1) {
-		  i++;
-		  if (i>=csize) {
-		     i = idx;
-		     printf("\n------------\n");
-		  }
-	       }
+      while (1) {
+	 c = *cp++;
+	 if ((c == '\n') || (c == 0)) {
+	    if (idx++ >= ctims.Size) {
+	       idx = 0;
+	       printf("\n");
+	    }
+	    cb = &ctims.Objects[idx];
 	    break;
-
-	    case '/':
-	       i = idx;
-	       nadr = strtoul(cp,&ep,0);
-	       if (cp != ep) {
-		  if (nadr < csize) i = nadr;
-		  cp = ep;
-	       }
+	 }
+	 else if (c == '/') {
+	    idx = strtoul(cp,&ep,0); cp = ep;
+	    if (idx++ >= ctims.Size) idx = 0;
+	    cb = &ctims.Objects[idx];
+	 }
+	 else if (c == '?') printf("%s\n",ectim_help);
+	 else if (c == '.') return;
+	 else if (c == 'x') {
+	    if (ctr_destroy_ctim(h,ob->EqpNum) < 0) {
+	       perror("ctr_destroy_ctim");
+	       return;
+	    }
 	    break;
-
-	    case '.': return;
-
-	    case '?':
-	       printf("%s\n",ectim_help);
+	 }
+	 else if (c == 'y') {
+	    new = strtoul(cp,&ep,0); cp = ep;
+	    frm = strtoul(cp,&ep,0); cp = ep;
+	    if (ctr_create_ctim(h,new,frm) < 0) {
+	       perror("ctr_create_ctim");
+	       return;
+	    }
 	    break;
-
-	    case 'f':
-	       frm = strtoul(cp,&ep,0);
-	       if (cp == ep) break;
-	       cp = ep;
-	       if (!CheckErr(ctr_CreateCtimObject(eqp,frm))) {
-		  printf("Error: Cant create/modify CTIM object: %d\n",(int) eqp);
-		  return;
-	       }
-	       printf(">>>Ctm:%d Fr:0x%08X : Frame changed\n",
-		      (int) eqp,
-		      (int) frm);
-	    break;
-
-	    case 'x':
-	       if (!CheckErr(ctr_CreateCtimObject(eqp,0))) {
-		  printf("Error: Cant disable CTIM object: %d\n",(int) eqp);
-		  return;
-	       }
-	       printf(">>>Ctm:%d Fr:0x%08X : Disabled\n",
-		      (int) eqp,
-		      (int) frm);
-	       if (idx>=(csize-1)) idx=0;
-	       i = idx;
-	    break;
-
-	    case 'y':
-	       eqp = strtoul(cp,&ep,0);
-	       if (cp == ep) break;
-	       cp = ep;
-	       frm = strtoul(cp,&ep,0);
-	       if (cp == ep) break;
-	       cp = ep;
-	       if (!CheckErr(ctr_CreateCtimObject(eqp,frm))) {
-		  printf("Error: Cant create CTIM object: %d\n",(int) eqp);
-		  return;
-	       }
-	       printf(">>>Ctm:%d Fr:0x%08X : Created\n",
-		      (int) eqp,
-		      (int) frm);
-	       i = csize;
-	    break;
-
-	    default: ;
 	 }
       }
    }
@@ -1662,7 +1574,7 @@ int GetSetCtim(int arg) { /* CTIM ID */
 ArgVal   *v;
 AtomType  at;
 
-unsigned long ctim;
+int ctim;
 
    arg++;
    v = &(vals[arg]);
@@ -1674,132 +1586,7 @@ unsigned long ctim;
       ctim = v->Number;
    }
 
-   EditCtim(ctim);
-
-   return arg;
-}
-
-/*****************************************************************/
-
-static char *LemoName[] = {"CH1","CH2","CH3","CH4","CH5","CH6","CH7","CH8","ST1","ST2","CK1","CK2"};
-
-int DoIo(int arg) {
-ArgVal   *v;
-AtomType  at;
-
-unsigned long lemos, lmask;
-ctr_Error err;
-int i;
-char txt[128];
-
-   arg++;
-   v = &(vals[arg]);
-   at = v->Type;
-
-   lemos = 0; lmask = 0;
-
-   if (at == Numeric) {
-      lemos = (ctr_Lemo) v->Number;
-
-      arg++;
-      v = &(vals[arg]);
-      at = v->Type;
-
-      if (at == Numeric) {
-	 lmask = (ctr_Lemo) v->Number;
-
-	 arg++;
-	 v = &(vals[arg]);
-	 at = v->Type;
-
-	 sprintf(txt,"Lemos:0x%X Mask:0x%X",(int) lemos, (int) lmask);
-	 if (yes_no("WARNING:Set CTR Output polarities:",txt)) {
-	    err = ctr_SetOutputs(module,lemos,lmask);
-	    if (err != ctr_ErrorSUCCESS) {
-	       printf("Error:%s; Can't Set CTR Outputs:%s\n",ctr_ErrorToString(err),txt);
-	       return arg;
-	    }
-	 }
-      }
-   }
-
-   err = ctr_GetIoStatus(module,(ctr_Lemo *) &lemos);
-   if (err != ctr_ErrorSUCCESS) {
-      printf("Error:%s; Can't get CTR Inputs\n",ctr_ErrorToString(err));
-      return arg;
-   }
-
-   printf("CtrLemo Logic Levels are:0x%03x\n",(int) lemos);
-   for (i=0; i<12; i++) {
-      lmask = 1 << i;
-      if (lmask & lemos) printf("%s:5V ",LemoName[i]);
-      else               printf("%s:0V ",LemoName[i]);
-   }
-   printf("\n");
-   return arg;
-}
-
-/*****************************************************************/
-
-int GetSetPll(int arg) {
-ArgVal   *v;
-AtomType  at;
-unsigned long pllflag;
-ctr_ModuleStats stats;
-ctr_Error ter;
-
-   arg++;
-   v = &(vals[arg]);
-   at = v->Type;
-
-   if (at == Operator) {
-      if (v->OId == OprNOOP) {
-	 arg++;
-	 v = &(vals[arg]);
-	 at = v->Type;
-	 printf("PLL Locking: 0=>SLOW, 1=>BRUTAL\n");
-      }
-      return arg;
-   }
-
-   if (at == Numeric) {
-      pllflag = v->Number;
-
-      arg++;
-      v = &(vals[arg]);
-      at = v->Type;
-
-      if ((pllflag != 0) && (pllflag != 1)) {
-	 printf("Error:Illegal PLL method[0..1]:%d\n",(int) pllflag);
-	 return arg;
-      }
-
-      ter = ctr_SetPllLocking(module,pllflag);
-      if (ter != ctr_ErrorSUCCESS) {
-	 printf("Error:%s; Can't set PLL locking\n",ctr_ErrorToString(ter));
-	 return arg;
-      }
-   }
-
-   ter = ctr_GetModuleStats(module,&stats);
-   if (ter != ctr_ErrorSUCCESS) {
-      printf("Error:%s; Can't read module ststistice\n",ctr_ErrorToString(ter));
-      return arg;
-   }
-
-   if (stats.Cst.Valid == 0) {
-      printf("Error:Pll lock control not available on module\n");
-      return arg;
-   }
-
-   printf("Cst.Stat:0x%X %s\n",
-	  (int) stats.Cst.Stat,
-	  io_stat_to_str(stats.Cst.Stat));
-
-   if (stats.Cst.Stat & ctr_CstStatUtcPllEnabled)
-      printf("PLL Slow locking\n");
-   else
-      printf("PLL Brutal locking\n");
+   edit_ctim(ctim);
 
    return arg;
 }
