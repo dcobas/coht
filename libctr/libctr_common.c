@@ -27,36 +27,6 @@
 #include <libctrP.h>
 
 /**
- * @brief Convert the CTR driver time to standard unix time
- * @param ctime points to the CtrDrvrTime value  to be converted
- * @param utime points to the unix timeval struct where conversion will be stored
- * @return Always returns zero
- */
-int ctr_ctime_to_unix(CtrDrvrTime *ctime, struct timeval *utime)
-{
-	float fus;
-	fus  = (ctime->TicksHPTDC / 0.256) * 1000.0;
-	utime->tv_sec = ctime->Second;
-	utime->tv_usec = (suseconds_t) fus;
-	return 0;
-}
-
-/**
- * @brief Convert the standard unix time to CTR driver time
- * @param utime points to the unix timeval to be converted
- * @param ctime points to the CtrDrvrTime value where conversion will be stored
- * @return Always returns zero
- */
-int ctr_unix_to_ctime(struct timeval *utime, CtrDrvrTime *ctime)
-{
-	float ftdc;
-	ftdc = (utime->tv_usec * 0.256) / 1000.0;
-	ctime->TicksHPTDC = (unsigned int) ftdc;
-	ctime->Second = utime->tv_sec;
-	return 0;
-}
-
-/**
  * @brief Get the number of installed CTR modules
  * @param A handle that was allocated in open
  * @return The installed module count or -1 on error

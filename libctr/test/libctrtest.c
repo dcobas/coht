@@ -14,6 +14,7 @@
 #include <sys/file.h>
 #include <a.out.h>
 #include <ctype.h>
+#include <time.h>
 
 #include <err/err.h>      /* Error handling */
 
@@ -36,12 +37,14 @@ static unsigned int cmdindx = 0;
 
 void *h;
 
+#include <libctr.h>
+
 #include "Cmds.h"
 #include "GetAtoms.c"
 #include "PrintAtoms.c"
 #include "DoCmd.c"
 #include "Cmds.c"
-#include "LibCtrCmds.c"
+#include "CtrLibCmds.c"
 
 /**************************************************************************/
 /* Prompt and do commands in a loop                                       */
@@ -54,8 +57,7 @@ char tmpb[CMD_BUF_SIZE];
 char prmt[PROMPT_LEN];
 char *dname = NULL;
 
-int cc;
-char *cp, *ep;
+char *cp;
 
 int cnt;
 CtrDrvrHardwareType typ;
@@ -68,7 +70,7 @@ CtrDrvrHardwareType typ;
       exit(1);
    }
 
-   if (ctr_get_type(h, &typ) < 0)
+   if (ctr_get_type(h, &typ) < 0) {
       perror("ctr_get_type");
       exit(1);
    }
@@ -81,14 +83,14 @@ CtrDrvrHardwareType typ;
    }
 
    cnt = ctr_get_module_count(h);
-   if (cnt < 0)
+   if (cnt < 0) {
       perror("ctr_get_module_count");
       exit(1);
    }
 
    gethostname(host,HOST_LEN);
 
-   while (True) {
+   while (1) {
 
       cmdbuf = &(history[cmdindx][0]);
       if (strlen(cmdbuf)) printf("{%s} ",cmdbuf);

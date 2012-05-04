@@ -6,15 +6,15 @@ int Illegal();              /* llegal command */
 
 int Quit();                 /* Quit test program  */
 int Help();                 /* Help on commands   */
-int News();                 /* Show GMT test news */
+int get_news();             /* Show GMT test news */
 int History();              /* History            */
 int Shell();                /* Shell command      */
 int Sleep();                /* Sleep seconds      */
 int Pause();                /* Pause keyboard     */
 int Atoms();                /* Atom list commands */
 
-int ChangeEditor();
-int ChangeDirectory();
+int change_text_editor();
+int change_working_directory();
 int GetVersion();
 
 int WaitInterrupt();
@@ -24,27 +24,16 @@ int GetSetPtim();
 int SimulateInterrupt();
 int GetSetRemote();
 int GetUtc();
-int WaitTelegram();
-int GetTelegram();
-int LineNames();
 int GetSetModule();
 int GetStatus();
-int GetSetPll();
 int NextModule();
 int GetSetCtim();
 int SwDeb();
 int CtimRead();
-int DoIo();
 int SetRemoteCmd();
 int GetSetCounter();
 int NextCounter();
-int Video();
 int Config();
-int LaunchHwTest();
-int LaunchLookat();
-int LaunchClock();
-int ParseCycleString();
-int ShowUserMat();
 int ConnectCTime();
 
 /* Commands */
@@ -65,7 +54,6 @@ typedef enum {
    CmdCE,    /* Change text editor   */
    CmdCD,    /* Change configuration */
    CmdVER,   /* Get version */
-   CmdCST,   /* Convert cycle string */
 
    CmdWI,    /* Wait for an interrupt */
    CmdCC,    /* Connect to a C time */
@@ -73,28 +61,17 @@ typedef enum {
    CmdTMO,   /* Get set timeout */
    CmdPTM,   /* Edit PTIM equipments */
    CmdSI,    /* Simulate an interrupt */
-   CmdDOIO,  /* Use CTR as an IO register */
    CmdREM,   /* Remote control a counter */
    CmdRCM,   /* Send a remote command */
    CmdCNF,   /* Edit counter configuration */
    CmdUTC,   /* Get UTC time */
-   CmdWTGM,  /* Wait telegram */
-   CmdGTGM,  /* Get telegram */
-   CmdLNAM,  /* Line names */
-   CmdUMAT,  /* User Matrix */
    CmdMOD,   /* Show modules */
    CmdNM,    /* Next module */
    CmdCNT,   /* Get or set current counter */
    CmdNC,    /* Next counter */
    CmdRST,   /* Read status */
-   CmdPLL,   /* Get set PLL locking method */
    CmdCTM,   /* Edit CTIM objects */
    CmdDEB,   /* Get set debug level */
-   CmdCLD,   /* Load CTIM definitions */
-   CmdVID,   /* Launch Tgm Video */
-   CmdHWT,   /* Launch hardware test program */
-   CmdLKM,   /* Launch lookat a timing */
-   CmdCLK,   /* Launch clock */
 
    CmdCMDS } CmdId;
 
@@ -109,19 +86,18 @@ static Cmd cmds[CmdCMDS] = {
 
    { CmdNOCM,   "???",    "Illegal command"          ,""                   ,Illegal },
 
-   { CmdQUIT,    "q" ,    "Quit test program"        ,""                   ,Quit    },
-   { CmdHELP,    "h" ,    "Help on commands"         ,""                   ,Help    },
-   { CmdNEWS,    "news",  "Show GMT test news"       ,""                   ,News    },
-   { CmdHIST,    "his",   "History"                  ,""                   ,History },
-   { CmdSHELL,   "sh",    "Shell command"            ,"UnixCmd"            ,Shell   },
-   { CmdSLEEP,   "s" ,    "Sleep seconds"            ,"Seconds"            ,Sleep   },
-   { CmdPAUSE,   "z" ,    "Pause keyboard"           ,""                   ,Pause   },
-   { CmdATOMS,   "a" ,    "Atom list commands"       ,""                   ,Atoms   },
+   { CmdQUIT,    "q" ,    "Quit test program"        ,""                   ,Quit     },
+   { CmdHELP,    "h" ,    "Help on commands"         ,""                   ,Help     },
+   { CmdNEWS,    "news",  "Show GMT test news"       ,""                   ,get_news },
+   { CmdHIST,    "his",   "History"                  ,""                   ,History  },
+   { CmdSHELL,   "sh",    "Shell command"            ,"UnixCmd"            ,Shell    },
+   { CmdSLEEP,   "s" ,    "Sleep seconds"            ,"Seconds"            ,Sleep    },
+   { CmdPAUSE,   "z" ,    "Pause keyboard"           ,""                   ,Pause    },
+   { CmdATOMS,   "a" ,    "Atom list commands"       ,""                   ,Atoms    },
 
-   { CmdCE,      "ce",    "Change text editor"       ,""                   ,ChangeEditor      },
-   { CmdCD,      "cd",    "Change configuration"     ,"Path"               ,ChangeDirectory   },
-   { CmdVER,     "ver",   "Get TimLib version"       ,""                   ,GetVersion        },
-   { CmdCST,     "cstr",  "Convert cycle string"     ,"mch.grp.val"        ,ParseCycleString  },
+   { CmdCE,      "ce",    "Change text editor"       ,""                   ,change_text_editor       },
+   { CmdCD,      "cd",    "Change configuration"     ,"Path"               ,change_working_directory },
+   { CmdVER,     "ver",   "Get TimLib version"       ,""                   ,GetVersion         },
 
    { CmdWI,      "wi",    "Wait for an interrupt"    ,"?|P<n>|C[M]<n>|Msk<t>" ,WaitInterrupt  },
    { CmdCC,      "cc",    "Connect to a C-event time","payload"            ,ConnectCTime      },
@@ -129,29 +105,19 @@ static Cmd cmds[CmdCMDS] = {
    { CmdTMO,     "tmo",   "Get set timeout"          ,"Timeout"            ,GetSetTmo         },
    { CmdPTM,     "ptm",   "Edit PTIM equipments"     ,"?|PtimId"           ,GetSetPtim        },
    { CmdSI,      "si",    "Simulate an interrupt"    ,"?|T<n>P<n>|C<n>[pld]|Msk",SimulateInterrupt },
-   { CmdDOIO,    "io",    "Use CTR as an IO reg"     ,"Lemos,Mask"         ,DoIo              },
    { CmdREM,     "rem",   "Remote control a counter" ,"?|[<Flg>]"          ,GetSetRemote      },
    { CmdRCM,     "rcm",   "Send a remote command"    ,"?|<Cmd>"            ,SetRemoteCmd      },
    { CmdCNF,     "cnf",   "Configure remote counter" ,""                   ,Config            },
    { CmdUTC,     "utc",   "Get UTC (Real/Adjusted)"  ,"R|A"                ,GetUtc            },
-   { CmdWTGM,    "wtgm",  "Wait telegram"            ,"?|[<Mch>|<n>]"      ,WaitTelegram      },
-   { CmdGTGM,    "gtgm",  "Get telegram"             ,"?|[<Mch>|<n>]"      ,GetTelegram       },
-   { CmdLNAM,    "stgm",  "Show telegram layout"     ,"?|[<Mch>|<n>]"      ,LineNames         },
-   { CmdUMAT,    "umat",  "Show User Matrix"         ,"?|[<Mch>|<n>]"      ,ShowUserMat       },
    { CmdMOD,     "mo",    "Get set module"           ,"[<Module>]"         ,GetSetModule      },
    { CmdNM,      "nm",    "Next Module"              ,""                   ,NextModule        },
    { CmdCNT,     "cnt",   "Get set Counter"          ,"[<Counter>]"        ,GetSetCounter     },
    { CmdNC,      "nc",    "Next Counter"             ,""                   ,NextCounter       },
    { CmdRST,     "rst",   "Read module Status"       ,""                   ,GetStatus         },
-   { CmdPLL,     "upll",  "UTC PLL lock Brutal/Slow" ,"?|0|1"              ,GetSetPll         },
 
-   { CmdCTM,     "ctm",   "Edit CTIM objects"        ,"?|CtimId"           ,GetSetCtim           },
+   { CmdCTM,     "ctm",   "Edit CTIM objects"        ,"?|CtimId"           ,GetSetCtim        },
    { CmdDEB,     "deb",   "Get set debug level"      ,"Level"              ,SwDeb             },
-   { CmdCLD,     "ctmr",  "Load CTIM definitions"    ,""                   ,CtimRead          },
-   { CmdVID,     "vid",   "Launch telegram video"    ,"?|Machine"          ,Video             },
-   { CmdHWT,     "hwt",   "Launch hw-test program"   ,""                   ,LaunchHwTest      },
-   { CmdLKM,     "lkm",   "Launch look at timing"    ,"P|C|H <eqp>"        ,LaunchLookat      },
-   { CmdCLK,     "clk",   "Launch timing clock"      ,"[<Module>]"         ,LaunchClock       } };
+};
 
 typedef enum {
 

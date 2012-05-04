@@ -28,6 +28,36 @@
 #include <libctrP.h>
 
 /**
+ * @brief Convert the CTR driver time to standard unix time
+ * @param ctime points to the CtrDrvrTime value  to be converted
+ * @param utime points to the unix timeval struct where conversion will be stored
+ * @return Always returns zero
+ */
+int ctr_ctime_to_unix(CtrDrvrTime *ctime, struct timeval *utime)
+{
+	float fus;
+	fus  = (ctime->TicksHPTDC / 0.256) * 1000.0;
+	utime->tv_sec = ctime->Second;
+	utime->tv_usec = (suseconds_t) fus;
+	return 0;
+}
+
+/**
+ * @brief Convert the standard unix time to CTR driver time
+ * @param utime points to the unix timeval to be converted
+ * @param ctime points to the CtrDrvrTime value where conversion will be stored
+ * @return Always returns zero
+ */
+int ctr_unix_to_ctime(struct timeval *utime, CtrDrvrTime *ctime)
+{
+	float ftdc;
+	ftdc = (utime->tv_usec * 0.256) / 1000.0;
+	ctime->TicksHPTDC = (unsigned int) ftdc;
+	ctime->Second = utime->tv_sec;
+	return 0;
+}
+
+/**
  * @brief This routine gets called when a function is not implemented
  * @return Always returns -1
  *
@@ -443,27 +473,15 @@ int ctr_set_cable_id(void *handle, int cable_id)
 }
 
 /**
- * @brief Get firmware version
+ * @brief Get driver and firmware version
  * @param A handle that was allocated in open
  * @param version points to where version will be stored
  * @return Zero means success else -1 is returned on error, see errno
  */
-int ctr_get_fw_version(void *handle, int *version)
+int ctr_get_version(void *handle, CtrDrvrVersion *version)
 {
 	struct ctr_handle_s *h = handle;
-	return h->api.ctr_get_fw_version(handle, version);
-}
-
-/**
- * @brief Get driver version
- * @param A handle that was allocated in open
- * @param version points to where version will be stored
- * @return Zero means success else -1 is returned on error, see errno
- */
-int ctr_get_dvr_version(void *handle, int *version)
-{
-	struct ctr_handle_s *h = handle;
-	return h->api.ctr_get_dvr_version(handle, version);
+	return h->api.ctr_get_version(handle, version);
 }
 
 /**

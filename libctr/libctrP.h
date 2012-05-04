@@ -61,8 +61,6 @@ typedef enum {
 	CTR_INDEX_simulate_interrupt,
 	CTR_INDEX_set_p2_output_byte,
 	CTR_INDEX_get_p2_output_byte,
-	CTR_INDEX_get_fw_version,
-	CTR_INDEX_get_dvr_version,
 	CTR_INDEX_list_ltim_objects,
 	CTR_INDEX_list_ctim_objects,
 
@@ -114,8 +112,6 @@ struct ctr_api_s {
 	int   (*ctr_simulate_interrupt)(void *handle, CtrDrvrConnectionClass ctr_class, int equip);
 	int   (*ctr_set_p2_output_byte)(void *handle, int p2byte);
 	int   (*ctr_get_p2_output_byte)(void *handle);
-	int   (*ctr_get_fw_version)(void *handle, int *version);
-	int   (*ctr_get_dvr_version)(void *handle, int *version);
 	int   (*ctr_list_ltim_objects)(void *handle, CtrDrvrPtimObjects *ltims);
 	int   (*ctr_list_ctim_objects)(void *handle, CtrDrvrCtimObjects *ctims);
 };
@@ -165,8 +161,6 @@ char *ctr_api_names[CTR_INDEX_LAST] = {
 	"ctr_simulate_interrupt",
 	"ctr_set_p2_output_byte",
 	"ctr_get_p2_output_byte",
-	"ctr_get_fw_version",
-	"ctr_get_dvr_version",
 	"ctr_list_ltim_objects",
 	"ctr_list_ctim_objects" };
 

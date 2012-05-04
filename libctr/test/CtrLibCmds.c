@@ -1,5 +1,5 @@
 /* ****************************************************************************** */
-/* libctr test program                                                            *
+/* libctr test program                                                            */
 /* Julian Lewis Mon 30th April 2012                                               */
 /* ****************************************************************************** */
 
@@ -126,7 +126,7 @@ struct timeval utime;
    bzero((void *) tbuf, 128);
    bzero((void *) tmp, 128);
 
-   ctr_time_to_unix(t,&utime);
+   ctr_ctime_to_unix(t,&utime);
 
    if (utime.tv_sec) {
       ctime_r((time_t *) &utime.tv_sec, tmp);
@@ -155,7 +155,6 @@ struct timeval utime;
 /* Convert an int to a name string                               */
 
 static char *int_to_str(int idx, int sze, char **names) {
-int i;
 static char res[128];
 
    bzero((void *) res,128);
@@ -184,18 +183,17 @@ static char res[128];
 
 /**************************************************************************/
 
-char *status_to_string(CtrDrvrStatus sts) {
-char res[256];
+char *sts_to_string(CtrDrvrStatus sts) {
+static char res[256];
 
 static char *stat_names[CtrDrvrSTATAE] = {"Gmt", "Pll", "XCk1","XCk2",
 					  "Test","Enb", "Htdc","Ctri",
 					  "Ctrp","Ctrv","Intr","Bus"};
    bzero((void *) res,256);
    sprintf(res,
-	   "SET=> %s\n"
-	   "CLR=> %s\n",
-	   enum_to_str((int)  sts,CtrDrvrSTATAE,stat_names)
-	   enum_to_str((int) ~sts,CtrDrvrSTATAE,stat_names)
+	   "SET=> %s\nCLR=> %s\n",
+	   enum_to_str((int)  sts,CtrDrvrSTATAE,stat_names),
+	   enum_to_str((int) ~sts,CtrDrvrSTATAE,stat_names));
    return res;
 }
 
@@ -243,7 +241,7 @@ char *counter_start_to_str(CtrDrvrCounterStart cstrt) {
 static char *cstart_names[CtrDrvrCounterSTARTS] = {"Nor",  "Ext1", "Ext2", "Chnd",
 						   "Self", "Remt", "Pps",  "Chnd+Stop"};
 
-   return to_str((int) cstrt,CtrDrvrCounterSTARTS,cstart_names);
+   return int_to_str((int) cstrt,CtrDrvrCounterSTARTS,cstart_names);
 }
 
 /*****************************************************************/
@@ -269,7 +267,7 @@ static char *clock_names[CtrDrvrCounterCLOCKS] = {"1KHz", "10MHz", "40MHz", "Ext
 char *polarity_to_str(CtrDrvrPolarity pol) {
 
 #define POLARITIES 2
-static char *polarity_names[POLARATIES] = {"TTL","BAR"};
+static char *polarity_names[POLARITIES] = {"TTL","BAR"};
 
    return int_to_str(pol,POLARITIES,polarity_names);
 }
@@ -288,24 +286,24 @@ static char *onzero_names[ON_ZEROS] = {"Bus","Out"};
 
 char *trigger_condition_to_str(CtrDrvrTriggerCondition tcon) {
 
-static char tcon_names[CtrDrvrTriggerCONDITIONS] = {"NoChk", "Equ", "LAnd"};
+static char *tcon_names[CtrDrvrTriggerCONDITIONS] = {"NoChk", "Equ", "LAnd"};
 
    return int_to_str((int) tcon,CtrDrvrTriggerCONDITIONS,tcon_names);
 }
 
 /*****************************************************************/
 
-#define REMC_FIELDS (CTR_CCV_ENABLE       | CTR_CCV_START       | CTR_CCV_MODE  |
-		     CTR_CCV_CLOCK        | CTR_CCV_PULSE_WIDTH | CTR_CCV_DELAY |
+#define REMC_FIELDS (CTR_CCV_ENABLE       | CTR_CCV_START       | CTR_CCV_MODE  | \
+		     CTR_CCV_CLOCK        | CTR_CCV_PULSE_WIDTH | CTR_CCV_DELAY | \
 		     CTR_CCV_COUNTER_MASK | CTR_CCV_POLARITY)
 
-#define PTIM_FIELDS (CTR_CCV_ENABLE       | CTR_CCV_START       | CTR_CCV_MODE  |
-		     CTR_CCV_CLOCK        | CTR_CCV_PULSE_WIDTH | CTR_CCV_DELAY |
-		     CTR_CCV_COUNTER_MASK | CTR_CCV_POLARITY    | CTR_CCV_CTIM  |
-		     CTR_CCV_PAYLOAD      | CTR_CCV_CMP_METHOD  | CTR_CCV_GRNUM |
+#define PTIM_FIELDS (CTR_CCV_ENABLE       | CTR_CCV_START       | CTR_CCV_MODE  | \
+		     CTR_CCV_CLOCK        | CTR_CCV_PULSE_WIDTH | CTR_CCV_DELAY | \
+		     CTR_CCV_COUNTER_MASK | CTR_CCV_POLARITY    | CTR_CCV_CTIM  | \
+		     CTR_CCV_PAYLOAD      | CTR_CCV_CMP_METHOD  | CTR_CCV_GRNUM | \
 		     CTR_CCV_GRVAL        | CTR_CCV_TGNUM)
 
-char * ccv_to_str(ctr_ccv_s *ccv, ctr_ccv_fields_t flds) {
+char *ccv_to_str(struct ctr_ccv_s *ccv, ctr_ccv_fields_t flds) {
 
 #define CCV_FIELDS 14
 
@@ -367,19 +365,19 @@ static char res[512];
 	    break;
 
 	    case CTR_CCV_CMP_METHOD:
-	       sprintf(tmp,"CMP:%s",ccv->cmp_method));
+	       sprintf(tmp,"CMP:%s",trigger_condition_to_str(ccv->cmp_method));
 	    break;
 
 	    case CTR_CCV_GRNUM:
-	       sprintf(tmp,"GNM:%d",,ccv->grnum);
+	       sprintf(tmp,"GNM:%d",ccv->grnum);
 	    break;
 
 	    case CTR_CCV_GRVAL:
-	       sprintf(tmp,"GVL:%d",,ccv->grnum);
+	       sprintf(tmp,"GVL:%d",ccv->grnum);
 	    break;
 
 	    case CTR_CCV_TGNUM:
-	       sprintf(tmp,"TGM:%d",,ccv->tgnum);
+	       sprintf(tmp,"TGM:%d",ccv->tgnum);
 	    break;
 
 
@@ -389,7 +387,6 @@ static char res[512];
 	 strcat(res,tmp);
 	 strcat(res," ");
 	 bzero((void *) tmp,128);
-	 }
       }
    }
    return res;
@@ -512,14 +509,14 @@ int mcnt;
 /*****************************************************************/
 
 int GetStatus(int arg) {
-CtrDrvrStatus *stat
+CtrDrvrStatus sts;
 
    arg++;
-   if (ctr_get_status(h,&stat) < 0) {
+   if (ctr_get_status(h,&sts) < 0) {
       perror("ctr_get_status");
       return arg;
    }
-   printf("Status:%s\n",status_to_str(stat);
+   printf("Status:%s\n",sts_to_string(sts));
    return arg;
 }
 
@@ -528,6 +525,7 @@ CtrDrvrStatus *stat
 int GetSetCounter(int arg) {
 ArgVal   *v;
 AtomType  at;
+int cnt;
 
    arg++;
 
@@ -548,7 +546,7 @@ int GetSetModule(int arg) {
 ArgVal   *v;
 AtomType  at;
 
-int mcnt;
+int mcnt, mod;
 
    arg++;
    mcnt = ctr_get_module_count(h);
@@ -676,17 +674,15 @@ CtrDrvrVersion dver;
 /*****************************************************************/
 
 int GetUtc(int arg) {
-ArgVal   *v;
-AtomType  at;
 
-CtrDrvrCTime *ctr_time;
+CtrDrvrCTime ctr_time;
 
    arg++;
    if (ctr_get_time(h,&ctr_time) < 0) {
       perror("ctr_get_time");
       return arg;
    }
-   printf("Time:%s\n",time_to_string(&t));
+   printf("Time:%s\n",time_to_string(&ctr_time.Time));
    return arg;
 }
 
@@ -804,14 +800,17 @@ struct ctr_interrupt_s ctr_interrupt;
    else if (ctr_interrupt.ctr_class == CtrDrvrConnectionClassPTIM) printf("Ptim:");
    else if (ctr_interrupt.ctr_class == CtrDrvrConnectionClassCTIM) printf("Ctim:");
    else                                                            printf("xxxx:");
+
    printf("Equp:0x%04X Pyld:0x%04X Modn:%d\n",
 	  ctr_interrupt.equip,
 	  ctr_interrupt.payload,
 	  ctr_interrupt.modnum);
-   printf("    :Onz:C%d %s Trg:C%d %s Str:C%d %s\n",
-	  ctr_interrupt.onzero.CTrain,time_to_str(ctr_interrupt.onzero.Time),
-	  ctr_interrupt.trigger.CTrain,time_to_str(ctr_interrupt.trigger.Time),
-	  ctr_interrupt.start.CTrain,time_to_str(ctr_interrupt.start.Time));
+
+   printf("    :Onz:C%04d %s Trg:C%04d %s Str:C%04d %s\n",
+	  ctr_interrupt.onzero.CTrain,  time_to_string(&ctr_interrupt.onzero.Time),
+	  ctr_interrupt.trigger.CTrain, time_to_string(&ctr_interrupt.trigger.Time),
+	  ctr_interrupt.start.CTrain,   time_to_string(&ctr_interrupt.start.Time));
+
    return arg;
 }
 
@@ -821,7 +820,7 @@ int SimulateInterrupt(int arg) { /* msk */
 ArgVal   *v;
 AtomType  at;
 
-int i, equip;
+int i, msk, equip;
 
    arg++;
    v = &(vals[arg]);
@@ -852,7 +851,7 @@ int i, equip;
 	 perror("ctr_simulate_interrupt");
 	 return arg;
       }
-      return arg
+      return arg;
    }
 
    if (at == Alpha) {
@@ -866,7 +865,7 @@ int i, equip;
 	       perror("ctr_simulate_interrupt");
 	       return arg;
 	    }
-	    return arg
+	    return arg;
 	 }
       }
 
@@ -880,7 +879,7 @@ int i, equip;
 	       perror("ctr_simulate_interrupt");
 	       return arg;
 	    }
-	    return arg
+	    return arg;
 	 }
       }
    }
@@ -914,7 +913,7 @@ static char *eccv_help =
 void edit_ccvs(int ltim) {
 
 struct ctr_ccv_s ccv[64];
-int n, sze, idx, ctim, pyld, tnum, gnum, gval, strt, clck, pwdt, dlay, enbl;
+int i, n, sze, idx, ctim, pyld, tnum, gnum, gval, strt, mode, clck, pwdt, dlay, enbl, poly, cmsk;
 char c, *cp, *ep, txt[128];
 
 CtrDrvrPtimObjects obs;
@@ -934,7 +933,7 @@ ctr_ccv_fields_t cf = 0;
    }
 
    if (!ob) {
-      fprintf(stderr,"edit_ccvs:Ltim:%d Not found\n");
+      fprintf(stderr,"edit_ccvs:Ltim:%d Not found\n",ltim);
       return;
    }
 
@@ -950,7 +949,7 @@ ctr_ccv_fields_t cf = 0;
    while (1) {
 
       if (cf) {
-	 if (ctr_set_ccv(h,ltim,idx,&ccv[idx],cf) < 0)
+	 if (ctr_set_ccv(h,ltim,idx,&ccv[idx],cf) < 0) {
 	    perror("ctr_set_ccv");
 	    return;
 	 }
@@ -1001,7 +1000,7 @@ ctr_ccv_fields_t cf = 0;
 
 	    case 'f':
 	       pyld = strtoul(cp,&ep,0); cp = ep;
-	       ccv[idx] = pyld;
+	       ccv[idx].payload = pyld;
 	       cf |= CTR_CCV_PAYLOAD;
 	    break;
 
@@ -1090,7 +1089,7 @@ static char *eptim_help =
 
 void edit_ltim(int ltim) {
 
-int i, idx, nid, mod, cnt, dim;
+int n, i, idx, nid, mod, cnt, dim;
 char c, *cp, *ep, txt[128];
 
 CtrDrvrPtimObjects obs;
@@ -1108,12 +1107,12 @@ CtrDrvrPtimBinding *ob = NULL;
 	 else ob = NULL;
       }
       if (!ob) {
-	 fprintf(stderr,"edit_ccvs:Ltim:%d Not found\n");
+	 fprintf(stderr,"edit_ccvs:Ltim:%d Not found\n",ltim);
 	 return;
       }
    } else {
       idx = 0;
-      ob = &obs[idx];
+      ob = &obs.Objects[idx];
    }
 
    while (1) {
@@ -1144,7 +1143,7 @@ CtrDrvrPtimBinding *ob = NULL;
 	       idx = 0;
 	       printf("\n");
 	    }
-	    ob = &obs[idx];
+	    ob = &obs.Objects[idx];
 	    break;
 	 }
 	 else if (c == '/') {
@@ -1225,7 +1224,7 @@ static void edit_remote(int cnt) {
 struct ctr_ccv_s ccv;
 ctr_ccv_fields_t cf = 0;
 
-int rfl, ch;
+int n, rfl, ch, strt, clck, mode, pwdt, dlay, enbl, poly, cmsk;
 char c, *cp, *ep, txt[128];
 
    if (cnt) ch = cnt;
@@ -1237,19 +1236,14 @@ char c, *cp, *ep, txt[128];
       return;
    }
    if (!rfl) {
-      printf("Ch:%d Not in remote\n");
+      printf("Ch:%d Not in remote\n",cnt);
       return;
    }
 
    while (1) {
       if (cf) {
-	 if (ctr_set_ccv(h,ltim,idx,&ccv[idx],cf) < 0)
-	    perror("ctr_set_ccv");
-	    return;
-	 }
-	 cf = 0;
-	 if (ctr_get_ccv(h,ltim,idx,&ccv[idx]) < 0) {
-	    perror("ctr_get_ccv");
+	 if (ctr_set_remote(h,rfl,ch,0,&ccv,cf) < 0) {
+	    perror("ctr_set_remote");
 	    return;
 	 }
       }
@@ -1287,7 +1281,7 @@ char c, *cp, *ep, txt[128];
 	    ccv.clock = clck;
 	    cf |= CTR_CCV_CLOCK;
 	 }
-	 elseif (c == 'o') {
+	 else if (c == 'o') {
 	    mode = strtoul(cp,&ep,0); cp = ep;
 	    ccv.mode = mode;
 	    cf |= CTR_CCV_MODE;
@@ -1396,9 +1390,9 @@ CtrDrvrRemote rcm;
 	 at = v->Type;
 
 	 printf("Cmd:\n");
-	 for (i=0; i<REM_CMDS; i++) {
+	 for (i=0; i<CtrDrvrREMOTES; i++) {
 	    msk = 1 << i;
-	    if (msk & ctr_RemoteBITS) {
+	    if (msk & RBITS) {
 	       printf("0x%02X %s\n",(int) msk,RemNames[i]);
 	    } else break;
 	 }
@@ -1418,8 +1412,8 @@ CtrDrvrRemote rcm;
       perror("ctr_get_remote");
       return arg;
    }
-   if (rlf) {
-      if (ctr_set_remote(h,rfl,counter,rcmd,NULL,0) < 0) {
+   if (rfl) {
+      if (ctr_set_remote(h,rfl,counter,rcm,NULL,0) < 0) {
 	 perror("ctr_set_remote");
 	 return arg;
       }
@@ -1493,7 +1487,7 @@ static char *ectim_help =
 void edit_ctim(int ctim) {
 
 char c, *cp, *ep, txt[128];
-int n, i, idx, nadr;
+int n, idx, new, frm;
 
 CtrDrvrCtimObjects ctims;
 CtrDrvrCtimBinding *cb = NULL;
@@ -1521,7 +1515,7 @@ CtrDrvrCtimBinding *cb = NULL;
 
    while (1) {
 
-      printf("%04d:ctim:%03d frame:0x%08X: ",ob->EqpNum,ob->Frame);
+      printf("%04d:ctim:%03d frame:0x%08X: ",idx,cb->EqpNum,cb->Frame.Long);
       fflush(stdout);
 
       bzero((void *) txt,128); n = 0; c = 0;
@@ -1549,7 +1543,7 @@ CtrDrvrCtimBinding *cb = NULL;
 	 else if (c == '?') printf("%s\n",ectim_help);
 	 else if (c == '.') return;
 	 else if (c == 'x') {
-	    if (ctr_destroy_ctim(h,ob->EqpNum) < 0) {
+	    if (ctr_destroy_ctim(h,cb->EqpNum) < 0) {
 	       perror("ctr_destroy_ctim");
 	       return;
 	    }
