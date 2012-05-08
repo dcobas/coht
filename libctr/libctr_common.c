@@ -431,7 +431,7 @@ int ctr_get_ccv(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv)
 	ctr_ccv->pulse_width = cnf->PulsWidth;
 	ctr_ccv->delay       = cnf->Delay;
 
-	cmsb.Counter = trg->Counter;
+	cmsb.Counter = ob.Counter;
 	if (ioctl(h->fd,CtrIoctlGET_OUT_MASK,&cmsb) < 0)
 		return -1;
 
@@ -689,8 +689,10 @@ int ctr_get_queue_size(void *handle)
 int ctr_set_queue_flag(void *handle, int flag)
 {
 	struct ctr_handle_s *h = handle;
-	unsigned long qf = flag;
+	unsigned long qf;
 
+	if (flag) qf = 0;
+	else      qf = 1;
 	if (ioctl(h->fd,CtrIoctlSET_QUEUE_FLAG,&qf) < 0)
 		return -1;
 	return 0;
@@ -708,7 +710,9 @@ int ctr_get_queue_flag(void *handle)
 
 	if (ioctl(h->fd,CtrIoctlGET_QUEUE_FLAG,&qf) < 0)
 		return -1;
-	return (int) qf;
+	if (qf) return 0;
+
+	return 1;
 }
 
 /**

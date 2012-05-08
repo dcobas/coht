@@ -35,6 +35,7 @@ int GetSetCounter();
 int NextCounter();
 int Config();
 int ConnectCTime();
+int GetSetEnable();
 
 /* Commands */
 
@@ -70,6 +71,7 @@ typedef enum {
    CmdCNT,   /* Get or set current counter */
    CmdNC,    /* Next counter */
    CmdRST,   /* Read status */
+   CmdENB,   /* Get/Set enable */
    CmdCTM,   /* Edit CTIM objects */
    CmdDEB,   /* Get set debug level */
 
@@ -103,7 +105,7 @@ static Cmd cmds[CmdCMDS] = {
    { CmdCC,      "cc",    "Connect to a C-event time","payload"            ,ConnectCTime      },
    { CmdQF,      "qf",    "Get set the queue flag"   ,"1/0"                ,GetSetQue         },
    { CmdTMO,     "tmo",   "Get set timeout"          ,"Timeout"            ,GetSetTmo         },
-   { CmdPTM,     "ptm",   "Edit PTIM equipments"     ,"?|PtimId"           ,GetSetPtim        },
+   { CmdPTM,     "ltm",   "Edit LTIM equipments"     ,"?|LtimId"           ,GetSetPtim        },
    { CmdSI,      "si",    "Simulate an interrupt"    ,"?|T<n>P<n>|C<n>[pld]|Msk",SimulateInterrupt },
    { CmdREM,     "rem",   "Remote control a counter" ,"?|[<Flg>]"          ,GetSetRemote      },
    { CmdRCM,     "rcm",   "Send a remote command"    ,"?|<Cmd>"            ,SetRemoteCmd      },
@@ -111,9 +113,10 @@ static Cmd cmds[CmdCMDS] = {
    { CmdUTC,     "utc",   "Get UTC (Real/Adjusted)"  ,"R|A"                ,GetUtc            },
    { CmdMOD,     "mo",    "Get set module"           ,"[<Module>]"         ,GetSetModule      },
    { CmdNM,      "nm",    "Next Module"              ,""                   ,NextModule        },
-   { CmdCNT,     "cnt",   "Get set Counter"          ,"[<Counter>]"        ,GetSetCounter     },
+   { CmdCNT,     "ch",    "Get set Counter"          ,"[<Counter>]"        ,GetSetCounter     },
    { CmdNC,      "nc",    "Next Counter"             ,""                   ,NextCounter       },
    { CmdRST,     "rst",   "Read module Status"       ,""                   ,GetStatus         },
+   { CmdENB,     "enb",   "Get/Set enable"           ,"flag"               ,GetSetEnable      },
 
    { CmdCTM,     "ctm",   "Edit CTIM objects"        ,"?|CtimId"           ,GetSetCtim        },
    { CmdDEB,     "deb",   "Get set debug level"      ,"Level"              ,SwDeb             },

@@ -190,10 +190,7 @@ static char *stat_names[CtrDrvrSTATAE] = {"Gmt", "Pll", "XCk1","XCk2",
 					  "Test","Enb", "Htdc","Ctri",
 					  "Ctrp","Ctrv","Intr","Bus"};
    bzero((void *) res,256);
-   sprintf(res,
-	   "SET=> %s\nCLR=> %s\n",
-	   enum_to_str((int)  sts,CtrDrvrSTATAE,stat_names),
-	   enum_to_str((int) ~sts,CtrDrvrSTATAE,stat_names));
+   strcat(res,enum_to_str((int) sts,CtrDrvrSTATAE,stat_names));
    return res;
 }
 
@@ -250,7 +247,7 @@ char *counter_mode_to_str(CtrDrvrCounterMode mode) {
 
 static char *mode_names[CtrDrvrCounterMODES] = {"Once", "Mult", "Brst", "Mult+Brst"};
 
-   return enum_to_str((int) mode,CtrDrvrCounterMODES,mode_names);
+   return int_to_str((int) mode,CtrDrvrCounterMODES,mode_names);
 }
 
 /*****************************************************************/
@@ -259,7 +256,7 @@ char *counter_clock_to_str(CtrDrvrCounterClock cclk) {
 
 static char *clock_names[CtrDrvrCounterCLOCKS] = {"1KHz", "10MHz", "40MHz", "Ext1", "Ext2", "Chnd" };
 
-   return enum_to_str((int) cclk,CtrDrvrCounterCLOCKS,clock_names);
+   return int_to_str((int) cclk,CtrDrvrCounterCLOCKS,clock_names);
 }
 
 /*****************************************************************/
@@ -320,20 +317,20 @@ static char res[512];
       if (msk & flds) {
 	 switch (msk) {
 	    case CTR_CCV_ENABLE:
-	       if (ccv->enable) sprintf(tmp,"Enb");
-	       else             sprintf(tmp,"Dis");
+	       if (ccv->enable) sprintf(tmp,"Enb ");
+	       else             sprintf(tmp,"Dis ");
 	    break;
 
 	    case CTR_CCV_START:
-	       sprintf(tmp,"STR:%s",counter_start_to_str(ccv->start));
+	       sprintf(tmp,"St:%s ",counter_start_to_str(ccv->start));
 	    break;
 
 	    case CTR_CCV_MODE:
-	       sprintf(tmp,"MOD:%s",counter_mode_to_str(ccv->mode));
+	       sprintf(tmp,"Md:%s ",counter_mode_to_str(ccv->mode));
 	    break;
 
 	    case CTR_CCV_CLOCK:
-	       sprintf(tmp,"CLK:%s",counter_clock_to_str(ccv->clock));
+	       sprintf(tmp,"Ck:%s ",counter_clock_to_str(ccv->clock));
 	    break;
 
 	    case CTR_CCV_PULSE_WIDTH:
@@ -341,51 +338,53 @@ static char res[512];
 	       if      (w >= 1000000) { w = w/1000000; cp = "ms"; }
 	       else if (w >= 1000   ) { w = w/1000;    cp = "us"; }
 	       else                   {                cp = "ns"; }
-	       sprintf(tmp,"PWD:%d%s",w,cp);
+	       sprintf(tmp,"Pw:%d%s ",w,cp);
 	    break;
 
 	    case CTR_CCV_DELAY:
-	       sprintf(tmp,"DLY:%d",ccv->delay);
+	       sprintf(tmp,"Dl:%d ",ccv->delay);
 	    break;
 
 	    case CTR_CCV_COUNTER_MASK:
-	       sprintf(tmp,"OMS:%s",counter_mask_to_str(ccv->counter_mask));
+	       sprintf(tmp,"Om:%s ",counter_mask_to_str(ccv->counter_mask));
 	    break;
 
 	    case CTR_CCV_POLARITY:
-	       sprintf(tmp,"POL:%s",polarity_to_str(ccv->polarity));
+	       sprintf(tmp,"Po:%s ",polarity_to_str(ccv->polarity));
 	    break;
 
 	    case CTR_CCV_CTIM:
-	       sprintf(tmp,"CTM:%d",ccv->ctim);
+	       sprintf(tmp,"Ctm:%d ",ccv->ctim);
 	    break;
 
 	    case CTR_CCV_PAYLOAD:
-	       sprintf(tmp,"PLD:%d",ccv->payload);
+	       sprintf(tmp,"Pl:%d ",ccv->payload);
 	    break;
 
 	    case CTR_CCV_CMP_METHOD:
-	       sprintf(tmp,"CMP:%s",trigger_condition_to_str(ccv->cmp_method));
+	       if (ccv->cmp_method)
+		  sprintf(tmp,"Cmp:%s ",trigger_condition_to_str(ccv->cmp_method));
 	    break;
 
 	    case CTR_CCV_GRNUM:
-	       sprintf(tmp,"GNM:%d",ccv->grnum);
+	       if (ccv->cmp_method)
+		  sprintf(tmp,"Gn:%d ",ccv->grnum);
 	    break;
 
 	    case CTR_CCV_GRVAL:
-	       sprintf(tmp,"GVL:%d",ccv->grnum);
+	       if (ccv->cmp_method)
+		  sprintf(tmp,"Gv:%d ",ccv->grnum);
 	    break;
 
 	    case CTR_CCV_TGNUM:
-	       sprintf(tmp,"TGM:%d",ccv->tgnum);
+	       if (ccv->cmp_method)
+		  sprintf(tmp,"Tg:%d ",ccv->tgnum);
 	    break;
-
 
 	    default:
 	    break;
 	 }
 	 strcat(res,tmp);
-	 strcat(res," ");
 	 bzero((void *) tmp,128);
       }
    }
@@ -486,6 +485,7 @@ int NextCounter(int arg) {
 
    counter++;
    if (counter > get_max_ch()) counter = 1;
+   printf("Cntr:%d Selected\n",counter);
    return arg;
 }
 
@@ -503,9 +503,38 @@ int mcnt;
 
    module++;
    if (module > mcnt) module = 1;
+   printf("Mod:%d Selected\n",module);
    return arg;
 }
 
+/*****************************************************************/
+
+int GetSetEnable(int arg) {
+ArgVal   *v;
+AtomType  at;
+int flag;
+
+   arg++;
+
+   v = &(vals[arg]);
+   at = v->Type;
+   if (at == Numeric) {
+      arg++;
+      flag = v->Number;
+      if (ctr_set_enable(h,flag) < 0) {
+	 perror("ctr_set_enable");
+	 return arg;
+      }
+   }
+
+   if ((flag = ctr_get_enable(h)) < 0) {
+      perror("ctr_get_enable");
+      return arg;
+   }
+   if (flag) printf("Module:%d Enabled\n" ,module);
+   else      printf("Module:%d Disabled\n",module);
+   return arg;
+}
 /*****************************************************************/
 
 int GetStatus(int arg) {
@@ -516,7 +545,7 @@ CtrDrvrStatus sts;
       perror("ctr_get_status");
       return arg;
    }
-   printf("Status:%s\n",sts_to_string(sts));
+   printf("Status:Set:%s\n", sts_to_string(sts));
    return arg;
 }
 
@@ -587,7 +616,8 @@ AtomType  at;
       }
    }
    debug_level = ctr_get_debug_level(h);
-   printf("Debg:%d\n",debug_level);
+   if (debug_level) printf("Debug:Level:%d ON\n",debug_level);
+   else             printf("Debug:OFF\n");
    return arg;
 }
 
@@ -689,13 +719,12 @@ CtrDrvrCTime ctr_time;
 /*****************************************************************/
 
 static int connected = 0;
-static char *class_names[3] = {"Hard","Ctim","Ptim"};
 
 int WaitInterrupt(int arg) { /* msk */
 ArgVal   *v;
 AtomType  at;
 
-int i, msk;
+int i, msk, qsz;
 
 CtrDrvrConnectionClass ctr_class;
 int equip;
@@ -732,6 +761,7 @@ struct ctr_interrupt_s ctr_interrupt;
 	    perror("ctr_connect");
 	    return arg;
 	 }
+	 connected++;
       } else {
 	 if (ctr_disconnect(h,ctr_class,0) < 0) {
 	    perror("ctr_disconnect");
@@ -795,22 +825,31 @@ struct ctr_interrupt_s ctr_interrupt;
       perror("ctr_wait");
       return arg;
    }
+   qsz = ctr_get_queue_size(h);
+   if (qsz < 0) {
+      perror("ctr_get_queue_size");
+      return arg;
+   }
 
    if      (ctr_interrupt.ctr_class == CtrDrvrConnectionClassHARD) printf("Hard:");
    else if (ctr_interrupt.ctr_class == CtrDrvrConnectionClassPTIM) printf("Ptim:");
    else if (ctr_interrupt.ctr_class == CtrDrvrConnectionClassCTIM) printf("Ctim:");
    else                                                            printf("xxxx:");
 
-   printf("Equp:0x%04X Pyld:0x%04X Modn:%d\n",
+   printf("Equp:%03d Pyld:0x%04X Modn:%d QuSz:%d\n",
 	  ctr_interrupt.equip,
 	  ctr_interrupt.payload,
-	  ctr_interrupt.modnum);
+	  ctr_interrupt.modnum,
+	  qsz);
 
-   printf("    :Onz:C%04d %s Trg:C%04d %s Str:C%04d %s\n",
+   printf("    :Onz:C%04d %s\n"
+	  "    :Trg:C%04d %s\n"
+	  "    :Str:C%04d %s\n",
 	  ctr_interrupt.onzero.CTrain,  time_to_string(&ctr_interrupt.onzero.Time),
 	  ctr_interrupt.trigger.CTrain, time_to_string(&ctr_interrupt.trigger.Time),
 	  ctr_interrupt.start.CTrain,   time_to_string(&ctr_interrupt.start.Time));
 
+   printf("\n");
    return arg;
 }
 
@@ -907,13 +946,13 @@ static char *eccv_help =
 "v<Delay>               Change Delay                Delay                                          \n"
 "e<enable>              Change OnZero behaviour     NoOut/Bus/Out/OutBus                           \n"
 "p<polarity>            Change polarity             TTL/TTL_BAR/TTL                                \n"
-"q<outmask>             Change output mask          1<<cntr 0x200/40MHz 0x400/ExCk1 0x800/ExCk2    \n";
+"m<outmask>             Change output mask          1<<cntr 0x200/40MHz 0x400/ExCk1 0x800/ExCk2    \n";
 
 
 void edit_ccvs(int ltim) {
 
 struct ctr_ccv_s ccv[64];
-int i, n, sze, idx, ctim, pyld, tnum, gnum, gval, strt, mode, clck, pwdt, dlay, enbl, poly, cmsk;
+int i, n, sze, idx, ctim, pyld, tnum, gnum, gval, strt, mode, clck, pwdt, dlay, enbl, poly, cmsk, nxt;
 char c, *cp, *ep, txt[128];
 
 CtrDrvrPtimObjects obs;
@@ -959,7 +998,7 @@ ctr_ccv_fields_t cf = 0;
 	    return;
 	 }
       }
-      printf("%s :",ccv_to_str(&ccv[idx],PTIM_FIELDS));
+      printf("%s:",ccv_to_str(&ccv[idx],PTIM_FIELDS));
       fflush(stdout);
 
       bzero((void *) txt,128); n = 0; c = 0;
@@ -969,108 +1008,165 @@ ctr_ccv_fields_t cf = 0;
 	 txt[n++] = c;
       }
 
+      nxt = 0;
       while (1) {
 
 	 if ((*cp == '\n') || (*cp == 0)) {
-	    if (idx++ >= sze) {
-	       idx = 0;
-	       printf("\n");
+	    if (!nxt) {
+	       if (++idx >= sze) {
+		  idx = 0;
+		  printf("\n");
+	       }
+	       nxt = 0;
 	    }
 	    break;
 	 }
 
-	 switch (*cp++) {
+	 c = *cp++;
 
-	    case '/':
-	       idx = strtoul(cp,&ep,0); cp = ep;
-	       if (idx >= sze) idx = 0;
-	    break;
+	 if (c == '/') {
+	    n = strtoul(cp,&ep,0);
+	    if (cp != ep) {
+	       cp = ep;
+	       if (n < sze) {
+		  idx = n;
+		  nxt = 1;
+	       } else printf("Error: bad index\n");
+	    } else printf("Error: no index\n");
+	 }
 
-	    case '?':
-	       printf("%s\n",eccv_help);
-	    break;
+	 else if (c == '?') printf("%s\n",eccv_help);
+	 else if (c == '.') return;
+	 else if (c == 'q') return;
 
-	    case '.': return;
-
-	    case 'i':
-	       ctim = strtoul(cp,&ep,0); cp = ep;
+	 else if (c == 'i') {
+	    ctim = strtoul(cp,&ep,0);
+	    if (cp != ep) {
+	       cp = ep;
 	       if (ctim) ccv[idx].ctim = ctim;
 	       cf |= CTR_CCV_CTIM;
-	    break;
+	       break;
+	    } else printf("Error: no ctim\n");
+	 }
 
-	    case 'f':
-	       pyld = strtoul(cp,&ep,0); cp = ep;
+	 else if (c == 'f') {
+	    pyld = strtoul(cp,&ep,0);
+	    if (cp != ep) {
+	       cp = ep;
 	       ccv[idx].payload = pyld;
 	       cf |= CTR_CCV_PAYLOAD;
-	    break;
+	       break;
+	    } else printf("Error: no payload\n");
+	 }
 
-	    case 't':
-	       tnum = strtoul(cp,&ep,0); cp = ep;
+	 else if (c =='t') {
+	    tnum = strtoul(cp,&ep,0);
+	    if (cp != ep) {
+	       cp = ep;
 	       ccv[idx].tgnum = tnum;
 	       cf |= CTR_CCV_TGNUM;
-	    break;
+	       break;
+	    } else printf("Error: no telegram number\n");
+	 }
 
-	    case 'n':
-	       gnum = strtoul(cp,&ep,0); cp = ep;
+	 else if (c == 'n') {
+	    gnum = strtoul(cp,&ep,0);
+	    if (cp != ep) {
+	       cp = ep;
 	       ccv[idx].grnum = gnum;
 	       cf |= CTR_CCV_GRNUM;
-	    break;
+	       break;
+	    } else printf("Error: no group number\n");
+	 }
 
-	    case 'g':
-	       gval = strtoul(cp,&ep,0); cp = ep;
+	 else if (c == 'g') {
+	    gval = strtoul(cp,&ep,0);
+	    if (cp != ep) {
+	       cp = ep;
 	       ccv[idx].grval = gval;
 	       cf |= CTR_CCV_GRVAL;
-	    break;
+	       break;
+	    } else printf("Error: no group value\n");
+	 }
 
-	    case 's':
-	       strt = strtoul(cp,&ep,0); cp = ep;
+	 else if (c == 's') {
+	    strt = strtoul(cp,&ep,0);
+	    if (cp != ep) {
+	       cp = ep;
 	       ccv[idx].start = strt;
 	       cf |= CTR_CCV_START;
-	    break;
+	       break;
+	    } else printf("Error: no start\n");
+	 }
 
-	    case 'k':
-	       clck = strtoul(cp,&ep,0); cp = ep;
+	 else if (c == 'k') {
+	    clck = strtoul(cp,&ep,0);
+	    if (cp != ep) {
+	       cp = ep;
 	       ccv[idx].clock = clck;
 	       cf |= CTR_CCV_CLOCK;
-	    break;
+	       break;
+	    } else printf("Error: bo clock\n");
+	 }
 
-	    case 'o':
-	       mode = strtoul(cp,&ep,0); cp = ep;
+	 else if (c == 'o') {
+	    mode = strtoul(cp,&ep,0); cp = ep;
+	    if (cp != ep) {
+	       cp = ep;
 	       ccv[idx].mode = mode;
 	       cf |= CTR_CCV_MODE;
-	    break;
+	       break;
+	    } else printf("Error: no mode\n");
+	 }
 
-	    case 'w':
-	       pwdt = strtoul(cp,&ep,0); cp = ep;
+	 else if (c == 'w') {
+	    pwdt = strtoul(cp,&ep,0);
+	    if (cp != ep) {
+	       cp = ep;
 	       ccv[idx].pulse_width = pwdt;
 	       cf |= CTR_CCV_PULSE_WIDTH;
-	    break;
+	       break;
+	    } else printf("Error: no pulse width\n");
+	 }
 
-	    case 'v':
-	       dlay = strtoul(cp,&ep,0); cp = ep;
+	 else if (c == 'v') {
+	    dlay = strtoul(cp,&ep,0);
+	    if (cp != ep) {
+	       cp = ep;
 	       ccv[idx].delay = dlay;
 	       cf |= CTR_CCV_DELAY;
-	    break;
+	       break;
+	    } else printf("Error: no delay value\n");
+	 }
 
-	    case 'e':
-	       enbl = strtoul(cp,&ep,0); cp = ep;
+	 else if (c == 'e') {
+	    enbl = strtoul(cp,&ep,0);
+	    if (cp != ep) {
+	       cp = ep;
 	       ccv[idx].enable = enbl;
 	       cf |= CTR_CCV_ENABLE;
-	    break;
+	       break;
+	    } else printf("Error: no enable flag\n");
+	 }
 
-	    case 'p':
-	       poly = strtoul(cp,&ep,0); cp = ep;
+	 else if (c == 'p') {
+	    poly = strtoul(cp,&ep,0);
+	    if (cp != ep) {
+	       cp = ep;
 	       ccv[idx].polarity = poly;
 	       cf |= CTR_CCV_POLARITY;
-	    break;
+	       break;
+	    } else printf("Error: no polarity\n");
+	 }
 
-	    case 'q':
-	       cmsk = strtoul(cp,&ep,0); cp = ep;
+	 else if (c == 'm') {
+	    cmsk = strtoul(cp,&ep,0);
+	    if (cp != ep) {
+	       cp = ep;
 	       ccv[idx].counter_mask = cmsk;
 	       cf |= CTR_CCV_COUNTER_MASK;
-	    break;
-
-	    default: break;
+	       break;
+	    } else printf("Error: no counter mask\n");
 	 }
       }
    }
@@ -1089,7 +1185,7 @@ static char *eptim_help =
 
 void edit_ltim(int ltim) {
 
-int n, i, idx, nid, mod, cnt, dim;
+int n, i, idx, nid, mod, cnt, dim, nxt;
 char c, *cp, *ep, txt[128];
 
 CtrDrvrPtimObjects obs;
@@ -1118,8 +1214,8 @@ CtrDrvrPtimBinding *ob = NULL;
    while (1) {
       if (obs.Size == 0) printf(">>>Ltim:None defined : ");
       else {
-	 printf("%02d:Ptm:%d Mo:%d Ch:%d Sz:%d Ix:%d: ",
-		idx+1,
+	 printf("%02d:Ltm:%d Mo:%d Ch:%d Sz:%d Ix:%d: ",
+		idx,
 		(int) ob->EqpNum,
 		(int) ob->ModuleIndex+1,
 		(int) ob->Counter,
@@ -1136,21 +1232,31 @@ CtrDrvrPtimBinding *ob = NULL;
 	 txt[n++] = c;
       }
 
+      nxt = 0;
       while (1) {
 	 c = *cp++;
 	 if ((c == '\n') || (c == 0)) {
-	    if (idx++ >= obs.Size) {
-	       idx = 0;
-	       printf("\n");
+	    if (!nxt) {
+	       if (++idx >= obs.Size) {
+		  idx = 0;
+		  printf("\n");
+	       }
+	       nxt = 0;
 	    }
 	    ob = &obs.Objects[idx];
 	    break;
 	 }
 	 else if (c == '/') {
-	    idx = strtoul(cp,&ep,0); cp = ep;
-	    if (idx > obs.Size) idx = 0;
+	    n = strtoul(cp,&ep,0);
+	    if (cp != ep) {
+	       cp = ep;
+	       nxt = 1;
+	       if (n < obs.Size) idx = n;
+	       else printf("Error: Bad index\n");
+	    } else printf("Error: No index\n");
 	 }
 	 else if (c == '.') return;
+	 else if (c == 'q') return;
 	 else if (c == '?') printf("%s\n",eptim_help);
 	 else if (c == 'a') edit_ccvs(ob->EqpNum);
 	 else if (c == 'y') {
@@ -1481,13 +1587,13 @@ static char *ectim_help =
 "/<Index>      Goto \n"
 "?             Help \n"
 ".             Exit \n"
-"x             Destroy \n"
+"x<id>         Destroy \n"
 "y<Id>,<Frame> Create  \n";
 
 void edit_ctim(int ctim) {
 
 char c, *cp, *ep, txt[128];
-int n, idx, new, frm;
+int n, idx, new, frm, eqp, nxt;
 
 CtrDrvrCtimObjects ctims;
 CtrDrvrCtimBinding *cb = NULL;
@@ -1515,6 +1621,11 @@ CtrDrvrCtimBinding *cb = NULL;
 
    while (1) {
 
+      if (ctr_list_ctim_objects(h,&ctims) < 0) {
+	 perror("ctr_list_ctim_objects");
+	 return;
+      }
+
       printf("%04d:ctim:%03d frame:0x%08X: ",idx,cb->EqpNum,cb->Frame.Long);
       fflush(stdout);
 
@@ -1524,38 +1635,61 @@ CtrDrvrCtimBinding *cb = NULL;
 	 c = (char) getchar();
 	 txt[n++] = c;
       }
+      nxt = 0;
 
       while (1) {
 	 c = *cp++;
 	 if ((c == '\n') || (c == 0)) {
-	    if (idx++ >= ctims.Size) {
-	       idx = 0;
-	       printf("\n");
+	    if (!nxt) {
+	       if (++idx >= ctims.Size) {
+		  idx = 0;
+		  printf("\n");
+	       }
+	       cb = &ctims.Objects[idx];
 	    }
-	    cb = &ctims.Objects[idx];
+	    nxt = 0;
 	    break;
 	 }
 	 else if (c == '/') {
-	    idx = strtoul(cp,&ep,0); cp = ep;
-	    if (idx++ >= ctims.Size) idx = 0;
-	    cb = &ctims.Objects[idx];
+	    n = strtoul(cp,&ep,0);
+	    if (cp != ep) {
+	       cp = ep;
+	       if (n < ctims.Size) {
+		  idx = n;
+		  cb = &ctims.Objects[idx];
+		  nxt = 1;
+	       } else printf("Error:Bad index\n");
+	    } else printf("Error:No index\n");
 	 }
 	 else if (c == '?') printf("%s\n",ectim_help);
 	 else if (c == '.') return;
+	 else if (c == 'q') return;
 	 else if (c == 'x') {
-	    if (ctr_destroy_ctim(h,cb->EqpNum) < 0) {
-	       perror("ctr_destroy_ctim");
-	       return;
-	    }
+	    eqp = strtoul(cp,&ep,0);
+	    if (cp != ep) {
+	       cp = ep;
+	       if (ctr_destroy_ctim(h,eqp) < 0) {
+		  perror("ctr_destroy_ctim");
+		  return;
+	       }
+	       printf("Destroyed:ctim:%d\n",eqp);
+	    } else printf("Error:No id\n");
 	    break;
 	 }
 	 else if (c == 'y') {
-	    new = strtoul(cp,&ep,0); cp = ep;
-	    frm = strtoul(cp,&ep,0); cp = ep;
-	    if (ctr_create_ctim(h,new,frm) < 0) {
-	       perror("ctr_create_ctim");
-	       return;
-	    }
+	    new = strtoul(cp,&ep,0);
+	    if (cp != ep) {
+	       cp = ep;
+	       frm = strtoul(cp,&ep,0);
+	       if (cp != ep) {
+		  cp = ep;
+		  if (ctr_create_ctim(h,new,frm) < 0) {
+		     perror("ctr_create_ctim");
+		     return;
+		  }
+		  printf("Created:%04d:ctim:%d 0x%08X OK\n",ctims.Size,new,frm);
+	       } else printf("Error:No frame\n");
+	    } else printf("Error:No id\n");
 	    break;
 	 }
       }

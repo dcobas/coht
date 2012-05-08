@@ -850,5 +850,5 @@ int ctr_list_ltim_objects(void *handle, CtrDrvrPtimObjects *ltims)
 int ctr_list_ctim_objects(void *handle, CtrDrvrCtimObjects *ctims)
 {
 	struct ctr_handle_s *h = handle;
-	return h->api.ctr_list_ltim_objects(handle,ctims);
+	return h->api.ctr_list_ctim_objects(handle,ctims);
 }
