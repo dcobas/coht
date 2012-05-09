@@ -18,7 +18,7 @@ ACCS=tst
 
 all:libctr.$(CPU).a libctrp.$(CPU).so libctrv.$(CPU).so
 
-libctr.$(CPU).o: libctr.c
+libctr.$(CPU).o: $(SRCS)
 
 libctrp.$(CPU).o: libctrp.c libctr_common.c
 

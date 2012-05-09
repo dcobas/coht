@@ -16,7 +16,7 @@
 #include <ctrhard.h>
 
 struct ctr_ccv_s {
-	int enable;                         /* Enable = 1, Disable = 0 */
+	int enable;                         /* Enable = 2, Bus = 1 Enable+Bus = 3 */
 	CtrDrvrCounterStart start;          /* The counters start. */
 	CtrDrvrCounterMode mode;            /* The counters operating mode. */
 	CtrDrvrCounterClock clock;          /* Clock specification. */

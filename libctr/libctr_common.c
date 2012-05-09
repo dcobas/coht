@@ -914,14 +914,20 @@ int ctr_set_remote(void *handle,
 	if (ioctl(h->fd,CtrIoctlGET_CONFIG,&cnfb) < 0)
 		return -1;
 
-	if (ctr_ccv_fields & CTR_CCV_ENABLE) {
-		if (ctr_ccv->enable)
-			cnf->OnZero |= CtrDrvrCounterOnZeroOUT;
-		else
-			cnf->OnZero &= ~CtrDrvrCounterOnZeroOUT;
-	}
-
 	if ((ctr_ccv) && (ctr_ccv_fields)) {
+
+		if (ctr_ccv_fields & CTR_CCV_ENABLE) {
+			if (ctr_ccv->enable & CtrDrvrCounterOnZeroBUS)
+				cnf->OnZero |= CtrDrvrCounterOnZeroBUS;
+			else
+				cnf->OnZero &= ~CtrDrvrCounterOnZeroBUS;
+
+			if (ctr_ccv->enable & CtrDrvrCounterOnZeroOUT)
+				cnf->OnZero |= CtrDrvrCounterOnZeroOUT;
+			else
+				cnf->OnZero &= ~CtrDrvrCounterOnZeroOUT;
+		}
+
 		if (ctr_ccv_fields & CTR_CCV_START)
 			cnf->Start = ctr_ccv->start;
 
@@ -956,6 +962,10 @@ int ctr_set_remote(void *handle,
 		}
 
 		if (ioctl(h->fd,CtrIoctlSET_CONFIG,&cnfb) < 0)
+			return -1;
+
+		crmb.Remote = CtrDrvrRemoteLOAD;
+		if (ioctl(h->fd,CtrIoctlREMOTE,&crmb) < 0)
 			return -1;
 	}
 
@@ -1001,9 +1011,7 @@ int ctr_get_remote(void *handle, CtrDrvrCounter ch, struct ctr_ccv_s *ctr_ccv)
 
 		bzero((void *) ctr_ccv, sizeof(struct ctr_ccv_s));
 
-		if (cnf->OnZero & CtrDrvrCounterOnZeroOUT)
-			ctr_ccv->enable = 1;
-
+		ctr_ccv->enable      = cnf->OnZero;
 		ctr_ccv->start       = cnf->Start;
 		ctr_ccv->mode        = cnf->Mode;
 		ctr_ccv->clock       = cnf->Clock;

@@ -317,7 +317,7 @@ static char res[512];
       if (msk & flds) {
 	 switch (msk) {
 	    case CTR_CCV_ENABLE:
-	       if (ccv->enable) sprintf(tmp,"e:Enb ");
+	       if (ccv->enable) sprintf(tmp,"e:%s ",onzero_to_str(ccv->enable));
 	       else             sprintf(tmp,"e:Dis ");
 	    break;
 
@@ -947,10 +947,10 @@ static char *eccv_help =
 "o<Mode>                Change Mode                 Once/Mult/Brst/Mult+Brst                       \n"
 "w<Pulse Width>         Change Pulse Width          Pulse Width                                    \n"
 "v<Delay>               Change Delay                Delay                                          \n"
-"e<enable>              Change OnZero behaviour     NoOut/Bus/Out/OutBus                           \n"
+"e<enable>              Change OnZero behaviour     0/NoOut,1/Bus,2/Out,3/OutBus                   \n"
 "p<polarity>            Change polarity             TTL/TTL_BAR/TTL                                \n"
-"m<outmask>             Change output mask          1<<cntr 0x200/40MHz 0x400/ExCk1 0x800/ExCk2    \n";
-"q                      Exit from the editor  \n"
+"m<outmask>             Change output mask          1<<cntr 0x200/40MHz 0x400/ExCk1 0x800/ExCk2    \n"
+"q                      Exit from the editor  \n";
 
 void edit_ccvs(int ltim) {
 
@@ -1334,9 +1334,10 @@ static char *erem_help =
 "o<Mode>                Change Mode                 Once/Mult/Brst/Mult+Brst                    \n"
 "w<Pulse Width>         Change Pulse Width          Pulse Width                                 \n"
 "v<Delay>               Change Delay                Delay                                       \n"
-"e<enable>              Change OnZero behaviour     NoOut/Bus/Out/OutBus                        \n"
+"e<enable>              Change OnZero behaviour     0/NoOut,1/Bus,2/Out,3/OutBus                \n"
 "p<polarity>            Change polarity             TTL/TTL_BAR/TTL                             \n"
-"m<outmask>             Change output mask          1<<cntr 0x200/40MHz 0x400/ExCk1 0x800/ExCk2 \n";
+"m<outmask>             Change output mask          1<<cntr 0x200/40MHz 0x400/ExCk1 0x800/ExCk2 \n"
+"q                      Exit from the editor  \n";
 
 static void edit_remote(int cnt) {
 
@@ -1354,19 +1355,31 @@ char c, *cp, *ep, txt[128];
       perror("ctr_get_remote");
       return;
    }
-   if (!rfl) {
-      printf("Ch:%d Not in remote\n",cnt);
-      return;
-   }
 
    while (1) {
+
       if (cf) {
 	 if (ctr_set_remote(h,rfl,ch,0,&ccv,cf) < 0) {
 	    perror("ctr_set_remote");
 	    return;
 	 }
+	 cf = 0;
       }
-      ccv_to_str(&ccv,REMC_FIELDS);
+
+      rfl = ctr_get_remote(h,ch,&ccv);
+      if (rfl < 0) {
+	 perror("ctr_get_remote");
+	 return;
+      }
+
+      printf("rem:%d ch:%d %s",rfl,ch,ccv_to_str(&ccv,REMC_FIELDS));
+      fflush(stdout);
+
+      if (!rfl) {
+	 printf("\n");
+	 if (ch++ >= get_max_ch()) return;
+	 continue;
+      }
 
       bzero((void *) txt,128); n = 0; c = 0;
       cp = ep = txt;
@@ -1376,7 +1389,9 @@ char c, *cp, *ep, txt[128];
       }
 
       while (1) {
+
 	 c = *cp++;
+
 	 if ((c == '\n') || (c == 0)) {
 	    if (ch++ >= get_max_ch()) {
 	       ch = 1;
@@ -1384,51 +1399,99 @@ char c, *cp, *ep, txt[128];
 	    }
 	    break;
 	 }
+
 	 else if (c == '/') {
-	    ch = strtoul(cp,&ep,0); cp = ep;
-	    if (ch > get_max_ch()) ch = 1;
+	    n = strtoul(cp,&ep,0);
+	    if (cp != ep) {
+	       cp = ep;
+	       if (n > get_max_ch()) printf("Error: bad channel\n");
+	       else ch = n;
+	       break;
+	    } else printf("Error: no channel\n");
 	 }
+
 	 else if (c == '?') printf("%s\n",erem_help);
 	 else if (c == '.') return;
+	 else if (c == 'q') return;
+
 	 else if (c == 's') {
-	    strt = strtoul(cp,&ep,0); cp = ep;
-	    ccv.start = strt;
-	    cf |= CTR_CCV_START;
+	    strt = strtoul(cp,&ep,0);
+	    if (cp != ep) {
+	       cp = ep;
+	       ccv.start = strt;
+	       cf |= CTR_CCV_START;
+	       break;
+	    } printf("Error: no start\n");
 	 }
+
 	 else if (c == 'k') {
-	    clck = strtoul(cp,&ep,0); cp = ep;
-	    ccv.clock = clck;
-	    cf |= CTR_CCV_CLOCK;
+	    clck = strtoul(cp,&ep,0);
+	    if (cp != ep) {
+	       cp = ep;
+	       ccv.clock = clck;
+	       cf |= CTR_CCV_CLOCK;
+	       break;
+	    } else printf("Error: no clock\n");
 	 }
+
 	 else if (c == 'o') {
-	    mode = strtoul(cp,&ep,0); cp = ep;
-	    ccv.mode = mode;
-	    cf |= CTR_CCV_MODE;
+	    mode = strtoul(cp,&ep,0);
+	    if (cp != ep) {
+	       cp = ep;
+	       ccv.mode = mode;
+	       cf |= CTR_CCV_MODE;
+	       break;
+	    } else printf("Error: no mode\n");
 	 }
+
 	 else if (c == 'w') {
-	    pwdt = strtoul(cp,&ep,0); cp = ep;
-	    ccv.pulse_width = pwdt;
-	    cf |= CTR_CCV_PULSE_WIDTH;
+	    pwdt = strtoul(cp,&ep,0);
+	    if (cp != ep) {
+	       cp = ep;
+	       ccv.pulse_width = pwdt;
+	       cf |= CTR_CCV_PULSE_WIDTH;
+	       break;
+	    } else printf("Error: no pulse width\n");
 	 }
+
 	 else if (c == 'v') {
-	    dlay = strtoul(cp,&ep,0); cp = ep;
-	    ccv.delay = dlay;
-	    cf |= CTR_CCV_DELAY;
+	    dlay = strtoul(cp,&ep,0);
+	    if (cp != ep) {
+	       cp = ep;
+	       ccv.delay = dlay;
+	       cf |= CTR_CCV_DELAY;
+	       break;
+	    } else printf("Error: no delay\n");
 	 }
+
 	 else if (c == 'e') {
-	    enbl = strtoul(cp,&ep,0); cp = ep;
-	    ccv.enable = enbl;
-	    cf |= CTR_CCV_ENABLE;
+	    enbl = strtoul(cp,&ep,0);
+	    if (cp != ep) {
+	       cp = ep;
+	       ccv.enable = enbl;
+	       cf |= CTR_CCV_ENABLE;
+	       break;
+	    } else printf("Error: no enable flag\n");
 	 }
+
 	 else if (c == 'p') {
-	    poly = strtoul(cp,&ep,0); cp = ep;
-	    ccv.polarity = poly;
-	    cf |= CTR_CCV_POLARITY;
+	    poly = strtoul(cp,&ep,0);
+	    if (cp != ep) {
+	       cp = ep;
+	       ccv.polarity = poly;
+	       cf |= CTR_CCV_POLARITY;
+	       break;
+	    } else printf("Error: no polarity\n");
 	 }
+
 	 else if (c == 'm') {
-	    cmsk = strtoul(cp,&ep,0); cp = ep;
-	    ccv.counter_mask = cmsk;
-	    cf |= CTR_CCV_COUNTER_MASK;
+	    cmsk = strtoul(cp,&ep,0);
+	    if (cp != ep) {
+	       cp = ep;
+	       ccv.counter_mask = cmsk;
+	       cf |= CTR_CCV_COUNTER_MASK;
+	       break;
+	    } else printf("Error: no counter mask\n");
 	 }
       }
    }
