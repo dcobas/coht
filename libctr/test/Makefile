@@ -23,3 +23,8 @@ clean:
 libctrtest.$(CPU).o: $(SRCS)
 
 libctrtest.$(CPU): libctrtest.$(CPU).o
+
+install: libctrtest.$(CPU)
+	dsc_install libctrtest.$(CPU) /acc/dsc/lab/$(CPU)/ctr
+	dsc_install libctrtest.$(CPU) /acc/dsc/oper/$(CPU)/ctr
+	dsc_install libctrtest.$(CPU) /acc/dsc/oplhc/$(CPU)/ctr
