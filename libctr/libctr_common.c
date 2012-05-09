@@ -302,7 +302,12 @@ int ctr_set_ccv(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv, ct
 	trg->Counter = ob.Counter;
 
 	if (ctr_ccv_fields & CTR_CCV_ENABLE) {
-		if (ctr_ccv->enable)
+		if (ctr_ccv->enable & CtrDrvrCounterOnZeroBUS)
+			cnf->OnZero |= CtrDrvrCounterOnZeroBUS;
+		else
+			cnf->OnZero &= ~CtrDrvrCounterOnZeroBUS;
+
+		if (ctr_ccv->enable & CtrDrvrCounterOnZeroOUT)
 			cnf->OnZero |= CtrDrvrCounterOnZeroOUT;
 		else
 			cnf->OnZero &= ~CtrDrvrCounterOnZeroOUT;
@@ -425,11 +430,7 @@ int ctr_get_ccv(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv)
 	if (ioctl(h->fd,CtrIoctlGET_ACTION,&act) < 0)
 		return -1;
 
-	if (cnf->OnZero & CtrDrvrCounterOnZeroOUT)
-		ctr_ccv->enable = 1;
-	else
-		ctr_ccv->enable = 0;
-
+	ctr_ccv->enable      = cnf->OnZero;
 	ctr_ccv->start       = cnf->Start;
 	ctr_ccv->mode        = cnf->Start;
 	ctr_ccv->clock       = cnf->Clock;

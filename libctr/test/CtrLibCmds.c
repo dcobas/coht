@@ -114,7 +114,7 @@ int yn, c;
 /*    the format is: Thu-18/Jan/2001 08:25:14.967                         */
 /*                   day-dd/mon/yyyy hh:mm:ss.ddd                         */
 
-volatile char *time_to_string(CtrDrvrTime *t) {
+char *time_to_string(CtrDrvrTime *t) {
 
 static char tbuf[128];
 
@@ -148,7 +148,7 @@ struct timeval utime;
       }
    }
 
-   return (tbuf);
+   return tbuf;
 }
 
 /*****************************************************************/
@@ -186,9 +186,9 @@ static char res[128];
 char *sts_to_string(CtrDrvrStatus sts) {
 static char res[256];
 
-static char *stat_names[CtrDrvrSTATAE] = {"Gmt", "Pll", "XCk1","XCk2",
-					  "Test","Enb", "Htdc","Ctri",
-					  "Ctrp","Ctrv","Intr","Bus"};
+static char *stat_names[CtrDrvrSTATAE] = {"GmtOk", "PllOk", "XCk1Ok","XCk2Ok",
+					  "TestOk","Enb",   "HtdcIn","Ctri",
+					  "Ctrp",  "Ctrv",  "IntrOk","BusOk"};
    bzero((void *) res,256);
    strcat(res,enum_to_str((int) sts,CtrDrvrSTATAE,stat_names));
    return res;
@@ -198,12 +198,12 @@ static char *stat_names[CtrDrvrSTATAE] = {"Gmt", "Pll", "XCk1","XCk2",
 
 char * io_stat_to_str(CtrDrvrIoStatus iostat) {
 
-static char *io_names[CtrDrvrIoSTATAE] = { "XE",    "XI",    "V1",     "V2",
-					   "S1",    "S2",    "X1",     "X2",
-					   "O1",    "O2",    "O3",     "O4",
-					   "O5",    "O6",    "O7",     "O8",
-					   "ID",    "DH",    "SP",     "XM",
-					   "TM" };
+static char *io_names[CtrDrvrIoSTATAE] = { "BeamEng", "ExtIo",    "V1Pcb",     "V2Pcb",
+					   "Start1",  "Start2",   "XClk1",     "XClk2",
+					   "Out1",    "Out2",     "Out3",      "Out4",
+					   "Out5",    "Out6",     "Out7",      "Out8",
+					   "IDChip",  "DebHis",   "PllEn",     "ExtMem",
+					   "TemPres" };
 
    return enum_to_str((int) iostat,CtrDrvrIoSTATAE,io_names);
 }
@@ -541,13 +541,49 @@ int flag;
 
 int GetStatus(int arg) {
 CtrDrvrStatus sts;
+CtrDrvrIoStatus ios;
+CtrDrvrModuleStats stats;
 
    arg++;
    if (ctr_get_status(h,&sts) < 0) {
       perror("ctr_get_status");
       return arg;
    }
-   printf("Status:Set:%s\n", sts_to_string(sts));
+   printf("\n");
+   printf("Hws:%s\n", sts_to_string(sts));
+
+   if (ctr_get_io_status(h,&ios) < 0) {
+      perror("ctr_get_io_status");
+      return arg;
+   }
+   printf("\n");
+   printf("Ios:%s\n", io_stat_to_str(ios));
+
+   if (ctr_get_stats(h, &stats) < 0) {
+      perror("ctr_get_stats");
+      return arg;
+   }
+
+   printf("\n");
+
+   if (stats.PllErrorThreshold)                printf("PllErrorThreshold    : %d\n",stats.PllErrorThreshold);
+   if (stats.PllDacLowPassValue)               printf("PllDacLowPassValue   : %d\n",stats.PllDacLowPassValue);
+   if (stats.PllDacCICConstant)                printf("PllDacCICConstant    : %d\n",stats.PllDacCICConstant);
+   if (stats.PllMonitorCICConstant)            printf("PllMonitorCICConstant: %d\n",stats.PllMonitorCICConstant);
+   if (stats.PhaseDCM)                         printf("PhaseDCM             : %d\n",stats.PhaseDCM);
+   if (stats.UtcPllPhaseError)                 printf("UtcPllPhaseError     : %d\n",stats.UtcPllPhaseError);
+   if (stats.Temperature)                      printf("Temperature          : %d\n",stats.Temperature);
+   if (stats.MsMissedErrs)                     printf("MsMissedErrs         : %d\n",stats.MsMissedErrs);
+					       printf("LastMsMissed         : %s\n",time_to_string(&stats.LastMsMissed));
+   if (stats.PllErrors)                        printf("PllErrors            : %d\n",stats.PllErrors);
+					       printf("LastPllError         : %s\n",time_to_string(&stats.LastPllError));
+   if (stats.MissedFrames)                     printf("MissedFrames         : %d\n",stats.MissedFrames);
+					       printf("LastFrameMissed      : %s\n",time_to_string(&stats.LastFrameMissed));
+   if (stats.BadReceptionCycles)               printf("BadReceptionCycles   : %d\n",stats.BadReceptionCycles);
+   if (stats.ReceivedFrames)                   printf("ReceivedFrames       : %d\n",stats.ReceivedFrames);
+   if (stats.SentFramesEvent)                  printf("SentFramesEvent      : %d\n",stats.SentFramesEvent);
+   if (stats.UtcPllErrs)                       printf("UtcPllErrs           : %d\n",stats.UtcPllErrs);
+
    return arg;
 }
 
@@ -577,7 +613,8 @@ int GetSetModule(int arg) {
 ArgVal   *v;
 AtomType  at;
 
-int mcnt, mod;
+int cbid, mcnt, mod, i;
+struct ctr_module_address_s module_address;
 
    arg++;
    mcnt = ctr_get_module_count(h);
@@ -594,7 +631,56 @@ int mcnt, mod;
       if (mod <= mcnt) module = mod;
    }
 
-   printf("Mod:%d Selected\n",module);
+   if (ctr_get_cable_id(h, &cbid) < 0) {
+      perror("ctr_get_cable_id");
+      return arg;
+   }
+   printf("Modn:%d CbId:0x%04X\n",module,cbid);
+
+   if (ctr_get_module_address(h, &module_address) < 0) {
+      perror("ctr_get_module_address");
+      return arg;
+   }
+
+   printf("Mmap:0x%p\n",module_address.memory_map);
+   if (module_address.jtag_address)
+      printf("Jtag:0x%p\n",module_address.jtag_address);
+
+   for (i=0; i<4; i++)
+      printf("Spec:%d 0x%X\n",i,module_address.specific[i]);
+
+   return arg;
+}
+
+/*****************************************************************/
+
+int GetTelegram(int arg) {
+ArgVal   *v;
+AtomType  at;
+
+int i, tgm = 1;
+short grps[32];
+
+   arg++;
+
+   v = &(vals[arg]);
+   at = v->Type;
+   if (at == Numeric) {
+      arg++;
+      tgm = v->Number;
+   }
+
+   bzero((void *) grps, 64);
+   if (ctr_get_telegram(h, tgm, (short *) grps) < 0) {
+      perror("ctr_get_telegram");
+      return arg;
+   }
+
+   for (i=0; i<32; i++) {
+      printf("g:%02d v:0x%04X ",i+1,(unsigned int) (0xFFFF & grps[i]));
+      if (((i+1)%4) == 0) printf("\n");
+   }
+   printf("\n");
    return arg;
 }
 

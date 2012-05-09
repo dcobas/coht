@@ -36,6 +36,7 @@ int NextCounter();
 int Config();
 int ConnectCTime();
 int GetSetEnable();
+int GetTelegram();
 
 /* Commands */
 
@@ -66,6 +67,7 @@ typedef enum {
    CmdRCM,   /* Send a remote command */
    CmdCNF,   /* Edit counter configuration */
    CmdUTC,   /* Get UTC time */
+   CmdTGM,   /* Get telegram */
    CmdMOD,   /* Show modules */
    CmdNM,    /* Next module */
    CmdCNT,   /* Get or set current counter */
@@ -111,6 +113,7 @@ static Cmd cmds[CmdCMDS] = {
    { CmdRCM,     "rcm",   "Send a remote command"    ,"?|<Cmd>"            ,SetRemoteCmd      },
    { CmdCNF,     "cnf",   "Configure remote counter" ,""                   ,Config            },
    { CmdUTC,     "utc",   "Get UTC (Real/Adjusted)"  ,"R|A"                ,GetUtc            },
+   { CmdTGM,     "tgm",   "Get a telegram"           ,"num"                ,GetTelegram       },
    { CmdMOD,     "mo",    "Get set module"           ,"[<Module>]"         ,GetSetModule      },
    { CmdNM,      "nm",    "Next Module"              ,""                   ,NextModule        },
    { CmdCNT,     "ch",    "Get set Counter"          ,"[<Counter>]"        ,GetSetCounter     },

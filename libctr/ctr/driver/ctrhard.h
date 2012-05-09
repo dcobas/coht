@@ -710,7 +710,7 @@ typedef struct {
    unsigned int UtcPllPhaseError;      /* Phase error Utc */
    unsigned int Temperature;           /* Card temperature. Only valid in CTRIs V3 RO */
    unsigned int MsMissedErrs;          /* Number of millisencods missed since last power up. (Latches the time)  RO */
-   CtrDrvrTime   LastMsMissed;
+   CtrDrvrTime  LastMsMissed;
 
    unsigned int PllErrors;             /* Number of pll errors since last power up (past threshold ) RO */
    CtrDrvrTime  LastPllError;
