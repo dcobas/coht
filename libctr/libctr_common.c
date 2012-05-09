@@ -299,6 +299,8 @@ int ctr_set_ccv(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv, ct
 	if (ioctl(h->fd,CtrIoctlGET_ACTION,&act) < 0)
 		return -1;
 
+	trg->Counter = ob.Counter;
+
 	if (ctr_ccv_fields & CTR_CCV_ENABLE) {
 		if (ctr_ccv->enable)
 			cnf->OnZero |= CtrDrvrCounterOnZeroOUT;
@@ -322,7 +324,7 @@ int ctr_set_ccv(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv, ct
 		cnf->Delay = ctr_ccv->delay;
 
 	if (ctr_ccv_fields & CTR_CCV_COUNTER_MASK) {
-		cmsb.Counter = trg->Counter;
+		cmsb.Counter = ob.Counter;
 		if (ioctl(h->fd,CtrIoctlGET_OUT_MASK,&cmsb) < 0)
 			return -1;
 		cmsb.Mask = ctr_ccv->counter_mask;
@@ -372,6 +374,9 @@ int ctr_set_ccv(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv, ct
 
 	if (ctr_ccv_fields & CTR_CCV_TGNUM)
 		trg->Machine = ctr_ccv->tgnum;
+
+	if (ioctl(h->fd,CtrIoctlSET_ACTION,&act) < 0)
+		return -1;
 
 	return 0;
 }

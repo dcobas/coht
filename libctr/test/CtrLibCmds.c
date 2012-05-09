@@ -317,20 +317,20 @@ static char res[512];
       if (msk & flds) {
 	 switch (msk) {
 	    case CTR_CCV_ENABLE:
-	       if (ccv->enable) sprintf(tmp,"Enb ");
-	       else             sprintf(tmp,"Dis ");
+	       if (ccv->enable) sprintf(tmp,"e:Enb ");
+	       else             sprintf(tmp,"e:Dis ");
 	    break;
 
 	    case CTR_CCV_START:
-	       sprintf(tmp,"St:%s ",counter_start_to_str(ccv->start));
+	       sprintf(tmp,"s:%s ",counter_start_to_str(ccv->start));
 	    break;
 
 	    case CTR_CCV_MODE:
-	       sprintf(tmp,"Md:%s ",counter_mode_to_str(ccv->mode));
+	       sprintf(tmp,"o:%s ",counter_mode_to_str(ccv->mode));
 	    break;
 
 	    case CTR_CCV_CLOCK:
-	       sprintf(tmp,"Ck:%s ",counter_clock_to_str(ccv->clock));
+	       sprintf(tmp,"k:%s ",counter_clock_to_str(ccv->clock));
 	    break;
 
 	    case CTR_CCV_PULSE_WIDTH:
@@ -338,47 +338,49 @@ static char res[512];
 	       if      (w >= 1000000) { w = w/1000000; cp = "ms"; }
 	       else if (w >= 1000   ) { w = w/1000;    cp = "us"; }
 	       else                   {                cp = "ns"; }
-	       sprintf(tmp,"Pw:%d%s ",w,cp);
+	       sprintf(tmp,"w:%d%s ",w,cp);
 	    break;
 
 	    case CTR_CCV_DELAY:
-	       sprintf(tmp,"Dl:%d ",ccv->delay);
+	       sprintf(tmp,"v:%d ",ccv->delay);
 	    break;
 
 	    case CTR_CCV_COUNTER_MASK:
-	       sprintf(tmp,"Om:%s ",counter_mask_to_str(ccv->counter_mask));
+	       sprintf(tmp,"m:%s ",counter_mask_to_str(ccv->counter_mask));
 	    break;
 
 	    case CTR_CCV_POLARITY:
-	       sprintf(tmp,"Po:%s ",polarity_to_str(ccv->polarity));
+	       sprintf(tmp,"p:%s ",polarity_to_str(ccv->polarity));
 	    break;
 
 	    case CTR_CCV_CTIM:
-	       sprintf(tmp,"Ctm:%d ",ccv->ctim);
+	       if (ccv->ctim)
+		  sprintf(tmp,"i:%d ",ccv->ctim);
 	    break;
 
 	    case CTR_CCV_PAYLOAD:
-	       sprintf(tmp,"Pl:%d ",ccv->payload);
+	       if (ccv->payload)
+		  sprintf(tmp,"f:%d ",ccv->payload);
 	    break;
 
 	    case CTR_CCV_CMP_METHOD:
 	       if (ccv->cmp_method)
-		  sprintf(tmp,"Cmp:%s ",trigger_condition_to_str(ccv->cmp_method));
+		  sprintf(tmp,"c:%s ",trigger_condition_to_str(ccv->cmp_method));
 	    break;
 
 	    case CTR_CCV_GRNUM:
 	       if (ccv->cmp_method)
-		  sprintf(tmp,"Gn:%d ",ccv->grnum);
+		  sprintf(tmp,"n:%d ",ccv->grnum);
 	    break;
 
 	    case CTR_CCV_GRVAL:
 	       if (ccv->cmp_method)
-		  sprintf(tmp,"Gv:%d ",ccv->grnum);
+		  sprintf(tmp,"g:%d ",ccv->grnum);
 	    break;
 
 	    case CTR_CCV_TGNUM:
 	       if (ccv->cmp_method)
-		  sprintf(tmp,"Tg:%d ",ccv->tgnum);
+		  sprintf(tmp,"t:%d ",ccv->tgnum);
 	    break;
 
 	    default:
@@ -936,6 +938,7 @@ static char *eccv_help =
 ".                      Exit from the editor  \n"
 "i<CTIM>                Change CTIM trigger number  CTIM                                           \n"
 "f<Payload>             Change payload              Payload                                        \n"
+"c<Compare method>      Change telegram compare     0/NoChk,1/Equality,2/Logical and               \n"
 "t<telegram number>     Change telegram number      0/CPS,1/PSB,2/LEI,3/ADE,4/SPS,5/LHC,6/SCT,7/FCT\n"
 "n<Trigger Group>       Change trigger group number Group Number                                   \n"
 "g<Trigger group value> Change trigger group value  Group Value                                    \n"
@@ -947,12 +950,12 @@ static char *eccv_help =
 "e<enable>              Change OnZero behaviour     NoOut/Bus/Out/OutBus                           \n"
 "p<polarity>            Change polarity             TTL/TTL_BAR/TTL                                \n"
 "m<outmask>             Change output mask          1<<cntr 0x200/40MHz 0x400/ExCk1 0x800/ExCk2    \n";
-
+"q                      Exit from the editor  \n"
 
 void edit_ccvs(int ltim) {
 
 struct ctr_ccv_s ccv[64];
-int i, n, sze, idx, ctim, pyld, tnum, gnum, gval, strt, mode, clck, pwdt, dlay, enbl, poly, cmsk, nxt;
+int i, n, sze, idx, ctim, pyld, cmpm, tnum, gnum, gval, strt, mode, clck, pwdt, dlay, enbl, poly, cmsk, nxt;
 char c, *cp, *ep, txt[128];
 
 CtrDrvrPtimObjects obs;
@@ -1057,6 +1060,16 @@ ctr_ccv_fields_t cf = 0;
 	       cf |= CTR_CCV_PAYLOAD;
 	       break;
 	    } else printf("Error: no payload\n");
+	 }
+
+	 else if (c == 'c') {
+	    cmpm = strtoul(cp,&ep,0);
+	    if (cp != ep) {
+	       cp = ep;
+	       ccv[idx].cmp_method = cmpm;
+	       cf |= CTR_CCV_CMP_METHOD;
+	       break;
+	    } else printf("Error: no compare method\n");
 	 }
 
 	 else if (c =='t') {
@@ -1323,7 +1336,7 @@ static char *erem_help =
 "v<Delay>               Change Delay                Delay                                       \n"
 "e<enable>              Change OnZero behaviour     NoOut/Bus/Out/OutBus                        \n"
 "p<polarity>            Change polarity             TTL/TTL_BAR/TTL                             \n"
-"q<outmask>             Change output mask          1<<cntr 0x200/40MHz 0x400/ExCk1 0x800/ExCk2 \n";
+"m<outmask>             Change output mask          1<<cntr 0x200/40MHz 0x400/ExCk1 0x800/ExCk2 \n";
 
 static void edit_remote(int cnt) {
 
@@ -1412,7 +1425,7 @@ char c, *cp, *ep, txt[128];
 	    ccv.polarity = poly;
 	    cf |= CTR_CCV_POLARITY;
 	 }
-	 else if (c == 'q') {
+	 else if (c == 'm') {
 	    cmsk = strtoul(cp,&ep,0); cp = ep;
 	    ccv.counter_mask = cmsk;
 	    cf |= CTR_CCV_COUNTER_MASK;
