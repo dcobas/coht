@@ -244,7 +244,7 @@ int ctr_wait(void *handle, struct ctr_interrupt_s *ctr_interrupt)
 
 	ctr_interrupt->ctr_class = rbf.Connection.EqpClass;
 	ctr_interrupt->equip     = rbf.Connection.EqpNum;
-	ctr_interrupt->payload   = rbf.Frame.Long & 0xFFFF;
+	ctr_interrupt->payload   = rbf.Frame.Long;
 	ctr_interrupt->modnum    = rbf.Connection.Module;
 	ctr_interrupt->onzero    = rbf.OnZeroTime;
 	ctr_interrupt->trigger   = rbf.TriggerTime;
@@ -1192,6 +1192,7 @@ int ctr_get_client_connections(void *handle, int pid, CtrDrvrClientConnections *
 	struct ctr_handle_s *h = handle;
 	CtrDrvrClientConnections cons;
 
+	bzero((void *) &cons, sizeof(CtrDrvrClientConnections));
 	cons.Pid = pid;
 	if (ioctl(h->fd,CtrIoctlGET_CLIENT_CONNECTIONS,&cons) < 0)
 		return -1;

@@ -360,7 +360,7 @@ static char res[512];
 
 	    case CTR_CCV_PAYLOAD:
 	       if (ccv->payload)
-		  sprintf(tmp,"f:%d ",ccv->payload);
+		  sprintf(tmp,"f:0x%X ",ccv->payload);
 	    break;
 
 	    case CTR_CCV_CMP_METHOD:
@@ -687,9 +687,11 @@ int ListClients(int arg) {
 CtrDrvrClientList pids;
 CtrDrvrClientConnections ccon;
 CtrDrvrConnection *con;
-int i, j;
+int i, j, pid;
 
    arg++;
+
+   pid = getpid();
 
    if (ctr_get_client_pids(h,&pids) < 0) {
       perror("ctr_get_client_pids");
@@ -701,10 +703,12 @@ int i, j;
 	 perror("ctr_get_client_connections");
 	 return arg;
       }
-      printf("PID:%04d\n",pids.Pid[i]);
+      printf("PID:%04d",pids.Pid[i]);
+      if (pid == pids.Pid[i]) printf(" <== this");
+      printf("\n");
       for (j=0; j<ccon.Size; j++) {
-	 con = &ccon.Connections[i];
-	 printf("   [Mod:%02d Eqp:%04d-0x%04X Cls:",
+	 con = &ccon.Connections[j];
+	 printf("   [Mod:%02d Eqp:%04d 0x%04X Cls:",
 	       con->Module,
 	       con->EqpNum,
 	       con->EqpNum);
@@ -714,6 +718,7 @@ int i, j;
 	 else                                                  printf("?:%d",(int) con->EqpClass);
 	 printf("]\n");
       }
+      printf("\n");
    }
    return arg;
 }
