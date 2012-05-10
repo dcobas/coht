@@ -66,7 +66,7 @@ typedef struct {
 typedef struct {
    unsigned int      Pid;
    unsigned int      Size;
-   CtrDrvrConnection  Connections[CtrDrvrCONNECTIONS];
+   CtrDrvrConnection Connections[CtrDrvrCONNECTIONS];
  } CtrDrvrClientConnections;
 
 typedef struct {

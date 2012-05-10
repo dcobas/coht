@@ -37,6 +37,12 @@ int Config();
 int ConnectCTime();
 int GetSetEnable();
 int GetTelegram();
+int GetSetInputDelay();
+int GetSetCableId();
+int GetSetPllLockMethod();
+int GetSetP2Byte();
+int MemTest();
+int ListClients();
 
 /* Commands */
 
@@ -58,6 +64,7 @@ typedef enum {
    CmdVER,   /* Get version */
 
    CmdWI,    /* Wait for an interrupt */
+   CmdCL,    /* Clients list */
    CmdCC,    /* Connect to a C time */
    CmdQF,    /* Get set the queue flag */
    CmdTMO,   /* Get set timeout */
@@ -68,6 +75,11 @@ typedef enum {
    CmdCNF,   /* Edit counter configuration */
    CmdUTC,   /* Get UTC time */
    CmdTGM,   /* Get telegram */
+   CmdIND,   /* Edit input delay */
+   CmdCID,   /* Edit cable ID */
+   CmdPLK,   /* Edit PLL lock method */
+   CmdP2B,   /* Edit P2 VME byte */
+   CmdMTS,   /* Memory test */
    CmdMOD,   /* Show modules */
    CmdNM,    /* Next module */
    CmdCNT,   /* Get or set current counter */
@@ -104,6 +116,7 @@ static Cmd cmds[CmdCMDS] = {
    { CmdVER,     "ver",   "Get TimLib version"       ,""                   ,GetVersion         },
 
    { CmdWI,      "wi",    "Wait for an interrupt"    ,"?|P<n>|C[M]<n>|Msk<t>" ,WaitInterrupt  },
+   { CmdCL,      "cl",    "Clients list connections" ,""                   ,ListClients       },
    { CmdCC,      "cc",    "Connect to a C-event time","payload"            ,ConnectCTime      },
    { CmdQF,      "qf",    "Get set the queue flag"   ,"1/0"                ,GetSetQue         },
    { CmdTMO,     "tmo",   "Get set timeout"          ,"Timeout"            ,GetSetTmo         },
@@ -114,9 +127,14 @@ static Cmd cmds[CmdCMDS] = {
    { CmdCNF,     "cnf",   "Configure remote counter" ,""                   ,Config            },
    { CmdUTC,     "utc",   "Get UTC (Real/Adjusted)"  ,"R|A"                ,GetUtc            },
    { CmdTGM,     "tgm",   "Get a telegram"           ,"num"                ,GetTelegram       },
+   { CmdIND,     "ind",   "Get/Set input delay"      ,"inputdelay"         ,GetSetInputDelay  },
+   { CmdCID,     "cid",   "Get/Set cable ID"         ,"cableid"            ,GetSetCableId     },
+   { CmdPLK,     "plk",   "Get/Set PLL lock method"  ,"0=Brutal, 1=Slow"   ,GetSetPllLockMethod },
+   { CmdP2B,     "oby",   "Get/Set P2 VME byte"      ,"Byte[0..8]"         ,GetSetP2Byte      },
+   { CmdMTS,     "mem",   "Mem test (disable mod)"   ,""                   ,MemTest           },
    { CmdMOD,     "mo",    "Get set module"           ,"[<Module>]"         ,GetSetModule      },
    { CmdNM,      "nm",    "Next Module"              ,""                   ,NextModule        },
-   { CmdCNT,     "ch",    "Get set Counter"          ,"[<Counter>]"        ,GetSetCounter     },
+   { CmdCNT,     "ch",    "Get/Set Counter"          ,"[<Counter>]"        ,GetSetCounter     },
    { CmdNC,      "nc",    "Next Counter"             ,""                   ,NextCounter       },
    { CmdRST,     "rst",   "Read module Status"       ,""                   ,GetStatus         },
    { CmdENB,     "enb",   "Get/Set enable"           ,"flag"               ,GetSetEnable      },

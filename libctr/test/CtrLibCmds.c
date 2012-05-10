@@ -537,6 +537,187 @@ int flag;
    else      printf("Module:%d Disabled\n",module);
    return arg;
 }
+
+/*****************************************************************/
+
+int GetSetInputDelay(int arg) {
+ArgVal   *v;
+AtomType  at;
+int delay;
+
+   arg++;
+
+   v = &(vals[arg]);
+   at = v->Type;
+   if (at == Numeric) {
+      arg++;
+      delay = v->Number;
+      if (ctr_set_input_delay(h,delay) < 0) {
+	 perror("ctr_set_input_delay");
+	 return arg;
+      }
+   }
+
+   if ((delay = ctr_get_input_delay(h)) < 0) {
+      perror("ctr_get_input_delay");
+      return arg;
+   }
+
+   printf("Input delay:%d Ticks = %dns\n",delay, delay*25);
+
+   return arg;
+}
+
+/*****************************************************************/
+
+int GetSetCableId(int arg) {
+ArgVal   *v;
+AtomType  at;
+int cid;
+
+   arg++;
+
+   v = &(vals[arg]);
+   at = v->Type;
+   if (at == Numeric) {
+      arg++;
+      cid = v->Number;
+      if (ctr_set_cable_id(h,cid) < 0) {
+	 perror("ctr_set_cable_id");
+	 return arg;
+      }
+   }
+
+   if (ctr_get_cable_id(h,&cid) < 0) {
+      perror("ctr_get_cable_id");
+      return arg;
+   }
+
+   printf("Cable ID:%d [0x%04X]\n",cid,cid);
+
+   return arg;
+}
+
+/*****************************************************************/
+
+int GetSetP2Byte(int arg) {
+ArgVal   *v;
+AtomType  at;
+int p2b;
+
+   arg++;
+
+   v = &(vals[arg]);
+   at = v->Type;
+   if (at == Numeric) {
+      arg++;
+      p2b = v->Number;
+      if (ctr_set_p2_output_byte(h,p2b) < 0) {
+	 perror("ctr_set_p2_output_byte");
+	 return arg;
+      }
+   }
+
+   if ((p2b = ctr_get_p2_output_byte(h)) < 0) {
+      perror("ctr_get_p2_output_byte");
+      return arg;
+   }
+
+   if (p2b) printf("P2-Byte:%d Bits:%d..%d\n",p2b, (p2b-1)*8, (p2b*8));
+   else     printf("P2-Byte:Not set\n");
+
+   return arg;
+}
+
+/*****************************************************************/
+
+int GetSetPllLockMethod(int arg) {
+ArgVal   *v;
+AtomType  at;
+int flag;
+
+   arg++;
+
+   v = &(vals[arg]);
+   at = v->Type;
+   if (at == Numeric) {
+      arg++;
+      flag = v->Number;
+      if (ctr_set_pll_lock_method(h,flag) < 0) {
+	 perror("ctr_set_pll_lock_method");
+	 return arg;
+      }
+   }
+
+   if ((flag = ctr_get_pll_lock_method(h)) < 0) {
+      perror("ctr_get_pll_lock_method");
+      return arg;
+   }
+   if (flag) printf("Module:%d: %d=Slow lock method\n" ,module,flag);
+   else      printf("Module:%d: 0=Brutal lock method\n",module);
+   return arg;
+}
+
+/*****************************************************************/
+
+int MemTest(int arg) {
+
+int addr, wpat, rpat, res;
+
+   arg++;
+
+   res = ctr_memory_test(h,&addr,&wpat,&rpat);
+   if (res < 0) {
+      if (errno) {
+	 perror("ctr_memory_test");
+	 return arg;
+      }
+      printf("MemoryTest:FAIL addr:0x%X wrote:0x%X read:0x%X\n",addr,wpat,rpat);
+      return arg;
+   }
+   printf("MemoryTest:PASS\n");
+
+   return arg;
+}
+
+/*****************************************************************/
+
+int ListClients(int arg) {
+
+CtrDrvrClientList pids;
+CtrDrvrClientConnections ccon;
+CtrDrvrConnection *con;
+int i, j;
+
+   arg++;
+
+   if (ctr_get_client_pids(h,&pids) < 0) {
+      perror("ctr_get_client_pids");
+      return arg;
+   }
+
+   for (i=0; i<pids.Size; i++) {
+      if (ctr_get_client_connections(h,pids.Pid[i],&ccon) < 0) {
+	 perror("ctr_get_client_connections");
+	 return arg;
+      }
+      printf("PID:%04d\n",pids.Pid[i]);
+      for (j=0; j<ccon.Size; j++) {
+	 con = &ccon.Connections[i];
+	 printf("   [Mod:%02d Eqp:%04d-0x%04X Cls:",
+	       con->Module,
+	       con->EqpNum,
+	       con->EqpNum);
+	 if      (con->EqpClass == CtrDrvrConnectionClassHARD) printf("Hard");
+	 else if (con->EqpClass == CtrDrvrConnectionClassPTIM) printf("Ltim");
+	 else if (con->EqpClass == CtrDrvrConnectionClassCTIM) printf("Ctim");
+	 else                                                  printf("?:%d",(int) con->EqpClass);
+	 printf("]\n");
+      }
+   }
+   return arg;
+}
+
 /*****************************************************************/
 
 int GetStatus(int arg) {
@@ -920,7 +1101,7 @@ struct ctr_interrupt_s ctr_interrupt;
    }
 
    if      (ctr_interrupt.ctr_class == CtrDrvrConnectionClassHARD) printf("Hard:");
-   else if (ctr_interrupt.ctr_class == CtrDrvrConnectionClassPTIM) printf("Ptim:");
+   else if (ctr_interrupt.ctr_class == CtrDrvrConnectionClassPTIM) printf("Ltim:");
    else if (ctr_interrupt.ctr_class == CtrDrvrConnectionClassCTIM) printf("Ctim:");
    else                                                            printf("xxxx:");
 
