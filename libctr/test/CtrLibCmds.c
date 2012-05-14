@@ -1405,7 +1405,7 @@ ctr_ccv_fields_t cf = 0;
 	 }
 
 	 else if (c == 'o') {
-	    mode = strtoul(cp,&ep,0); cp = ep;
+	    mode = strtoul(cp,&ep,0);
 	    if (cp != ep) {
 	       cp = ep;
 	       ccv[idx].mode = mode;

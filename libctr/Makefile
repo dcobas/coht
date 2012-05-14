@@ -5,10 +5,11 @@
 CPU=L865
 KVER=2.6.24.7-rt27
 SOVER=1.0
+LDVER=1.0
 
 include /acc/dsc/src/co/Make.auto
 
-CFLAGS= -g -Wall -I. -I./ctr/driver -fPIC
+CFLAGS= -g -Wall -I. -I./ctr/driver -fPIC -DLDVER=$(LDVER) -DSOVER=$(SOVER)
 
 SRCS=libctr.c libctr.h libctrP.h libctrp.c libctrv.c
 
@@ -47,6 +48,9 @@ clean:
 
 install: $(INSTFILES)
 	dsc_install libctr.$(CPU).a /acc/local/$(CPU)/tim
+	rm -rf /acc/local/$(CPU)/tim/libctr.$(LDVER)
+	mkdir /acc/local/$(CPU)/tim/libctr.$(LDVER)
+	dsc_install libctr.$(CPU).a /acc/local/$(CPU)/tim/libctr.$(LDVER)
 	rm -f /acc/local/$(CPU)/ctr/libctr.h
 	dsc_install libctr.h /acc/local/$(CPU)/ctr
 	rm -f /acc/dsc/lab/$(CPU)/$(KVER)/ctrp/libctrp.so.$(SOVER)

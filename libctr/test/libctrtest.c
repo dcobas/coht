@@ -62,7 +62,7 @@ char *cp;
 int cnt;
 CtrDrvrHardwareType typ;
 
-   printf("libctrtest: compiled %s %s\n",__DATE__,__TIME__);
+   printf("libctrtest: compiled %s %s libctr.a version:%s\n",__DATE__,__TIME__,ctr_get_ldver());
 
    h = ctr_open(NULL);
    if (h < 0) {

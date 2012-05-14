@@ -71,6 +71,18 @@ int ctr_not_implemented()
 }
 
 /**
+ * @brief Return the version string for libctr.a that you are linked with.
+ * @return Points to the version string, its never null
+ */
+
+char *ctr_get_ldver()
+{
+	static char res[32];
+	sprintf(res,"%1.1f",LDVER);
+	return res;
+}
+
+/**
  * @brief Get a handle to be used in subsequent library calls
  * @param Version string or NULL for the latest
  * @return The handle to be used in subsequent calls or -1

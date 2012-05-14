@@ -83,6 +83,13 @@ int ctr_ctime_to_unix(CtrDrvrTime *ctime, struct timeval *utime);
 int ctr_unix_to_ctime(struct timeval *utime, CtrDrvrTime *ctime);
 
 /**
+ * @brief Return the version string for libctr.a that you are linked with.
+ * @return Points to the version string, its never null
+ */
+
+char *ctr_get_ldver();
+
+/**
  * As this library runs exclusivley on Linux I use standard kernel coding
  * style and error reporting where possible. It is available both as a shared
  * object and as a static link. It exports the ctrdrvr public definitions
