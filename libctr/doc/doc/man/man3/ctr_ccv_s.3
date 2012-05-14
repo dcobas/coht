@@ -1,0 +1,95 @@
+.TH "ctr_ccv_s" 3 "14 May 2012" "libctr Timing Library" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+ctr_ccv_s \- 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "int \fBenable\fP"
+.br
+.ti -1c
+.RI "CtrDrvrCounterStart \fBstart\fP"
+.br
+.ti -1c
+.RI "CtrDrvrCounterMode \fBmode\fP"
+.br
+.ti -1c
+.RI "CtrDrvrCounterClock \fBclock\fP"
+.br
+.ti -1c
+.RI "int \fBpulse_width\fP"
+.br
+.ti -1c
+.RI "int \fBdelay\fP"
+.br
+.ti -1c
+.RI "CtrDrvrCounterMask \fBcounter_mask\fP"
+.br
+.ti -1c
+.RI "CtrDrvrPolarity \fBpolarity\fP"
+.br
+.ti -1c
+.RI "int \fBctim\fP"
+.br
+.ti -1c
+.RI "int \fBpayload\fP"
+.br
+.ti -1c
+.RI "CtrDrvrTriggerCondition \fBcmp_method\fP"
+.br
+.ti -1c
+.RI "int \fBgrnum\fP"
+.br
+.ti -1c
+.RI "int \fBgrval\fP"
+.br
+.ti -1c
+.RI "int \fBtgnum\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+Julian Lewis Fri-30th March 2012 BE/CO/HT julian.lewis@cern.ch
+.PP
+CTR timing library definitions. This library is to be used exclusivlely by the new open CBCM timing library. It is up to the implementers of the open CBCM timing library to provide any abstraction layers and to hide this completely from user code. 
+.PP
+.SH "Field Documentation"
+.PP 
+.SS "CtrDrvrCounterClock \fBctr_ccv_s::clock\fP"
+.PP
+.SS "CtrDrvrTriggerCondition \fBctr_ccv_s::cmp_method\fP"
+.PP
+.SS "CtrDrvrCounterMask \fBctr_ccv_s::counter_mask\fP"
+.PP
+.SS "int \fBctr_ccv_s::ctim\fP"
+.PP
+.SS "int \fBctr_ccv_s::delay\fP"
+.PP
+.SS "int \fBctr_ccv_s::enable\fP"
+.PP
+.SS "int \fBctr_ccv_s::grnum\fP"
+.PP
+.SS "int \fBctr_ccv_s::grval\fP"
+.PP
+.SS "CtrDrvrCounterMode \fBctr_ccv_s::mode\fP"
+.PP
+.SS "int \fBctr_ccv_s::payload\fP"
+.PP
+.SS "CtrDrvrPolarity \fBctr_ccv_s::polarity\fP"
+.PP
+.SS "int \fBctr_ccv_s::pulse_width\fP"
+.PP
+.SS "CtrDrvrCounterStart \fBctr_ccv_s::start\fP"
+.PP
+.SS "int \fBctr_ccv_s::tgnum\fP"
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libctr Timing Library from the source code.

@@ -1,0 +1,59 @@
+.TH "ctr_interrupt_s" 3 "14 May 2012" "libctr Timing Library" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+ctr_interrupt_s \- 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "CtrDrvrConnectionClass \fBctr_class\fP"
+.br
+.ti -1c
+.RI "int \fBequip\fP"
+.br
+.ti -1c
+.RI "int \fBpayload\fP"
+.br
+.ti -1c
+.RI "int \fBmodnum\fP"
+.br
+.ti -1c
+.RI "CtrDrvrCTime \fBonzero\fP"
+.br
+.ti -1c
+.RI "CtrDrvrCTime \fBtrigger\fP"
+.br
+.ti -1c
+.RI "CtrDrvrCTime \fBstart\fP"
+.br
+.in -1c
+.SH "Field Documentation"
+.PP 
+.SS "CtrDrvrConnectionClass \fBctr_interrupt_s::ctr_class\fP"
+.PP
+.SS "int \fBctr_interrupt_s::equip\fP"
+.PP
+CTR interrupt class 
+.SS "int \fBctr_interrupt_s::modnum\fP"
+.PP
+16-Bit payload of the event if CTIM 
+.SS "CtrDrvrCTime \fBctr_interrupt_s::onzero\fP"
+.PP
+Module number of interrupting device 
+.SS "int \fBctr_interrupt_s::payload\fP"
+.PP
+LTIM id, hardware mask, CTIM id 
+.SS "CtrDrvrCTime \fBctr_interrupt_s::start\fP"
+.PP
+Trigger time of action 
+.SS "CtrDrvrCTime \fBctr_interrupt_s::trigger\fP"
+.PP
+Time of end of action 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libctr Timing Library from the source code.

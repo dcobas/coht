@@ -1,0 +1,1200 @@
+.TH "libctr.doxygen" 3 "14 May 2012" "libctr Timing Library" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+libctr.doxygen \- 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <sys/time.h>\fP
+.br
+\fC#include <ctrdrvr.h>\fP
+.br
+\fC#include <ctrhard.h>\fP
+.br
+
+.SS "Data Structures"
+
+.in +1c
+.ti -1c
+.RI "struct \fBctr_ccv_s\fP"
+.br
+.ti -1c
+.RI "struct \fBctr_interrupt_s\fP"
+.br
+.ti -1c
+.RI "struct \fBctr_module_address_s\fP"
+.br
+.in -1c
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBCTR_ERROR\fP   (-1)"
+.br
+.in -1c
+.SS "Enumerations"
+
+.in +1c
+.ti -1c
+.RI "enum \fBctr_ccv_fields_t\fP { \fBCTR_CCV_ENABLE\fP =  0x0001, \fBCTR_CCV_START\fP =  0x0002, \fBCTR_CCV_MODE\fP =  0x0004, \fBCTR_CCV_CLOCK\fP =  0x0008, \fBCTR_CCV_PULSE_WIDTH\fP =  0x0010, \fBCTR_CCV_DELAY\fP =  0x0020, \fBCTR_CCV_COUNTER_MASK\fP =  0x0040, \fBCTR_CCV_POLARITY\fP =  0x0080, \fBCTR_CCV_CTIM\fP =  0x0100, \fBCTR_CCV_PAYLOAD\fP =  0x0200, \fBCTR_CCV_CMP_METHOD\fP =  0x0400, \fBCTR_CCV_GRNUM\fP =  0x0800, \fBCTR_CCV_GRVAL\fP =  0x1000, \fBCTR_CCV_TGNUM\fP =  0x2000 }"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "int \fBctr_ctime_to_unix\fP (CtrDrvrTime *ctime, struct timeval *utime)"
+.br
+.RI "\fIConvert the CTR driver time to standard unix time. \fP"
+.ti -1c
+.RI "int \fBctr_unix_to_ctime\fP (struct timeval *utime, CtrDrvrTime *ctime)"
+.br
+.RI "\fIConvert the standard unix time to CTR driver time. \fP"
+.ti -1c
+.RI "void * \fBctr_open\fP (char *version)"
+.br
+.RI "\fIGet a handle to be used in subsequent library calls. \fP"
+.ti -1c
+.RI "int \fBctr_close\fP (void *handle)"
+.br
+.RI "\fIClose a handle and free up resources. \fP"
+.ti -1c
+.RI "int \fBctr_get_module_count\fP (void *handle)"
+.br
+.RI "\fIGet the number of installed CTR modules. \fP"
+.ti -1c
+.RI "int \fBctr_set_module\fP (void *handle, int modnum)"
+.br
+.RI "\fISet the current working module number. \fP"
+.ti -1c
+.RI "int \fBctr_get_module\fP (void *handle)"
+.br
+.RI "\fIGet the current working module number. \fP"
+.ti -1c
+.RI "int \fBctr_get_type\fP (void *handle, CtrDrvrHardwareType *type)"
+.br
+.RI "\fIGet the device type handled by the driver CTRV, CTRP, CTRI, CTRE. \fP"
+.ti -1c
+.RI "int \fBctr_get_module_address\fP (void *handle, struct \fBctr_module_address_s\fP *module_address)"
+.br
+.RI "\fIGet the addresses of a module. \fP"
+.ti -1c
+.RI "int \fBctr_connect\fP (void *handle, CtrDrvrConnectionClass ctr_class, int equip)"
+.br
+.RI "\fIConnect to a ctr interrupt. \fP"
+.ti -1c
+.RI "int \fBctr_connect_payload\fP (void *handle, int ctim, int payload)"
+.br
+.RI "\fIConnect to a ctr interrupt with a given payload. \fP"
+.ti -1c
+.RI "int \fBctr_disconnect\fP (void *handle, CtrDrvrConnectionClass ctr_class, int mask)"
+.br
+.RI "\fIDisconnect from an interrupt on current module. \fP"
+.ti -1c
+.RI "int \fBctr_wait\fP (void *handle, struct \fBctr_interrupt_s\fP *ctr_interrupt)"
+.br
+.RI "\fIWait for an interrupt. \fP"
+.ti -1c
+.RI "int \fBctr_set_ccv\fP (void *handle, int ltim, int index, struct \fBctr_ccv_s\fP *ctr_ccv, \fBctr_ccv_fields_t\fP ctr_ccv_fields)"
+.br
+.RI "\fISet a CCV. \fP"
+.ti -1c
+.RI "int \fBctr_get_ccv\fP (void *handle, int ltim, int index, struct \fBctr_ccv_s\fP *ctr_ccv)"
+.br
+.RI "\fIget an ltim action setting \fP"
+.ti -1c
+.RI "int \fBctr_create_ltim\fP (void *handle, int ltim, int ch, int size)"
+.br
+.RI "\fICreate an empty LTIM object on the current module. \fP"
+.ti -1c
+.RI "int \fBctr_destroy_ltim\fP (void *handle, int ltim)"
+.br
+.RI "\fIDestroy an LTIM object on the current module. \fP"
+.ti -1c
+.RI "int \fBctr_list_ltim_objects\fP (void *handle, CtrDrvrPtimObjects *ltims)"
+.br
+.RI "\fIList LTIM objects. \fP"
+.ti -1c
+.RI "int \fBctr_list_ctim_objects\fP (void *handle, CtrDrvrCtimObjects *ctims)"
+.br
+.RI "\fIList CTIM objects. \fP"
+.ti -1c
+.RI "int \fBctr_get_telegram\fP (void *handle, int index, short *telegram)"
+.br
+.RI "\fIget a telegram \fP"
+.ti -1c
+.RI "int \fBctr_get_time\fP (void *handle, CtrDrvrCTime *ctr_time)"
+.br
+.RI "\fIGet time. \fP"
+.ti -1c
+.RI "int \fBctr_set_time\fP (void *handle, CtrDrvrTime ctr_time)"
+.br
+.RI "\fISet the time on the current module. \fP"
+.ti -1c
+.RI "int \fBctr_get_cable_id\fP (void *handle, int *cable_id)"
+.br
+.RI "\fIGet cable ID. \fP"
+.ti -1c
+.RI "int \fBctr_set_cable_id\fP (void *handle, int cable_id)"
+.br
+.RI "\fISet the cable ID of a module. \fP"
+.ti -1c
+.RI "int \fBctr_get_version\fP (void *handle, CtrDrvrVersion *version)"
+.br
+.RI "\fIGet driver and firmware version. \fP"
+.ti -1c
+.RI "int \fBctr_create_ctim\fP (void *handle, int ctim, int mask)"
+.br
+.RI "\fIAssociate a CTIM number to a Frame. \fP"
+.ti -1c
+.RI "int \fBctr_destroy_ctim\fP (void *handle, int ctim)"
+.br
+.RI "\fIDestroy a CTIM. \fP"
+.ti -1c
+.RI "int \fBctr_get_queue_size\fP (void *handle)"
+.br
+.RI "\fIGet the size of your queue for a given handle. \fP"
+.ti -1c
+.RI "int \fBctr_set_queue_flag\fP (void *handle, int flag)"
+.br
+.RI "\fITurn your queue on or off. \fP"
+.ti -1c
+.RI "int \fBctr_get_queue_flag\fP (void *handle)"
+.br
+.RI "\fIGet the current queue flag setting. \fP"
+.ti -1c
+.RI "int \fBctr_set_enable\fP (void *handle, int flag)"
+.br
+.RI "\fIEnable/Disable timing reception on current module. \fP"
+.ti -1c
+.RI "int \fBctr_get_enable\fP (void *handle)"
+.br
+.RI "\fIGet the Enable/Disable flag value. \fP"
+.ti -1c
+.RI "int \fBctr_set_input_delay\fP (void *handle, int delay)"
+.br
+.RI "\fISet the CTR timing input delay value. \fP"
+.ti -1c
+.RI "int \fBctr_get_input_delay\fP (void *handle)"
+.br
+.RI "\fIGet the CTR timing input delay value. \fP"
+.ti -1c
+.RI "int \fBctr_set_debug_level\fP (void *handle, int level)"
+.br
+.RI "\fISet the CTR driver debug print out level. \fP"
+.ti -1c
+.RI "int \fBctr_get_debug_level\fP (void *handle)"
+.br
+.RI "\fIGet the CTR driver debug print out level. \fP"
+.ti -1c
+.RI "int \fBctr_set_timeout\fP (void *handle, int timeout)"
+.br
+.RI "\fISet your timeout in milliseconds. \fP"
+.ti -1c
+.RI "int \fBctr_get_timeout\fP (void *handle)"
+.br
+.RI "\fIGet your timeout in milliseconds. \fP"
+.ti -1c
+.RI "int \fBctr_get_status\fP (void *handle, CtrDrvrStatus *stat)"
+.br
+.RI "\fIGet the CTR module status. \fP"
+.ti -1c
+.RI "int \fBctr_set_remote\fP (void *handle, int remote_flag, CtrDrvrCounter ch, CtrDrvrRemote rcmd, struct \fBctr_ccv_s\fP *ctr_ccv, \fBctr_ccv_fields_t\fP ctr_ccv_fields)"
+.br
+.RI "\fISet up a counter remotley from user code rather than from a CTIM. \fP"
+.ti -1c
+.RI "int \fBctr_get_remote\fP (void *handle, CtrDrvrCounter ch, struct \fBctr_ccv_s\fP *ctr_ccv)"
+.br
+.RI "\fIGet the remote counter flag and config. \fP"
+.ti -1c
+.RI "int \fBctr_set_pll_lock_method\fP (void *handle, int lock_method)"
+.br
+.RI "\fIChoose PLL locking method, brutal or slow. \fP"
+.ti -1c
+.RI "int \fBctr_get_pll_lock_method\fP (void *handle)"
+.br
+.RI "\fIGet Pll locking method. \fP"
+.ti -1c
+.RI "int \fBctr_get_io_status\fP (void *handle, CtrDrvrIoStatus *io_stat)"
+.br
+.RI "\fIRead the io status. \fP"
+.ti -1c
+.RI "int \fBctr_get_stats\fP (void *handle, CtrDrvrModuleStats *stats)"
+.br
+.RI "\fIGet module statistics. \fP"
+.ti -1c
+.RI "int \fBctr_memory_test\fP (void *handle, int *address, int *wpat, int *rpat)"
+.br
+.RI "\fIPerform a memory test. \fP"
+.ti -1c
+.RI "int \fBctr_get_client_pids\fP (void *handle, CtrDrvrClientList *client_pids)"
+.br
+.RI "\fIGet the list of all driver clients. \fP"
+.ti -1c
+.RI "int \fBctr_get_client_connections\fP (void *handle, int pid, CtrDrvrClientConnections *connections)"
+.br
+.RI "\fIGet a clients connections. \fP"
+.ti -1c
+.RI "int \fBctr_simulate_interrupt\fP (void *handle, CtrDrvrConnectionClass ctr_class, int equip)"
+.br
+.RI "\fIsimulate an interrupt \fP"
+.ti -1c
+.RI "int \fBctr_set_p2_output_byte\fP (void *handle, int p2byte)"
+.br
+.RI "\fISelect the P2 output byte number for current module. \fP"
+.ti -1c
+.RI "int \fBctr_get_p2_output_byte\fP (void *handle)"
+.br
+.RI "\fIGet the P2 output byte number. \fP"
+.in -1c
+.SH "Define Documentation"
+.PP 
+.SS "#define CTR_ERROR   (-1)"
+.PP
+As this library runs exclusivley on Linux I use standard kernel coding style and error reporting where possible. It is available both as a shared object and as a static link. It exports the ctrdrvr public definitions which follow the old OSF-Motif coding style. In all cases if the return value is -1, then errno contains the error number. The errno variable is per thread and so this mechanism is thread safe. A return of zero or a posative value means success. Error numbers are defined in errno.h and there are standard Linux facilities for treating them. See err(3), error(3), perror(3), strerror(3) 
+.SH "Enumeration Type Documentation"
+.PP 
+.SS "enum \fBctr_ccv_fields_t\fP"
+.PP
+\fBEnumerator: \fP
+.in +1c
+.TP
+\fB\fICTR_CCV_ENABLE \fP\fP
+.TP
+\fB\fICTR_CCV_START \fP\fP
+.TP
+\fB\fICTR_CCV_MODE \fP\fP
+.TP
+\fB\fICTR_CCV_CLOCK \fP\fP
+.TP
+\fB\fICTR_CCV_PULSE_WIDTH \fP\fP
+.TP
+\fB\fICTR_CCV_DELAY \fP\fP
+.TP
+\fB\fICTR_CCV_COUNTER_MASK \fP\fP
+.TP
+\fB\fICTR_CCV_POLARITY \fP\fP
+.TP
+\fB\fICTR_CCV_CTIM \fP\fP
+.TP
+\fB\fICTR_CCV_PAYLOAD \fP\fP
+.TP
+\fB\fICTR_CCV_CMP_METHOD \fP\fP
+.TP
+\fB\fICTR_CCV_GRNUM \fP\fP
+.TP
+\fB\fICTR_CCV_GRVAL \fP\fP
+.TP
+\fB\fICTR_CCV_TGNUM \fP\fP
+
+.SH "Function Documentation"
+.PP 
+.SS "int ctr_close (void * handle)"
+.PP
+Close a handle and free up resources. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno
+.RE
+.PP
+This routine disconnects from all interrupts, frees up memory and closes the ctr driver. It should be called once for each ctr_open. 
+.SS "int ctr_connect (void * handle, CtrDrvrConnectionClass ctr_class, int equip)"
+.PP
+Connect to a ctr interrupt. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIctr_class\fP see CtrDrvrConnectionClass, the class of timing to connect 
+.br
+\fIequip\fP is class specific: hardware mask, ctim number or ltim number 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno
+.RE
+.PP
+In the case of connecting to a ctim event you create the ctim first and pass this id in parameter equip. To connect to an LTIM you must use the module number on which the LTIM exists.
+.PP
+Connect to the PPS hardware event on module 2
+.PP
+CtrDrvrConnectionClass ctr_class = CtrDrvrConnectionClassHARD; CtrDrvrInterruptMask hmask = CtrDrvrInterruptMaskPPS; int modnum = 2;
+.PP
+if (ctr_set_module(handle,modnum) < 0) ... if (ctr_connect(handle,ctr_class,(int) hmask) < 0) ... 
+.SS "int ctr_connect_payload (void * handle, int ctim, int payload)"
+.PP
+Connect to a ctr interrupt with a given payload. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIctim\fP you want to connect to. 
+.br
+\fIpayload\fP that must match the CTIM event (equality) 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno
+.RE
+.PP
+In the case of connecting to a ctim event you create the ctim first and pass this id in parameter here
+.PP
+Connect to the millisecond CTIM at C100 on module 1
+.PP
+int ctim = 911; # (0x0100FFFF) Millisecond C-Event with wildcard int payload = 100; # C-time to be woken up at i.e. C100 int modnum = 1; # Module 1
+.PP
+if (ctr_set_module(handle,modnum) < 0) ... if (ctr_connect_payload(handle,ctim,payload) < 0) ... 
+.SS "int ctr_create_ctim (void * handle, int ctim, int mask)"
+.PP
+Associate a CTIM number to a Frame. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIctim\fP event Id to create 
+.br
+\fImask\fP event frame, like 0x2438FFFF (if there is a payload, set FFFF at the end) 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno 
+.RE
+.PP
+
+.SS "int ctr_create_ltim (void * handle, int ltim, int ch, int size)"
+.PP
+Create an empty LTIM object on the current module. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIltim\fP number to create 
+.br
+\fIchannel\fP number for ltim 
+.br
+\fIsize\fP of ltim action array (PLS lines) 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno 
+.RE
+.PP
+
+.SS "int ctr_ctime_to_unix (CtrDrvrTime * ctime, struct timeval * utime)"
+.PP
+Convert the CTR driver time to standard unix time. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIctime\fP points to the CtrDrvrTime value to be converted 
+.br
+\fIutime\fP points to the unix timeval struct where conversion will be stored 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Always returns zero 
+.RE
+.PP
+
+.SS "int ctr_destroy_ctim (void * handle, int ctim)"
+.PP
+Destroy a CTIM. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIctim\fP event Id to destroy 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno 
+.RE
+.PP
+
+.SS "int ctr_destroy_ltim (void * handle, int ltim)"
+.PP
+Destroy an LTIM object on the current module. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIltim\fP number to destroy 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno 
+.RE
+.PP
+
+.SS "int ctr_disconnect (void * handle, CtrDrvrConnectionClass ctr_class, int mask)"
+.PP
+Disconnect from an interrupt on current module. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIctr_class\fP the calss of timing to disconnect 
+.br
+\fImask\fP the class specific, hardware mask, ctim or ltim number 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno
+.RE
+.PP
+The client code must remember what it is connected to in order to disconnect. 
+.SS "int ctr_get_cable_id (void * handle, int * cable_id)"
+.PP
+Get cable ID. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIcable_id\fP points to where id will be stored 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno 
+.RE
+.PP
+
+.SS "int ctr_get_ccv (void * handle, int ltim, int index, struct \fBctr_ccv_s\fP * ctr_ccv)"
+.PP
+get an ltim action setting 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIltim\fP number to get 
+.br
+\fIindex\fP into ltim action array 0..size-1 
+.br
+\fIctr_ccv\fP points to where the values will be stored 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno 
+.RE
+.PP
+
+.SS "int ctr_get_client_connections (void * handle, int pid, CtrDrvrClientConnections * connections)"
+.PP
+Get a clients connections. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIPid\fP of the client whose connections you want 
+.br
+\fIPointer\fP to where clients connections will be stored 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno 
+.RE
+.PP
+
+.SS "int ctr_get_client_pids (void * handle, CtrDrvrClientList * client_pids)"
+.PP
+Get the list of all driver clients. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIPointer\fP to the client list 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno 
+.RE
+.PP
+
+.SS "int ctr_get_debug_level (void * handle)"
+.PP
+Get the CTR driver debug print out level. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+The debug level 0..7 (0=Off) else -1 for error 
+.RE
+.PP
+
+.SS "int ctr_get_enable (void * handle)"
+.PP
+Get the Enable/Disable flag value. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+The enable/Disable flag value or -1 on error 
+.RE
+.PP
+
+.SS "int ctr_get_input_delay (void * handle)"
+.PP
+Get the CTR timing input delay value. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+The input delay value in 40MHz ticks value or -1 on error 
+.RE
+.PP
+
+.SS "int ctr_get_io_status (void * handle, CtrDrvrIoStatus * io_stat)"
+.PP
+Read the io status. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIPointer\fP to where the iostatus will be stored 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno 
+.RE
+.PP
+
+.SS "int ctr_get_module (void * handle)"
+.PP
+Get the current working module number. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+module number 1..n or -1 on error 
+.RE
+.PP
+
+.SS "int ctr_get_module_address (void * handle, struct \fBctr_module_address_s\fP * module_address)"
+.PP
+Get the addresses of a module. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIPointer\fP to where the module address will be stored 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno 
+.RE
+.PP
+
+.SS "int ctr_get_module_count (void * handle)"
+.PP
+Get the number of installed CTR modules. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+The installed module count or -1 on error 
+.RE
+.PP
+
+.SS "int ctr_get_p2_output_byte (void * handle)"
+.PP
+Get the P2 output byte number. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+The output byte number or -1 on error
+.RE
+.PP
+If a value of 0 is returned, no output byte is set 
+.SS "int ctr_get_pll_lock_method (void * handle)"
+.PP
+Get Pll locking method. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+The lock flag (0=Brutal 1=Slow) or -1 on error 
+.RE
+.PP
+
+.SS "int ctr_get_queue_flag (void * handle)"
+.PP
+Get the current queue flag setting. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+The queue flag 0..1 (QOFF..QON) else -1 on error 
+.RE
+.PP
+
+.SS "int ctr_get_queue_size (void * handle)"
+.PP
+Get the size of your queue for a given handle. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Queue size or -1 on error 
+.RE
+.PP
+
+.SS "int ctr_get_remote (void * handle, CtrDrvrCounter ch, struct \fBctr_ccv_s\fP * ctr_ccv)"
+.PP
+Get the remote counter flag and config. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIch\fP is the channel 1..3 for ctri, 1..4 for ctrp, 1..8 for ctrv. 
+.br
+\fIctr_ccv\fP are the values of the counter 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+The remote flag 0=normal, 1=remote or -1 on error 
+.RE
+.PP
+
+.SS "int ctr_get_stats (void * handle, CtrDrvrModuleStats * stats)"
+.PP
+Get module statistics. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIPointer\fP to where the statistics will be stored 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno 
+.RE
+.PP
+
+.SS "int ctr_get_status (void * handle, CtrDrvrStatus * stat)"
+.PP
+Get the CTR module status. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIPointer\fP to where the status will be stored of type CtrDrvrStatus 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno 
+.RE
+.PP
+
+.SS "int ctr_get_telegram (void * handle, int index, short * telegram)"
+.PP
+get a telegram 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIindex\fP into the array of telegrams 0..7 
+.br
+\fItelegram\fP point to a short array of at least size 32 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno 
+.RE
+.PP
+
+.SS "int ctr_get_time (void * handle, CtrDrvrCTime * ctr_time)"
+.PP
+Get time. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIctr_time\fP point to where time will be stored 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno 
+.RE
+.PP
+
+.SS "int ctr_get_timeout (void * handle)"
+.PP
+Get your timeout in milliseconds. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+The timeout in millisecond else -1 for error 
+.RE
+.PP
+
+.SS "int ctr_get_type (void * handle, CtrDrvrHardwareType * type)"
+.PP
+Get the device type handled by the driver CTRV, CTRP, CTRI, CTRE. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIPointer\fP to where the device type will be stored 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno
+.RE
+.PP
+Different device types implement different features. In any case where the device type is important, say setting the P2 byte, then the routine will check and return an error if its not supported. 
+.SS "int ctr_get_version (void * handle, CtrDrvrVersion * version)"
+.PP
+Get driver and firmware version. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIversion\fP points to where version will be stored 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno 
+.RE
+.PP
+
+.SS "int ctr_list_ctim_objects (void * handle, CtrDrvrCtimObjects * ctims)"
+.PP
+List CTIM objects. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIPlace\fP where the list will be stored 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno 
+.RE
+.PP
+
+.SS "int ctr_list_ltim_objects (void * handle, CtrDrvrPtimObjects * ltims)"
+.PP
+List LTIM objects. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIPlace\fP where the list will be stored 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno 
+.RE
+.PP
+
+.SS "int ctr_memory_test (void * handle, int * address, int * wpat, int * rpat)"
+.PP
+Perform a memory test. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIpoints\fP to where a bad address will be stored 
+.br
+\fIpoints\fP to the data written 
+.br
+\fIpoints\fP to the data read back 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero success (no mem error) else -1 errno is set 0 (mem error)
+.RE
+.PP
+The Module must have been disabled for this test to run This routine will return -1 with errno set zero if there is a memory error in this case the address where the error happened, the write and read data are available to see what went wrong. 
+.SS "void* ctr_open (char * version)"
+.PP
+Get a handle to be used in subsequent library calls. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIVersion\fP string or NULL for the latest 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+The handle to be used in subsequent calls or -1
+.RE
+.PP
+The ctr_open call returns a pointer to an opeaque structure defined within the library internal implementation. Clients never see what is behind the void pointer.
+.PP
+If a version string is specified and shared objects are in use, then the specified version will be loaded, else a NULL or empty string points to the installed version. Version strings consits of two integers seperated by a point eg '3.1' or '1.0' these numbers are the major and minor version numbers.
+.PP
+Implementation hint: NEVER hard code the version number into the source!! Its part of the environment, suggest CTR_LIB_VERSION environment variable. If it's not defined, use the default NULL string.
+.PP
+The returned handle is -1 on error otherwise its a valid handle. On error use the standard Linux error functions for details.
+.PP
+Each time ctr_open is called a new handle is allocated, due to the current ctr driver implementation there can never be more than 16 open handles at any one time (this limitation should be removed).
+.PP
+void *my_handle; my_handle = ctr_open(NULL); if ((int) my_handle == CTR_ERROR) perror('ctr_open error'); 
+.SS "int ctr_set_cable_id (void * handle, int cable_id)"
+.PP
+Set the cable ID of a module. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIThe\fP cable ID to set 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno
+.RE
+.PP
+Note this cable ID will be overwritten within 1 second if the current module is enabled and connected to the timing network. 
+.SS "int ctr_set_ccv (void * handle, int ltim, int index, struct \fBctr_ccv_s\fP * ctr_ccv, \fBctr_ccv_fields_t\fP ctr_ccv_fields)"
+.PP
+Set a CCV. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIltim\fP number to be set 
+.br
+\fIindex\fP into ptim action array 0..size-1 
+.br
+\fIctr_ccv\fP are the values to be set 
+.br
+\fIctr_ccv_fields\fP to be set from ctr_ccv 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno 
+.RE
+.PP
+
+.SS "int ctr_set_debug_level (void * handle, int level)"
+.PP
+Set the CTR driver debug print out level. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIThe\fP level to be set 0=None ..7 Up to level 7 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno 
+.RE
+.PP
+
+.SS "int ctr_set_enable (void * handle, int flag)"
+.PP
+Enable/Disable timing reception on current module. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIEnable\fP flag (1=enabled 0=disabled) 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno 
+.RE
+.PP
+
+.SS "int ctr_set_input_delay (void * handle, int delay)"
+.PP
+Set the CTR timing input delay value. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIThe\fP new delay value in 40MHz (25ns) Ticks (24-Bit) 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno 
+.RE
+.PP
+
+.SS "int ctr_set_module (void * handle, int modnum)"
+.PP
+Set the current working module number. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fImodnum\fP module number 1..n (n = module_count) 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno
+.RE
+.PP
+A client owns the handle he opened and should use it exclusivley never giving it to another thread. In this case it is thread safe to call set_module for your handle. All subsequent calls will work using the set module number. 
+.SS "int ctr_set_p2_output_byte (void * handle, int p2byte)"
+.PP
+Select the P2 output byte number for current module. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIThe\fP output byte number or zero 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno
+.RE
+.PP
+OutputByte: In the VME version of the CTR, the eight counter outputs can be placed on one byte of the P2 connector. If this value is zero the CTR does not drive the P2 connector, a value between 1..8 selects the byte number in the 64bit P2 VME bus. 
+.SS "int ctr_set_pll_lock_method (void * handle, int lock_method)"
+.PP
+Choose PLL locking method, brutal or slow. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIThe\fP lock flag 0=Brutal 1= slow 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno 
+.RE
+.PP
+
+.SS "int ctr_set_queue_flag (void * handle, int flag)"
+.PP
+Turn your queue on or off. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIflag\fP 1=>queuing is off, 0=>queuing is on 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno 
+.RE
+.PP
+
+.SS "int ctr_set_remote (void * handle, int remote_flag, CtrDrvrCounter ch, CtrDrvrRemote rcmd, struct \fBctr_ccv_s\fP * ctr_ccv, \fBctr_ccv_fields_t\fP ctr_ccv_fields)"
+.PP
+Set up a counter remotley from user code rather than from a CTIM. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIremote\fP flag 0=normal, 1=remote control by user 
+.br
+\fIch\fP is the channel 1..3 for ctri, 1..4 for ctrp, 1..8 for ctrv. 
+.br
+\fIrcmd\fP is the command see CtrDrvrRemote 
+.br
+\fIctr_ccv\fP are the values to be set 
+.br
+\fIctr_ccv_fields\fP to be set from ctr_ccv 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno
+.RE
+.PP
+Set a counter under full remote control (IE under DSC tasks control) This feature permits you to do what you like with counters even if there is no timing cable attached. With this you can drive stepper motors, wire scanners or whatever. No PTIM or CTIM is involved, the configuration is loaded directly by the application. Note that when the argument remflg is set to 1, the counter can not be written to by incomming triggers so all PTIM objects using the counter stop overwriting the counter configuration and are effectivley disabled. Setting the remflg 0 permits PTIM triggers to write to the counter configuration, the write block is removed. Also note that in some cases it is useful to perform remote actions, such as remoteSTOP, even if the remflg is set to zero. The remflg simply blocks PTIM overwrites, the counter configuration can still be accessed ! 
+.SS "int ctr_set_time (void * handle, CtrDrvrTime ctr_time)"
+.PP
+Set the time on the current module. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIctr_time\fP the time to be set 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno
+.RE
+.PP
+Note this time will be overwritten within 1 second if the current module is enabled and connected to the timing network. 
+.SS "int ctr_set_timeout (void * handle, int timeout)"
+.PP
+Set your timeout in milliseconds. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIThe\fP timeout im milliseconds, zero means no timeout 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno 
+.RE
+.PP
+
+.SS "int ctr_simulate_interrupt (void * handle, CtrDrvrConnectionClass ctr_class, int equip)"
+.PP
+simulate an interrupt 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIClass\fP of interrupt to simulate 
+.br
+\fIClass\fP value 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno 
+.RE
+.PP
+
+.SS "int ctr_unix_to_ctime (struct timeval * utime, CtrDrvrTime * ctime)"
+.PP
+Convert the standard unix time to CTR driver time. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIutime\fP points to the unix timeval to be converted 
+.br
+\fIctime\fP points to the CtrDrvrTime value where conversion will be stored 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Always returns zero 
+.RE
+.PP
+
+.SS "int ctr_wait (void * handle, struct \fBctr_interrupt_s\fP * ctr_interrupt)"
+.PP
+Wait for an interrupt. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIA\fP handle that was allocated in open 
+.br
+\fIPointer\fP to an interrupt structure 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Zero means success else -1 is returned on error, see errno 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libctr Timing Library from the source code.

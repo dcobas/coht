@@ -1,0 +1,936 @@
+\section{libctr.doxygen File Reference}
+\label{libctr_8doxygen}\index{libctr.doxygen@{libctr.doxygen}}
+{\tt \#include $<$sys/time.h$>$}\par
+{\tt \#include $<$ctrdrvr.h$>$}\par
+{\tt \#include $<$ctrhard.h$>$}\par
+\subsection*{Data Structures}
+\begin{CompactItemize}
+\item 
+struct \bf{ctr\_\-ccv\_\-s}
+\item 
+struct \bf{ctr\_\-interrupt\_\-s}
+\item 
+struct \bf{ctr\_\-module\_\-address\_\-s}
+\end{CompactItemize}
+\subsection*{Defines}
+\begin{CompactItemize}
+\item 
+\#define \bf{CTR\_\-ERROR}~(-1)
+\end{CompactItemize}
+\subsection*{Enumerations}
+\begin{CompactItemize}
+\item 
+enum \bf{ctr\_\-ccv\_\-fields\_\-t} \{ \par
+\bf{CTR\_\-CCV\_\-ENABLE} =  0x0001, 
+\bf{CTR\_\-CCV\_\-START} =  0x0002, 
+\bf{CTR\_\-CCV\_\-MODE} =  0x0004, 
+\bf{CTR\_\-CCV\_\-CLOCK} =  0x0008, 
+\par
+\bf{CTR\_\-CCV\_\-PULSE\_\-WIDTH} =  0x0010, 
+\bf{CTR\_\-CCV\_\-DELAY} =  0x0020, 
+\bf{CTR\_\-CCV\_\-COUNTER\_\-MASK} =  0x0040, 
+\bf{CTR\_\-CCV\_\-POLARITY} =  0x0080, 
+\par
+\bf{CTR\_\-CCV\_\-CTIM} =  0x0100, 
+\bf{CTR\_\-CCV\_\-PAYLOAD} =  0x0200, 
+\bf{CTR\_\-CCV\_\-CMP\_\-METHOD} =  0x0400, 
+\bf{CTR\_\-CCV\_\-GRNUM} =  0x0800, 
+\par
+\bf{CTR\_\-CCV\_\-GRVAL} =  0x1000, 
+\bf{CTR\_\-CCV\_\-TGNUM} =  0x2000
+ \}
+\end{CompactItemize}
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+int \bf{ctr\_\-ctime\_\-to\_\-unix} (Ctr\-Drvr\-Time $\ast$ctime, struct timeval $\ast$utime)
+\begin{CompactList}\small\item\em Convert the CTR driver time to standard unix time. \item\end{CompactList}\item 
+int \bf{ctr\_\-unix\_\-to\_\-ctime} (struct timeval $\ast$utime, Ctr\-Drvr\-Time $\ast$ctime)
+\begin{CompactList}\small\item\em Convert the standard unix time to CTR driver time. \item\end{CompactList}\item 
+void $\ast$ \bf{ctr\_\-open} (char $\ast$version)
+\begin{CompactList}\small\item\em Get a handle to be used in subsequent library calls. \item\end{CompactList}\item 
+int \bf{ctr\_\-close} (void $\ast$handle)
+\begin{CompactList}\small\item\em Close a handle and free up resources. \item\end{CompactList}\item 
+int \bf{ctr\_\-get\_\-module\_\-count} (void $\ast$handle)
+\begin{CompactList}\small\item\em Get the number of installed CTR modules. \item\end{CompactList}\item 
+int \bf{ctr\_\-set\_\-module} (void $\ast$handle, int modnum)
+\begin{CompactList}\small\item\em Set the current working module number. \item\end{CompactList}\item 
+int \bf{ctr\_\-get\_\-module} (void $\ast$handle)
+\begin{CompactList}\small\item\em Get the current working module number. \item\end{CompactList}\item 
+int \bf{ctr\_\-get\_\-type} (void $\ast$handle, Ctr\-Drvr\-Hardware\-Type $\ast$type)
+\begin{CompactList}\small\item\em Get the device type handled by the driver CTRV, CTRP, CTRI, CTRE. \item\end{CompactList}\item 
+int \bf{ctr\_\-get\_\-module\_\-address} (void $\ast$handle, struct \bf{ctr\_\-module\_\-address\_\-s} $\ast$module\_\-address)
+\begin{CompactList}\small\item\em Get the addresses of a module. \item\end{CompactList}\item 
+int \bf{ctr\_\-connect} (void $\ast$handle, Ctr\-Drvr\-Connection\-Class ctr\_\-class, int equip)
+\begin{CompactList}\small\item\em Connect to a ctr interrupt. \item\end{CompactList}\item 
+int \bf{ctr\_\-connect\_\-payload} (void $\ast$handle, int ctim, int payload)
+\begin{CompactList}\small\item\em Connect to a ctr interrupt with a given payload. \item\end{CompactList}\item 
+int \bf{ctr\_\-disconnect} (void $\ast$handle, Ctr\-Drvr\-Connection\-Class ctr\_\-class, int mask)
+\begin{CompactList}\small\item\em Disconnect from an interrupt on current module. \item\end{CompactList}\item 
+int \bf{ctr\_\-wait} (void $\ast$handle, struct \bf{ctr\_\-interrupt\_\-s} $\ast$ctr\_\-interrupt)
+\begin{CompactList}\small\item\em Wait for an interrupt. \item\end{CompactList}\item 
+int \bf{ctr\_\-set\_\-ccv} (void $\ast$handle, int ltim, int index, struct \bf{ctr\_\-ccv\_\-s} $\ast$ctr\_\-ccv, \bf{ctr\_\-ccv\_\-fields\_\-t} ctr\_\-ccv\_\-fields)
+\begin{CompactList}\small\item\em Set a CCV. \item\end{CompactList}\item 
+int \bf{ctr\_\-get\_\-ccv} (void $\ast$handle, int ltim, int index, struct \bf{ctr\_\-ccv\_\-s} $\ast$ctr\_\-ccv)
+\begin{CompactList}\small\item\em get an ltim action setting \item\end{CompactList}\item 
+int \bf{ctr\_\-create\_\-ltim} (void $\ast$handle, int ltim, int ch, int size)
+\begin{CompactList}\small\item\em Create an empty LTIM object on the current module. \item\end{CompactList}\item 
+int \bf{ctr\_\-destroy\_\-ltim} (void $\ast$handle, int ltim)
+\begin{CompactList}\small\item\em Destroy an LTIM object on the current module. \item\end{CompactList}\item 
+int \bf{ctr\_\-list\_\-ltim\_\-objects} (void $\ast$handle, Ctr\-Drvr\-Ptim\-Objects $\ast$ltims)
+\begin{CompactList}\small\item\em List LTIM objects. \item\end{CompactList}\item 
+int \bf{ctr\_\-list\_\-ctim\_\-objects} (void $\ast$handle, Ctr\-Drvr\-Ctim\-Objects $\ast$ctims)
+\begin{CompactList}\small\item\em List CTIM objects. \item\end{CompactList}\item 
+int \bf{ctr\_\-get\_\-telegram} (void $\ast$handle, int index, short $\ast$telegram)
+\begin{CompactList}\small\item\em get a telegram \item\end{CompactList}\item 
+int \bf{ctr\_\-get\_\-time} (void $\ast$handle, Ctr\-Drvr\-CTime $\ast$ctr\_\-time)
+\begin{CompactList}\small\item\em Get time. \item\end{CompactList}\item 
+int \bf{ctr\_\-set\_\-time} (void $\ast$handle, Ctr\-Drvr\-Time ctr\_\-time)
+\begin{CompactList}\small\item\em Set the time on the current module. \item\end{CompactList}\item 
+int \bf{ctr\_\-get\_\-cable\_\-id} (void $\ast$handle, int $\ast$cable\_\-id)
+\begin{CompactList}\small\item\em Get cable ID. \item\end{CompactList}\item 
+int \bf{ctr\_\-set\_\-cable\_\-id} (void $\ast$handle, int cable\_\-id)
+\begin{CompactList}\small\item\em Set the cable ID of a module. \item\end{CompactList}\item 
+int \bf{ctr\_\-get\_\-version} (void $\ast$handle, Ctr\-Drvr\-Version $\ast$version)
+\begin{CompactList}\small\item\em Get driver and firmware version. \item\end{CompactList}\item 
+int \bf{ctr\_\-create\_\-ctim} (void $\ast$handle, int ctim, int mask)
+\begin{CompactList}\small\item\em Associate a CTIM number to a Frame. \item\end{CompactList}\item 
+int \bf{ctr\_\-destroy\_\-ctim} (void $\ast$handle, int ctim)
+\begin{CompactList}\small\item\em Destroy a CTIM. \item\end{CompactList}\item 
+int \bf{ctr\_\-get\_\-queue\_\-size} (void $\ast$handle)
+\begin{CompactList}\small\item\em Get the size of your queue for a given handle. \item\end{CompactList}\item 
+int \bf{ctr\_\-set\_\-queue\_\-flag} (void $\ast$handle, int flag)
+\begin{CompactList}\small\item\em Turn your queue on or off. \item\end{CompactList}\item 
+int \bf{ctr\_\-get\_\-queue\_\-flag} (void $\ast$handle)
+\begin{CompactList}\small\item\em Get the current queue flag setting. \item\end{CompactList}\item 
+int \bf{ctr\_\-set\_\-enable} (void $\ast$handle, int flag)
+\begin{CompactList}\small\item\em Enable/Disable timing reception on current module. \item\end{CompactList}\item 
+int \bf{ctr\_\-get\_\-enable} (void $\ast$handle)
+\begin{CompactList}\small\item\em Get the Enable/Disable flag value. \item\end{CompactList}\item 
+int \bf{ctr\_\-set\_\-input\_\-delay} (void $\ast$handle, int delay)
+\begin{CompactList}\small\item\em Set the CTR timing input delay value. \item\end{CompactList}\item 
+int \bf{ctr\_\-get\_\-input\_\-delay} (void $\ast$handle)
+\begin{CompactList}\small\item\em Get the CTR timing input delay value. \item\end{CompactList}\item 
+int \bf{ctr\_\-set\_\-debug\_\-level} (void $\ast$handle, int level)
+\begin{CompactList}\small\item\em Set the CTR driver debug print out level. \item\end{CompactList}\item 
+int \bf{ctr\_\-get\_\-debug\_\-level} (void $\ast$handle)
+\begin{CompactList}\small\item\em Get the CTR driver debug print out level. \item\end{CompactList}\item 
+int \bf{ctr\_\-set\_\-timeout} (void $\ast$handle, int timeout)
+\begin{CompactList}\small\item\em Set your timeout in milliseconds. \item\end{CompactList}\item 
+int \bf{ctr\_\-get\_\-timeout} (void $\ast$handle)
+\begin{CompactList}\small\item\em Get your timeout in milliseconds. \item\end{CompactList}\item 
+int \bf{ctr\_\-get\_\-status} (void $\ast$handle, Ctr\-Drvr\-Status $\ast$stat)
+\begin{CompactList}\small\item\em Get the CTR module status. \item\end{CompactList}\item 
+int \bf{ctr\_\-set\_\-remote} (void $\ast$handle, int remote\_\-flag, Ctr\-Drvr\-Counter ch, Ctr\-Drvr\-Remote rcmd, struct \bf{ctr\_\-ccv\_\-s} $\ast$ctr\_\-ccv, \bf{ctr\_\-ccv\_\-fields\_\-t} ctr\_\-ccv\_\-fields)
+\begin{CompactList}\small\item\em Set up a counter remotley from user code rather than from a CTIM. \item\end{CompactList}\item 
+int \bf{ctr\_\-get\_\-remote} (void $\ast$handle, Ctr\-Drvr\-Counter ch, struct \bf{ctr\_\-ccv\_\-s} $\ast$ctr\_\-ccv)
+\begin{CompactList}\small\item\em Get the remote counter flag and config. \item\end{CompactList}\item 
+int \bf{ctr\_\-set\_\-pll\_\-lock\_\-method} (void $\ast$handle, int lock\_\-method)
+\begin{CompactList}\small\item\em Choose PLL locking method, brutal or slow. \item\end{CompactList}\item 
+int \bf{ctr\_\-get\_\-pll\_\-lock\_\-method} (void $\ast$handle)
+\begin{CompactList}\small\item\em Get Pll locking method. \item\end{CompactList}\item 
+int \bf{ctr\_\-get\_\-io\_\-status} (void $\ast$handle, Ctr\-Drvr\-Io\-Status $\ast$io\_\-stat)
+\begin{CompactList}\small\item\em Read the io status. \item\end{CompactList}\item 
+int \bf{ctr\_\-get\_\-stats} (void $\ast$handle, Ctr\-Drvr\-Module\-Stats $\ast$stats)
+\begin{CompactList}\small\item\em Get module statistics. \item\end{CompactList}\item 
+int \bf{ctr\_\-memory\_\-test} (void $\ast$handle, int $\ast$address, int $\ast$wpat, int $\ast$rpat)
+\begin{CompactList}\small\item\em Perform a memory test. \item\end{CompactList}\item 
+int \bf{ctr\_\-get\_\-client\_\-pids} (void $\ast$handle, Ctr\-Drvr\-Client\-List $\ast$client\_\-pids)
+\begin{CompactList}\small\item\em Get the list of all driver clients. \item\end{CompactList}\item 
+int \bf{ctr\_\-get\_\-client\_\-connections} (void $\ast$handle, int pid, Ctr\-Drvr\-Client\-Connections $\ast$connections)
+\begin{CompactList}\small\item\em Get a clients connections. \item\end{CompactList}\item 
+int \bf{ctr\_\-simulate\_\-interrupt} (void $\ast$handle, Ctr\-Drvr\-Connection\-Class ctr\_\-class, int equip)
+\begin{CompactList}\small\item\em simulate an interrupt \item\end{CompactList}\item 
+int \bf{ctr\_\-set\_\-p2\_\-output\_\-byte} (void $\ast$handle, int p2byte)
+\begin{CompactList}\small\item\em Select the P2 output byte number for current module. \item\end{CompactList}\item 
+int \bf{ctr\_\-get\_\-p2\_\-output\_\-byte} (void $\ast$handle)
+\begin{CompactList}\small\item\em Get the P2 output byte number. \item\end{CompactList}\end{CompactItemize}
+
+
+\subsection{Define Documentation}
+\index{libctr.doxygen@{libctr.doxygen}!CTR_ERROR@{CTR\_\-ERROR}}
+\index{CTR_ERROR@{CTR\_\-ERROR}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}\#define CTR\_\-ERROR~(-1)}\label{libctr_8doxygen_9fe0cb0facdb58cb9ae0672fb1758893}
+
+
+As this library runs exclusivley on Linux I use standard kernel coding style and error reporting where possible. It is available both as a shared object and as a static link. It exports the ctrdrvr public definitions which follow the old OSF-Motif coding style. In all cases if the return value is -1, then errno contains the error number. The errno variable is per thread and so this mechanism is thread safe. A return of zero or a posative value means success. Error numbers are defined in errno.h and there are standard Linux facilities for treating them. See err(3), error(3), perror(3), strerror(3) 
+
+\subsection{Enumeration Type Documentation}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_ccv_fields_t@{ctr\_\-ccv\_\-fields\_\-t}}
+\index{ctr_ccv_fields_t@{ctr\_\-ccv\_\-fields\_\-t}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}enum \bf{ctr\_\-ccv\_\-fields\_\-t}}\label{libctr_8doxygen_136487c03ed42da1baa53aed26f69bcf}
+
+
+\begin{Desc}
+\item[Enumerator: ]\par
+\begin{description}
+\index{CTR_CCV_ENABLE@{CTR\_\-CCV\_\-ENABLE}!libctr.doxygen@{libctr.doxygen}}\index{libctr.doxygen@{libctr.doxygen}!CTR_CCV_ENABLE@{CTR\_\-CCV\_\-ENABLE}}\item[{\em 
+CTR\_\-CCV\_\-ENABLE\label{libctr_8doxygen_136487c03ed42da1baa53aed26f69bcf86c2415be8695776ff5d16c4823c0dae}
+}]\index{CTR_CCV_START@{CTR\_\-CCV\_\-START}!libctr.doxygen@{libctr.doxygen}}\index{libctr.doxygen@{libctr.doxygen}!CTR_CCV_START@{CTR\_\-CCV\_\-START}}\item[{\em 
+CTR\_\-CCV\_\-START\label{libctr_8doxygen_136487c03ed42da1baa53aed26f69bcf339d8aff83d7c295fef20bcce2e55052}
+}]\index{CTR_CCV_MODE@{CTR\_\-CCV\_\-MODE}!libctr.doxygen@{libctr.doxygen}}\index{libctr.doxygen@{libctr.doxygen}!CTR_CCV_MODE@{CTR\_\-CCV\_\-MODE}}\item[{\em 
+CTR\_\-CCV\_\-MODE\label{libctr_8doxygen_136487c03ed42da1baa53aed26f69bcf387d2422538d56fd8d857271671b2941}
+}]\index{CTR_CCV_CLOCK@{CTR\_\-CCV\_\-CLOCK}!libctr.doxygen@{libctr.doxygen}}\index{libctr.doxygen@{libctr.doxygen}!CTR_CCV_CLOCK@{CTR\_\-CCV\_\-CLOCK}}\item[{\em 
+CTR\_\-CCV\_\-CLOCK\label{libctr_8doxygen_136487c03ed42da1baa53aed26f69bcfb2f37ed972dc6a2c3d939f21ae3325e3}
+}]\index{CTR_CCV_PULSE_WIDTH@{CTR\_\-CCV\_\-PULSE\_\-WIDTH}!libctr.doxygen@{libctr.doxygen}}\index{libctr.doxygen@{libctr.doxygen}!CTR_CCV_PULSE_WIDTH@{CTR\_\-CCV\_\-PULSE\_\-WIDTH}}\item[{\em 
+CTR\_\-CCV\_\-PULSE\_\-WIDTH\label{libctr_8doxygen_136487c03ed42da1baa53aed26f69bcf34c1434ca55cb73712f59e9ff4245c80}
+}]\index{CTR_CCV_DELAY@{CTR\_\-CCV\_\-DELAY}!libctr.doxygen@{libctr.doxygen}}\index{libctr.doxygen@{libctr.doxygen}!CTR_CCV_DELAY@{CTR\_\-CCV\_\-DELAY}}\item[{\em 
+CTR\_\-CCV\_\-DELAY\label{libctr_8doxygen_136487c03ed42da1baa53aed26f69bcff45ebc8b577ff6046aebf13e03c79de0}
+}]\index{CTR_CCV_COUNTER_MASK@{CTR\_\-CCV\_\-COUNTER\_\-MASK}!libctr.doxygen@{libctr.doxygen}}\index{libctr.doxygen@{libctr.doxygen}!CTR_CCV_COUNTER_MASK@{CTR\_\-CCV\_\-COUNTER\_\-MASK}}\item[{\em 
+CTR\_\-CCV\_\-COUNTER\_\-MASK\label{libctr_8doxygen_136487c03ed42da1baa53aed26f69bcf38ba3665928bbd15500f9b076a85007a}
+}]\index{CTR_CCV_POLARITY@{CTR\_\-CCV\_\-POLARITY}!libctr.doxygen@{libctr.doxygen}}\index{libctr.doxygen@{libctr.doxygen}!CTR_CCV_POLARITY@{CTR\_\-CCV\_\-POLARITY}}\item[{\em 
+CTR\_\-CCV\_\-POLARITY\label{libctr_8doxygen_136487c03ed42da1baa53aed26f69bcf048fa7f3f559d4984f96fad1beb866b1}
+}]\index{CTR_CCV_CTIM@{CTR\_\-CCV\_\-CTIM}!libctr.doxygen@{libctr.doxygen}}\index{libctr.doxygen@{libctr.doxygen}!CTR_CCV_CTIM@{CTR\_\-CCV\_\-CTIM}}\item[{\em 
+CTR\_\-CCV\_\-CTIM\label{libctr_8doxygen_136487c03ed42da1baa53aed26f69bcf3f8cc44e9723dd618807f418bc3dc258}
+}]\index{CTR_CCV_PAYLOAD@{CTR\_\-CCV\_\-PAYLOAD}!libctr.doxygen@{libctr.doxygen}}\index{libctr.doxygen@{libctr.doxygen}!CTR_CCV_PAYLOAD@{CTR\_\-CCV\_\-PAYLOAD}}\item[{\em 
+CTR\_\-CCV\_\-PAYLOAD\label{libctr_8doxygen_136487c03ed42da1baa53aed26f69bcf233c2b19bbf90291a1e20f016cb91f91}
+}]\index{CTR_CCV_CMP_METHOD@{CTR\_\-CCV\_\-CMP\_\-METHOD}!libctr.doxygen@{libctr.doxygen}}\index{libctr.doxygen@{libctr.doxygen}!CTR_CCV_CMP_METHOD@{CTR\_\-CCV\_\-CMP\_\-METHOD}}\item[{\em 
+CTR\_\-CCV\_\-CMP\_\-METHOD\label{libctr_8doxygen_136487c03ed42da1baa53aed26f69bcfc0ea0cbea8cf7973ae89e92cd4a193a3}
+}]\index{CTR_CCV_GRNUM@{CTR\_\-CCV\_\-GRNUM}!libctr.doxygen@{libctr.doxygen}}\index{libctr.doxygen@{libctr.doxygen}!CTR_CCV_GRNUM@{CTR\_\-CCV\_\-GRNUM}}\item[{\em 
+CTR\_\-CCV\_\-GRNUM\label{libctr_8doxygen_136487c03ed42da1baa53aed26f69bcfd8ba76ec3c1e99a6db7a356953a6a120}
+}]\index{CTR_CCV_GRVAL@{CTR\_\-CCV\_\-GRVAL}!libctr.doxygen@{libctr.doxygen}}\index{libctr.doxygen@{libctr.doxygen}!CTR_CCV_GRVAL@{CTR\_\-CCV\_\-GRVAL}}\item[{\em 
+CTR\_\-CCV\_\-GRVAL\label{libctr_8doxygen_136487c03ed42da1baa53aed26f69bcf6b81416fa65f3c02e1d80af16b646de4}
+}]\index{CTR_CCV_TGNUM@{CTR\_\-CCV\_\-TGNUM}!libctr.doxygen@{libctr.doxygen}}\index{libctr.doxygen@{libctr.doxygen}!CTR_CCV_TGNUM@{CTR\_\-CCV\_\-TGNUM}}\item[{\em 
+CTR\_\-CCV\_\-TGNUM\label{libctr_8doxygen_136487c03ed42da1baa53aed26f69bcfaf99acb8b43d339e6a938fe49b865377}
+}]\end{description}
+\end{Desc}
+
+
+
+\subsection{Function Documentation}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_close@{ctr\_\-close}}
+\index{ctr_close@{ctr\_\-close}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-close (void $\ast$ {\em handle})}\label{libctr_8doxygen_d1260cd705ed58679661c36bbceff2da}
+
+
+Close a handle and free up resources. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno\end{Desc}
+This routine disconnects from all interrupts, frees up memory and closes the ctr driver. It should be called once for each ctr\_\-open. \index{libctr.doxygen@{libctr.doxygen}!ctr_connect@{ctr\_\-connect}}
+\index{ctr_connect@{ctr\_\-connect}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-connect (void $\ast$ {\em handle}, Ctr\-Drvr\-Connection\-Class {\em ctr\_\-class}, int {\em equip})}\label{libctr_8doxygen_621da31345626c2770b80dc981013be7}
+
+
+Connect to a ctr interrupt. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em ctr\_\-class}]see Ctr\-Drvr\-Connection\-Class, the class of timing to connect \item[{\em equip}]is class specific: hardware mask, ctim number or ltim number \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno\end{Desc}
+In the case of connecting to a ctim event you create the ctim first and pass this id in parameter equip. To connect to an LTIM you must use the module number on which the LTIM exists.
+
+Connect to the PPS hardware event on module 2
+
+Ctr\-Drvr\-Connection\-Class ctr\_\-class = Ctr\-Drvr\-Connection\-Class\-HARD; Ctr\-Drvr\-Interrupt\-Mask hmask = Ctr\-Drvr\-Interrupt\-Mask\-PPS; int modnum = 2;
+
+if (ctr\_\-set\_\-module(handle,modnum) $<$ 0) ... if (ctr\_\-connect(handle,ctr\_\-class,(int) hmask) $<$ 0) ... \index{libctr.doxygen@{libctr.doxygen}!ctr_connect_payload@{ctr\_\-connect\_\-payload}}
+\index{ctr_connect_payload@{ctr\_\-connect\_\-payload}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-connect\_\-payload (void $\ast$ {\em handle}, int {\em ctim}, int {\em payload})}\label{libctr_8doxygen_b11720b007c8cfd832a098c23f6c9fea}
+
+
+Connect to a ctr interrupt with a given payload. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em ctim}]you want to connect to. \item[{\em payload}]that must match the CTIM event (equality) \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno\end{Desc}
+In the case of connecting to a ctim event you create the ctim first and pass this id in parameter here
+
+Connect to the millisecond CTIM at C100 on module 1
+
+int ctim = 911; \# (0x0100FFFF) Millisecond C-Event with wildcard int payload = 100; \# C-time to be woken up at i.e. C100 int modnum = 1; \# Module 1
+
+if (ctr\_\-set\_\-module(handle,modnum) $<$ 0) ... if (ctr\_\-connect\_\-payload(handle,ctim,payload) $<$ 0) ... \index{libctr.doxygen@{libctr.doxygen}!ctr_create_ctim@{ctr\_\-create\_\-ctim}}
+\index{ctr_create_ctim@{ctr\_\-create\_\-ctim}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-create\_\-ctim (void $\ast$ {\em handle}, int {\em ctim}, int {\em mask})}\label{libctr_8doxygen_79ebbc8362308a05793b2dc87fa9c288}
+
+
+Associate a CTIM number to a Frame. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em ctim}]event Id to create \item[{\em mask}]event frame, like 0x2438FFFF (if there is a payload, set FFFF at the end) \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_create_ltim@{ctr\_\-create\_\-ltim}}
+\index{ctr_create_ltim@{ctr\_\-create\_\-ltim}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-create\_\-ltim (void $\ast$ {\em handle}, int {\em ltim}, int {\em ch}, int {\em size})}\label{libctr_8doxygen_0cf46533ac668e31829f1f8756626384}
+
+
+Create an empty LTIM object on the current module. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em ltim}]number to create \item[{\em channel}]number for ltim \item[{\em size}]of ltim action array (PLS lines) \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_ctime_to_unix@{ctr\_\-ctime\_\-to\_\-unix}}
+\index{ctr_ctime_to_unix@{ctr\_\-ctime\_\-to\_\-unix}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-ctime\_\-to\_\-unix (Ctr\-Drvr\-Time $\ast$ {\em ctime}, struct timeval $\ast$ {\em utime})}\label{libctr_8doxygen_09dc6e16cd3eadc150a487ed22f832b9}
+
+
+Convert the CTR driver time to standard unix time. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em ctime}]points to the Ctr\-Drvr\-Time value to be converted \item[{\em utime}]points to the unix timeval struct where conversion will be stored \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Always returns zero \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_destroy_ctim@{ctr\_\-destroy\_\-ctim}}
+\index{ctr_destroy_ctim@{ctr\_\-destroy\_\-ctim}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-destroy\_\-ctim (void $\ast$ {\em handle}, int {\em ctim})}\label{libctr_8doxygen_d67727479978f309e40a175f47331611}
+
+
+Destroy a CTIM. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em ctim}]event Id to destroy \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_destroy_ltim@{ctr\_\-destroy\_\-ltim}}
+\index{ctr_destroy_ltim@{ctr\_\-destroy\_\-ltim}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-destroy\_\-ltim (void $\ast$ {\em handle}, int {\em ltim})}\label{libctr_8doxygen_f0394d80d81f6b9a1c58c99731d3121a}
+
+
+Destroy an LTIM object on the current module. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em ltim}]number to destroy \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_disconnect@{ctr\_\-disconnect}}
+\index{ctr_disconnect@{ctr\_\-disconnect}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-disconnect (void $\ast$ {\em handle}, Ctr\-Drvr\-Connection\-Class {\em ctr\_\-class}, int {\em mask})}\label{libctr_8doxygen_ebe58613eb6fa7c893c1139df04634eb}
+
+
+Disconnect from an interrupt on current module. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em ctr\_\-class}]the calss of timing to disconnect \item[{\em mask}]the class specific, hardware mask, ctim or ltim number \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno\end{Desc}
+The client code must remember what it is connected to in order to disconnect. \index{libctr.doxygen@{libctr.doxygen}!ctr_get_cable_id@{ctr\_\-get\_\-cable\_\-id}}
+\index{ctr_get_cable_id@{ctr\_\-get\_\-cable\_\-id}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-get\_\-cable\_\-id (void $\ast$ {\em handle}, int $\ast$ {\em cable\_\-id})}\label{libctr_8doxygen_60d45f0e1514800900d22abf56fcba34}
+
+
+Get cable ID. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em cable\_\-id}]points to where id will be stored \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_get_ccv@{ctr\_\-get\_\-ccv}}
+\index{ctr_get_ccv@{ctr\_\-get\_\-ccv}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-get\_\-ccv (void $\ast$ {\em handle}, int {\em ltim}, int {\em index}, struct \bf{ctr\_\-ccv\_\-s} $\ast$ {\em ctr\_\-ccv})}\label{libctr_8doxygen_2b14397191d592972c6216ae2de44d68}
+
+
+get an ltim action setting 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em ltim}]number to get \item[{\em index}]into ltim action array 0..size-1 \item[{\em ctr\_\-ccv}]points to where the values will be stored \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_get_client_connections@{ctr\_\-get\_\-client\_\-connections}}
+\index{ctr_get_client_connections@{ctr\_\-get\_\-client\_\-connections}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-get\_\-client\_\-connections (void $\ast$ {\em handle}, int {\em pid}, Ctr\-Drvr\-Client\-Connections $\ast$ {\em connections})}\label{libctr_8doxygen_0034170a230c6c84919c3e341dd7d652}
+
+
+Get a clients connections. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em Pid}]of the client whose connections you want \item[{\em Pointer}]to where clients connections will be stored \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_get_client_pids@{ctr\_\-get\_\-client\_\-pids}}
+\index{ctr_get_client_pids@{ctr\_\-get\_\-client\_\-pids}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-get\_\-client\_\-pids (void $\ast$ {\em handle}, Ctr\-Drvr\-Client\-List $\ast$ {\em client\_\-pids})}\label{libctr_8doxygen_fb395f219db7cb041519c4c206dd0055}
+
+
+Get the list of all driver clients. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em Pointer}]to the client list \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_get_debug_level@{ctr\_\-get\_\-debug\_\-level}}
+\index{ctr_get_debug_level@{ctr\_\-get\_\-debug\_\-level}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-get\_\-debug\_\-level (void $\ast$ {\em handle})}\label{libctr_8doxygen_bbc79d7b8a2cea5d03d94854245a69ef}
+
+
+Get the CTR driver debug print out level. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]The debug level 0..7 (0=Off) else -1 for error \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_get_enable@{ctr\_\-get\_\-enable}}
+\index{ctr_get_enable@{ctr\_\-get\_\-enable}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-get\_\-enable (void $\ast$ {\em handle})}\label{libctr_8doxygen_c3fe86f1f41553673716c7b5c34aa974}
+
+
+Get the Enable/Disable flag value. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]The enable/Disable flag value or -1 on error \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_get_input_delay@{ctr\_\-get\_\-input\_\-delay}}
+\index{ctr_get_input_delay@{ctr\_\-get\_\-input\_\-delay}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-get\_\-input\_\-delay (void $\ast$ {\em handle})}\label{libctr_8doxygen_b2e136d3278da57fb43bca762a68f42d}
+
+
+Get the CTR timing input delay value. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]The input delay value in 40MHz ticks value or -1 on error \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_get_io_status@{ctr\_\-get\_\-io\_\-status}}
+\index{ctr_get_io_status@{ctr\_\-get\_\-io\_\-status}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-get\_\-io\_\-status (void $\ast$ {\em handle}, Ctr\-Drvr\-Io\-Status $\ast$ {\em io\_\-stat})}\label{libctr_8doxygen_d9a35d397466d9e442afbbeaa0555c55}
+
+
+Read the io status. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em Pointer}]to where the iostatus will be stored \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_get_module@{ctr\_\-get\_\-module}}
+\index{ctr_get_module@{ctr\_\-get\_\-module}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-get\_\-module (void $\ast$ {\em handle})}\label{libctr_8doxygen_32b534750bde200c72d807db7bbd9d16}
+
+
+Get the current working module number. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]module number 1..n or -1 on error \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_get_module_address@{ctr\_\-get\_\-module\_\-address}}
+\index{ctr_get_module_address@{ctr\_\-get\_\-module\_\-address}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-get\_\-module\_\-address (void $\ast$ {\em handle}, struct \bf{ctr\_\-module\_\-address\_\-s} $\ast$ {\em module\_\-address})}\label{libctr_8doxygen_d6f2193a2abaaffe67b0038b4daf6421}
+
+
+Get the addresses of a module. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em Pointer}]to where the module address will be stored \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_get_module_count@{ctr\_\-get\_\-module\_\-count}}
+\index{ctr_get_module_count@{ctr\_\-get\_\-module\_\-count}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-get\_\-module\_\-count (void $\ast$ {\em handle})}\label{libctr_8doxygen_d9dffdbd573bcf32445f2925f73ca7a0}
+
+
+Get the number of installed CTR modules. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]The installed module count or -1 on error \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_get_p2_output_byte@{ctr\_\-get\_\-p2\_\-output\_\-byte}}
+\index{ctr_get_p2_output_byte@{ctr\_\-get\_\-p2\_\-output\_\-byte}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-get\_\-p2\_\-output\_\-byte (void $\ast$ {\em handle})}\label{libctr_8doxygen_e1a6170e3efe17795221bc749b6605f6}
+
+
+Get the P2 output byte number. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]The output byte number or -1 on error\end{Desc}
+If a value of 0 is returned, no output byte is set \index{libctr.doxygen@{libctr.doxygen}!ctr_get_pll_lock_method@{ctr\_\-get\_\-pll\_\-lock\_\-method}}
+\index{ctr_get_pll_lock_method@{ctr\_\-get\_\-pll\_\-lock\_\-method}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-get\_\-pll\_\-lock\_\-method (void $\ast$ {\em handle})}\label{libctr_8doxygen_8c895f43fe616b4765b695a4184f055a}
+
+
+Get Pll locking method. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]The lock flag (0=Brutal 1=Slow) or -1 on error \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_get_queue_flag@{ctr\_\-get\_\-queue\_\-flag}}
+\index{ctr_get_queue_flag@{ctr\_\-get\_\-queue\_\-flag}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-get\_\-queue\_\-flag (void $\ast$ {\em handle})}\label{libctr_8doxygen_992c00ab46898ecc288914ceb849bf31}
+
+
+Get the current queue flag setting. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]The queue flag 0..1 (QOFF..QON) else -1 on error \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_get_queue_size@{ctr\_\-get\_\-queue\_\-size}}
+\index{ctr_get_queue_size@{ctr\_\-get\_\-queue\_\-size}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-get\_\-queue\_\-size (void $\ast$ {\em handle})}\label{libctr_8doxygen_cbf9b964cb001ff81deaea39e3431a95}
+
+
+Get the size of your queue for a given handle. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Queue size or -1 on error \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_get_remote@{ctr\_\-get\_\-remote}}
+\index{ctr_get_remote@{ctr\_\-get\_\-remote}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-get\_\-remote (void $\ast$ {\em handle}, Ctr\-Drvr\-Counter {\em ch}, struct \bf{ctr\_\-ccv\_\-s} $\ast$ {\em ctr\_\-ccv})}\label{libctr_8doxygen_856a0d3c4d3c4eaf709d9b99c9adda13}
+
+
+Get the remote counter flag and config. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em ch}]is the channel 1..3 for ctri, 1..4 for ctrp, 1..8 for ctrv. \item[{\em ctr\_\-ccv}]are the values of the counter \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]The remote flag 0=normal, 1=remote or -1 on error \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_get_stats@{ctr\_\-get\_\-stats}}
+\index{ctr_get_stats@{ctr\_\-get\_\-stats}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-get\_\-stats (void $\ast$ {\em handle}, Ctr\-Drvr\-Module\-Stats $\ast$ {\em stats})}\label{libctr_8doxygen_7ecf44d2882ca5e45aaacdf3a0fd7de9}
+
+
+Get module statistics. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em Pointer}]to where the statistics will be stored \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_get_status@{ctr\_\-get\_\-status}}
+\index{ctr_get_status@{ctr\_\-get\_\-status}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-get\_\-status (void $\ast$ {\em handle}, Ctr\-Drvr\-Status $\ast$ {\em stat})}\label{libctr_8doxygen_b07057467de4749943fc90bd785da954}
+
+
+Get the CTR module status. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em Pointer}]to where the status will be stored of type Ctr\-Drvr\-Status \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_get_telegram@{ctr\_\-get\_\-telegram}}
+\index{ctr_get_telegram@{ctr\_\-get\_\-telegram}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-get\_\-telegram (void $\ast$ {\em handle}, int {\em index}, short $\ast$ {\em telegram})}\label{libctr_8doxygen_747788e83bc357d502fff46c25299fd3}
+
+
+get a telegram 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em index}]into the array of telegrams 0..7 \item[{\em telegram}]point to a short array of at least size 32 \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_get_time@{ctr\_\-get\_\-time}}
+\index{ctr_get_time@{ctr\_\-get\_\-time}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-get\_\-time (void $\ast$ {\em handle}, Ctr\-Drvr\-CTime $\ast$ {\em ctr\_\-time})}\label{libctr_8doxygen_a25d5651b6da7f7f20f67063da1e0017}
+
+
+Get time. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em ctr\_\-time}]point to where time will be stored \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_get_timeout@{ctr\_\-get\_\-timeout}}
+\index{ctr_get_timeout@{ctr\_\-get\_\-timeout}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-get\_\-timeout (void $\ast$ {\em handle})}\label{libctr_8doxygen_5f823ac1692921cbf9eb23664b9e498b}
+
+
+Get your timeout in milliseconds. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]The timeout in millisecond else -1 for error \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_get_type@{ctr\_\-get\_\-type}}
+\index{ctr_get_type@{ctr\_\-get\_\-type}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-get\_\-type (void $\ast$ {\em handle}, Ctr\-Drvr\-Hardware\-Type $\ast$ {\em type})}\label{libctr_8doxygen_e040fbe9bde17bf241023c8cf3f4a2e6}
+
+
+Get the device type handled by the driver CTRV, CTRP, CTRI, CTRE. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em Pointer}]to where the device type will be stored \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno\end{Desc}
+Different device types implement different features. In any case where the device type is important, say setting the P2 byte, then the routine will check and return an error if its not supported. \index{libctr.doxygen@{libctr.doxygen}!ctr_get_version@{ctr\_\-get\_\-version}}
+\index{ctr_get_version@{ctr\_\-get\_\-version}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-get\_\-version (void $\ast$ {\em handle}, Ctr\-Drvr\-Version $\ast$ {\em version})}\label{libctr_8doxygen_a0ceaeb987a40eceda3d47e3d399f5b0}
+
+
+Get driver and firmware version. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em version}]points to where version will be stored \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_list_ctim_objects@{ctr\_\-list\_\-ctim\_\-objects}}
+\index{ctr_list_ctim_objects@{ctr\_\-list\_\-ctim\_\-objects}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-list\_\-ctim\_\-objects (void $\ast$ {\em handle}, Ctr\-Drvr\-Ctim\-Objects $\ast$ {\em ctims})}\label{libctr_8doxygen_16f9fe47eb627e1efc1020c274f1a110}
+
+
+List CTIM objects. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em Place}]where the list will be stored \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_list_ltim_objects@{ctr\_\-list\_\-ltim\_\-objects}}
+\index{ctr_list_ltim_objects@{ctr\_\-list\_\-ltim\_\-objects}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-list\_\-ltim\_\-objects (void $\ast$ {\em handle}, Ctr\-Drvr\-Ptim\-Objects $\ast$ {\em ltims})}\label{libctr_8doxygen_9fd26ac9be8ded5db0caa4cef1876952}
+
+
+List LTIM objects. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em Place}]where the list will be stored \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_memory_test@{ctr\_\-memory\_\-test}}
+\index{ctr_memory_test@{ctr\_\-memory\_\-test}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-memory\_\-test (void $\ast$ {\em handle}, int $\ast$ {\em address}, int $\ast$ {\em wpat}, int $\ast$ {\em rpat})}\label{libctr_8doxygen_8cdb803537399fc1b1eff193b9998362}
+
+
+Perform a memory test. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em points}]to where a bad address will be stored \item[{\em points}]to the data written \item[{\em points}]to the data read back \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero success (no mem error) else -1 errno is set 0 (mem error)\end{Desc}
+The Module must have been disabled for this test to run This routine will return -1 with errno set zero if there is a memory error in this case the address where the error happened, the write and read data are available to see what went wrong. \index{libctr.doxygen@{libctr.doxygen}!ctr_open@{ctr\_\-open}}
+\index{ctr_open@{ctr\_\-open}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}void$\ast$ ctr\_\-open (char $\ast$ {\em version})}\label{libctr_8doxygen_197688487e3b8af77e9c093c54b4493a}
+
+
+Get a handle to be used in subsequent library calls. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Version}]string or NULL for the latest \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]The handle to be used in subsequent calls or -1\end{Desc}
+The ctr\_\-open call returns a pointer to an opeaque structure defined within the library internal implementation. Clients never see what is behind the void pointer.
+
+If a version string is specified and shared objects are in use, then the specified version will be loaded, else a NULL or empty string points to the installed version. Version strings consits of two integers seperated by a point eg \char`\"{}3.1\char`\"{} or \char`\"{}1.0\char`\"{} these numbers are the major and minor version numbers.
+
+Implementation hint: NEVER hard code the version number into the source!! Its part of the environment, suggest CTR\_\-LIB\_\-VERSION environment variable. If it's not defined, use the default NULL string.
+
+The returned handle is -1 on error otherwise its a valid handle. On error use the standard Linux error functions for details.
+
+Each time ctr\_\-open is called a new handle is allocated, due to the current ctr driver implementation there can never be more than 16 open handles at any one time (this limitation should be removed).
+
+void $\ast$my\_\-handle; my\_\-handle = ctr\_\-open(NULL); if ((int) my\_\-handle == CTR\_\-ERROR) perror(\char`\"{}ctr\_\-open error\char`\"{}); \index{libctr.doxygen@{libctr.doxygen}!ctr_set_cable_id@{ctr\_\-set\_\-cable\_\-id}}
+\index{ctr_set_cable_id@{ctr\_\-set\_\-cable\_\-id}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-set\_\-cable\_\-id (void $\ast$ {\em handle}, int {\em cable\_\-id})}\label{libctr_8doxygen_e71aba318309d65baa91e59e8825388b}
+
+
+Set the cable ID of a module. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em The}]cable ID to set \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno\end{Desc}
+Note this cable ID will be overwritten within 1 second if the current module is enabled and connected to the timing network. \index{libctr.doxygen@{libctr.doxygen}!ctr_set_ccv@{ctr\_\-set\_\-ccv}}
+\index{ctr_set_ccv@{ctr\_\-set\_\-ccv}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-set\_\-ccv (void $\ast$ {\em handle}, int {\em ltim}, int {\em index}, struct \bf{ctr\_\-ccv\_\-s} $\ast$ {\em ctr\_\-ccv}, \bf{ctr\_\-ccv\_\-fields\_\-t} {\em ctr\_\-ccv\_\-fields})}\label{libctr_8doxygen_62d1d686d7be3a72fa518149d1e9ee2b}
+
+
+Set a CCV. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em ltim}]number to be set \item[{\em index}]into ptim action array 0..size-1 \item[{\em ctr\_\-ccv}]are the values to be set \item[{\em ctr\_\-ccv\_\-fields}]to be set from ctr\_\-ccv \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_set_debug_level@{ctr\_\-set\_\-debug\_\-level}}
+\index{ctr_set_debug_level@{ctr\_\-set\_\-debug\_\-level}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-set\_\-debug\_\-level (void $\ast$ {\em handle}, int {\em level})}\label{libctr_8doxygen_68fe0a707265a45a27b630f9d81399cd}
+
+
+Set the CTR driver debug print out level. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em The}]level to be set 0=None ..7 Up to level 7 \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_set_enable@{ctr\_\-set\_\-enable}}
+\index{ctr_set_enable@{ctr\_\-set\_\-enable}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-set\_\-enable (void $\ast$ {\em handle}, int {\em flag})}\label{libctr_8doxygen_fc811c9a87dfe440c7226dd710af0ae1}
+
+
+Enable/Disable timing reception on current module. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em Enable}]flag (1=enabled 0=disabled) \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_set_input_delay@{ctr\_\-set\_\-input\_\-delay}}
+\index{ctr_set_input_delay@{ctr\_\-set\_\-input\_\-delay}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-set\_\-input\_\-delay (void $\ast$ {\em handle}, int {\em delay})}\label{libctr_8doxygen_35f2c54af78bc72593dcc27474bc7fb8}
+
+
+Set the CTR timing input delay value. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em The}]new delay value in 40MHz (25ns) Ticks (24-Bit) \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_set_module@{ctr\_\-set\_\-module}}
+\index{ctr_set_module@{ctr\_\-set\_\-module}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-set\_\-module (void $\ast$ {\em handle}, int {\em modnum})}\label{libctr_8doxygen_f15e57a9ff2db2eaad0c370ad1e3daa9}
+
+
+Set the current working module number. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em modnum}]module number 1..n (n = module\_\-count) \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno\end{Desc}
+A client owns the handle he opened and should use it exclusivley never giving it to another thread. In this case it is thread safe to call set\_\-module for your handle. All subsequent calls will work using the set module number. \index{libctr.doxygen@{libctr.doxygen}!ctr_set_p2_output_byte@{ctr\_\-set\_\-p2\_\-output\_\-byte}}
+\index{ctr_set_p2_output_byte@{ctr\_\-set\_\-p2\_\-output\_\-byte}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-set\_\-p2\_\-output\_\-byte (void $\ast$ {\em handle}, int {\em p2byte})}\label{libctr_8doxygen_14f8812fa84c11b88e2921607f624295}
+
+
+Select the P2 output byte number for current module. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em The}]output byte number or zero \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno\end{Desc}
+Output\-Byte: In the VME version of the CTR, the eight counter outputs can be placed on one byte of the P2 connector. If this value is zero the CTR does not drive the P2 connector, a value between 1..8 selects the byte number in the 64bit P2 VME bus. \index{libctr.doxygen@{libctr.doxygen}!ctr_set_pll_lock_method@{ctr\_\-set\_\-pll\_\-lock\_\-method}}
+\index{ctr_set_pll_lock_method@{ctr\_\-set\_\-pll\_\-lock\_\-method}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-set\_\-pll\_\-lock\_\-method (void $\ast$ {\em handle}, int {\em lock\_\-method})}\label{libctr_8doxygen_5860a1bdeaa79388579c620107d0340f}
+
+
+Choose PLL locking method, brutal or slow. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em The}]lock flag 0=Brutal 1= slow \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_set_queue_flag@{ctr\_\-set\_\-queue\_\-flag}}
+\index{ctr_set_queue_flag@{ctr\_\-set\_\-queue\_\-flag}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-set\_\-queue\_\-flag (void $\ast$ {\em handle}, int {\em flag})}\label{libctr_8doxygen_38f3a1443afadc935ef57272ab9f849e}
+
+
+Turn your queue on or off. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em flag}]1=$>$queuing is off, 0=$>$queuing is on \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_set_remote@{ctr\_\-set\_\-remote}}
+\index{ctr_set_remote@{ctr\_\-set\_\-remote}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-set\_\-remote (void $\ast$ {\em handle}, int {\em remote\_\-flag}, Ctr\-Drvr\-Counter {\em ch}, Ctr\-Drvr\-Remote {\em rcmd}, struct \bf{ctr\_\-ccv\_\-s} $\ast$ {\em ctr\_\-ccv}, \bf{ctr\_\-ccv\_\-fields\_\-t} {\em ctr\_\-ccv\_\-fields})}\label{libctr_8doxygen_29d33be6c697568d4d2a13ce12855a21}
+
+
+Set up a counter remotley from user code rather than from a CTIM. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em remote}]flag 0=normal, 1=remote control by user \item[{\em ch}]is the channel 1..3 for ctri, 1..4 for ctrp, 1..8 for ctrv. \item[{\em rcmd}]is the command see Ctr\-Drvr\-Remote \item[{\em ctr\_\-ccv}]are the values to be set \item[{\em ctr\_\-ccv\_\-fields}]to be set from ctr\_\-ccv \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno\end{Desc}
+Set a counter under full remote control (IE under DSC tasks control) This feature permits you to do what you like with counters even if there is no timing cable attached. With this you can drive stepper motors, wire scanners or whatever. No PTIM or CTIM is involved, the configuration is loaded directly by the application. Note that when the argument remflg is set to 1, the counter can not be written to by incomming triggers so all PTIM objects using the counter stop overwriting the counter configuration and are effectivley disabled. Setting the remflg 0 permits PTIM triggers to write to the counter configuration, the write block is removed. Also note that in some cases it is useful to perform remote actions, such as remote\-STOP, even if the remflg is set to zero. The remflg simply blocks PTIM overwrites, the counter configuration can still be accessed ! \index{libctr.doxygen@{libctr.doxygen}!ctr_set_time@{ctr\_\-set\_\-time}}
+\index{ctr_set_time@{ctr\_\-set\_\-time}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-set\_\-time (void $\ast$ {\em handle}, Ctr\-Drvr\-Time {\em ctr\_\-time})}\label{libctr_8doxygen_234878b168fb6f8da712ef1f47d7f6d5}
+
+
+Set the time on the current module. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em ctr\_\-time}]the time to be set \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno\end{Desc}
+Note this time will be overwritten within 1 second if the current module is enabled and connected to the timing network. \index{libctr.doxygen@{libctr.doxygen}!ctr_set_timeout@{ctr\_\-set\_\-timeout}}
+\index{ctr_set_timeout@{ctr\_\-set\_\-timeout}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-set\_\-timeout (void $\ast$ {\em handle}, int {\em timeout})}\label{libctr_8doxygen_60971a629ef7110115d4b1389359b169}
+
+
+Set your timeout in milliseconds. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em The}]timeout im milliseconds, zero means no timeout \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_simulate_interrupt@{ctr\_\-simulate\_\-interrupt}}
+\index{ctr_simulate_interrupt@{ctr\_\-simulate\_\-interrupt}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-simulate\_\-interrupt (void $\ast$ {\em handle}, Ctr\-Drvr\-Connection\-Class {\em ctr\_\-class}, int {\em equip})}\label{libctr_8doxygen_d5959e71509663040db21423f7d1a42c}
+
+
+simulate an interrupt 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em Class}]of interrupt to simulate \item[{\em Class}]value \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_unix_to_ctime@{ctr\_\-unix\_\-to\_\-ctime}}
+\index{ctr_unix_to_ctime@{ctr\_\-unix\_\-to\_\-ctime}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-unix\_\-to\_\-ctime (struct timeval $\ast$ {\em utime}, Ctr\-Drvr\-Time $\ast$ {\em ctime})}\label{libctr_8doxygen_4cd6c08e06ea1c80a47755499b22a18c}
+
+
+Convert the standard unix time to CTR driver time. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em utime}]points to the unix timeval to be converted \item[{\em ctime}]points to the Ctr\-Drvr\-Time value where conversion will be stored \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Always returns zero \end{Desc}
+\index{libctr.doxygen@{libctr.doxygen}!ctr_wait@{ctr\_\-wait}}
+\index{ctr_wait@{ctr\_\-wait}!libctr.doxygen@{libctr.doxygen}}
+\subsubsection{\setlength{\rightskip}{0pt plus 5cm}int ctr\_\-wait (void $\ast$ {\em handle}, struct \bf{ctr\_\-interrupt\_\-s} $\ast$ {\em ctr\_\-interrupt})}\label{libctr_8doxygen_365202e6572dcba9c093375361a6a3da}
+
+
+Wait for an interrupt. 
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em A}]handle that was allocated in open \item[{\em Pointer}]to an interrupt structure \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]Zero means success else -1 is returned on error, see errno \end{Desc}
