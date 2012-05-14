@@ -1001,7 +1001,7 @@ AtomType  at;
 int i, msk, qsz;
 
 CtrDrvrConnectionClass ctr_class;
-int equip;
+int equip, payld;
 struct ctr_interrupt_s ctr_interrupt;
 
    arg++;
@@ -1019,7 +1019,7 @@ struct ctr_interrupt_s ctr_interrupt;
 	    printf("%s 0x%04X ",interrupt_to_str(msk),msk);
 	    if ((i%4) == 0)  printf("\n");
 	 }
-	 printf("\n<hardware mask> P<ptim object> C<ctim object>\n");
+	 printf("\n<hardware mask> P<ptim object> C<ctim object>[<payload>]\n");
 	 return arg;
       }
    }
@@ -1080,6 +1080,16 @@ struct ctr_interrupt_s ctr_interrupt;
 	    arg++;
 	    v = &(vals[arg]);
 	    at = v->Type;
+
+	    if (at == Numeric) {
+	       payld = v->Number;
+	       arg++;
+
+	       if (ctr_connect_payload(h,equip,payld) < 0) {
+		  perror("ctr_connect_payload");
+		  return arg;
+	       }
+	    }
 
 	    if (ctr_connect(h,ctr_class,equip) < 0) {
 	       perror("ctr_connect");
@@ -1466,11 +1476,11 @@ static char *eptim_help =
 "?                        Print this help text  \n"
 ".                        Exit from the editor  \n"
 "a                        Edit actions          \n"
-"y<Id>,<Mod><Cntr>,<Size> Create PTIM equipment \n";
+"y<Id>,<Cntr>,<Size> Create PTIM equipment \n";
 
 void edit_ltim(int ltim) {
 
-int n, i, idx, nid, mod, cnt, dim, nxt;
+int n, i, idx, nid, cnt, dim, nxt;
 char c, *cp, *ep, txt[128];
 
 CtrDrvrPtimObjects obs;
@@ -1550,13 +1560,6 @@ CtrDrvrPtimBinding *ob = NULL;
 	       fprintf(stderr,"libctrtest:Error:No PTIM ID defined\n");
 	       break;
 	    } cp = ep;
-
-	    mod = strtoul(cp,&ep,0);
-	    if (cp == ep) {
-	       fprintf(stderr,"libctrtest:Error:No Mod defined\n");
-	       break;
-	    } cp = ep;
-	    if (mod == 0) mod = module;
 
 	    cnt = strtoul(cp,&ep,0);
 	    if (cp == ep) {

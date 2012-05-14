@@ -115,7 +115,7 @@ static Cmd cmds[CmdCMDS] = {
    { CmdCD,      "cd",    "Change configuration"     ,"Path"               ,change_working_directory },
    { CmdVER,     "ver",   "Get TimLib version"       ,""                   ,GetVersion         },
 
-   { CmdWI,      "wi",    "Wait for an interrupt"    ,"?|P<n>|C[M]<n>|Msk<t>" ,WaitInterrupt  },
+   { CmdWI,      "wi",    "Wait for an interrupt"    ,"?|P<n>|C<n><n>|Msk<t>" ,WaitInterrupt  },
    { CmdCL,      "cl",    "Clients list connections" ,""                   ,ListClients       },
    { CmdCC,      "cc",    "Connect to a C-event time","payload"            ,ConnectCTime      },
    { CmdQF,      "qf",    "Get set the queue flag"   ,"1/0"                ,GetSetQue         },

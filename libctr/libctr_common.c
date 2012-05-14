@@ -474,7 +474,7 @@ int ctr_create_ltim(void *handle, int ltim, int ch, int size)
 		return -1;
 
 	ptim.EqpNum = ltim;
-	ptim.ModuleIndex = mod;
+	ptim.ModuleIndex = mod -1;
 	ptim.Counter = ch;
 	ptim.Size = size;
 	ptim.StartIndex = 0;
