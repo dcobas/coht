@@ -29,6 +29,7 @@ typedef enum {
 	CTR_INDEX_set_ccv,
 	CTR_INDEX_get_ccv,
 	CTR_INDEX_create_ltim,
+	CTR_INDEX_destroy_ltim,
 	CTR_INDEX_get_telegram,
 	CTR_INDEX_get_time,
 	CTR_INDEX_set_time,
@@ -80,6 +81,7 @@ struct ctr_api_s {
 	int   (*ctr_set_ccv)(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv, ctr_ccv_fields_t ctr_ccv_fields);
 	int   (*ctr_get_ccv)(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv);
 	int   (*ctr_create_ltim)(void *handle, int ltim, int ch, int size);
+	int   (*ctr_destroy_ltim)(void *handle, int ltim);
 	int   (*ctr_get_telegram)(void *handle, int index, short *telegram);
 	int   (*ctr_get_time)(void *handle, CtrDrvrCTime *ctr_time);
 	int   (*ctr_set_time)(void *handle, CtrDrvrTime ctr_time);
@@ -129,6 +131,7 @@ char *ctr_api_names[CTR_INDEX_LAST] = {
 	"ctr_set_ccv",
 	"ctr_get_ccv",
 	"ctr_create_ltim",
+	"ctr_destroy_ltim",
 	"ctr_get_telegram",
 	"ctr_get_time",
 	"ctr_set_time",

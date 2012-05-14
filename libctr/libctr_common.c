@@ -485,6 +485,32 @@ int ctr_create_ltim(void *handle, int ltim, int ch, int size)
 }
 
 /**
+ * @brief Destroy an LTIM object on the current module
+ * @param A handle that was allocated in open
+ * @param ltim number to destroy
+ * @return Zero means success else -1 is returned on error, see errno
+ */
+int ctr_destroy_ltim(void *handle, int ltim)
+{
+	struct ctr_handle_s *h = handle;
+	CtrDrvrPtimBinding ptim;
+
+	ptim.EqpNum = ltim;
+	ptim.ModuleIndex = 0;
+	ptim.Counter = 0;
+	ptim.Size = 0;
+	ptim.StartIndex = 0;
+
+	if (ioctl(h->fd,CtrIoctlGET_PTIM_BINDING,&ptim) < 0)
+		return -1;
+
+	if (ioctl(h->fd,CtrIoctlDESTROY_PTIM_OBJECT,&ptim) < 0)
+		return -1;
+
+	return 0;
+}
+
+/**
  * @brief get a telegram
  * @param index into the array of telegrams 0..7
  * @param telegram point to a short array of at least size 32

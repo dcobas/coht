@@ -282,6 +282,14 @@ int ctr_get_ccv(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv);
 int ctr_create_ltim(void *handle, int ltim, int ch, int size);
 
 /**
+ * @brief Destroy an LTIM object on the current module
+ * @param A handle that was allocated in open
+ * @param ltim number to destroy
+ * @return Zero means success else -1 is returned on error, see errno
+ */
+int ctr_destroy_ltim(void *handle, int ltim);
+
+/**
  * @brief List LTIM objects
  * @param A handle that was allocated in open
  * @param Place where the list will be stored

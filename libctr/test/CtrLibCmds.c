@@ -1554,6 +1554,26 @@ CtrDrvrPtimBinding *ob = NULL;
 	 else if (c == 'q') return;
 	 else if (c == '?') printf("%s\n",eptim_help);
 	 else if (c == 'a') edit_ccvs(ob->EqpNum);
+
+	 else if (c == 'x') {
+	    nid = strtoul(cp,&ep,0);
+	    if (cp == ep) {
+	       fprintf(stderr,"libctrtest:Error:No PTIM ID defined\n");
+	       break;
+	    } cp = ep;
+
+	    if (ctr_destroy_ltim(h,nid) < 0) {
+	       perror("ctr_destroy_ltim");
+	       return;
+	    }
+	    if (ctr_list_ltim_objects(h,&obs) < 0) {
+	       perror("ctr_list_ltim_objects");
+	       return;
+	    }
+	    ob = &obs.Objects[0];
+	    break;
+	 }
+
 	 else if (c == 'y') {
 	    nid = strtoul(cp,&ep,0);
 	    if (cp == ep) {
