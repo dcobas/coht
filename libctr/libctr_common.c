@@ -211,18 +211,32 @@ int ctr_connect_payload(void *handle, int ctim, int payload)
 int ctr_disconnect(void *handle, CtrDrvrConnectionClass ctr_class, int mask)
 {
 	struct ctr_handle_s *h = handle;
-	CtrDrvrConnection con;
-	int mod;
+	CtrDrvrClientConnections ccon;
+	int i, pid, flg=0;
 
-	mod = ctr_get_module(handle);
-	if (mod < 0)
+	pid = getpid();
+	if (ctr_get_client_connections(handle,pid,&ccon) < 0)
 		return -1;
 
-	con.Module = mod;
-	con.EqpNum = mask;
-	con.EqpClass = ctr_class;
-	if (ioctl(h->fd,CtrIoctlDISCONNECT,&con) < 0)
-		return -1;
+	if (!mask) {
+		for (i=0; i<ccon.Size; i++)
+			if (ioctl(h->fd,CtrIoctlDISCONNECT,&ccon.Connections[i]) < 0)
+				return -1;
+	} else {
+		for (i=0; i<ccon.Size; i++) {
+			if ((ccon.Connections[i].EqpNum   == mask)
+			&&  (ccon.Connections[i].EqpClass == ctr_class)) {
+				if (ioctl(h->fd,CtrIoctlDISCONNECT,&ccon.Connections[i]) < 0)
+					return -1;
+				flg = 1;
+				break;
+			}
+		}
+		if (!flg) {
+			errno = ENOTCONN; /* The socket is not connected */
+			return -1;
+		}
+	}
 	return 0;
 }
 
