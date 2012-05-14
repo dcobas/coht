@@ -65,7 +65,7 @@ CtrDrvrHardwareType typ;
    printf("libctrtest: compiled %s %s\n",__DATE__,__TIME__);
 
    h = ctr_open(NULL);
-   if ((int) h < 0) {
+   if (h < 0) {
       perror("ctr_open");
       exit(1);
    }
