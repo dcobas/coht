@@ -46,34 +46,55 @@ clean:
 	rm -f libctrv.$(CPU).o
 	rm -f libctrv.$(CPU).so
 
-install: $(INSTFILES)
+install:
+	@echo -e "\nUse: install-all, install-lib, install-lab, install-oper, install-oplhc\n"
+
+install-all: install-lib install-lab install-oper install-oplhc
+
+install-lib: $(INSTFILES)
+	@echo -e "\nInstalling libctr.a in /acc/local/"$(CPU)"/tim"
 	dsc_install libctr.$(CPU).a /acc/local/$(CPU)/tim
 	rm -rf /acc/local/$(CPU)/tim/libctr.$(LDVER)
 	mkdir /acc/local/$(CPU)/tim/libctr.$(LDVER)
+	@echo "Installing libctr.a in /acc/local/"$(CPU)"tim/libctr."$(LDVER)
 	dsc_install libctr.$(CPU).a /acc/local/$(CPU)/tim/libctr.$(LDVER)
 	rm -f /acc/local/$(CPU)/ctr/libctr.h
+	@echo "Installing libctr.h in /acc/local/"$(CPU)"/ctr"
 	dsc_install libctr.h /acc/local/$(CPU)/ctr
+	@echo -e "Done install-lib\n"
+
+install-lab: $(INSTFILES)
+	@echo -e "\nInstalling libctrp.so and libctrv.so in lab"
 	rm -f /acc/dsc/lab/$(CPU)/$(KVER)/ctrp/libctrp.so.$(SOVER)
 	rm -f /acc/dsc/lab/$(CPU)/$(KVER)/ctrv/libctrv.so.$(SOVER)
-	rm -f /acc/dsc/oper/$(CPU)/$(KVER)/ctrp/libctrp.so.$(SOVER)
-	rm -f /acc/dsc/oper/$(CPU)/$(KVER)/ctrv/libctrv.so.$(SOVER)
-	rm -f /acc/dsc/oplhc/$(CPU)/$(KVER)/ctrp/libctrp.so.$(SOVER)
-	rm -f /acc/dsc/oplhc/$(CPU)/$(KVER)/ctrv/libctrv.so.$(SOVER)
 	rm -f /acc/dsc/lab/$(CPU)/$(KVER)/ctrp/libctrp.so
 	rm -f /acc/dsc/lab/$(CPU)/$(KVER)/ctrv/libctrv.so
-	rm -f /acc/dsc/oper/$(CPU)/$(KVER)/ctrp/libctrp.so
-	rm -f /acc/dsc/oper/$(CPU)/$(KVER)/ctrv/libctrv.so
-	rm -f /acc/dsc/oplhc/$(CPU)/$(KVER)/ctrp/libctrp.so
-	rm -f /acc/dsc/oplhc/$(CPU)/$(KVER)/ctrv/libctrv.so
 	cp libctrp.$(CPU).so /acc/dsc/lab/$(CPU)/$(KVER)/ctrp/libctrp.so.$(SOVER)
 	cp libctrv.$(CPU).so /acc/dsc/lab/$(CPU)/$(KVER)/ctrv/libctrv.so.$(SOVER)
-	cp libctrp.$(CPU).so /acc/dsc/oper/$(CPU)/$(KVER)/ctrp/libctrp.so.$(SOVER)
-	cp libctrv.$(CPU).so /acc/dsc/oper/$(CPU)/$(KVER)/ctrv/libctrv.so.$(SOVER)
-	cp libctrp.$(CPU).so /acc/dsc/oplhc/$(CPU)/$(KVER)/ctrp/libctrp.so.$(SOVER)
-	cp libctrv.$(CPU).so /acc/dsc/oplhc/$(CPU)/$(KVER)/ctrv/libctrv.so.$(SOVER)
 	ln -s /acc/dsc/lab/$(CPU)/$(KVER)/ctrp/libctrp.so.$(SOVER) /acc/dsc/lab/$(CPU)/$(KVER)/ctrp/libctrp.so
 	ln -s /acc/dsc/lab/$(CPU)/$(KVER)/ctrv/libctrv.so.$(SOVER) /acc/dsc/lab/$(CPU)/$(KVER)/ctrv/libctrv.so
+	@echo -e "Done install-lab\n"
+
+install-oper: $(INSTFILES)
+	@echo -e "\nInstalling libctrp.so and libctrv.so in oper"
+	rm -f /acc/dsc/oper/$(CPU)/$(KVER)/ctrp/libctrp.so.$(SOVER)
+	rm -f /acc/dsc/oper/$(CPU)/$(KVER)/ctrv/libctrv.so.$(SOVER)
+	rm -f /acc/dsc/oper/$(CPU)/$(KVER)/ctrp/libctrp.so
+	rm -f /acc/dsc/oper/$(CPU)/$(KVER)/ctrv/libctrv.so
+	cp libctrp.$(CPU).so /acc/dsc/oper/$(CPU)/$(KVER)/ctrp/libctrp.so.$(SOVER)
+	cp libctrv.$(CPU).so /acc/dsc/oper/$(CPU)/$(KVER)/ctrv/libctrv.so.$(SOVER)
 	ln -s /acc/dsc/oper/$(CPU)/$(KVER)/ctrp/libctrp.so.$(SOVER) /acc/dsc/oper/$(CPU)/$(KVER)/ctrp/libctrp.so
 	ln -s /acc/dsc/oper/$(CPU)/$(KVER)/ctrv/libctrv.so.$(SOVER) /acc/dsc/oper/$(CPU)/$(KVER)/ctrv/libctrv.so
+	@echo -e "Done install-oper\n"
+
+install-oplhc: $(INSTFILES)
+	@echo -e "\nInstalling libctrp.so and libctrv.so in oplhc"
+	rm -f /acc/dsc/oplhc/$(CPU)/$(KVER)/ctrp/libctrp.so.$(SOVER)
+	rm -f /acc/dsc/oplhc/$(CPU)/$(KVER)/ctrv/libctrv.so.$(SOVER)
+	rm -f /acc/dsc/oplhc/$(CPU)/$(KVER)/ctrp/libctrp.so
+	rm -f /acc/dsc/oplhc/$(CPU)/$(KVER)/ctrv/libctrv.so
+	cp libctrp.$(CPU).so /acc/dsc/oplhc/$(CPU)/$(KVER)/ctrp/libctrp.so.$(SOVER)
+	cp libctrv.$(CPU).so /acc/dsc/oplhc/$(CPU)/$(KVER)/ctrv/libctrv.so.$(SOVER)
 	ln -s /acc/dsc/oplhc/$(CPU)/$(KVER)/ctrp/libctrp.so.$(SOVER) /acc/dsc/oplhc/$(CPU)/$(KVER)/ctrp/libctrp.so
 	ln -s /acc/dsc/oplhc/$(CPU)/$(KVER)/ctrv/libctrv.so.$(SOVER) /acc/dsc/oplhc/$(CPU)/$(KVER)/ctrv/libctrv.so
+	@echo -e "Done install-oplhc\n"
