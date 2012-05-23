@@ -1126,12 +1126,17 @@ struct ctr_interrupt_s ctr_interrupt;
 	  ctr_interrupt.modnum,
 	  qsz);
 
-   printf("    :Onz:C%04d %s\n"
-	  "    :Trg:C%04d %s\n"
-	  "    :Str:C%04d %s\n",
-	  ctr_interrupt.onzero.CTrain,  time_to_string(&ctr_interrupt.onzero.Time),
-	  ctr_interrupt.trigger.CTrain, time_to_string(&ctr_interrupt.trigger.Time),
-	  ctr_interrupt.start.CTrain,   time_to_string(&ctr_interrupt.start.Time));
+   printf("    :Onz:C%04d %s\n",
+	  ctr_interrupt.onzero.CTrain,
+	  time_to_string(&ctr_interrupt.onzero.Time));
+
+   printf("    :Trg:C%04d %s\n",
+	  ctr_interrupt.trigger.CTrain,
+	  time_to_string(&ctr_interrupt.trigger.Time));
+
+   printf("    :Str:C%04d %s\n",
+	  ctr_interrupt.start.CTrain,
+	  time_to_string(&ctr_interrupt.start.Time));
 
    printf("\n");
    return arg;

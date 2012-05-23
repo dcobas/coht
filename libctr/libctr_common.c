@@ -331,7 +331,7 @@ int ctr_set_ccv(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv, ct
 		cnf->Start = ctr_ccv->start;
 
 	if (ctr_ccv_fields & CTR_CCV_MODE)
-		cnf->Start = ctr_ccv->mode;
+		cnf->Mode = ctr_ccv->mode;
 
 	if (ctr_ccv_fields & CTR_CCV_CLOCK)
 		cnf->Clock = ctr_ccv->clock;
@@ -446,7 +446,7 @@ int ctr_get_ccv(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv)
 
 	ctr_ccv->enable      = cnf->OnZero;
 	ctr_ccv->start       = cnf->Start;
-	ctr_ccv->mode        = cnf->Start;
+	ctr_ccv->mode        = cnf->Mode;
 	ctr_ccv->clock       = cnf->Clock;
 	ctr_ccv->pulse_width = cnf->PulsWidth;
 	ctr_ccv->delay       = cnf->Delay;

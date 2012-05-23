@@ -35,10 +35,10 @@
  */
 int ctr_ctime_to_unix(CtrDrvrTime *ctime, struct timeval *utime)
 {
-	float fus;
-	fus  = (ctime->TicksHPTDC / 0.256) * 1000.0;
+	double fus;
+	fus = ctime->TicksHPTDC / 2.56;
 	utime->tv_sec = ctime->Second;
-	utime->tv_usec = (suseconds_t) fus;
+	utime->tv_usec = (suseconds_t) (fus / 1000.0);
 	return 0;
 }
 
@@ -50,9 +50,9 @@ int ctr_ctime_to_unix(CtrDrvrTime *ctime, struct timeval *utime)
  */
 int ctr_unix_to_ctime(struct timeval *utime, CtrDrvrTime *ctime)
 {
-	float ftdc;
-	ftdc = (utime->tv_usec * 0.256) / 1000.0;
-	ctime->TicksHPTDC = (unsigned int) ftdc;
+	double ftdc;
+	ftdc = utime->tv_usec * 2.56;
+	ctime->TicksHPTDC = (unsigned int) (ftdc * 1000.0);
 	ctime->Second = utime->tv_sec;
 	return 0;
 }
