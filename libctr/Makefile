@@ -56,8 +56,9 @@ install-lib: $(INSTFILES)
 	dsc_install libctr.$(CPU).a /acc/local/$(CPU)/tim
 	rm -rf /acc/local/$(CPU)/tim/libctr.$(LDVER)
 	mkdir /acc/local/$(CPU)/tim/libctr.$(LDVER)
-	@echo "Installing libctr.a in /acc/local/"$(CPU)"tim/libctr."$(LDVER)
+	@echo "Installing libctr.a and libctr.h in /acc/local/"$(CPU)"tim/libctr."$(LDVER)
 	dsc_install libctr.$(CPU).a /acc/local/$(CPU)/tim/libctr.$(LDVER)
+	dsc_install libctr.h /acc/local/$(CPU)/tim/libctr.$(LDVER)
 	rm -f /acc/local/$(CPU)/ctr/libctr.h
 	@echo "Installing libctr.h in /acc/local/"$(CPU)"/ctr"
 	dsc_install libctr.h /acc/local/$(CPU)/ctr
