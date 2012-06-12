@@ -191,7 +191,7 @@ void *ctr_open(char *version)
 	for (i=0; i<CTR_INDEX_LAST; i++) {
 		ptr[i] = (unsigned long) dlsym(h->dll_handle, ctr_api_names[i]);
 		if (!ptr[i]) {
-			fprintf(stderr,"ctr_open:%s\n",dlerror());
+			// fprintf(stderr,"ctr_open:%s\n",dlerror());
 			ptr[i] = (unsigned long) ctr_not_implemented;
 		}
 	}
