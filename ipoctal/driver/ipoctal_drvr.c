@@ -478,6 +478,7 @@ static int ipoctal_install_all(void)
 		tty->init_termios.c_cflag = B9600 | CS8 | CREAD | HUPCL | CLOCAL;
 		tty->init_termios.c_ispeed = 9600;
 		tty->init_termios.c_ospeed = 9600;
+		tty->init_termios.c_iflag = tty_std_termios.c_iflag | IGNBRK;
 
 		tty_set_operations(tty, &ipoctalFops);
 		res = tty_register_driver(tty);
@@ -752,9 +753,12 @@ void ipoctal_set_termios(struct tty_struct *tty, struct ktermios *old_termios)
 	unsigned char mr1 = 0;
 	unsigned char mr2 = 0;
 	unsigned char csr = 0;
+ 	unsigned char imr = 0;
+ 	unsigned char imr_brk = 0;
 	unsigned int channel = tty->index;
 	int index = *(int *)tty->driver_data;
 	struct ipoctal *ipoctal;
+ 	int block = channel / 2;
 
 	ipoctal = &ipoctal_installed[index];
 
@@ -881,6 +885,25 @@ void ipoctal_set_termios(struct tty_struct *tty, struct ktermios *old_termios)
 		return;
 	}
 
+ 	/* Set ignore break status */
+ 	imr = ipoctal_read_io_reg(
+ 			ipoctal,
+ 			&ipoctal->block_regs[block].u.w.imr);
+ 	
+ 	if((channel % 2) == 1)
+ 		imr_brk = IMR_DELTA_BREAK_B;
+ 	else
+ 		imr_brk = IMR_DELTA_BREAK_A;
+ 	
+ 	if (I_IGNBRK(tty))
+ 		imr &= ~imr_brk;
+ 	else
+ 		imr |= imr_brk;
+ 	
+ 	ipoctal_write_io_reg(
+ 		ipoctal,
+ 		&ipoctal->block_regs[block].u.w.imr, imr);
+ 
 	mr1 |= MR1_ERROR_CHAR;
 	mr1 |= MR1_RxINT_RxRDY;
 
