@@ -28,6 +28,7 @@ video                  /usr/local/bin/                      ;Displays telegrams
 pllplot                /usr/local/drivers/ctr/              ;Plot instructions for PLL plot
 Vhdl.versions          /usr/local/drivers/ctr/              ;Latest VHDL version numbers
 CtrVhdlUpdateRequired  /dsc/data/ctr/                       ;Modules needing VHDL update
+CtrVersionHistory      /dsc/data/ctr/                       ;History of CTR VHDL updates
 ltim.obnames           /tmp/                                ;Names of ltims
 TimLookat              /usr/local/bin/                      ;Look at a timing with timlib
 AqLog                  /dsc/local/tmp/                      ;Acquisition log file

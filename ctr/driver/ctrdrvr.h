@@ -10,8 +10,8 @@
 #ifndef CTRDRVR
 #define CTRDRVR
 
-#include <ctrhard.h>   /* Hardware interface for expert and diagnostic clients */
-#include <hptdc.h>     /* HPTDC (Time to Digital Convertor) definitions */
+#include "ctrhard.h"   /* Hardware interface for expert and diagnostic clients */
+#include "hptdc.h"     /* HPTDC (Time to Digital Convertor) definitions */
 
 /* Maximum number of simultaneous clients for driver */
 
@@ -415,4 +415,216 @@ typedef enum {
    CtrDrvrLAST_IOCTL
 
  } CtrDrvrControlFunction;
+#endif
+
+/*
+ * Set up the IOCTL numbers
+ */
+
+#ifdef __linux__
+
+#define MAGIC 'C'
+
+#define CIO(nr)      _IO(MAGIC,nr)
+#define CIOR(nr,sz)  _IOR(MAGIC,nr,sz)
+#define CIOW(nr,sz)  _IOW(MAGIC,nr,sz)
+#define CIOWR(nr,sz) _IOWR(MAGIC,nr,sz)
+
+#define CtrIoctlSET_SW_DEBUG                   CIOWR(CtrDrvrSET_SW_DEBUG           ,unsigned long)
+#define CtrIoctlGET_SW_DEBUG                   CIOWR(CtrDrvrGET_SW_DEBUG           ,unsigned long)
+#define CtrIoctlGET_VERSION                    CIOWR(CtrDrvrGET_VERSION            ,CtrDrvrVersion)
+#define CtrIoctlSET_TIMEOUT                    CIOWR(CtrDrvrSET_TIMEOUT            ,unsigned long)
+#define CtrIoctlGET_TIMEOUT                    CIOWR(CtrDrvrGET_TIMEOUT            ,unsigned long)
+#define CtrIoctlSET_QUEUE_FLAG                 CIOWR(CtrDrvrSET_QUEUE_FLAG         ,unsigned long)
+#define CtrIoctlGET_QUEUE_FLAG                 CIOWR(CtrDrvrGET_QUEUE_FLAG         ,unsigned long)
+#define CtrIoctlGET_QUEUE_SIZE                 CIOWR(CtrDrvrGET_QUEUE_SIZE         ,unsigned long)
+#define CtrIoctlGET_QUEUE_OVERFLOW             CIOWR(CtrDrvrGET_QUEUE_OVERFLOW     ,unsigned long)
+#define CtrIoctlGET_MODULE_DESCRIPTOR          CIOWR(CtrDrvrGET_MODULE_DESCRIPTOR  ,CtrDrvrModuleAddress)
+#define CtrIoctlSET_MODULE                     CIOWR(CtrDrvrSET_MODULE             ,unsigned long)
+#define CtrIoctlGET_MODULE                     CIOWR(CtrDrvrGET_MODULE             ,unsigned long)
+#define CtrIoctlGET_MODULE_COUNT               CIOWR(CtrDrvrGET_MODULE_COUNT       ,unsigned long)
+#define CtrIoctlRESET                          CIOWR(CtrDrvrRESET                  ,unsigned long)
+#define CtrIoctlENABLE                         CIOWR(CtrDrvrENABLE                 ,unsigned long)
+#define CtrIoctlGET_STATUS                     CIOWR(CtrDrvrGET_STATUS             ,unsigned long)
+#define CtrIoctlGET_INPUT_DELAY                CIOWR(CtrDrvrGET_INPUT_DELAY        ,unsigned long)
+#define CtrIoctlSET_INPUT_DELAY                CIOWR(CtrDrvrSET_INPUT_DELAY        ,unsigned long)
+#define CtrIoctlGET_CLIENT_LIST                CIOWR(CtrDrvrGET_CLIENT_LIST        ,CtrDrvrClientList)
+#define CtrIoctlCONNECT                        CIOWR(CtrDrvrCONNECT                ,CtrDrvrConnection)
+#define CtrIoctlDISCONNECT                     CIOWR(CtrDrvrDISCONNECT             ,CtrDrvrConnection)
+#define CtrIoctlGET_CLIENT_CONNECTIONS         CIOWR(CtrDrvrGET_CLIENT_CONNECTIONS ,CtrDrvrClientConnections)
+#define CtrIoctlSET_UTC                        CIOWR(CtrDrvrSET_UTC                ,CtrDrvrCTime)
+#define CtrIoctlGET_UTC                        CIOWR(CtrDrvrGET_UTC                ,CtrDrvrCTime)
+#define CtrIoctlGET_CABLE_ID                   CIOWR(CtrDrvrGET_CABLE_ID           ,unsigned long)
+#define CtrIoctlGET_ACTION                     CIOWR(CtrDrvrGET_ACTION             ,CtrDrvrAction)
+#define CtrIoctlSET_ACTION                     CIOWR(CtrDrvrSET_ACTION             ,CtrDrvrAction)
+#define CtrIoctlCREATE_CTIM_OBJECT             CIOWR(CtrDrvrCREATE_CTIM_OBJECT     ,CtrDrvrCtimBinding)
+#define CtrIoctlDESTROY_CTIM_OBJECT            CIOWR(CtrDrvrDESTROY_CTIM_OBJECT    ,CtrDrvrCtimBinding)
+#define CtrIoctlLIST_CTIM_OBJECTS              CIOWR(CtrDrvrLIST_CTIM_OBJECTS      ,CtrDrvrCtimObjects) // too big
+#define CtrIoctlCHANGE_CTIM_FRAME              CIOWR(CtrDrvrCHANGE_CTIM_FRAME      ,CtrDrvrCtimBinding)
+#define CtrIoctlCREATE_PTIM_OBJECT             CIOWR(CtrDrvrCREATE_PTIM_OBJECT     ,CtrDrvrPtimBinding)
+#define CtrIoctlDESTROY_PTIM_OBJECT            CIOWR(CtrDrvrDESTROY_PTIM_OBJECT    ,CtrDrvrPtimBinding)
+#define CtrIoctlLIST_PTIM_OBJECTS              CIOWR(CtrDrvrLIST_PTIM_OBJECTS      ,CtrDrvrPtimObjects)
+#define CtrIoctlGET_PTIM_BINDING               CIOWR(CtrDrvrGET_PTIM_BINDING       ,CtrDrvrPtimBinding)
+#define CtrIoctlGET_OUT_MASK                   CIOWR(CtrDrvrGET_OUT_MASK           ,CtrDrvrCounterMaskBuf)
+#define CtrIoctlSET_OUT_MASK                   CIOWR(CtrDrvrSET_OUT_MASK           ,CtrDrvrCounterMaskBuf)
+#define CtrIoctlGET_COUNTER_HISTORY            CIOWR(CtrDrvrGET_COUNTER_HISTORY    ,CtrDrvrCounterHistoryBuf)
+#define CtrIoctlGET_REMOTE                     CIOWR(CtrDrvrGET_REMOTE             ,CtrdrvrRemoteCommandBuf)
+#define CtrIoctlSET_REMOTE                     CIOWR(CtrDrvrSET_REMOTE             ,CtrdrvrRemoteCommandBuf)
+#define CtrIoctlREMOTE                         CIOWR(CtrDrvrREMOTE                 ,CtrdrvrRemoteCommandBuf)
+#define CtrIoctlGET_CONFIG                     CIOWR(CtrDrvrGET_CONFIG             ,CtrDrvrCounterConfigurationBuf)
+#define CtrIoctlSET_CONFIG                     CIOWR(CtrDrvrSET_CONFIG             ,CtrDrvrCounterConfigurationBuf)
+#define CtrIoctlGET_PLL                        CIOWR(CtrDrvrGET_PLL                ,CtrDrvrPll)
+#define CtrIoctlSET_PLL                        CIOWR(CtrDrvrSET_PLL                ,CtrDrvrPll)
+#define CtrIoctlSET_PLL_ASYNC_PERIOD           CIOWR(CtrDrvrSET_PLL_ASYNC_PERIOD   ,CtrDrvrPllAsyncPeriodNs)
+#define CtrIoctlGET_PLL_ASYNC_PERIOD           CIOWR(CtrDrvrGET_PLL_ASYNC_PERIOD   ,CtrDrvrPllAsyncPeriodNs)
+#define CtrIoctlREAD_TELEGRAM                  CIOWR(CtrDrvrREAD_TELEGRAM          ,CtrDrvrTgmBuf)
+#define CtrIoctlREAD_EVENT_HISTORY             CIOWR(CtrDrvrREAD_EVENT_HISTORY     ,CtrDrvrEventHistory) // too big
+#define CtrIoctlJTAG_OPEN                      CIOWR(CtrDrvrJTAG_OPEN              ,unsigned long)
+#define CtrIoctlJTAG_READ_BYTE                 CIOWR(CtrDrvrJTAG_READ_BYTE         ,unsigned long)
+#define CtrIoctlJTAG_WRITE_BYTE                CIOWR(CtrDrvrJTAG_WRITE_BYTE        ,unsigned long)
+#define CtrIoctlJTAG_CLOSE                     CIOWR(CtrDrvrJTAG_CLOSE             ,unsigned long)
+#define CtrIoctlHPTDC_OPEN                     CIOWR(CtrDrvrHPTDC_OPEN             ,unsigned long)
+#define CtrIoctlHPTDC_IO                       CIOWR(CtrDrvrHPTDC_IO               ,CtrDrvrHptdcIoBuf)
+#define CtrIoctlHPTDC_CLOSE                    CIOWR(CtrDrvrHPTDC_CLOSE            ,unsigned long)
+#define CtrIoctlRAW_READ                       CIOWR(CtrDrvrRAW_READ               ,CtrDrvrRawIoBlock)
+#define CtrIoctlRAW_WRITE                      CIOWR(CtrDrvrRAW_WRITE              ,CtrDrvrRawIoBlock)
+#define CtrIoctlGET_RECEPTION_ERRORS           CIOWR(CtrDrvrGET_RECEPTION_ERRORS   ,CtrDrvrReceptionErrors)
+#define CtrIoctlGET_IO_STATUS                  CIOWR(CtrDrvrGET_IO_STATUS          ,unsigned long)
+#define CtrIoctlGET_IDENTITY                   CIOWR(CtrDrvrGET_IDENTITY           ,CtrDrvrBoardId)
+#define CtrIoctlSET_DEBUG_HISTORY              CIOWR(CtrDrvrSET_DEBUG_HISTORY      ,unsigned long)
+#define CtrIoctlSET_BRUTAL_PLL                 CIOWR(CtrDrvrSET_BRUTAL_PLL         ,unsigned long)
+#define CtrIoctlGET_MODULE_STATS               CIOWR(CtrDrvrGET_MODULE_STATS       ,CtrDrvrModuleStats)
+#define CtrIoctlSET_CABLE_ID                   CIOWR(CtrDrvrSET_CABLE_ID           ,unsigned long)
+#define CtrIoctlIOCTL_64                       CIOWR(CtrDrvrIOCTL_64               ,unsigned long)
+#define CtrIoctlIOCTL_65                       CIOWR(CtrDrvrIOCTL_65               ,unsigned long)
+#define CtrIoctlIOCTL_66                       CIOWR(CtrDrvrIOCTL_66               ,unsigned long)
+#define CtrIoctlIOCTL_67                       CIOWR(CtrDrvrIOCTL_67               ,unsigned long)
+#define CtrIoctlIOCTL_68                       CIOWR(CtrDrvrIOCTL_68               ,unsigned long)
+#define CtrIoctlIOCTL_69                       CIOWR(CtrDrvrIOCTL_69               ,unsigned long)
+
+#ifdef CTR_VME
+#define CtrIoctlGET_OUTPUT_BYTE                CIOWR(CtrDrvrGET_OUTPUT_BYTE        ,unsigned long)
+#define CtrIoctlSET_OUTPUT_BYTE                CIOWR(CtrDrvrSET_OUTPUT_BYTE        ,unsigned long)
+#endif
+
+#ifdef CTR_PCI
+#define CtrIoctlSET_MODULE_BY_SLOT             CIOWR(CtrDrvrSET_MODULE_BY_SLOT     ,unsigned long)
+#define CtrIoctlGET_MODULE_SLOT                CIOWR(CtrDrvrGET_MODULE_SLOT        ,unsigned long)
+#define CtrIoctlREMAP                          CIOWR(CtrDrvrREMAP                  ,unsigned long)
+#define CtrIoctl93LC56B_EEPROM_OPEN            CIOWR(CtrDrvr93LC56B_EEPROM_OPEN    ,unsigned long)
+#define CtrIoctl93LC56B_EEPROM_READ            CIOWR(CtrDrvr93LC56B_EEPROM_READ    ,CtrDrvrRawIoBlock)
+#define CtrIoctl93LC56B_EEPROM_WRITE           CIOWR(CtrDrvr93LC56B_EEPROM_WRITE   ,CtrDrvrRawIoBlock)
+#define CtrIoctl93LC56B_EEPROM_ERASE           CIOWR(CtrDrvr93LC56B_EEPROM_ERASE   ,unsigned long)
+#define CtrIoctl93LC56B_EEPROM_CLOSE           CIOWR(CtrDrvr93LC56B_EEPROM_CLOSE   ,unsigned long)
+#define CtrIoctlPLX9030_RECONFIGURE            CIOWR(CtrDrvrPLX9030_RECONFIGURE    ,unsigned long)
+#define CtrIoctlPLX9030_CONFIG_OPEN            CIOWR(CtrDrvrPLX9030_CONFIG_OPEN    ,unsigned long)
+#define CtrIoctlPLX9030_CONFIG_READ            CIOWR(CtrDrvrPLX9030_CONFIG_READ    ,CtrDrvrRawIoBlock)
+#define CtrIoctlPLX9030_CONFIG_WRITE           CIOWR(CtrDrvrPLX9030_CONFIG_WRITE   ,CtrDrvrRawIoBlock)
+#define CtrIoctlPLX9030_CONFIG_CLOSE           CIOWR(CtrDrvrPLX9030_CONFIG_CLOSE   ,unsigned long)
+#define CtrIoctlPLX9030_LOCAL_OPEN             CIOWR(CtrDrvrPLX9030_LOCAL_OPEN     ,unsigned long)
+#define CtrIoctlPLX9030_LOCAL_READ             CIOWR(CtrDrvrPLX9030_LOCAL_READ     ,CtrDrvrRawIoBlock)
+#define CtrIoctlPLX9030_LOCAL_WRITE            CIOWR(CtrDrvrPLX9030_LOCAL_WRITE    ,CtrDrvrRawIoBlock)
+#define CtrIoctlPLX9030_LOCAL_CLOSE            CIOWR(CtrDrvrPLX9030_LOCAL_CLOSE    ,unsigned long)
+#endif
+
+
+#else
+
+#define CtrIoctlSET_SW_DEBUG                   CtrDrvrSET_SW_DEBUG
+#define CtrIoctlGET_SW_DEBUG                   CtrDrvrGET_SW_DEBUG
+#define CtrIoctlGET_VERSION                    CtrDrvrGET_VERSION
+#define CtrIoctlSET_TIMEOUT                    CtrDrvrSET_TIMEOUT
+#define CtrIoctlGET_TIMEOUT                    CtrDrvrGET_TIMEOUT
+#define CtrIoctlSET_QUEUE_FLAG                 CtrDrvrSET_QUEUE_FLAG
+#define CtrIoctlGET_QUEUE_FLAG                 CtrDrvrGET_QUEUE_FLAG
+#define CtrIoctlGET_QUEUE_SIZE                 CtrDrvrGET_QUEUE_SIZE
+#define CtrIoctlGET_QUEUE_OVERFLOW             CtrDrvrGET_QUEUE_OVERFLOW
+#define CtrIoctlGET_MODULE_DESCRIPTOR          CtrDrvrGET_MODULE_DESCRIPTOR
+#define CtrIoctlSET_MODULE                     CtrDrvrSET_MODULE
+#define CtrIoctlGET_MODULE                     CtrDrvrGET_MODULE
+#define CtrIoctlGET_MODULE_COUNT               CtrDrvrGET_MODULE_COUNT
+#define CtrIoctlRESET                          CtrDrvrRESET
+#define CtrIoctlENABLE                         CtrDrvrENABLE
+#define CtrIoctlGET_STATUS                     CtrDrvrGET_STATUS
+#define CtrIoctlGET_INPUT_DELAY                CtrDrvrGET_INPUT_DELAY
+#define CtrIoctlSET_INPUT_DELAY                CtrDrvrSET_INPUT_DELAY
+#define CtrIoctlGET_CLIENT_LIST                CtrDrvrGET_CLIENT_LIST
+#define CtrIoctlCONNECT                        CtrDrvrCONNECT
+#define CtrIoctlDISCONNECT                     CtrDrvrDISCONNECT
+#define CtrIoctlGET_CLIENT_CONNECTIONS         CtrDrvrGET_CLIENT_CONNECTIONS
+#define CtrIoctlSET_UTC                        CtrDrvrSET_UTC
+#define CtrIoctlGET_UTC                        CtrDrvrGET_UTC
+#define CtrIoctlGET_CABLE_ID                   CtrDrvrGET_CABLE_ID
+#define CtrIoctlGET_ACTION                     CtrDrvrGET_ACTION
+#define CtrIoctlSET_ACTION                     CtrDrvrSET_ACTION
+#define CtrIoctlCREATE_CTIM_OBJECT             CtrDrvrCREATE_CTIM_OBJECT
+#define CtrIoctlDESTROY_CTIM_OBJECT            CtrDrvrDESTROY_CTIM_OBJECT
+#define CtrIoctlLIST_CTIM_OBJECTS              CtrDrvrLIST_CTIM_OBJECTS
+#define CtrIoctlCHANGE_CTIM_FRAME              CtrDrvrCHANGE_CTIM_FRAME
+#define CtrIoctlCREATE_PTIM_OBJECT             CtrDrvrCREATE_PTIM_OBJECT
+#define CtrIoctlDESTROY_PTIM_OBJECT            CtrDrvrDESTROY_PTIM_OBJECT
+#define CtrIoctlLIST_PTIM_OBJECTS              CtrDrvrLIST_PTIM_OBJECTS
+#define CtrIoctlGET_PTIM_BINDING               CtrDrvrGET_PTIM_BINDING
+#define CtrIoctlGET_OUT_MASK                   CtrDrvrGET_OUT_MASK
+#define CtrIoctlSET_OUT_MASK                   CtrDrvrSET_OUT_MASK
+#define CtrIoctlGET_COUNTER_HISTORY            CtrDrvrGET_COUNTER_HISTORY
+#define CtrIoctlGET_REMOTE                     CtrDrvrGET_REMOTE
+#define CtrIoctlSET_REMOTE                     CtrDrvrSET_REMOTE
+#define CtrIoctlREMOTE                         CtrDrvrREMOTE
+#define CtrIoctlGET_CONFIG                     CtrDrvrGET_CONFIG
+#define CtrIoctlSET_CONFIG                     CtrDrvrSET_CONFIG
+#define CtrIoctlGET_PLL                        CtrDrvrGET_PLL
+#define CtrIoctlSET_PLL                        CtrDrvrSET_PLL
+#define CtrIoctlSET_PLL_ASYNC_PERIOD           CtrDrvrSET_PLL_ASYNC_PERIOD
+#define CtrIoctlGET_PLL_ASYNC_PERIOD           CtrDrvrGET_PLL_ASYNC_PERIOD
+#define CtrIoctlREAD_TELEGRAM                  CtrDrvrREAD_TELEGRAM
+#define CtrIoctlREAD_EVENT_HISTORY             CtrDrvrREAD_EVENT_HISTORY
+#define CtrIoctlJTAG_OPEN                      CtrDrvrJTAG_OPEN
+#define CtrIoctlJTAG_READ_BYTE                 CtrDrvrJTAG_READ_BYTE
+#define CtrIoctlJTAG_WRITE_BYTE                CtrDrvrJTAG_WRITE_BYTE
+#define CtrIoctlJTAG_CLOSE                     CtrDrvrJTAG_CLOSE
+#define CtrIoctlHPTDC_OPEN                     CtrDrvrHPTDC_OPEN
+#define CtrIoctlHPTDC_IO                       CtrDrvrHPTDC_IO
+#define CtrIoctlHPTDC_CLOSE                    CtrDrvrHPTDC_CLOSE
+#define CtrIoctlRAW_READ                       CtrDrvrRAW_READ
+#define CtrIoctlRAW_WRITE                      CtrDrvrRAW_WRITE
+#define CtrIoctlGET_RECEPTION_ERRORS           CtrDrvrGET_RECEPTION_ERRORS
+#define CtrIoctlGET_IO_STATUS                  CtrDrvrGET_IO_STATUS
+#define CtrIoctlGET_IDENTITY                   CtrDrvrGET_IDENTITY
+#define CtrIoctlSET_DEBUG_HISTORY              CtrDrvrSET_DEBUG_HISTORY
+#define CtrIoctlSET_BRUTAL_PLL                 CtrDrvrSET_BRUTAL_PLL
+#define CtrIoctlGET_MODULE_STATS               CtrDrvrGET_MODULE_STATS
+#define CtrIoctlSET_CABLE_ID                   CtrDrvrSET_CABLE_ID
+#define CtrIoctlIOCTL_64                       CtrDrvrIOCTL_64
+#define CtrIoctlIOCTL_65                       CtrDrvrIOCTL_65
+#define CtrIoctlIOCTL_66                       CtrDrvrIOCTL_66
+#define CtrIoctlIOCTL_67                       CtrDrvrIOCTL_67
+#define CtrIoctlIOCTL_68                       CtrDrvrIOCTL_68
+#define CtrIoctlIOCTL_69                       CtrDrvrIOCTL_69
+
+#ifdef CTR_VME
+#define CtrIoctlGET_OUTPUT_BYTE                CtrDrvrGET_OUTPUT_BYTE
+#define CtrIoctlSET_OUTPUT_BYTE                CtrDrvrSET_OUTPUT_BYTE
+#endif
+
+#ifdef CTR_PCI
+#define CtrIoctlSET_MODULE_BY_SLOT             CtrDrvrSET_MODULE_BY_SLOT
+#define CtrIoctlGET_MODULE_SLOT                CtrDrvrGET_MODULE_SLOT
+#define CtrIoctlREMAP                          CtrDrvrREMAP
+#define CtrIoctl93LC56B_EEPROM_OPEN            CtrDrvr93LC56B_EEPROM_OPEN
+#define CtrIoctl93LC56B_EEPROM_READ            CtrDrvr93LC56B_EEPROM_READ
+#define CtrIoctl93LC56B_EEPROM_WRITE           CtrDrvr93LC56B_EEPROM_WRITE
+#define CtrIoctl93LC56B_EEPROM_ERASE           CtrDrvr93LC56B_EEPROM_ERASE
+#define CtrIoctl93LC56B_EEPROM_CLOSE           CtrDrvr93LC56B_EEPROM_CLOSE
+#define CtrIoctlPLX9030_RECONFIGURE            CtrDrvrPLX9030_RECONFIGURE
+#define CtrIoctlPLX9030_CONFIG_OPEN            CtrDrvrPLX9030_CONFIG_OPEN
+#define CtrIoctlPLX9030_CONFIG_READ            CtrDrvrPLX9030_CONFIG_READ
+#define CtrIoctlPLX9030_CONFIG_WRITE           CtrDrvrPLX9030_CONFIG_WRITE
+#define CtrIoctlPLX9030_CONFIG_CLOSE           CtrDrvrPLX9030_CONFIG_CLOSE
+#define CtrIoctlPLX9030_LOCAL_OPEN             CtrDrvrPLX9030_LOCAL_OPEN
+#define CtrIoctlPLX9030_LOCAL_READ             CtrDrvrPLX9030_LOCAL_READ
+#define CtrIoctlPLX9030_LOCAL_WRITE            CtrDrvrPLX9030_LOCAL_WRITE
+#define CtrIoctlPLX9030_LOCAL_CLOSE            CtrDrvrPLX9030_LOCAL_CLOSE
+#endif
+
 #endif

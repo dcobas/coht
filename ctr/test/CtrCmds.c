@@ -55,8 +55,8 @@ int xsvf_iDebugLevel = 0;
 static Plx9030Eprom eeprom;
 #endif
 
-static int module = 1;
-static int channel = CtrDrvrCounter1;
+static long module = 1;
+static long channel = CtrDrvrCounter1;
 
 static char *editor = "e";
 
@@ -138,7 +138,7 @@ int i, j;
 
 /**************************************************************************/
 
-static void IErr(char *name, int *value) {
+static void IErr(char *name, long *value) {
 
    if (value != NULL)
       printf("CtrDrvr: [%02d] ioctl=%s arg=%d :Error\n",
@@ -238,7 +238,7 @@ unsigned int nl, nr;
 /*    the format is: Thu-18/Jan/2001 08:25:14.967                         */
 /*                   day-dd/mon/yyyy hh:mm:ss.ddd                         */
 
-volatile char *TimeToStr(CtrDrvrTime *t, int hpflag) {
+char *TimeToStr(CtrDrvrTime *t, int hpflag) {
 
 static char tbuf[128];
 
@@ -246,13 +246,15 @@ char tmp[128];
 char *yr, *ti, *md, *mn, *dy;
 double ms;
 double fms;
+time_t tsec;
 
     bzero((void *) tbuf, 128);
     bzero((void *) tmp, 128);
 
     if (t->Second) {
 
-	ctime_r ((time_t *) &t->Second, tmp);  /* Day Mon DD HH:MM:SS YYYY\n\0 */
+	tsec = t->Second;
+	ctime_r ((time_t *) &tsec, tmp);  /* Day Mon DD HH:MM:SS YYYY\n\0 */
 
         tmp[3] = 0;
         dy = &(tmp[0]);
@@ -440,7 +442,7 @@ int n, earg;
 int Module(int arg) {
 ArgVal   *v;
 AtomType  at;
-int mod, cnt, cbl;
+long mod, cnt, cbl;
 CtrDrvrModuleAddress moad;
 
 #ifdef PS_VER
@@ -456,7 +458,7 @@ int wrc;
       arg++;
       if (v->Number) {
 	 mod = v->Number;
-	 if (ioctl(ctr,CtrDrvrSET_MODULE,&mod) < 0) {
+	 if (ioctl(ctr,CtrIoctlSET_MODULE,&mod) < 0) {
 	    IErr("SET_MODULE",&mod);
 	    return arg;
 	 }
@@ -464,21 +466,21 @@ int wrc;
       module = mod;
    }
 
-   if (ioctl(ctr,CtrDrvrGET_MODULE_COUNT,&cnt) < 0) {
+   if (ioctl(ctr,CtrIoctlGET_MODULE_COUNT,&cnt) < 0) {
       IErr("GET_MODULE_COUNT",NULL);
       return arg;
    }
 
    for (mod=1; mod<=cnt; mod++) {
-      if (ioctl(ctr,CtrDrvrSET_MODULE,&mod) < 0) {
+      if (ioctl(ctr,CtrIoctlSET_MODULE,&mod) < 0) {
 	 IErr("SET_MODULE",&mod);
 	 return arg;
       }
-      if (ioctl(ctr,CtrDrvrGET_MODULE_DESCRIPTOR,&moad) < 0) {
+      if (ioctl(ctr,CtrIoctlGET_MODULE_DESCRIPTOR,&moad) < 0) {
 	 IErr("GET_MODULE_DESCRIPTOR",NULL);
 	 return arg;
       }
-      if (ioctl(ctr,CtrDrvrGET_CABLE_ID,&cbl) < 0) {
+      if (ioctl(ctr,CtrIoctlGET_CABLE_ID,&cbl) < 0) {
 	 IErr("GET_CABLE_ID",NULL);
 	 return arg;
       }
@@ -499,9 +501,9 @@ int wrc;
 #endif
 
 #ifdef CTR_VME
-      printf("VME:0x%08x JTAG:0x%08x Vec:0x%02x Lvl:%1d ",
-	     (int) moad.VMEAddress,
-	     (int) moad.JTGAddress,
+      printf("VME:0x%p JTAG:0x%p Vec:0x%02x Lvl:%1d ",
+	     moad.VMEAddress,
+	     moad.JTGAddress,
 	     (int) moad.InterruptVector,
 	     (int) moad.InterruptLevel);
 #endif
@@ -513,18 +515,18 @@ int wrc;
 	 printf("Cable:%s Tgm:%s",cblnam,TgmGetMachineName(mch));
       } else {
 	 wrc = cbl;
-	 printf("Cable:Wrong:%d",cbl);
+	 printf("Cable:Wrong:%d",(int) cbl);
       }
       if (mod == module) printf("<==");
       printf("\n");
 
       if (wrc) printf("ERROR: CONFIGURATION: Cable:%d Incompatible TGM NETWORK setting\n", wrc);
 #else
-      printf("Cable:%d\n",cbl);
+      printf("Cable:%d\n",(int) cbl);
 #endif
 
    }
-   ioctl(ctr,CtrDrvrSET_MODULE,&module);
+   ioctl(ctr,CtrIoctlSET_MODULE,&module);
 
    return arg;
 }
@@ -532,17 +534,17 @@ int wrc;
 /*****************************************************************/
 
 int NextModule(int arg) {
-int cnt;
+long cnt;
 
    arg++;
 
-   ioctl(ctr,CtrDrvrGET_MODULE_COUNT,&cnt);
+   ioctl(ctr,CtrIoctlGET_MODULE_COUNT,&cnt);
    if (module >= cnt) {
       module = 1;
-      ioctl(ctr,CtrDrvrSET_MODULE,&module);
+      ioctl(ctr,CtrIoctlSET_MODULE,&module);
    } else {
       module ++;
-      ioctl(ctr,CtrDrvrSET_MODULE,&module);
+      ioctl(ctr,CtrIoctlSET_MODULE,&module);
    }
 
    return arg;
@@ -563,17 +565,17 @@ int NextChannel(int arg) {
 /*****************************************************************/
 
 int PrevModule(int arg) {
-int cnt;
+long cnt;
 
    arg++;
 
-   ioctl(ctr,CtrDrvrGET_MODULE_COUNT,&cnt);
+   ioctl(ctr,CtrIoctlGET_MODULE_COUNT,&cnt);
    if (module > 1) {
       module --;
-      ioctl(ctr,CtrDrvrSET_MODULE,&module);
+      ioctl(ctr,CtrIoctlSET_MODULE,&module);
    } else {
       module = cnt;
-      ioctl(ctr,CtrDrvrSET_MODULE,&module);
+      ioctl(ctr,CtrIoctlSET_MODULE,&module);
    }
 
    return arg;
@@ -596,7 +598,7 @@ int PrevChannel(int arg) {
 int GetSetChannel(int arg) {
 ArgVal   *v;
 AtomType  at;
-int ch;
+long ch;
 
    arg++;
    v = &(vals[arg]);
@@ -607,10 +609,10 @@ int ch;
       if ((ch >= CtrDrvrCounter1) && (ch <= CHANNELS)) {
 	 channel = ch;
       } else {
-	 printf("Error: Illegal counter number: %d\n",ch);
+	 printf("Error: Illegal counter number: %d\n",(int) ch);
       }
    }
-   printf("Active Counter: %d\n",channel);
+   printf("Active Counter: %d\n",(int) channel);
    return arg;
 }
 
@@ -619,7 +621,7 @@ int ch;
 int SwDeb(int arg) { /* Arg!=0 => On, else Off */
 ArgVal   *v;
 AtomType  at;
-int debug;
+long debug;
 
    arg++;
    v = &(vals[arg]);
@@ -628,20 +630,20 @@ int debug;
       arg++;
       if (v->Number) debug = v->Number;
       else           debug = 0;
-      if (ioctl(ctr,CtrDrvrSET_SW_DEBUG,&debug) < 0) {
+      if (ioctl(ctr,CtrIoctlSET_SW_DEBUG,&debug) < 0) {
 	 IErr("SET_SW_DEBUG",&debug);
 	 return arg;
       }
    }
    debug = -1;
-   if (ioctl(ctr,CtrDrvrGET_SW_DEBUG,&debug) < 0) {
+   if (ioctl(ctr,CtrIoctlGET_SW_DEBUG,&debug) < 0) {
       IErr("GET_SW_DEBUG",NULL);
       return arg;
    }
    if (debug > 0)
-      printf("SoftwareDebug: [%d] Enabled\n",debug);
+      printf("SoftwareDebug: [%d] Enabled\n",(int) debug);
    else
-      printf("SoftwareDebug: [%d] Disabled\n",debug);
+      printf("SoftwareDebug: [%d] Disabled\n",(int) debug);
 
    return arg;
 }
@@ -652,7 +654,7 @@ int debug;
 int GetSetOByte(int arg) { /* Output Byte on P2 0..8 */
 ArgVal   *v;
 AtomType  at;
-int obyte;
+long obyte;
 
    arg++;
    v = &(vals[arg]);
@@ -660,18 +662,18 @@ int obyte;
    if (at == Numeric) {
       arg++;
       obyte = v->Number;
-      if (ioctl(ctr,CtrDrvrSET_OUTPUT_BYTE,&obyte) < 0) {
+      if (ioctl(ctr,CtrIoctlSET_OUTPUT_BYTE,&obyte) < 0) {
 	 IErr("SET_OUTPUT_BYTE",&obyte);
 	 return arg;
       }
    }
    obyte = -1;
-   if (ioctl(ctr,CtrDrvrGET_OUTPUT_BYTE,&obyte) < 0) {
+   if (ioctl(ctr,CtrIoctlGET_OUTPUT_BYTE,&obyte) < 0) {
       IErr("GET_OUTPUT_BYTE",NULL);
       return arg;
    }
    if (obyte > 0)
-      printf("Output Byte on P2 is: VME[%d] Enabled\n",obyte);
+      printf("Output Byte on P2 is: VME[%d] Enabled\n",(int) obyte);
    else
       printf("Output Byte on P2 is: VME[0] Disabled\n");
 
@@ -684,7 +686,7 @@ int obyte;
 int GetSetTmo(int arg) { /* Arg=0 => Timeouts disabled, else Arg = Timeout */
 ArgVal   *v;
 AtomType  at;
-int timeout;
+long timeout;
 
    arg++;
    v = &(vals[arg]);
@@ -692,20 +694,20 @@ int timeout;
    if (at == Numeric) {
       arg++;
       timeout = v->Number;
-      if (ioctl(ctr,CtrDrvrSET_TIMEOUT,&timeout) < 0) {
+      if (ioctl(ctr,CtrIoctlSET_TIMEOUT,&timeout) < 0) {
 	 IErr("SET_TIMEOUT",&timeout);
 	 return arg;
       }
    }
    timeout = -1;
-   if (ioctl(ctr,CtrDrvrGET_TIMEOUT,&timeout) < 0) {
+   if (ioctl(ctr,CtrIoctlGET_TIMEOUT,&timeout) < 0) {
       IErr("GET_TIMEOUT",NULL);
       return arg;
    }
    if (timeout > 0)
-      printf("Timeout: [%d] Enabled\n",timeout);
+      printf("Timeout: [%d] Enabled\n",(int) timeout);
    else
-      printf("Timeout: [%d] Disabled\n",timeout);
+      printf("Timeout: [%d] Disabled\n",(int) timeout);
 
    return arg;
 }
@@ -759,7 +761,7 @@ Plx9030Field *fp;
       iob.UserArray = array;
 
       if (space == 0) {
-	 if (ioctl(ctr,CtrDrvrRAW_READ,&iob) < 0) {
+	 if (ioctl(ctr,CtrIoctlRAW_READ,&iob) < 0) {
 	    IErr("RAW_READ",NULL);
 	    break;
 	 }
@@ -773,7 +775,7 @@ Plx9030Field *fp;
 	    addr = iob.Offset = fp->Offset;
 	 } else return;
 
-	 if (ioctl(ctr,CtrDrvrPLX9030_CONFIG_READ,&iob) < 0) {
+	 if (ioctl(ctr,CtrIoctlPLX9030_CONFIG_READ,&iob) < 0) {
 	    IErr("PLX9030_CONFIG_READ",NULL);
 	    break;
 	 }
@@ -784,7 +786,7 @@ Plx9030Field *fp;
 	    iob.Size = fp->FieldSize;
 	    addr = iob.Offset = fp->Offset;
 	 } else return;
-	 if (ioctl(ctr,CtrDrvrPLX9030_LOCAL_READ,&iob) < 0) {
+	 if (ioctl(ctr,CtrIoctlPLX9030_LOCAL_READ,&iob) < 0) {
 	    IErr("PLX9030_LOCAL_READ",NULL);
 	    break;
 	 }
@@ -837,19 +839,19 @@ Plx9030Field *fp;
 	 if (cp != str) {
 	    if (space == 0) {
 	       iob.Size = 1;
-	       if (ioctl(ctr,CtrDrvrRAW_WRITE,&iob) < 0) {
+	       if (ioctl(ctr,CtrIoctlRAW_WRITE,&iob) < 0) {
 		  IErr("RAW_WRITE",NULL);
 		  break;
 	       }
 
 #ifdef CTR_PCI
 	    } else if (space == 1) {
-	       if (ioctl(ctr,CtrDrvrPLX9030_CONFIG_WRITE,&iob) < 0) {
+	       if (ioctl(ctr,CtrIoctlPLX9030_CONFIG_WRITE,&iob) < 0) {
 		  IErr("PLX9030_CONFIG_WRITE",NULL);
 		  break;
 	       }
 	    } else if (space == 2) {
-	       if (ioctl(ctr,CtrDrvrPLX9030_LOCAL_WRITE,&iob) < 0) {
+	       if (ioctl(ctr,CtrIoctlPLX9030_LOCAL_WRITE,&iob) < 0) {
 		  IErr("PLX9030_LOCAL_WRITE",NULL);
 		  break;
 	       }
@@ -892,7 +894,7 @@ ArgVal   *v;
 AtomType  at;
 
    printf("Raw Io: Address space: PLX9030 Configuration Registers\n");
-   ioctl(ctr,CtrDrvrPLX9030_CONFIG_OPEN,NULL);
+   ioctl(ctr,CtrIoctlPLX9030_CONFIG_OPEN,NULL);
 
    arg++;
    v = &(vals[arg]);
@@ -903,7 +905,7 @@ AtomType  at;
    } else
       EditMemory(0,1);
 
-   ioctl(ctr,CtrDrvrPLX9030_CONFIG_CLOSE,NULL);
+   ioctl(ctr,CtrIoctlPLX9030_CONFIG_CLOSE,NULL);
 
    return arg;
 }
@@ -917,7 +919,7 @@ ArgVal   *v;
 AtomType  at;
 
    printf("Raw Io: Address space: BAR0: PLX9030 Local Configuration Registers\n");
-   ioctl(ctr,CtrDrvrPLX9030_LOCAL_OPEN,NULL);
+   ioctl(ctr,CtrIoctlPLX9030_LOCAL_OPEN,NULL);
 
    arg++;
 
@@ -929,7 +931,7 @@ AtomType  at;
    } else
       EditMemory(0,2);
 
-   ioctl(ctr,CtrDrvrPLX9030_LOCAL_CLOSE,NULL);
+   ioctl(ctr,CtrIoctlPLX9030_LOCAL_CLOSE,NULL);
 
    return arg;
 }
@@ -971,7 +973,7 @@ int i;
    printf("EpromRead: 93LC56B EEPROM from the CTR PCI card\n");
 
 
-   ioctl(ctr,CtrDrvr93LC56B_EEPROM_OPEN,NULL);
+   ioctl(ctr,CtrIoctl93LC56B_EEPROM_OPEN,NULL);
 
    for (i=0; i<Plx9030EPROM_REGS; i++) {
 
@@ -981,14 +983,14 @@ int i;
       iob.UserArray    = array;
       iob.UserArray[0] = 0;
 
-      if (ioctl(ctr,CtrDrvr93LC56B_EEPROM_READ,&iob) < 0) {
+      if (ioctl(ctr,CtrIoctl93LC56B_EEPROM_READ,&iob) < 0) {
 	 IErr("93LC56B_EEPROM_WRITE",NULL);
 	 break;
       }
       eeprom[i] = (unsigned short) iob.UserArray[0];
    }
 
-   ioctl(ctr,CtrDrvr93LC56B_EEPROM_CLOSE,NULL);
+   ioctl(ctr,CtrIoctl93LC56B_EEPROM_CLOSE,NULL);
 
    if (i>=Plx9030EPROM_REGS) printf("EpromRead: Done\n");
 
@@ -1013,7 +1015,7 @@ int i;
 
    iob.UserArray = array;
 
-   ioctl(ctr,CtrDrvr93LC56B_EEPROM_OPEN,NULL);
+   ioctl(ctr,CtrIoctl93LC56B_EEPROM_OPEN,NULL);
 
    for (i=0; i<Plx9030EPROM_REGS; i++) {
 
@@ -1022,13 +1024,13 @@ int i;
       iob.Offset       = fp->Offset;
       iob.UserArray[0] = (unsigned int) eeprom[i];
 
-      if (ioctl(ctr,CtrDrvr93LC56B_EEPROM_WRITE,&iob) < 0) {
+      if (ioctl(ctr,CtrIoctl93LC56B_EEPROM_WRITE,&iob) < 0) {
 	 IErr("93LC56B_EEPROM_WRITE",NULL);
 	 break;
       }
    }
 
-   ioctl(ctr,CtrDrvr93LC56B_EEPROM_CLOSE,NULL);
+   ioctl(ctr,CtrIoctl93LC56B_EEPROM_CLOSE,NULL);
 
    if (i>=Plx9030EPROM_REGS) printf("EpromWrite: Done\n");
 
@@ -1177,10 +1179,10 @@ int EpromErase(int arg) {
    if (YesNo("EpromErase: Wipe CTR flash","Revert to Plx9030 defaults") == 0)
       return arg;
 
-   ioctl(ctr,CtrDrvr93LC56B_EEPROM_OPEN,NULL);
-   if (ioctl(ctr,CtrDrvr93LC56B_EEPROM_ERASE,NULL) < 0)
+   ioctl(ctr,CtrIoctl93LC56B_EEPROM_OPEN,NULL);
+   if (ioctl(ctr,CtrIoctl93LC56B_EEPROM_ERASE,NULL) < 0)
       IErr("93LC56B_EEPROM_ERASE",NULL);
-   ioctl(ctr,CtrDrvr93LC56B_EEPROM_CLOSE,NULL);
+   ioctl(ctr,CtrIoctl93LC56B_EEPROM_CLOSE,NULL);
 
    return arg;
 }
@@ -1196,7 +1198,7 @@ int PlxReConfig(int arg) {
    if (YesNo("PlxReConfig: Reconfigure CTR from","93LC56B EEPROM") == 0)
       return arg;
 
-   if (ioctl(ctr,CtrDrvrPLX9030_RECONFIGURE,NULL) < 0)
+   if (ioctl(ctr,CtrIoctlPLX9030_RECONFIGURE,NULL) < 0)
       IErr("PLX9030_RECONFIGURE",NULL);
 
    return arg;
@@ -1218,7 +1220,7 @@ int Remap(int arg) {
    if (YesNo("Remap: Rebuild PCI tree","Reinstall CTR driver") == 0)
       return arg;
 
-   if (ioctl(ctr,CtrDrvrREMAP,NULL) < 0)
+   if (ioctl(ctr,CtrIoctlREMAP,NULL) < 0)
       IErr("REMAP",NULL);
 
    printf("Remap: Done, you must restart the test program\n");
@@ -1239,7 +1241,7 @@ CtrDrvrTime t;
 
    inp = fopen(fname,"r");
    if (inp) {
-      if (ioctl(ctr,CtrDrvrJTAG_OPEN,NULL)) {
+      if (ioctl(ctr,CtrIoctlJTAG_OPEN,NULL)) {
 	 IErr("JTAG_OPEN",NULL);
 	 return 1;
       }
@@ -1250,7 +1252,7 @@ CtrDrvrTime t;
       else    printf("Jtag: xsvfExecute: ReturnCode: %d All OK\n",cc);
       fclose(inp);
 
-      if (ioctl(ctr,CtrDrvrJTAG_CLOSE,NULL) < 0) {
+      if (ioctl(ctr,CtrIoctlJTAG_CLOSE,NULL) < 0) {
 	 IErr("JTAG_CLOSE",NULL);
 	 return 1;
       }
@@ -1258,7 +1260,7 @@ CtrDrvrTime t;
       sleep(5); /* Wait for hardware to reconfigure */
 
       bzero((void *) &version, sizeof(CtrDrvrVersion));
-      if (ioctl(ctr,CtrDrvrGET_VERSION,&version) < 0) {
+      if (ioctl(ctr,CtrIoctlGET_VERSION,&version) < 0) {
 	 IErr("GET_VERSION",NULL);
 	 return 1;
       }
@@ -1274,6 +1276,88 @@ CtrDrvrTime t;
    return cc;
 }
 
+/*
+ * This routine updates the version history files for each module
+ * Each time the version changes one line is added to the history of that module
+ * This is independant mechanism for required Update warnings
+ * Fri 17th Dec 2010 Julian Lewis CO/HT
+ */
+
+int UpdateVersionHistory() {
+
+long m, cnt, vhdlver, filver, found;
+CtrDrvrVersion version;
+FILE *verf = NULL;
+char txt[128], fname[64], host[64], *ep, dv[128], df[128];
+CtrDrvrTime tv, tf;
+time_t tod;
+
+   if (ioctl(ctr,CtrIoctlGET_MODULE_COUNT,&cnt) < 0) {
+      IErr("GET_MODULE_COUNT",NULL);
+      return 0;
+   }
+
+   for (m=1; m<=cnt; m++) {
+
+      if (ioctl(ctr,CtrIoctlSET_MODULE,&m) < 0) {
+	 IErr("SET_MODULE",&m);
+	 return 0;
+      }
+
+      bzero((void *) &version, sizeof(CtrDrvrVersion));
+      if (ioctl(ctr,CtrIoctlGET_VERSION,&version) < 0) {
+	 IErr("GET_VERSION",NULL);
+	 return 0;
+      }
+      vhdlver = version.VhdlVersion;
+
+      bzero((void *) host,64);
+      gethostname(host,64);
+
+      if (!GetFile("CtrVersionHistory"))
+	 sprintf(path,"/dsc/data/ctr/CtrVersionHistory");
+      sprintf(fname,"%s_%s.%02d",path,host,(int) m);
+
+      umask(0);
+      verf = fopen(fname,"a+");
+      if (verf) {
+	 rewind(verf); /* LynxOs is brain dead, sets the read pointer to the end of file  */
+	 found = 0;
+	 while (1) {
+
+	    if (fgets(txt,128,verf) == NULL) break;
+	    filver = strtoul(txt,&ep,0);
+	    if (filver == vhdlver) {
+	       found = 1;
+	       /* break;  LynxOs again, so we need to go all the way to the end */
+	    }
+	 }
+
+	 if (!found) {
+	    tv.Second = vhdlver;
+	    tv.TicksHPTDC = 0;
+	    strcpy(dv,TimeToStr(&tv,0));
+
+	    tod = time(NULL);
+	    tf.Second = (int) tod;
+	    tf.TicksHPTDC = 0;
+	    strcpy(df,TimeToStr(&tf,0));
+
+	    sprintf(txt,"%d VHDL:%s Date:%s\n",(int) vhdlver,dv,df);
+	    fputs(txt,verf);
+	 }
+
+	 fclose(verf);
+
+      } else {
+	 fprintf(stderr,"UpdateVersionHistory: Can't open file: %s for read/write/append\n",fname);
+	 perror("UpdateVersionHistory");
+	 return 0;
+      }
+   }
+   return 1;
+}
+
 /*****************************************************************/
 /* Force reload of all installed modeules                        */
 
@@ -1286,7 +1370,7 @@ unsigned int vhdlver;
 char fname[128], vname[128], txt[128], *cp, *ep;
 char host[49];
 CtrDrvrHardwareType ht, cht;
-int m, cnt, update;
+long m, cnt, update;
 
    arg++;
    v = &(vals[arg]);
@@ -1309,7 +1393,7 @@ int m, cnt, update;
    bzero((void *) &t, sizeof(CtrDrvrTime));
 
    version.HardwareType = CtrDrvrHardwareTypeNONE;
-   if (ioctl(ctr,CtrDrvrGET_VERSION,&version) >= 0) {
+   if (ioctl(ctr,CtrIoctlGET_VERSION,&version) >= 0) {
       cht = version.HardwareType;
 
       if (version.HardwareType == CtrDrvrHardwareTypeCTRP) {
@@ -1428,7 +1512,7 @@ int m, cnt, update;
       return arg;
    }
 
-   if (ioctl(ctr,CtrDrvrGET_MODULE_COUNT,&cnt) < 0) {
+   if (ioctl(ctr,CtrIoctlGET_MODULE_COUNT,&cnt) < 0) {
       IErr("GET_MODULE_COUNT",NULL);
       return arg;
    }
@@ -1440,13 +1524,13 @@ int m, cnt, update;
       sprintf(txt,"rm -f %s",fname);
       system(txt);
 
-      if (ioctl(ctr,CtrDrvrSET_MODULE,&m) < 0) {
+      if (ioctl(ctr,CtrIoctlSET_MODULE,&m) < 0) {
 	 IErr("SET_MODULE",&m);
 	 return arg;
       }
 
       bzero((void *) &version, sizeof(CtrDrvrVersion));
-      if (ioctl(ctr,CtrDrvrGET_VERSION,&version) < 0) {
+      if (ioctl(ctr,CtrIoctlGET_VERSION,&version) < 0) {
 	 IErr("GET_VERSION",NULL);
 	 return arg;
       }
@@ -1496,9 +1580,13 @@ int m, cnt, update;
       }
    }
 
-   if (ioctl(ctr,CtrDrvrSET_MODULE,&module) < 0) {
+   if (ioctl(ctr,CtrIoctlSET_MODULE,&module) < 0) {
       IErr("SET_MODULE",&module);
    }
+
+   if (!UpdateVersionHistory())
+      fprintf(stderr,"UpdateVersionHistory: Failed\n");
+
    return arg;
 }
 
@@ -1533,7 +1621,7 @@ CtrDrvrVersion version;
 
       bzero((void *) fname, 128);
       version.HardwareType = CtrDrvrHardwareTypeNONE;
-      if (ioctl(ctr,CtrDrvrGET_VERSION,&version) >= 0) {
+      if (ioctl(ctr,CtrIoctlGET_VERSION,&version) >= 0) {
 
 	 if (version.HardwareType == CtrDrvrHardwareTypeCTRP) {
 	    printf("Detected: Hardware Type: CTRP PMC (3 Channel)\n");
@@ -1641,7 +1729,7 @@ CtrDrvrVersion version;
 int GetSetQue(int arg) { /* Arg=Flag */
 ArgVal   *v;
 AtomType  at;
-int qflag, qsize, qover;
+long qflag, qsize, qover;
 
    arg++;
 
@@ -1651,21 +1739,21 @@ int qflag, qsize, qover;
       arg++;
       qflag = v->Number;
 
-      if (ioctl(ctr,CtrDrvrSET_QUEUE_FLAG,&qflag) < 0) {
-	 IErr("SET_QUEUE_FLAG",(int *) &qflag);
+      if (ioctl(ctr,CtrIoctlSET_QUEUE_FLAG,&qflag) < 0) {
+	 IErr("SET_QUEUE_FLAG", &qflag);
 	 return arg;
       }
    }
    qflag = -1;
-   if (ioctl(ctr,CtrDrvrGET_QUEUE_FLAG,&qflag) < 0) {
+   if (ioctl(ctr,CtrIoctlGET_QUEUE_FLAG,&qflag) < 0) {
       IErr("GET_QUEUE_FLAG",NULL);
       return arg;
    }
-   if (ioctl(ctr,CtrDrvrGET_QUEUE_SIZE,&qsize) < 0) {
+   if (ioctl(ctr,CtrIoctlGET_QUEUE_SIZE,&qsize) < 0) {
       IErr("GET_QUEUE_SIZE",NULL);
       return arg;
    }
-   if (ioctl(ctr,CtrDrvrGET_QUEUE_OVERFLOW,&qover) < 0) {
+   if (ioctl(ctr,CtrIoctlGET_QUEUE_OVERFLOW,&qover) < 0) {
       IErr("GET_QUEUE_FLAG",NULL);
       return arg;
    }
@@ -1684,11 +1772,11 @@ int GetSetCableId(int arg) {
 ArgVal   *v;
 AtomType  at;
 
-unsigned int cid;
+long cid;
 
    arg++;
 
-   if (ioctl(ctr,CtrDrvrSET_MODULE,&module) < 0) {
+   if (ioctl(ctr,CtrIoctlSET_MODULE,&module) < 0) {
       IErr("SET_MODULE",NULL);
       return arg;
    }
@@ -1699,19 +1787,19 @@ unsigned int cid;
       arg++;
       cid = v->Number;
 
-      if (ioctl(ctr,CtrDrvrSET_CABLE_ID,&cid) < 0) {
-	 IErr("SET_CABLE_ID",(int *) &cid);
+      if (ioctl(ctr,CtrIoctlSET_CABLE_ID,&cid) < 0) {
+	 IErr("SET_CABLE_ID", &cid);
 	 return arg;
       }
    }
 
    cid = -1;
-   if (ioctl(ctr,CtrDrvrGET_CABLE_ID,&cid) < 0) {
+   if (ioctl(ctr,CtrIoctlGET_CABLE_ID,&cid) < 0) {
       IErr("GET_CABLE_ID",NULL);
       return arg;
    }
 
-   printf("Module: %d ID: %d",module, (int) cid);
+   printf("Module: %d ID: %d",(int) module, (int) cid);
    if (cid) printf("\n"); else printf(": Not Set\n");
 
    return arg;
@@ -1730,7 +1818,7 @@ int i, j, k, pid, mypid, omod, nmod;
 
    mypid = getpid();
 
-   if (ioctl(ctr,CtrDrvrGET_CLIENT_LIST,&clist) < 0) {
+   if (ioctl(ctr,CtrIoctlGET_CLIENT_LIST,&clist) < 0) {
       IErr("GET_CLIENT_LIST",NULL);
       return arg;
    }
@@ -1741,7 +1829,7 @@ int i, j, k, pid, mypid, omod, nmod;
       bzero((void *) &cons, sizeof(CtrDrvrClientConnections));
       cons.Pid = pid;
 
-      if (ioctl(ctr,CtrDrvrGET_CLIENT_CONNECTIONS,&cons) < 0) {
+      if (ioctl(ctr,CtrIoctlGET_CLIENT_CONNECTIONS,&cons) < 0) {
 	 IErr("GET_CLIENT_CONNECTIONS",NULL);
 	 return arg;
       }
@@ -1782,13 +1870,13 @@ int module;
 
    arg++;
 
-   if (ioctl(ctr,CtrDrvrRESET,NULL) < 0) {
+   if (ioctl(ctr,CtrIoctlRESET,NULL) < 0) {
       IErr("RESET",NULL);
       return arg;
    }
 
    module = -1;
-   if (ioctl(ctr,CtrDrvrGET_MODULE,&module) < 0) {
+   if (ioctl(ctr,CtrIoctlGET_MODULE,&module) < 0) {
       IErr("GET_MODULE",NULL);
       return arg;
    }
@@ -1833,31 +1921,45 @@ static char res[128];
 
 /*****************************************************************/
 
-int GetStatus(int arg) {
+void PrintPll() {
 
 unsigned int stat;
 CtrDrvrModuleStats mstat;
+CtrDrvrPll plb;
+float ph, er, per, aspn;
 
-   arg++;
-   if (ioctl(ctr,CtrDrvrGET_STATUS,&stat) < 0) {
-      IErr("GET_STATUS",NULL);
-      return arg;
-   }
-   printf("Mod:%d Status:%s\n",module,StatusToStr(stat));
+   printf("\n");
+   printf("Module:%d PLL parameters...\n",(int) module);
+   printf("\n");
 
-   if (ioctl(ctr,CtrDrvrGET_IO_STATUS,&stat) <0) {
+   if (ioctl(ctr,CtrIoctlGET_IO_STATUS,&stat) <0) {
       IErr("GET_IO_STATUS",NULL);
-      return arg;
+      return;
    }
-   printf("Mod: %d IoStatus:%s\n",module,IoStatusToStr(stat));
+   if (ioctl(ctr,CtrIoctlGET_PLL,&plb) < 0) {
+      IErr("GET_PLL",NULL);
+      return;
+   }
 
+   if (ioctl(ctr,CtrIoctlGET_PLL_ASYNC_PERIOD,&aspn) < 0) {
+      IErr("GET_PLL_ASYNC_PERIOD",NULL);
+      return;
+   }
    if (stat & CtrDrvrIOStatusExtendedMemory) {
-      if (ioctl(ctr,CtrDrvrGET_MODULE_STATS,&mstat) < 0) {
+      if (ioctl(ctr,CtrIoctlGET_MODULE_STATS,&mstat) < 0) {
 	 IErr("GET_MODULE_STATS",NULL);
-	 return arg;
+	 return;
       }
 
-      printf("PllErrorThreshold    :%d\n",(int) mstat.PllErrorThreshold);
+      er = ((aspn * (float) mstat.PllErrorThreshold) / (float) plb.NumAverage) / (float) (1 << mstat.PllMonitorCICConstant);
+      per = ((aspn * (float) (int) plb.Error) / (float) plb.NumAverage) / (float) (1 << mstat.PllMonitorCICConstant);
+      ph = (aspn * (float) plb.Phase / (float) plb.NumAverage);
+
+      printf("PllErrorThreshold    :%7d (asp*er/2^CicK)/nav = %f ns\n",(int) mstat.PllErrorThreshold,er);
+      printf("PllError             :%7d (asp*er/2^CicK)/nav = %f ns\n",(int) plb.Error, per);
+      printf("PllPhase             :%7d (phase/nav)         = %f ns\n",plb.Phase,ph);
+      printf("PllSyncCountPeriod   :%f ns\n",aspn);
+      printf("\n");
       printf("PllDacLowPassValue   :%d\n",(int) mstat.PllDacLowPassValue);
       printf("PllDacCICConstant    :%d\n",(int) mstat.PllDacCICConstant);
       printf("PllMonitorCICConstant:%d\n",(int) mstat.PllMonitorCICConstant);
@@ -1875,9 +1977,68 @@ CtrDrvrModuleStats mstat;
       printf("SentFramesEvent      :%d\n",(int) mstat.SentFramesEvent);
       printf("UtcPllErrs           :%d\n",(int) mstat.UtcPllErrs);
       printf("LastExt1Start        :%s\n",TimeToStr(&(mstat.LastExt1Start),1));
+      printf("\n");
+      printf("PllError             :[0x%08x]%d\n",plb.Error      ,plb.Error);
+      printf("PllIntegrator        :[0x%08x]%d\n",plb.Integrator ,plb.Integrator);
+      printf("PllDac               :[0x%08x]%d\n",plb.Dac        ,plb.Dac);
+      printf("PllLastItLen         :[0x%08x]%d\n",plb.LastItLen  ,plb.LastItLen);
+      printf("PllPhase             :[0x%08x]%d\n",plb.Phase      ,plb.Phase);
+      printf("PllNumAverage        :[0x%08x]%d\n",plb.NumAverage ,plb.NumAverage);
+      printf("PllKP                :[0x%08x]%d\n",plb.KP         ,plb.KP);
+      printf("PllKI                :[0x%08x]%d\n",plb.KI         ,plb.KI);
+   }
+}
 
+/*****************************************************************/
+
+int GetStatus(int arg) {
+
+CtrDrvrRawIoBlock iob;
+
+CtrDrvrBoardId bird;
+unsigned long stat, iostat;
+int i;
+long svn;
+int array[32];
+CtrDrvrMemoryMap *mp=NULL;
+
+   arg++;
+   printf("\n");
+   printf("Module:%d Status ...\n",(int) module);
+   printf("\n");
+
+   if (ioctl(ctr,CtrIoctlGET_STATUS,&stat) < 0) {
+      IErr("GET_STATUS",NULL);
+      return arg;
    }
 
+   if (ioctl(ctr,CtrIoctlGET_IO_STATUS,&iostat) <0) {
+      IErr("GET_IO_STATUS",NULL);
+      return arg;
+   }
+
+   if (ioctl(ctr,CtrIoctlGET_IDENTITY,&bird) < 0) {
+      IErr("GET_IDENTITY",NULL);
+      return arg;
+   }
+
+   bzero((void *) array, 32*sizeof(int));
+   svn = (long) (&mp->SvnId) / sizeof(int);
+   for (i=0; i<32; i++) {
+      iob.Size = 1;
+      iob.Offset = svn + i;
+      iob.UserArray = (unsigned int *) &array[i];
+      if (ioctl(ctr,CtrIoctlRAW_READ,&iob) < 0) {
+	 IErr("RAW_READ",NULL);
+	 return arg;
+      }
+   }
+   printf("Status       :0x%08X = %s\n",(int) stat, StatusToStr(stat));
+   printf("IoStatus     :0x%08X = %s\n",(int) iostat, IoStatusToStr(iostat));
+   printf("BoardIdentity:0x%08x-%08X\n",(int) bird.IdMSL,(int) bird.IdLSL);
+   printf("SVN          :%s\n",(char *) array);
+
+   PrintPll();
    return arg;
 }
 
@@ -1899,15 +2060,15 @@ HptdcRegisterVlaue hpver, hpverbk;
    hpio.Wreg = &hpver;
    hpio.Rreg = &hpverbk;
 
-   if (ioctl(ctr,CtrDrvrHPTDC_OPEN,NULL) < 0) {
+   if (ioctl(ctr,CtrIoctlHPTDC_OPEN,NULL) < 0) {
       IErr("HPTDC_OPEN",NULL);
       return 0;
    }
-   if (ioctl(ctr,CtrDrvrHPTDC_IO,&(hpio)) < 0) {
+   if (ioctl(ctr,CtrIoctlHPTDC_IO,&(hpio)) < 0) {
       IErr("HPTDC_IO",NULL);
       return 0;
    }
-   ioctl(ctr,CtrDrvrHPTDC_CLOSE,NULL);
+   ioctl(ctr,CtrIoctlHPTDC_CLOSE,NULL);
 
    return hpverbk.Value;
 }
@@ -1926,7 +2087,7 @@ CtrDrvrHardwareType ht;
    arg++;
 
    bzero((void *) &version, sizeof(CtrDrvrVersion));
-   if (ioctl(ctr,CtrDrvrGET_VERSION,&version) < 0) {
+   if (ioctl(ctr,CtrIoctlGET_VERSION,&version) < 0) {
       IErr("GET_VERSION",NULL);
       return arg;
    }
@@ -2021,7 +2182,7 @@ CtrDrvrTime  *t;
 	 if (time(&tim) > 0) {
 	    t->Second = tim; t->TicksHPTDC = 0;
 	    printf("UTC: Set time: %s\n",TimeToStr(t,0));
-	    if (ioctl(ctr,CtrDrvrSET_UTC,&t->Second) < 0) {
+	    if (ioctl(ctr,CtrIoctlSET_UTC,&t->Second) < 0) {
 	       IErr("SET_UTC",NULL);
 	       return arg;
 	    }
@@ -2030,7 +2191,7 @@ CtrDrvrTime  *t;
       }
    }
 
-   if (ioctl(ctr,CtrDrvrGET_UTC,&ct) < 0) {
+   if (ioctl(ctr,CtrIoctlGET_UTC,&ct) < 0) {
       IErr("GET_UTC",NULL);
       return arg;
    }
@@ -2050,7 +2211,7 @@ AtomType  at;
 
 CtrDrvrConnection con;
 CtrDrvrReadBuf rbf;
-int i, cc, qflag, qsize, interrupt, cnt, msk;
+long i, cc, qflag, qsize, interrupt, cnt, msk;
 
    arg++;
    v = &(vals[arg]);
@@ -2079,7 +2240,7 @@ int i, cc, qflag, qsize, interrupt, cnt, msk;
 	 con.Module   = module;
 	 con.EqpNum   = interrupt;
 	 con.EqpClass = CtrDrvrConnectionClassHARD;
-	 if (ioctl(ctr,CtrDrvrCONNECT,&con) < 0) {
+	 if (ioctl(ctr,CtrIoctlCONNECT,&con) < 0) {
 	    IErr("CONNECT",&interrupt);
 	    return arg;
 	 }
@@ -2087,7 +2248,7 @@ int i, cc, qflag, qsize, interrupt, cnt, msk;
       } else {
 	 con.Module   = 0;
 	 con.EqpNum   = 0;
-	 if (ioctl(ctr,CtrDrvrDISCONNECT,&con) < 0) {
+	 if (ioctl(ctr,CtrIoctlDISCONNECT,&con) < 0) {
 	    IErr("DISCONNECT",&interrupt);
 	    return arg;
 	 }
@@ -2107,7 +2268,7 @@ int i, cc, qflag, qsize, interrupt, cnt, msk;
 	    con.Module   = 0;
 	    con.EqpNum   = interrupt;
 	    con.EqpClass = CtrDrvrConnectionClassPTIM;
-	    if (ioctl(ctr,CtrDrvrCONNECT,&con) < 0) {
+	    if (ioctl(ctr,CtrIoctlCONNECT,&con) < 0) {
 	       IErr("CONNECT",&interrupt);
 	       return arg;
 	    }
@@ -2122,7 +2283,7 @@ int i, cc, qflag, qsize, interrupt, cnt, msk;
 	    con.Module   = module;
 	    con.EqpNum   = interrupt;
 	    con.EqpClass = CtrDrvrConnectionClassCTIM;
-	    if (ioctl(ctr,CtrDrvrCONNECT,&con) < 0) {
+	    if (ioctl(ctr,CtrIoctlCONNECT,&con) < 0) {
 	       IErr("CONNECT",&interrupt);
 	       return arg;
 	    }
@@ -2158,11 +2319,11 @@ int i, cc, qflag, qsize, interrupt, cnt, msk;
       }
    } while (True);
 
-   if (ioctl(ctr,CtrDrvrGET_QUEUE_FLAG,&qflag) < 0) {
+   if (ioctl(ctr,CtrIoctlGET_QUEUE_FLAG,&qflag) < 0) {
       IErr("GET_QUEUE_FLAG",NULL);
       return arg;
    }
-   if (ioctl(ctr,CtrDrvrGET_QUEUE_SIZE,&qsize) < 0) {
+   if (ioctl(ctr,CtrIoctlGET_QUEUE_SIZE,&qsize) < 0) {
       IErr("GET_QUEUE_SIZE",NULL);
       return arg;
    }
@@ -2230,7 +2391,7 @@ double lat, avr, sum, maxt, mint;
       printf("Error: You must first disconnect from all interrupts (wi 0)\n");
       return arg;
    }
-   if (ioctl(ctr,CtrDrvrGET_QUEUE_FLAG,&qflag) < 0) {
+   if (ioctl(ctr,CtrIoctlGET_QUEUE_FLAG,&qflag) < 0) {
       IErr("GET_QUEUE_FLAG",NULL);
       return arg;
    }
@@ -2242,15 +2403,15 @@ double lat, avr, sum, maxt, mint;
    con.Module = 0;
    con.EqpNum = CtrDrvrInterruptMaskPPS;
    con.EqpClass = CtrDrvrConnectionClassHARD;
-   if (ioctl(ctr,CtrDrvrCONNECT,&con) < 0) {
-      IErr("CONNECT",(int *) &con.EqpNum);
+   if (ioctl(ctr,CtrIoctlCONNECT,&con) < 0) {
+      IErr("CONNECT", (long *) &con.EqpNum);
       return arg;
    }
 
    for (i=0; i<loop; i++) {
 
       cc = read(ctr,&rbf,sizeof(CtrDrvrReadBuf));
-      if (ioctl(ctr,CtrDrvrGET_UTC,&ct) < 0) {
+      if (ioctl(ctr,CtrIoctlGET_UTC,&ct) < 0) {
 	 IErr("GET_UTC",NULL);
 	 return arg;
       }
@@ -2304,8 +2465,8 @@ char *cp = act_str;
    cnf = &(act.Config);
    grp = &(trg->Group);
 
-   if (ioctl(ctr,CtrDrvrGET_ACTION,&act) < 0) {
-      IErr("GET_ACTION",&anum);
+   if (ioctl(ctr,CtrIoctlGET_ACTION,&act) < 0) {
+      IErr("GET_ACTION",(long *) &anum);
       return NULL;
    }
 
@@ -2388,7 +2549,7 @@ AtomType  at;
 CtrDrvrConnection con;
 CtrDrvrWriteBuf wbf;
 CtrDrvrPtimBinding ob;
-int i, cc, trignum;
+long i, cc, trignum;
 
    arg++;
    v = &(vals[arg]);
@@ -2430,7 +2591,7 @@ int i, cc, trignum;
 	    ob.StartIndex = 0;
 	    ob.Counter = 0;
 	    ob.Size = 0;
-	    if (ioctl(ctr,CtrDrvrGET_PTIM_BINDING,&ob) < 0) {
+	    if (ioctl(ctr,CtrIoctlGET_PTIM_BINDING,&ob) < 0) {
 	       printf("Error: Cant get Binding for PTIM object: %d\n",(int) ob.EqpNum);
 	       IErr("GET_PTIM_BINDING",NULL);
 	       return arg;
@@ -2455,7 +2616,7 @@ int i, cc, trignum;
 	 if (at == Numeric) {
 	    trignum    = v->Number;
 	    act.TriggerNumber = trignum;
-	    if (ioctl(ctr,CtrDrvrGET_ACTION,&act) < 0) {
+	    if (ioctl(ctr,CtrIoctlGET_ACTION,&act) < 0) {
 	       IErr("GET_ACTION",&trignum);
 	       return arg;
 	    }
@@ -2464,7 +2625,7 @@ int i, cc, trignum;
 	    ob.StartIndex = 0;
 	    ob.Counter = 0;
 	    ob.Size = 0;
-	    if (ioctl(ctr,CtrDrvrGET_PTIM_BINDING,&ob) < 0) {
+	    if (ioctl(ctr,CtrIoctlGET_PTIM_BINDING,&ob) < 0) {
 	       printf("Error: Cant get Binding for PTIM object: %d\n",(int) ob.EqpNum);
 	       IErr("GET_PTIM_BINDING",NULL);
 	       return arg;
@@ -2515,7 +2676,7 @@ int i, n, wbk, ok;
 unsigned long nadr, anum;
 unsigned long eqp, frm, grn, grv, plw, dly, trc, mch, str, clk, mde, enb;
 
-   if (mod) ioctl(ctr,CtrDrvrSET_MODULE,&mod);
+   if (mod) ioctl(ctr,CtrIoctlSET_MODULE,&mod);
 
    anum = start;
 
@@ -2524,9 +2685,9 @@ unsigned long eqp, frm, grn, grv, plw, dly, trc, mch, str, clk, mde, enb;
    cnf = &(act.Config);
    grp = &(trg->Group);
 
-   if (ioctl(ctr,CtrDrvrLIST_CTIM_OBJECTS,&ctimo) < 0) {
+   if (ioctl(ctr,CtrIoctlLIST_CTIM_OBJECTS,&ctimo) < 0) {
       IErr("LIST_CTIM_OBJECTS",NULL);
-      if (mod) ioctl(ctr,CtrDrvrSET_MODULE,&module);
+      if (mod) ioctl(ctr,CtrIoctlSET_MODULE,&module);
       return;
    }
 
@@ -2544,9 +2705,9 @@ unsigned long eqp, frm, grn, grv, plw, dly, trc, mch, str, clk, mde, enb;
 	       case '\n':
 		  if (wbk || err_in_act) {
 		     wbk = 0; err_in_act = 0;
-		     if (ioctl(ctr,CtrDrvrSET_ACTION,&act) < 0) {
-			IErr("SET_ACTION",(int *) &anum);
-			if (mod) ioctl(ctr,CtrDrvrSET_MODULE,&module);
+		     if (ioctl(ctr,CtrIoctlSET_ACTION,&act) < 0) {
+			IErr("SET_ACTION",(long *) &anum);
+			if (mod) ioctl(ctr,CtrIoctlSET_MODULE,&module);
 			return;
 		     }
 		  } else if (n==1) {
@@ -2571,7 +2732,7 @@ unsigned long eqp, frm, grn, grv, plw, dly, trc, mch, str, clk, mde, enb;
 
 	       case 'q':
 	       case '.':
-		  if (mod) ioctl(ctr,CtrDrvrSET_MODULE,&module);
+		  if (mod) ioctl(ctr,CtrIoctlSET_MODULE,&module);
 		  return;
 
 	       case 'i':
@@ -2589,7 +2750,7 @@ unsigned long eqp, frm, grn, grv, plw, dly, trc, mch, str, clk, mde, enb;
 		     if (ok) break;
 		  }
 		  printf("Error: No such CTIM equipment: %d\n",(int) eqp);
-		  if (mod) ioctl(ctr,CtrDrvrSET_MODULE,&module);
+		  if (mod) ioctl(ctr,CtrIoctlSET_MODULE,&module);
 		  return;
 
 	       case 'f':
@@ -2607,7 +2768,7 @@ unsigned long eqp, frm, grn, grv, plw, dly, trc, mch, str, clk, mde, enb;
 		     if (ok) break;
 		  }
 		  printf("Error: No CTIM equipment has Frame: %d\n",(int) frm);
-		  if (mod) ioctl(ctr,CtrDrvrSET_MODULE,&module);
+		  if (mod) ioctl(ctr,CtrIoctlSET_MODULE,&module);
 		  return;
 
 	       case 't':
@@ -2618,7 +2779,7 @@ unsigned long eqp, frm, grn, grv, plw, dly, trc, mch, str, clk, mde, enb;
 		     break;
 		  }
 		  printf("Error: No such Trigger Condition: %d\n",(int) trc);
-		  if (mod) ioctl(ctr,CtrDrvrSET_MODULE,&module);
+		  if (mod) ioctl(ctr,CtrIoctlSET_MODULE,&module);
 		  return;
 
 	       case 'm':
@@ -2630,11 +2791,11 @@ unsigned long eqp, frm, grn, grv, plw, dly, trc, mch, str, clk, mde, enb;
 			break;
 		     }
 		     printf("Error: No such Machine: %d\n",(int) mch);
-		     if (mod) ioctl(ctr,CtrDrvrSET_MODULE,&module);
+		     if (mod) ioctl(ctr,CtrIoctlSET_MODULE,&module);
 		     return;
 		  }
 		  printf("Error: Telegram checking is Off\n");
-		  if (mod) ioctl(ctr,CtrDrvrSET_MODULE,&module);
+		  if (mod) ioctl(ctr,CtrIoctlSET_MODULE,&module);
 		  return;
 
 	       case 'n':
@@ -2646,11 +2807,11 @@ unsigned long eqp, frm, grn, grv, plw, dly, trc, mch, str, clk, mde, enb;
 			break;
 		     }
 		     printf("Error: Group Number: %d Out of Range\n",(int) grn);
-		     if (mod) ioctl(ctr,CtrDrvrSET_MODULE,&module);
+		     if (mod) ioctl(ctr,CtrIoctlSET_MODULE,&module);
 		     return;
 		  }
 		  printf("Error: Telegram checking is Off\n");
-		  if (mod) ioctl(ctr,CtrDrvrSET_MODULE,&module);
+		  if (mod) ioctl(ctr,CtrIoctlSET_MODULE,&module);
 		  return;
 
 	       case 'g':
@@ -2661,7 +2822,7 @@ unsigned long eqp, frm, grn, grv, plw, dly, trc, mch, str, clk, mde, enb;
 		     break;
 		  }
 		  printf("Error: Telegram checking is Off\n");
-		  if (mod) ioctl(ctr,CtrDrvrSET_MODULE,&module);
+		  if (mod) ioctl(ctr,CtrIoctlSET_MODULE,&module);
 		  return;
 
 	       case 's':
@@ -2672,7 +2833,7 @@ unsigned long eqp, frm, grn, grv, plw, dly, trc, mch, str, clk, mde, enb;
 		     break;
 		  }
 		  printf("Error: No such counter Start: %d\n",(int) str);
-		  if (mod) ioctl(ctr,CtrDrvrSET_MODULE,&module);
+		  if (mod) ioctl(ctr,CtrIoctlSET_MODULE,&module);
 		  return;
 
 	       case 'k':
@@ -2683,7 +2844,7 @@ unsigned long eqp, frm, grn, grv, plw, dly, trc, mch, str, clk, mde, enb;
 		     break;
 		  }
 		  printf("Error: No such counter Clock: %d\n",(int) clk);
-		  if (mod) ioctl(ctr,CtrDrvrSET_MODULE,&module);
+		  if (mod) ioctl(ctr,CtrIoctlSET_MODULE,&module);
 		  return;
 
 	       case 'o':
@@ -2694,7 +2855,7 @@ unsigned long eqp, frm, grn, grv, plw, dly, trc, mch, str, clk, mde, enb;
 		     break;
 		  }
 		  printf("Error: No such counter Mode: %d\n",(int) mde);
-		  if (mod) ioctl(ctr,CtrDrvrSET_MODULE,&module);
+		  if (mod) ioctl(ctr,CtrIoctlSET_MODULE,&module);
 		  return;
 
 	       case 'w':
@@ -2794,7 +2955,7 @@ char comment[128];
    while (1) {
 
       bzero((void *) &ctimo, sizeof(CtrDrvrCtimObjects));
-      if (ioctl(ctr,CtrDrvrLIST_CTIM_OBJECTS,&ctimo) < 0) {
+      if (ioctl(ctr,CtrIoctlLIST_CTIM_OBJECTS,&ctimo) < 0) {
 	 printf("Error: Cant get CTIM Object Bindings\n");
 	 IErr("LIST_CTIM_OBJECTS",NULL);
 	 return;
@@ -2861,7 +3022,7 @@ char comment[128];
 	       ob.Frame.Long = strtoul(cp,&ep,0);
 	       if (cp == ep) break;
 	       cp = ep;
-	       if (ioctl(ctr,CtrDrvrCHANGE_CTIM_FRAME,&(ob)) < 0) {
+	       if (ioctl(ctr,CtrIoctlCHANGE_CTIM_FRAME,&(ob)) < 0) {
 		  printf("Error: Cant create CTIM object: %d\n",(int) ob.EqpNum);
 		  IErr("CHANGE_CTIM_FRAME",NULL);
 		  return;
@@ -2872,7 +3033,7 @@ char comment[128];
 	    break;
 
 	    case 'x':
-	       if (ioctl(ctr,CtrDrvrDESTROY_CTIM_OBJECT,&(ctimo.Objects[i])) < 0) {
+	       if (ioctl(ctr,CtrIoctlDESTROY_CTIM_OBJECT,&(ctimo.Objects[i])) < 0) {
 		  printf("Error: Cant destroy CTIM object: %d\n",(int) ctimo.Objects[i].EqpNum);
 		  IErr("DESTROY_CTIM_OBJECT",NULL);
 		  return;
@@ -2891,7 +3052,7 @@ char comment[128];
 	       ob.Frame.Long = strtoul(cp,&ep,0);
 	       if (cp == ep) break;
 	       cp = ep;
-	       if (ioctl(ctr,CtrDrvrCREATE_CTIM_OBJECT,&(ob)) < 0) {
+	       if (ioctl(ctr,CtrIoctlCREATE_CTIM_OBJECT,&(ob)) < 0) {
 		  printf("Error: Cant create CTIM object: %d\n",(int) ob.EqpNum);
 		  IErr("CREATE_CTIM_OBJECT",NULL);
 		  return;
@@ -2928,7 +3089,7 @@ CtrDrvrTrigger *trg;
 CtrDrvrCounterConfiguration *cnf;
 
 char c, *cp, *ep, str[128];
-int n, i, j, ix, nadr;
+long n, i, j, ix, nadr;
 
    if (id) {
       ix = -1;
@@ -2949,7 +3110,7 @@ int n, i, j, ix, nadr;
    while (1) {
 
       bzero((void *) &ptimo, sizeof(CtrDrvrPtimObjects));
-      if (ioctl(ctr,CtrDrvrLIST_PTIM_OBJECTS,&ptimo) < 0) {
+      if (ioctl(ctr,CtrIoctlLIST_PTIM_OBJECTS,&ptimo) < 0) {
 	 printf("Error: Cant get PTIM Object Bindings\n");
 	 IErr("LIST_PTIM_OBJECTS",NULL);
 	 return;
@@ -2957,7 +3118,7 @@ int n, i, j, ix, nadr;
 
       if (ptimo.Size)
 	 printf("[%d]Ptm:%s Mo:%d Ch:%d Sz:%d St:%d : ",
-		      i+1,
+		(int) i+1,
 		      GetPtmName(ptimo.Objects[i].EqpNum,0),
 		(int) ptimo.Objects[i].ModuleIndex +1,
 		(int) ptimo.Objects[i].Counter,
@@ -2974,7 +3135,7 @@ int n, i, j, ix, nadr;
       while (*cp != 0) {
 
 	 bzero((void *) &ptimo, sizeof(CtrDrvrPtimObjects));
-	 if (ioctl(ctr,CtrDrvrLIST_PTIM_OBJECTS,&ptimo) < 0) {
+	 if (ioctl(ctr,CtrIoctlLIST_PTIM_OBJECTS,&ptimo) < 0) {
 	    printf("Error: Cant get PTIM Object Bindings\n");
 	    IErr("LIST_PTIM_OBJECTS",NULL);
 	    return;
@@ -3014,7 +3175,7 @@ int n, i, j, ix, nadr;
 	       ob.StartIndex = 0;
 	       ob.Counter = 0;
 	       ob.Size = 0;
-	       if (ioctl(ctr,CtrDrvrGET_PTIM_BINDING,&ob) < 0) {
+	       if (ioctl(ctr,CtrIoctlGET_PTIM_BINDING,&ob) < 0) {
 		  printf("Error: Cant get Binding for PTIM object: %d\n",(int) ob.EqpNum);
 		  IErr("GET_PTIM_BINDING",NULL);
 		  return;
@@ -3028,12 +3189,12 @@ int n, i, j, ix, nadr;
 	       ob.StartIndex = 0;
 	       ob.Counter = 0;
 	       ob.Size = 0;
-	       if (ioctl(ctr,CtrDrvrGET_PTIM_BINDING,&ob) < 0) {
+	       if (ioctl(ctr,CtrIoctlGET_PTIM_BINDING,&ob) < 0) {
 		  printf("Error: Cant get Binding for PTIM object: %d\n",(int) ob.EqpNum);
 		  IErr("GET_PTIM_BINDING",NULL);
 		  return;
 	       }
-	       if (ioctl(ctr,CtrDrvrDESTROY_PTIM_OBJECT,&(ob)) < 0) {
+	       if (ioctl(ctr,CtrIoctlDESTROY_PTIM_OBJECT,&(ob)) < 0) {
 		  printf("Error: Cant destroy PTIM object: %d\n",(int) ptimo.Objects[i].EqpNum);
 		  IErr("DESTROY_PTIM_OBJECT",NULL);
 		  return;
@@ -3065,12 +3226,12 @@ int n, i, j, ix, nadr;
 	       if (cp == ep) break;
 	       cp = ep;
 
-	       if (ioctl(ctr,CtrDrvrCREATE_PTIM_OBJECT,&(ob)) < 0) {
+	       if (ioctl(ctr,CtrIoctlCREATE_PTIM_OBJECT,&(ob)) < 0) {
 		  printf("Error: Cant create PTIM object: %d\n",(int) ob.EqpNum);
 		  IErr("CREATE_PTIM_OBJECT",NULL);
 		  return;
 	       }
-	       if (ioctl(ctr,CtrDrvrGET_PTIM_BINDING,&(ob)) < 0) {
+	       if (ioctl(ctr,CtrIoctlGET_PTIM_BINDING,&(ob)) < 0) {
 		  printf("Error: Cant read PTIM object: %d\n",(int) ob.EqpNum);
 		  IErr("GET_PTIM_BINDING",NULL);
 		  return;
@@ -3105,7 +3266,7 @@ int n, i, j, ix, nadr;
 
 	       for (j=ob.StartIndex; j<ob.StartIndex+ob.Size; j++) {
 		  act.TriggerNumber = j+1;
-		  if (ioctl(ctr,CtrDrvrSET_ACTION,&act) < 0) {
+		  if (ioctl(ctr,CtrIoctlSET_ACTION,&act) < 0) {
 		     printf("Error: Cant initialize PTIM object\n");
 		     IErr("SET_ACTION",&i);
 		     return;
@@ -3142,7 +3303,7 @@ int i;
 	 printf("Error: Output Mask: 0x%X Illegal\n",(int) omsk);
 	 return arg;
       }
-      ioctl(ctr,CtrDrvrGET_OUT_MASK,&cmsb);
+      ioctl(ctr,CtrIoctlGET_OUT_MASK,&cmsb);
       cmsb.Mask = omsk;
 
       v = &(vals[arg]);
@@ -3153,13 +3314,13 @@ int i;
 	 else                cmsb.Polarity = CtrDrvrPolarityTTL;
       }
 
-      if (ioctl(ctr,CtrDrvrSET_OUT_MASK,&cmsb) < 0) {
+      if (ioctl(ctr,CtrIoctlSET_OUT_MASK,&cmsb) < 0) {
 	 printf("Error: Cant set Mask: 0x%X for Counter: %d\n",(int) cmsb.Mask,(int) cmsb.Counter);
 	 IErr("SET_OUT_MASK",NULL);
 	 return arg;
       }
    }
-   if (ioctl(ctr,CtrDrvrGET_OUT_MASK,&cmsb) < 0) {
+   if (ioctl(ctr,CtrIoctlGET_OUT_MASK,&cmsb) < 0) {
       printf("Error: Cant Get Mask for Counter: %d\n",(int) cmsb.Counter);
       IErr("GET_OUT_MASK",NULL);
       return arg;
@@ -3204,7 +3365,7 @@ unsigned long cntr, rflg;
       rflg = v->Number;
       if (rflg) crmb.Remote = 1;
       else      crmb.Remote = 0;
-      if (ioctl(ctr,CtrDrvrSET_REMOTE,&crmb) < 0) {
+      if (ioctl(ctr,CtrIoctlSET_REMOTE,&crmb) < 0) {
 	 printf("Error: Cant set Counter: %d to Remote state: %d\n",
 		(int) crmb.Counter,
 		(int) crmb.Remote);
@@ -3212,7 +3373,7 @@ unsigned long cntr, rflg;
 	 return arg;
       }
    }
-   if (ioctl(ctr,CtrDrvrGET_REMOTE,&crmb) < 0) {
+   if (ioctl(ctr,CtrIoctlGET_REMOTE,&crmb) < 0) {
       printf("Error: Cant Get Remote state for Counter: %d\n",(int) crmb.Counter);
       IErr("GET_REMOTE",NULL);
       return arg;
@@ -3273,7 +3434,7 @@ int i ,msk;
 
    cntr = channel;
    crmb.Counter = cntr;
-   if (ioctl(ctr,CtrDrvrGET_REMOTE,&crmb) < 0) {
+   if (ioctl(ctr,CtrIoctlGET_REMOTE,&crmb) < 0) {
       printf("Error: Cant Get Remote state for Counter: %d\n",(int) crmb.Counter);
       IErr("GET_REMOTE",NULL);
       return arg;
@@ -3287,7 +3448,7 @@ int i ,msk;
 	 rcmd = v->Number;
 	 if (rcmd) {
 	    crmb.Remote = rcmd;
-	    if (ioctl(ctr,CtrDrvrREMOTE,&crmb) < 0) {
+	    if (ioctl(ctr,CtrIoctlREMOTE,&crmb) < 0) {
 	       printf("Error: Cant send: 0x%X to Counter: %d\n",
 		      (int) crmb.Remote,
 		      (int) crmb.Counter);
@@ -3325,16 +3486,16 @@ int debh;
    if (at == Numeric) {
       arg++;
       debh = v->Number;
-      if (ioctl(ctr,CtrDrvrSET_DEBUG_HISTORY,&debh) < 0) {
+      if (ioctl(ctr,CtrIoctlSET_DEBUG_HISTORY,&debh) < 0) {
 	 IErr("SET_DEBUG_HISTORY",NULL);
 	 return arg;
       }
    }
-   if (ioctl(ctr,CtrDrvrGET_IO_STATUS,&stat) <0) {
+   if (ioctl(ctr,CtrIoctlGET_IO_STATUS,&stat) <0) {
       IErr("GET_IO_STATUS",NULL);
       return arg;
    }
-   printf("Mod: %d IoStatus:%s\n",module,IoStatusToStr(stat));
+   printf("Mod: %d IoStatus:%s\n",(int) module,IoStatusToStr(stat));
    return arg;
 }
 
@@ -3356,16 +3517,16 @@ int brtpll;
    if (at == Numeric) {
       arg++;
       brtpll = v->Number;
-      if (ioctl(ctr,CtrDrvrSET_BRUTAL_PLL,&brtpll) < 0) {
+      if (ioctl(ctr,CtrIoctlSET_BRUTAL_PLL,&brtpll) < 0) {
 	 IErr("SET_BRUTAL_PLL",NULL);
 	 return arg;
       }
    }
-   if (ioctl(ctr,CtrDrvrGET_IO_STATUS,&stat) <0) {
+   if (ioctl(ctr,CtrIoctlGET_IO_STATUS,&stat) <0) {
       IErr("GET_IO_STATUS",NULL);
       return arg;
    }
-   printf("Mod: %d IoStatus:%s\n",module,IoStatusToStr(stat));
+   printf("Mod: %d IoStatus:%s\n",(int) module,IoStatusToStr(stat));
    return arg;
 }
 
@@ -3551,17 +3712,17 @@ int i, diffs;
       hpio.Wreg = hptdcSetup;
       hpio.Rreg = hptdcSetupRbk;
 
-      if (ioctl(ctr,CtrDrvrHPTDC_OPEN,NULL) < 0) {
+      if (ioctl(ctr,CtrIoctlHPTDC_OPEN,NULL) < 0) {
 	 printf("Cant open HPTDC JTAG interface\n");
 	 IErr("HPTDC_OPEN",NULL);
 	 return arg;
       }
-      if (ioctl(ctr,CtrDrvrHPTDC_IO,&(hpio)) < 0) {
+      if (ioctl(ctr,CtrIoctlHPTDC_IO,&(hpio)) < 0) {
 	 printf("Cant access HPTDC setup registers on chip\n");
 	 IErr("HPTDC_IO",NULL);
 	 return arg;
       }
-      ioctl(ctr,CtrDrvrHPTDC_CLOSE,NULL);
+      ioctl(ctr,CtrIoctlHPTDC_CLOSE,NULL);
       diffs = 0;
       for (i=0; i<HptdcSetupREGISTERS; i++) {
 	 if (hptdcSetup[i].Value != hptdcSetupRbk[i].Value) {
@@ -3769,17 +3930,17 @@ CtrDrvrHptdcIoBuf hpio;
    hpio.Wreg = hptdcStatus;
    hpio.Rreg = hptdcStatus;
 
-   if (ioctl(ctr,CtrDrvrHPTDC_OPEN,NULL) < 0) {
+   if (ioctl(ctr,CtrIoctlHPTDC_OPEN,NULL) < 0) {
       printf("Cant open HPTDC JTAG interface\n");
       IErr("HPTDC_OPEN",NULL);
       return arg;
    }
-   if (ioctl(ctr,CtrDrvrHPTDC_IO,&(hpio)) < 0) {
+   if (ioctl(ctr,CtrIoctlHPTDC_IO,&(hpio)) < 0) {
       printf("Cant access HPTDC status registers on chip\n");
       IErr("HPTDC_IO",NULL);
       return arg;
    }
-   ioctl(ctr,CtrDrvrHPTDC_CLOSE,NULL);
+   ioctl(ctr,CtrIoctlHPTDC_CLOSE,NULL);
    EditHptdcRegs(hptdcStatus, hptdcStatusNames, HptdcStatusREGISTERS, 0);
 
    return arg;
@@ -3824,17 +3985,17 @@ int i, diffs;
       hpio.Wreg = hptdcControl;
       hpio.Rreg = hptdcControlRbk;
 
-      if (ioctl(ctr,CtrDrvrHPTDC_OPEN,NULL) < 0) {
+      if (ioctl(ctr,CtrIoctlHPTDC_OPEN,NULL) < 0) {
 	 printf("Cant open HPTDC JTAG interface\n");
 	 IErr("HPTDC_OPEN",NULL);
 	 return arg;
       }
-      if (ioctl(ctr,CtrDrvrHPTDC_IO,&(hpio)) < 0) {
+      if (ioctl(ctr,CtrIoctlHPTDC_IO,&(hpio)) < 0) {
 	 printf("Cant access HPTDC control registers on chip\n");
 	 IErr("HPTDC_IO",NULL);
 	 return arg;
       }
-      ioctl(ctr,CtrDrvrHPTDC_CLOSE,NULL);
+      ioctl(ctr,CtrIoctlHPTDC_CLOSE,NULL);
       diffs = 0;
       for (i=0; i<HptdcControlREGISTERS; i++) {
 	 if (hptdcControl[i].Value != hptdcControlRbk[i].Value) {
@@ -4041,13 +4202,13 @@ unsigned long enb, stat;
    if (at == Numeric) {
       arg++;
       enb = v->Number;
-      if (ioctl(ctr,CtrDrvrENABLE,&enb) < 0) {
+      if (ioctl(ctr,CtrIoctlENABLE,&enb) < 0) {
 	 printf("Error: Cant enable/disable event reception\n");
 	 IErr("ENABLE",NULL);
 	 return arg;
       }
    }
-   if (ioctl(ctr,CtrDrvrGET_STATUS,&stat) < 0) {
+   if (ioctl(ctr,CtrIoctlGET_STATUS,&stat) < 0) {
       printf("Error: Cant read status from module: %d\n",(int) module);
       IErr("GET_STATUS",NULL);
       return arg;
@@ -4073,13 +4234,13 @@ float us;
    if (at == Numeric) {
       arg++;
       dly = v->Number;
-      if (ioctl(ctr,CtrDrvrSET_INPUT_DELAY,&dly) < 0) {
+      if (ioctl(ctr,CtrIoctlSET_INPUT_DELAY,&dly) < 0) {
 	 printf("Error: Cant set input delay to: %d\n",(int) dly);
 	 IErr("SET_INPUT_DELAY",NULL);
 	 return arg;
       }
    }
-   if (ioctl(ctr,CtrDrvrGET_INPUT_DELAY,&dly) < 0) {
+   if (ioctl(ctr,CtrIoctlGET_INPUT_DELAY,&dly) < 0) {
       printf("Error: Cant get input delay from module: %d\n",(int) module);
       IErr("GET_INPUT_DELAY",NULL);
       return arg;
@@ -4106,7 +4267,7 @@ static char *ecnf_help =
 "e<Enable>              Enable or Disable output    1=Enable/0=Disable                          \n"
 "b<Bus>                 Enable businterrupts        1=Interrupt/0=No interrupt                  \n";
 
-void EditConfig(unsigned long cntr) {
+void EditConfig(long cntr) {
 
 CtrDrvrCounterConfiguration *cnf;
 CtrDrvrCounterConfigurationBuf cnfb;
@@ -4120,14 +4281,14 @@ unsigned long plw, dly, str, clk, mde, enb, bus;
 
    while (1) {
       crmb.Counter = cntr;
-      if (ioctl(ctr,CtrDrvrGET_REMOTE,&crmb) < 0) {
+      if (ioctl(ctr,CtrIoctlGET_REMOTE,&crmb) < 0) {
 	 printf("Error: Cant Get Remote state for Counter: %d\n",(int) crmb.Counter);
 	 IErr("GET_REMOTE",NULL);
 	 return;
       }
       if (crmb.Remote) {
 	 cnfb.Counter = cntr;
-	 if (ioctl(ctr,CtrDrvrGET_CONFIG,&cnfb) < 0) {
+	 if (ioctl(ctr,CtrIoctlGET_CONFIG,&cnfb) < 0) {
 	    printf("Error: Cant Get configuration for Counter: %d\n",(int) cntr);
 	    IErr("GET_CONFIG",NULL);
 	    return;
@@ -4152,14 +4313,14 @@ unsigned long plw, dly, str, clk, mde, enb, bus;
 	       case '\n':
 		  if (wbk) {
 		     wbk = 0;
-		     if (ioctl(ctr,CtrDrvrSET_CONFIG,&cnfb) < 0) {
+		     if (ioctl(ctr,CtrIoctlSET_CONFIG,&cnfb) < 0) {
 			printf("Error: Cant set counter: %d configuration\n",(int) cntr);
-			IErr("SET_CONFIG",(int *) &cntr);
+			IErr("SET_CONFIG", &cntr);
 			return;
 		     }
 		     crmb.Remote = CtrDrvrRemoteLOAD;
-		     if (ioctl(ctr,CtrDrvrREMOTE,&crmb) < 0) {
-			IErr("REMOTE",(int *) &cntr);
+		     if (ioctl(ctr,CtrIoctlREMOTE,&crmb) < 0) {
+			IErr("REMOTE", &cntr);
 			return;
 		     }
 		  } else if (n==1) {
@@ -4272,7 +4433,7 @@ CtrDrvrCounterHistoryBuf chsb;
 
    cntr = channel;
    chsb.Counter = cntr;
-   if (ioctl(ctr,CtrDrvrGET_COUNTER_HISTORY,&chsb) < 0) {
+   if (ioctl(ctr,CtrIoctlGET_COUNTER_HISTORY,&chsb) < 0) {
       printf("Error: Cant Get History for Counter: %d\n",(int) chsb.Counter);
       IErr("GET_COUNTER_HISTORY",NULL);
       return arg;
@@ -4311,8 +4472,6 @@ ArgVal   *v;
 AtomType  at;
 
 CtrDrvrPll plb;
-float aspn;
-double ph, er;
 int sign = 1;
 
    arg++;
@@ -4331,51 +4490,107 @@ int sign = 1;
 
    if (at == Numeric) {
 
-      if (ioctl(ctr,CtrDrvrGET_PLL,&plb) < 0) {
+      if (ioctl(ctr,CtrIoctlGET_PLL,&plb) < 0) {
 	 IErr("GET_PLL",NULL);
 	 return arg;
       }
       arg++;
       plb.Dac = v->Number * sign;
 
-      if (ioctl(ctr,CtrDrvrSET_PLL,&plb) < 0) {
+      if (ioctl(ctr,CtrIoctlSET_PLL,&plb) < 0) {
 	 IErr("SET_PLL",NULL);
 	 return arg;
       }
-      if (ioctl(ctr,CtrDrvrSET_PLL,&plb) < 0) {
+      if (ioctl(ctr,CtrIoctlSET_PLL,&plb) < 0) {
 	 IErr("SET_PLL",NULL);
 	 return arg;
       }
    }
 
    sleep(1);
-
-   if (ioctl(ctr,CtrDrvrGET_PLL,&plb) < 0) {
-      IErr("GET_PLL",NULL);
-      return arg;
-   }
-   if (ioctl(ctr,CtrDrvrGET_PLL_ASYNC_PERIOD,&aspn) < 0) {
-      IErr("GET_PLL_ASYNC_PERIOD",NULL);
-      return arg;
-   }
-   ph = aspn * ((double) (int) plb.Phase / (double) (int) plb.NumAverage);
-   er = aspn * ((double) (int) plb.Error / (double) (int) plb.NumAverage);
-
-   printf("Error      : [0x%08x] %d\n",(int) plb.Error     ,(int) plb.Error);
-   printf("Integrator : [0x%08x] %d\n",(int) plb.Integrator,(int) plb.Integrator);
-   printf("Dac        : [0x%08x] %d\n",(int) plb.Dac       ,(int) plb.Dac);
-   printf("LastItLen  : [0x%08x] %d\n",(int) plb.LastItLen ,(int) plb.LastItLen);
-   printf("KI         : [0x%08x] %d\n",(int) plb.KI        ,(int) plb.KI);
-   printf("KP         : [0x%08x] %d\n",(int) plb.KP        ,(int) plb.KP);
-   printf("NumAverage : [0x%08x] %d\n",(int) plb.NumAverage,(int) plb.NumAverage);
-   printf("Phase      : [0x%08x] %d\n",(int) plb.Phase     ,(int) plb.Phase);
-   printf("AsPrdNs    : %f (ns)\n",aspn);
-
-   printf("Error*Period/Naverage  : %fns\n",er);
-   printf("Phase*Period/Naverage  : %fns\n",ph);
-
+   PrintPll();
    return arg;
 }
+
+/*****************************************************************/
+
+int SetPllParams(int arg) { /* ErrT, DacK, MonK */
+ArgVal   *v;
+AtomType  at;
+
+CtrDrvrMemoryMap *mp = NULL;
+CtrDrvrRawIoBlock iob;
+int array[2];
+
+   iob.Size = 1;
+   iob.UserArray = (unsigned int *) array;
+   array[0] = 0; array[1] = 0;
+
+   arg++;
+   v = &(vals[arg]);
+   at = v->Type;
+
+   if (at == Numeric) {
+
+      iob.Size = 1;
+      iob.UserArray = (unsigned int *) array;
+      array[1] = 0;
+      array[0] = v->Number;
+
+      arg++;
+      v = &(vals[arg]);
+      at = v->Type;
+
+      iob.Offset = (long) &mp->ModStats.PllErrorThreshold / sizeof(int);
+      if (ioctl(ctr,CtrIoctlRAW_WRITE,&iob) < 0) {
+	 IErr("RAW_WRITE",NULL);
+	 return arg;
+      }
+      printf("Set PllErrorThreshold:%d OK\n",array[0]);
+
+      if (at == Numeric) {
+
+	 iob.Size = 1;
+	 iob.UserArray = (unsigned int *) array;
+	 array[1] = 0;
+	 array[0] = v->Number;
+
+	 arg++;
+	 v = &(vals[arg]);
+	 at = v->Type;
+
+	 iob.Offset = (long) &mp->ModStats.PllDacCICConstant / sizeof(int);
+	 if (ioctl(ctr,CtrIoctlRAW_WRITE,&iob) < 0) {
+	    IErr("RAW_WRITE",NULL);
+	    return arg;
+	 }
+	 printf("Set PllDacCICConstant:%d OK\n",array[0]);
+
+	 if (at == Numeric) {
+
+	    iob.Size = 1;
+	    iob.UserArray = (unsigned int *) array;
+	    array[1] = 0;
+	    array[0] = v->Number;
+
+	    arg++;
+	    v = &(vals[arg]);
+	    at = v->Type;
+
+	    iob.Offset = (long) &mp->ModStats.PllMonitorCICConstant / sizeof(int);
+	    if (ioctl(ctr,CtrIoctlRAW_WRITE,&iob) < 0) {
+	       IErr("RAW_WRITE",NULL);
+	       return arg;
+	    }
+	    printf("Set PllMonitorCICConstant:%d OK\n",array[0]);
+
+	 }
+      }
+   }
+   PrintPll();
+   return arg;
+}
+
 /*****************************************************************/
 
 int GetSetPll(int arg) { /* KI KP NAV PHASE */
@@ -4383,8 +4598,6 @@ ArgVal   *v;
 AtomType  at;
 
 CtrDrvrPll plb;
-float aspn;
-double ph, er;
 
    arg++;
 
@@ -4392,7 +4605,7 @@ double ph, er;
    at = v->Type;
    if (at == Numeric) {
 
-      if (ioctl(ctr,CtrDrvrGET_PLL,&plb) < 0) {
+      if (ioctl(ctr,CtrIoctlGET_PLL,&plb) < 0) {
 	 IErr("GET_PLL",NULL);
 	 return arg;
       }
@@ -4424,38 +4637,14 @@ double ph, er;
       printf("NumAverage : [0x%08x] %d\n",(int) plb.NumAverage,(int) plb.NumAverage);
       printf("Phase      : [0x%08x] %d\n",(int) plb.Phase     ,(int) plb.Phase);
       if (YesNo("Set PLL to above and ","read back") == 0) return arg;
-      if (ioctl(ctr,CtrDrvrSET_PLL,&plb) < 0) {
+      if (ioctl(ctr,CtrIoctlSET_PLL,&plb) < 0) {
 	 IErr("SET_PLL",NULL);
 	 return arg;
       }
    }
 
    sleep(1);
-
-   if (ioctl(ctr,CtrDrvrGET_PLL,&plb) < 0) {
-      IErr("GET_PLL",NULL);
-      return arg;
-   }
-   if (ioctl(ctr,CtrDrvrGET_PLL_ASYNC_PERIOD,&aspn) < 0) {
-      IErr("GET_PLL_ASYNC_PERIOD",NULL);
-      return arg;
-   }
-   ph = aspn * ((double) (int) plb.Phase / (double) (int) plb.NumAverage);
-   er = aspn * ((double) (int) plb.Error / (double) (int) plb.NumAverage);
-
-   printf("Error      : [0x%08x] %d\n",(int) plb.Error     ,(int) plb.Error);
-   printf("Integrator : [0x%08x] %d\n",(int) plb.Integrator,(int) plb.Integrator);
-   printf("Dac        : [0x%08x] %d\n",(int) plb.Dac       ,(int) plb.Dac);
-   printf("LastItLen  : [0x%08x] %d\n",(int) plb.LastItLen ,(int) plb.LastItLen);
-   printf("KI         : [0x%08x] %d\n",(int) plb.KI        ,(int) plb.KI);
-   printf("KP         : [0x%08x] %d\n",(int) plb.KP        ,(int) plb.KP);
-   printf("NumAverage : [0x%08x] %d\n",(int) plb.NumAverage,(int) plb.NumAverage);
-   printf("Phase      : [0x%08x] %d\n",(int) plb.Phase     ,(int) plb.Phase);
-   printf("AsPrdNs    : %f (ns)\n",aspn);
-
-   printf("Error*Period/Naverage  : %fns\n",er);
-   printf("Phase*Period/Naverage  : %fns\n",ph);
-
+   PrintPll();
    return arg;
 }
 
@@ -4482,7 +4671,7 @@ TgmLineNameTable   ltab;
       m = v->Number;
       if ((m > CtrDrvrMachineNONE) && (m <= CtrDrvrMachineMACHINES)) {
 	 tgmb.Machine = m;
-	 if (ioctl(ctr,CtrDrvrREAD_TELEGRAM,&tgmb) < 0) {
+	 if (ioctl(ctr,CtrIoctlREAD_TELEGRAM,&tgmb) < 0) {
 	    printf("Error: Cant read telegram for machine: %s Module: %d\n",MachineNames[m],(int) module);
 	    IErr("READ_TELEGRAM",NULL);
 	    return arg;
@@ -4561,7 +4750,7 @@ char comment[128];
    }
 
    bzero((void *) &ehsb, sizeof(CtrDrvrEventHistory));
-   if (ioctl(ctr,CtrDrvrREAD_EVENT_HISTORY,&ehsb) < 0) {
+   if (ioctl(ctr,CtrIoctlREAD_EVENT_HISTORY,&ehsb) < 0) {
       printf("Error: Cant Get Event History for Module: %d\n",(int) module);
       IErr("READ_EVENT_HISTORY",NULL);
       return arg;
@@ -4639,7 +4828,7 @@ TgvName eqname;
       frame = TgvGetFrameForMember(equip);
       ob.EqpNum = equip;
       ob.Frame.Long = frame;
-      if (ioctl(ctr,CtrDrvrCREATE_CTIM_OBJECT,&(ob)) < 0) {
+      if (ioctl(ctr,CtrIoctlCREATE_CTIM_OBJECT,&(ob)) < 0) {
 	 fal++;
 	 if (arg) printf("Already exists: %s\n",eqname);
       } else {
@@ -4794,7 +4983,7 @@ char txt[128];
    arg++;
 
    GetFile("CtrClock");
-   sprintf(txt,"%s %d",path,module);
+   sprintf(txt,"%s %d",path,(int) module);
    printf("Launching: %s\n\n",txt);
    Launch(txt);
 
@@ -4832,7 +5021,7 @@ int obj;
       return arg;
    }
    GetFile("TimLookat");
-   sprintf(txt,"%s %d %c %d",path,module,c,obj);
+   sprintf(txt,"%s %d %c %d",path,(int) module,c,obj);
    printf("Launching: %s\n\n",txt);
    Launch(txt);
 
@@ -4970,12 +5159,12 @@ unsigned long stat, option;
       printf("\n");
    }
 
-   ioctl(ctr,CtrDrvrGET_MODULE_COUNT,&cnt);
+   ioctl(ctr,CtrIoctlGET_MODULE_COUNT,&cnt);
    for (i=1; i<=cnt; i++) {
-      ioctl(ctr,CtrDrvrSET_MODULE,&module);
+      ioctl(ctr,CtrIoctlSET_MODULE,&module);
       if (GetHptdcVersion() == HptdcVERSION) {
 
-	 ioctl(ctr,CtrDrvrGET_STATUS,&stat);
+	 ioctl(ctr,CtrIoctlGET_STATUS,&stat);
 	 if (stat & CtrDrvrStatusHPTDC_IN) continue; /* Already setup */
 
 	 printf("HPTDC Found on Module:%d Setting up\n",i);
@@ -5004,7 +5193,7 @@ unsigned long stat, option;
 			if (ReadControl(fname)) {
 			   HptdcControlIo(0);
 			   enb = CtrDrvrCommandSET_HPTDC;
-			   ioctl(ctr,CtrDrvrENABLE,&enb);
+			   ioctl(ctr,CtrIoctlENABLE,&enb);
 			   printf("HPTDC Setup on Module:%d OK\n",i);
 			}
 		     }
@@ -5014,7 +5203,7 @@ unsigned long stat, option;
 	 }
       } else {
 	 enb = ~CtrDrvrCommandSET_HPTDC;
-	 ioctl(ctr,CtrDrvrENABLE,&enb);
+	 ioctl(ctr,CtrIoctlENABLE,&enb);
       }
    }
    return arg;
@@ -5047,7 +5236,7 @@ CtrDrvrRawIoBlock iob;
 	 iob.Size = 1;
 	 iob.Offset = addr;
 	 if (flg == 1) data = pat + i;
-	 if (ioctl(ctr,CtrDrvrRAW_WRITE,&iob) < 0) {
+	 if (ioctl(ctr,CtrIoctlRAW_WRITE,&iob) < 0) {
 	    IErr("RAW_WRITE",NULL);
 	    return -1;
 	 }
@@ -5060,7 +5249,7 @@ CtrDrvrRawIoBlock iob;
       addr = i + RAMAD;
       iob.Size = 1;
       iob.Offset = addr;
-      if (ioctl(ctr,CtrDrvrRAW_READ,&iob) < 0) {
+      if (ioctl(ctr,CtrIoctlRAW_READ,&iob) < 0) {
 	 IErr("RAW_READ",NULL);
 	 return -1;
       }
@@ -5100,7 +5289,7 @@ unsigned long stat;
 
    arg++;
 
-   if (ioctl(ctr,CtrDrvrGET_STATUS,&stat) < 0) {
+   if (ioctl(ctr,CtrIoctlGET_STATUS,&stat) < 0) {
       printf("Error: Cant read status from module: %d\n",(int) module);
       IErr("GET_STATUS",NULL);
       return arg;
@@ -5158,7 +5347,7 @@ int PlotPll(int arg) { /* Plot PLL curves */
 ArgVal   *v;
 AtomType  at;
 
-unsigned long nav, kp, ki, points, phase, qflag, qsize, qsave, to, tn;
+long nav, kp, ki, points, phase, qflag, qsize, qsave, to, tn;
 CtrDrvrConnection con;
 CtrDrvrReadBuf rbf, ibf;
 CtrDrvrPll *pll, plb;
@@ -5176,7 +5365,7 @@ int i, cc;
    }
 
    bzero((void *) &plb, sizeof(CtrDrvrPll));
-   if (ioctl(ctr,CtrDrvrGET_PLL,&plb) < 0) {
+   if (ioctl(ctr,CtrIoctlGET_PLL,&plb) < 0) {
       IErr("GET_PLL",NULL);
       return arg;
    }
@@ -5238,28 +5427,28 @@ int i, cc;
    con.Module   = module;
    con.EqpClass = CtrDrvrConnectionClassHARD;
    con.EqpNum   = CtrDrvrInterruptMaskPLL_ITERATION;
-   if (ioctl(ctr,CtrDrvrCONNECT,&con) < 0) {
+   if (ioctl(ctr,CtrIoctlCONNECT,&con) < 0) {
       IErr("CONNECT",NULL);
       free(pll);
       return arg;
    }
 
-   if (ioctl(ctr,CtrDrvrSET_PLL,&plb) < 0) {
+   if (ioctl(ctr,CtrIoctlSET_PLL,&plb) < 0) {
       IErr("SET_PLL",NULL);
       free(pll);
       return arg;
    }
 
    qsave = 0;
-   if (ioctl(ctr,CtrDrvrGET_QUEUE_FLAG,&qsave) < 0) {
-      IErr("GET_QUEUE_FLAG",(int *) &qsave);
+   if (ioctl(ctr,CtrIoctlGET_QUEUE_FLAG,&qsave) < 0) {
+      IErr("GET_QUEUE_FLAG", &qsave);
       free(pll);
       return arg;
    }
 
    qflag = 0;
-   if (ioctl(ctr,CtrDrvrSET_QUEUE_FLAG,&qflag) < 0) {
-      IErr("SET_QUEUE_FLAG",(int *) &qflag);
+   if (ioctl(ctr,CtrIoctlSET_QUEUE_FLAG,&qflag) < 0) {
+      IErr("SET_QUEUE_FLAG", &qflag);
       free(pll);
       return arg;
    }
@@ -5267,14 +5456,14 @@ int i, cc;
    while (connected) {
       cc = read(ctr,&ibf,sizeof(CtrDrvrReadBuf));
       if (cc <= 0) break;
-      ioctl(ctr,CtrDrvrGET_QUEUE_SIZE,&qsize);
+      ioctl(ctr,CtrIoctlGET_QUEUE_SIZE,&qsize);
       if ((qsize == 0)
       &&  ((CtrDrvrInterruptMaskPLL_ITERATION & ibf.Connection.EqpNum) == 0)) break;
    }
 
    qflag = 1;
-   if (ioctl(ctr,CtrDrvrSET_QUEUE_FLAG,&qflag) < 0) {
-      IErr("SET_QUEUE_FLAG",(int *) &qflag);
+   if (ioctl(ctr,CtrIoctlSET_QUEUE_FLAG,&qflag) < 0) {
+      IErr("SET_QUEUE_FLAG", &qflag);
       free(pll);
       return arg;
    }
@@ -5290,7 +5479,7 @@ int i, cc;
 
       if ((CtrDrvrInterruptMaskPLL_ITERATION & rbf.Connection.EqpNum)
       &&  (rbf.Connection.EqpClass == CtrDrvrConnectionClassHARD)) {
-	 if (ioctl(ctr,CtrDrvrGET_PLL,&pll[i++]) < 0) {
+	 if (ioctl(ctr,CtrIoctlGET_PLL,&pll[i++]) < 0) {
 	    IErr("GET_PLL",NULL);
 	    free(pll);
 	    return arg;
@@ -5332,14 +5521,14 @@ int i, cc;
    con.Module   = module;
    con.EqpClass = CtrDrvrConnectionClassHARD;
    con.EqpNum   = CtrDrvrInterruptMaskPLL_ITERATION;
-   if (ioctl(ctr,CtrDrvrDISCONNECT,&con) < 0) {
+   if (ioctl(ctr,CtrIoctlDISCONNECT,&con) < 0) {
       IErr("DISCONNECT",NULL);
       free(pll);
       return arg;
    }
 
-   if (ioctl(ctr,CtrDrvrSET_QUEUE_FLAG,&qsave) < 0) {
-      IErr("SET_QUEUE_FLAG",(int *) &qsave);
+   if (ioctl(ctr,CtrIoctlSET_QUEUE_FLAG,&qsave) < 0) {
+      IErr("SET_QUEUE_FLAG", &qsave);
       free(pll);
       return arg;
    }
@@ -5412,13 +5601,13 @@ CtrDrvrAction act;
 
    con.Module   = 0;
    con.EqpNum   = 0;
-   if (ioctl(ctr,CtrDrvrDISCONNECT,&con) < 0) {
+   if (ioctl(ctr,CtrIoctlDISCONNECT,&con) < 0) {
       IErr("DISCONNECT",NULL);
       return arg;
    }
    connected = 0;
 
-   if (ioctl(ctr,CtrDrvrGET_CABLE_ID,&cbl) < 0) {
+   if (ioctl(ctr,CtrIoctlGET_CABLE_ID,&cbl) < 0) {
       IErr("GET_CABLE_ID",NULL);
       return arg;
    }
@@ -5436,7 +5625,7 @@ CtrDrvrAction act;
    con.Module   = 0;
    con.EqpClass = CtrDrvrConnectionClassCTIM;
    con.EqpNum   = sctim;
-   if (ioctl(ctr,CtrDrvrCONNECT,&con) < 0) {
+   if (ioctl(ctr,CtrIoctlCONNECT,&con) < 0) {
       IErr("CONNECT",NULL);
       fclose(lgf);
       return arg;
@@ -5445,7 +5634,7 @@ CtrDrvrAction act;
    if (ectim != sctim) {
       con.EqpClass = CtrDrvrConnectionClassCTIM;
       con.EqpNum   = ectim;
-      if (ioctl(ctr,CtrDrvrCONNECT,&con) < 0) {
+      if (ioctl(ctr,CtrIoctlCONNECT,&con) < 0) {
 	 IErr("CONNECT",NULL);
 	 return arg;
       }
@@ -5460,7 +5649,7 @@ CtrDrvrAction act;
 	 if (ptm_names[i].Flg) {
 	    con.EqpClass = CtrDrvrConnectionClassPTIM;
 	    con.EqpNum   = ptm_names[i].Eqp;
-	    if (ioctl(ctr,CtrDrvrCONNECT,&con) < 0) {
+	    if (ioctl(ctr,CtrIoctlCONNECT,&con) < 0) {
 	       IErr("CONNECT",NULL);
 	       fclose(lgf);
 	       return arg;
@@ -5470,7 +5659,7 @@ CtrDrvrAction act;
 
       printf("AqLog: Waiting for start...\n");
       while (1) {
-	 if (ioctl(ctr,CtrDrvrGET_QUEUE_SIZE,&qsz) < 0) {
+	 if (ioctl(ctr,CtrIoctlGET_QUEUE_SIZE,&qsz) < 0) {
 	    IErr("CONNECT",NULL);
 	    fclose(lgf);
 	    return arg;
@@ -5508,9 +5697,9 @@ CtrDrvrAction act;
 
 	 if (rbf.Connection.EqpClass == CtrDrvrConnectionClassPTIM) {
 
-	    ioctl(ctr,CtrDrvrSET_MODULE,&rbf.Connection.Module);
+	    ioctl(ctr,CtrIoctlSET_MODULE,&rbf.Connection.Module);
 	    act.TriggerNumber = rbf.TriggerNumber;
-	    if (ioctl(ctr,CtrDrvrGET_ACTION,&act) < 0) continue;
+	    if (ioctl(ctr,CtrIoctlGET_ACTION,&act) < 0) continue;
 	    if ((act.Config.OnZero & CtrDrvrCounterOnZeroOUT) == 0) continue;
 
 	    usr = rbf.Frame.Struct.Value;
@@ -5538,7 +5727,7 @@ CtrDrvrAction act;
 				 ptm_comment_txt);
 
 	    msd = 0;
-	    ioctl(ctr,CtrDrvrGET_QUEUE_OVERFLOW,&msd);
+	    ioctl(ctr,CtrIoctlGET_QUEUE_OVERFLOW,&msd);
 	    if (msd) fprintf(lgf," Msd %d\n",msd);
 	    else     fprintf(lgf,"\n");
 
@@ -5548,7 +5737,7 @@ CtrDrvrAction act;
 
       con.Module   = 0;
       con.EqpNum   = 0;
-      ioctl(ctr,CtrDrvrDISCONNECT,&con);
+      ioctl(ctr,CtrIoctlDISCONNECT,&con);
 
       fclose(lgf);
       printf("AqLog: Written:%d Acquisitions to:%s\n",cnt,fname);
@@ -5569,7 +5758,7 @@ CtrDrvrReceptionErrors rers;
 CtrDrvrTime t;
 
    arg++;
-   if (ioctl(ctr,CtrDrvrGET_RECEPTION_ERRORS,&rers) < 0) {
+   if (ioctl(ctr,CtrIoctlGET_RECEPTION_ERRORS,&rers) < 0) {
       IErr("GET_RECEPTION_ERRORS",NULL);
       return arg;
    }
@@ -5592,7 +5781,7 @@ int IoStatus(int arg) {
 unsigned long iostat;
 
    arg++;
-   if (ioctl(ctr,CtrDrvrGET_IO_STATUS,&iostat) < 0) {
+   if (ioctl(ctr,CtrIoctlGET_IO_STATUS,&iostat) < 0) {
       IErr("GET_IO_STATUS",NULL);
       return arg;
    }
@@ -5607,7 +5796,7 @@ int GetBoardId(int arg) {
 CtrDrvrBoardId bird;
 
    arg++;
-   if (ioctl(ctr,CtrDrvrGET_IDENTITY,&bird) < 0) {
+   if (ioctl(ctr,CtrIoctlGET_IDENTITY,&bird) < 0) {
       IErr("GET_IDENTITY",NULL);
       return arg;
    }

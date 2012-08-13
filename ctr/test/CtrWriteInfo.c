@@ -133,7 +133,7 @@ unsigned int oby = 0;
       fprintf(stderr,"\nFATAL: Could not open CTR driver");
       exit(1);
    }
-   if (ioctl(ctr,CtrDrvrLIST_PTIM_OBJECTS,&ptimo) < 0) {
+   if (ioctl(ctr,CtrIoctlLIST_PTIM_OBJECTS,&ptimo) < 0) {
       fprintf(stderr,"%s: Cant get PTIM definitions from driver\n",pname);
       perror(pname);
       exit(1);
@@ -147,11 +147,11 @@ unsigned int oby = 0;
 	      (int) ptim->ModuleIndex+1,
 	      (int) ptim->Counter);
       modnum = ptim->ModuleIndex+1;
-      ioctl(ctr,CtrDrvrSET_MODULE,&modnum);
+      ioctl(ctr,CtrIoctlSET_MODULE,&modnum);
       for (j=ptim->StartIndex; j<ptim->StartIndex + ptim->Size; j++) {
 	 bzero((void *) &actn, sizeof(CtrDrvrAction));
 	 actn.TriggerNumber = j+1;
-	 if (ioctl(ctr,CtrDrvrGET_ACTION,&actn) < 0) {
+	 if (ioctl(ctr,CtrIoctlGET_ACTION,&actn) < 0) {
 	    fprintf(stderr,"%s: Cant read action from driver\n",pname);
 	    perror(pname);
 	    exit(1);
@@ -221,13 +221,13 @@ unsigned int oby = 0;
 
    rcnt = 0;
    cnf = &cnfb.Config;
-   if (ioctl(ctr,CtrDrvrGET_MODULE_COUNT,&cnt) >=0 ) {
+   if (ioctl(ctr,CtrIoctlGET_MODULE_COUNT,&cnt) >=0 ) {
       for (modnum=1; modnum<=cnt; modnum++) {
-	 ioctl(ctr,CtrDrvrSET_MODULE,&modnum);
+	 ioctl(ctr,CtrIoctlSET_MODULE,&modnum);
 	 fprintf(assFile,"{\n");
 	 for (ch=CtrDrvrCounter1; ch<=CtrDrvrCounter8; ch++) {
 	    cmsb.Counter = ch;
-	    if (ioctl(ctr,CtrDrvrGET_OUT_MASK,&cmsb) >=0) {
+	    if (ioctl(ctr,CtrIoctlGET_OUT_MASK,&cmsb) >=0) {
 	       fprintf(assFile,"   {OUTMSK %d %d,0x%08X,%s}\n",
 		       modnum,
 		       ch,
@@ -238,11 +238,12 @@ unsigned int oby = 0;
 	 fprintf(assFile,"}\n\n");
 
 #ifdef CTR_VME
-	 ioctl(ctr,CtrDrvrGET_OUTPUT_BYTE,&oby);
-	 if (oby) {
-	    fprintf(assFile,"{\n");
-	    fprintf(assFile,"{OUTBYTE %d %d}\n",modnum,(int) oby);
-	    fprintf(assFile,"}\n\n");
+	 if (ioctl(ctr,CtrIoctlGET_OUTPUT_BYTE,&oby) >= 0) {
+	    if (oby) {
+	       fprintf(assFile,"{\n");
+	       fprintf(assFile,"{OUTBYTE %d %d}\n",modnum,(int) oby);
+	       fprintf(assFile,"}\n\n");
+	    }
 	 }
 #endif
 
@@ -250,10 +251,10 @@ unsigned int oby = 0;
 	 for (ch=CtrDrvrCounter1; ch<=CtrDrvrCounter8; ch++) {
 	    crmb.Counter = ch;
 	    crmb.Remote  = 0;
-	    if (ioctl(ctr,CtrDrvrGET_REMOTE,&crmb) >= 0 ) {
+	    if (ioctl(ctr,CtrIoctlGET_REMOTE,&crmb) >= 0 ) {
 	       if (crmb.Remote) {
 		  cnfb.Counter = ch;
-		  if (ioctl(ctr,CtrDrvrGET_CONFIG,&cnfb) >= 0) {
+		  if (ioctl(ctr,CtrIoctlGET_CONFIG,&cnfb) >= 0) {
 		     fprintf(assFile,"   {REMOTE %d %d,%s,%s,%s,%d,%d,%s}\n",
 			     modnum,
 			     ch,

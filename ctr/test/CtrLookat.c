@@ -142,7 +142,7 @@ int GetCableId() {
 
 int cbid = -1;
 
-   if (ioctl(ctr,CtrDrvrGET_CABLE_ID,&cbid) < 0) {
+   if (ioctl(ctr,CtrIoctlGET_CABLE_ID,&cbid) < 0) {
       IErr("GET_CABLE_ID",NULL);
       return 0;
    }
@@ -154,7 +154,7 @@ int cbid = -1;
 
 int Connect(CtrDrvrConnection *con) {
 
-   if (ioctl(ctr,CtrDrvrCONNECT,con) < 0) {
+   if (ioctl(ctr,CtrIoctlCONNECT,con) < 0) {
       IErr("CONNECT",(int *) &(con->EqpNum));
       return 0;
    }
@@ -187,7 +187,7 @@ CtrDrvrTgmBuf tgm;
 int u;
 
    tgm.Machine = machine;
-   if (ioctl(ctr,CtrDrvrREAD_TELEGRAM,&tgm) < 0)
+   if (ioctl(ctr,CtrIoctlREAD_TELEGRAM,&tgm) < 0)
       IErr("READ_TELEGRAM",&machine);
    u = tgm.Telegram[0]; *user = u;
    return (char *) TgmGetLineName(TgvTgvToTgmMachine(machine),"USER",u);
@@ -215,7 +215,7 @@ char *cp = act_str;
    cnf = &(act.Config);
    grp = &(trg->Group);
 
-   if (ioctl(ctr,CtrDrvrGET_ACTION,&act) < 0) {
+   if (ioctl(ctr,CtrIoctlGET_ACTION,&act) < 0) {
       IErr("GET_ACTION",&anum);
       return NULL;
    }
@@ -343,7 +343,7 @@ CtrDrvrReadBuf rbf;
       ob.StartIndex = 0;
       ob.Counter = 0;
       ob.Size = 0;
-      if (ioctl(ctr,CtrDrvrGET_PTIM_BINDING,&ob) < 0) {
+      if (ioctl(ctr,CtrIoctlGET_PTIM_BINDING,&ob) < 0) {
 	 printf("Error: Cant get Binding for PTIM object: %d\n",(int) ob.EqpNum);
 	 IErr("GET_PTIM_BINDING",NULL);
 	 exit(1);

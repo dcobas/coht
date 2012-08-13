@@ -7,9 +7,9 @@
 /*                                                            */
 /* ********************************************************** */
 
-#include <EmulateLynxOs.h>
-#include <DrvrSpec.h>
-#include <plx9030.h>   /* PLX9030 Registers and definition   */
+#include "EmulateLynxOs.h"
+#include "DrvrSpec.h"
+#include "plx9030.h"   /* PLX9030 Registers and definition   */
 
 #include <linux/interrupt.h>	/* enable_irq, disable_irq */
 
@@ -18,16 +18,338 @@
 #define sel LynxSel
 #define enable restore
 
-#include <ctrhard.h>   /* Hardware description               */
-#include <ctrdrvr.h>   /* Public driver interface            */
-#include <ctrdrvrP.h>  /* Private driver structures          */
+#include "ctrhard.h"   /* Hardware description               */
+#include "ctrdrvr.h"   /* Public driver interface            */
+#include "ctrdrvrP.h"  /* Private driver structures          */
 
-#include <ports.h>     /* XILINX Jtag stuff                  */
-#include <hptdc.h>     /* High prescision time to digital convertor */
+#include "ports.h"     /* XILINX Jtag stuff                  */
+#include "hptdc.h"     /* High prescision time to digital convertor */
+
+/**
+ * ====================================================================
+ * Handle PCI module parameters
+ * Julian Lewis 3rd/Oct/2011 BE/CO/HT
+ *
+ * Example: insmod drv.ko luns=7,4,3,5 pci_buses=1,1,2,3 pci_slots=4,5,4,5
+ *
+ * Constraints are imposed here that force lun numbers to be in the
+ * range MIN_DEV..LAST_DEV to be backwards compatible.
+ *
+ * This code hunts for all installed PCI modules with the given vendor
+ * and device IDs. If they correspond to the installation parameters
+ * they get installed using the given lun, otherwise hardware found
+ * that is not in the arg list will be assigned a free LUN if one is
+ * available. If modules are specified in the parameter list that are
+ * not present, they are not used. The driver must decide what it wants
+ * to do when there is a mismatch between the number of installed luns
+ * and the number specified in the argument list.
+ */
+
+#define MIN_DEV 1                         /** First valid LUN number */
+#define MAX_DEVS 16                       /** Max number of devices */
+#define LAST_DEV (MAX_DEVS - 1 + MIN_DEV) /** Last valid LUN number */
+
+static int luns[MAX_DEVS];
+static int pci_buses[MAX_DEVS];
+static int pci_slots[MAX_DEVS];
+
+static int luns_num;
+static int pci_bus_num;
+static int pci_slot_num;
+
+module_param_array(luns,      int, &luns_num,     0);
+module_param_array(pci_buses, int, &pci_bus_num,  0);
+module_param_array(pci_slots, int, &pci_slot_num, 0);
+
+MODULE_PARM_DESC(luns,      "logical unit numbers");
+MODULE_PARM_DESC(pci_buses, "pci bus numbers");
+MODULE_PARM_DESC(pci_slots, "pci slot numbers");
+
+#define NAME_LEN 16
+#define BARS 6         /* 0..5 but bar=0 isn't used */
+#define BAR_MASK 0x3E  /* 5 bits 111110 bar 1..5 */
+
+typedef struct {
+	char name[NAME_LEN];     /* Device name */
+	int vid;                 /* Vendor ID */
+	int did;                 /* Device ID */
+	int lun;                 /* Logical unit number */
+	int pci_bus_num;         /* PCI bus number */
+	int pci_slot_num;        /* PCI slot number */
+	int bars;                /* Bit mask of used bars */
+	void *map[BARS];         /* Corresponding memory maps */
+	struct pci_dev *dev;     /* PCI device */
+} mod_par_t;                     /* Module parameter block */
+
+static mod_par_t mods[MAX_DEVS]; /* An array of MAX_DEVS module parameter blocks */
+
+static int iluns = 0;       /* Installed luns so far */
+
+/**
+ * =========================================================
+ * @brief Debug routine to print mod par arguments
+ */
+
+static void print_args(char *name)
+{
+	int i;
+
+	printk("%s:Installation module parameters ...\n",name);
+	for (i=0; i<luns_num; i++) {
+		printk("%s:%02d - [Lun:%02d Bus:0x%X Slot:0x%X]\n",
+		       name,i,luns[i],pci_buses[i],pci_slots[i]);
+	}
+	printk("%s:%02d Luns declared\n",name,luns_num);
+}
+
+/**
+ * =========================================================
+ * @brief Validate insmod args
+ * @return 1=OK 0=Bad
+ */
+
+static int check_args(char *name)
+{
+	int i, lun;
+
+	print_args(name);
+
+	if ((luns_num < 1)
+	||  (luns_num > MAX_DEVS)) {
+		printk("%s:bad LUN count:%d, out of [1..%d] not installing\n",
+		       name,
+		       luns_num,
+		       MAX_DEVS);
+		return 0;
+	}
+	if ((luns_num != pci_slot_num)
+	||  (luns_num != pci_bus_num)) {
+		printk("%s:bad PCI parameter count:(Slots:%d,Busses:%d) should be:%d\n",
+		       name,
+		       pci_slot_num,
+		       pci_bus_num,
+		       luns_num);
+		return 0;
+	}
+	for (i=0; i<luns_num; i++) {
+		lun = luns[i];
+		if ((lun < MIN_DEV) || (lun > LAST_DEV)) {
+			printk("%s:LUN:%d out of [%d..%d]\n",
+			       name,
+			       lun,
+			       MIN_DEV,
+			       LAST_DEV);
+			return 0;
+		}
+	}
+	return 1;
+}
+
+/**
+ * =========================================================
+ * @brief Hunt for a lun number given the PCI bus and slot numbers
+ * @param bus   PCI_bus number
+ * @param slot  Slot number on PCI bus
+ * @return -1=NOT Found else lun number
+ */
+
+int hunt_lun(int bus, int slot)
+{
+	int i;
+	for (i=0; i<luns_num; i++)
+		if ((pci_slots[i] == slot)
+		&&  (pci_buses[i] == bus))
+			return luns[i];
+	return -1;
+}
+
+/**
+ * =========================================================
+ * @brief           Get an unused Lun number
+ * @return          A lun number or zero if none available
+ */
+
+static int used_luns = 0;
+
+int get_unused_lun()
+{
+
+	int i, lun, bit;
+
+	if (!used_luns) {
+		for (i=0; i<luns_num; i++) {
+			lun = luns[i];
+			bit = 1 << lun;
+			used_luns |= bit;
+		}
+	}
+	for (i=MIN_DEV; i<=LAST_DEV; i++) {
+		bit = 1 << i;
+		if (!(used_luns & bit)) {
+			used_luns |= bit;
+			return i;
+		}
+	}
+	return 0;
+}
+
+/**
+ * =========================================================
+ * @brief           Add the next PCI device
+ * @param  pcur     Previous added device or NULL
+ * @param  mpar     Module parameters
+ * @return          Pointer to pci_device structure or NULL
+ */
+
+struct pci_dev *add_next_dev(struct pci_dev *pcur,
+			     mod_par_t *mpar)
+{
+	struct pci_dev *pprev = pcur;
+	int cc, lun, bar, len;
+	char bar_name[32];
+
+	mpar->dev = NULL;
+
+	pcur = pci_get_device(mpar->vid, mpar->did, pprev);
+	if (!pcur)
+		return NULL;
+
+	mpar->pci_bus_num  = pcur->bus->number;
+	mpar->pci_slot_num = PCI_SLOT(pcur->devfn);
+
+	lun = hunt_lun(mpar->pci_bus_num,mpar->pci_slot_num);
+	if (lun < 0) {
+		printk("%s:Found undeclared module at BUS:%d SLOT:%d\n",
+		       mpar->name,
+		       mpar->pci_bus_num,
+		       mpar->pci_slot_num);
+
+		lun = get_unused_lun();
+		if (!lun)
+			return NULL;
+
+		printk("%s:Auto assigned BUS:%d SLOT:%d to LUN:%d\n",
+		       mpar->name,
+		       mpar->pci_bus_num,
+		       mpar->pci_slot_num,
+		       lun);
+	}
+	mpar->lun = lun;
+
+	cc = pci_enable_device(pcur);
+	printk("%s:VID:0x%X DID:0x%X BUS:%d SLOT:%d LUN:%d",
+	       mpar->name,
+	       mpar->vid,
+	       mpar->did,
+	       mpar->pci_bus_num,
+	       mpar->pci_slot_num,
+	       mpar->lun);
+	if (cc) {
+		printk(" pci_enable:ERROR:%d",
+		       cc);
+		return NULL;
+	} else
+		printk(" Enabled:OK\n");
+
+	/*
+	 * Map BARS
+	 */
+
+	for (bar=0; bar<BARS; bar++) {
+		if (mpar->bars & (1<<bar)) {
+			sprintf(bar_name,"%s-bar:%d.lun:%d",
+				mpar->name,
+				bar,
+				mpar->lun);
+
+			len = pci_resource_len(pcur, bar);
+			cc = pci_request_region(pcur, bar, bar_name);
+			if (cc) {
+				pci_disable_device(pcur);
+				printk("%s:pci_request_region:len:0x%x:%s:ERROR:%d\n",
+				       mpar->name,
+				       len,
+				       bar_name,
+				       cc);
+				return NULL;
+			}
+			printk("%s:Mapped bar:%s:OK\n",
+			       mpar->name,
+			       bar_name);
+			mpar->map[bar] = pci_iomap(pcur,bar,len);
+		}
+	}
+	iluns++;
+	mpar->dev = pcur;
+	return pcur;
+}
+
+/**
+ * =========================================================
+ * @brief Initialize module parameters array
+ * @param name  name of module
+ * @param vid   vendor id
+ * @param did   device id
+ * @return      number of modules initialized
+ */
+
+int init_mod_pars(char *name, int vid, int did, int bars)
+{
+	int i;
+	struct pci_dev *pcur = NULL;
+	mod_par_t *par = NULL;
+
+	for (i=0; i<MAX_DEVS; i++) {
+		par = &mods[i];
+		strncpy(par->name,name,NAME_LEN);
+		par->vid  = vid;
+		par->did  = did;
+		par->bars = bars;
+		pcur = add_next_dev(pcur,par);
+		if (!pcur)
+			break;
+	}
+	printk("%s:Initialized:%d modules\n",
+	       name,
+	       iluns);
+	if (iluns != luns_num)
+		printk("%s:ModPars declared luns:%d - Mismatch\n",
+		       name,
+		       luns_num);
+	return iluns;
+}
+
+/**
+ * =========================================================
+ * @brief Initialize old drm crap, I am getting rid of this
+ * @param name  name of module
+ * @return      1=OK else Fail
+ */
+
+int old_drm_crap(char *name, struct pci_dev *dev)
+{
+	int i;
+	for (i=0; i<MAX_DEVS; i++) {
+		if (lynxos_isrs[i].Handle == 0) {
+			lynxos_isrs[i].Handle = dev;
+			lynxos_isrs[i].Slot = (dev->devfn >> 3);
+			if (dev->irq) {
+				lynxos_isrs[i].Irq = dev->irq;
+				 pci_write_config_byte(dev, PCI_INTERRUPT_LINE, dev->irq);
+			}
+			return 1;
+		}
+	}
+	return 0;
+}
 
 /*========================================================================*/
 /* Define prototypes and forward references for local driver routines.    */
 /*========================================================================*/
+
+int timeout(int (*func)(void *), char *arg, int interval);
+char *CtrDrvrInstall(CtrDrvrInfoTable *info);
+int CtrDrvrUninstall(CtrDrvrWorkingArea * wa);
 
 static void Int32Copy(volatile unsigned int *dst, volatile unsigned int *src, unsigned int size);
 
@@ -105,7 +427,7 @@ static int DisConnectAll(CtrDrvrClientContext *ccon);
 
 /* ==================================================== */
 
-static void SetEndian();
+static void SetEndian(void);
 
 static void ToLittleEndian(char *from, char *to, int size);
 
@@ -136,23 +458,12 @@ static void ReadEpromWord(CtrDrvrModuleContext *mcon, unsigned int  *word);
 /* Driver entry points       */
 /* ========================= */
 
-irqreturn_t IntrHandler();
-int CtrDrvrOpen();
-int CtrDrvrClose();
-int CtrDrvrRead();
-int CtrDrvrWrite();
-int CtrDrvrSelect();
-char * CtrDrvrInstall();
-int CtrDrvrUninstall();
-int CtrDrvrIoctl();
+irqreturn_t IntrHandler(CtrDrvrModuleContext *);
 
 /* Flash the i/o pipe line */
 
 #define EIEIO
 #define SYNC
-
-extern void disable_intr();
-extern void enable_intr();
 
 CtrDrvrWorkingArea *Wa       = NULL;
 
@@ -278,7 +589,7 @@ char *iocname;
 /* so this routine finds out which one we are.                */
 /* ========================================================== */
 
-static void SetEndian() {
+static void SetEndian(void) {
 
 static unsigned int str[2] = { 0x41424344, 0x0 };
 
@@ -562,12 +873,12 @@ static int RemapFlag = 0;
 
 static int Remap(CtrDrvrModuleContext *mcon) {
 
-   drm_locate(mcon->Handle);    /* Rebuild PCI tree */
+   drm_locate(mcon->Handle);                    /* Rebuild PCI tree */
 
-   RemapFlag = 1;               /* Don't release memory */
-   CtrDrvrUninstall(Wa);        /* Uninstall all */
-   CtrDrvrInstall(Wa);          /* Re-install all */
-   RemapFlag = 0;               /* Normal uninstall */
+   RemapFlag = 1;                               /* Don't release memory */
+   CtrDrvrUninstall((CtrDrvrWorkingArea *) Wa); /* Uninstall all */
+   CtrDrvrInstall((CtrDrvrInfoTable *) Wa);     /* Re-install all */
+   RemapFlag = 0;                               /* Normal uninstall */
 
    return OK;
 }
@@ -735,7 +1046,7 @@ int i = 0;
    /* Wait at least 10 ms after a "reset", for the module to recover */
 
    sreset(&(mcon->Semaphore));
-   mcon->Timer = timeout(ResetTimeout, (char *) mcon, 2);
+   mcon->Timer = timeout((void *) ResetTimeout, (char *) mcon, 2);
    if (mcon->Timer < 0) mcon->Timer = 0;
    if (mcon->Timer) swait(&(mcon->Semaphore), SEM_SIGABORT);
    if (mcon->Timer) CancelTimeout(&(mcon->Timer));
@@ -1516,10 +1827,7 @@ CtrDrvrReadBuf         rbf;
 /* OPEN                                                                   */
 /*========================================================================*/
 
-int CtrDrvrOpen(wa, dnm, flp)
-CtrDrvrWorkingArea * wa;        /* Working area */
-int dnm;                        /* Device number */
-struct LynxFile * flp; {            /* File pointer */
+int CtrDrvrOpen(CtrDrvrWorkingArea *wa, int dnm, struct LynxFile *flp) {
 
 int cnum;                       /* Client number */
 CtrDrvrClientContext * ccon;    /* Client context */
@@ -1564,9 +1872,7 @@ CtrDrvrClientContext * ccon;    /* Client context */
 /* CLOSE                                                                  */
 /*========================================================================*/
 
-int CtrDrvrClose(wa, flp)
-CtrDrvrWorkingArea * wa;    /* Working area */
-struct LynxFile * flp; {    /* File pointer */
+int CtrDrvrClose(CtrDrvrWorkingArea *wa, struct LynxFile *flp) {
 
 int cnum;                   /* Client number */
 CtrDrvrClientContext *ccon; /* Client context */
@@ -1616,11 +1922,7 @@ CtrDrvrClientContext *ccon; /* Client context */
 /* READ                                                                   */
 /*========================================================================*/
 
-int CtrDrvrRead(wa, flp, u_buf, cnt)
-CtrDrvrWorkingArea * wa;       /* Working area */
-struct LynxFile * flp;         /* File pointer */
-char * u_buf;                  /* Users buffer */
-int cnt; {                     /* Byte count in buffer */
+int CtrDrvrRead(CtrDrvrWorkingArea *wa, struct LynxFile *flp, char *u_buf, int cnt) {
 
 CtrDrvrClientContext *ccon;    /* Client context */
 CtrDrvrQueue         *queue;
@@ -1647,7 +1949,7 @@ unsigned long         ps;
    }
 
    if (ccon->Timeout) {
-      ccon->Timer = timeout(ReadTimeout, (char *) ccon, ccon->Timeout);
+      ccon->Timer = timeout((void *) ReadTimeout, (char *) ccon, ccon->Timeout);
       if (ccon->Timer < 0) {
 
 	 ccon->Timer = 0;
@@ -1702,11 +2004,7 @@ unsigned long         ps;
 /* with the supplied CtrDrvrReadBuf.                                     */
 /*========================================================================*/
 
-int CtrDrvrWrite(wa, flp, u_buf, cnt)
-CtrDrvrWorkingArea * wa;       /* Working area */
-struct LynxFile * flp;             /* File pointer */
-char * u_buf;                  /* Users buffer */
-int cnt; {                     /* Byte count in buffer */
+int CtrDrvrWrite(CtrDrvrWorkingArea *wa, struct LynxFile *flp, char *u_buf, int cnt) {
 
 CtrDrvrClientContext *ccon;    /* Client context */
 CtrDrvrModuleContext *mcon;
@@ -1803,11 +2101,7 @@ unsigned int          clients;
 /* SELECT                                                                 */
 /*========================================================================*/
 
-int CtrDrvrSelect(wa, flp, wch, ffs)
-CtrDrvrWorkingArea * wa;        /* Working area */
-struct LynxFile * flp;              /* File pointer */
-int wch;                        /* Read/Write direction */
-struct sel * ffs; {             /* Selection structurs */
+int CtrDrvrSelect(CtrDrvrWorkingArea *wa, struct LynxFile *flp, int wch, struct sel *ffs) {
 
 CtrDrvrClientContext * ccon;
 int cnum;
@@ -1829,8 +2123,10 @@ int cnum;
 /* Assumes that all Ctr modules are brothers                              */
 /*========================================================================*/
 
-char * CtrDrvrInstall(info)
-CtrDrvrInfoTable * info; {      /* Driver info table */
+#define CTRP_BARS 0x5
+
+char *CtrDrvrInstall(CtrDrvrInfoTable *info)
+{
 
 CtrDrvrWorkingArea *wa;
 drm_node_handle handle;
@@ -1841,46 +2137,37 @@ int modix, mid, cc, j;
 CtrDrvrMemoryMap *mmap;
 int cmd;
 
-   // RecoverMode = (unsigned char) info->RecoverMode;
+   mod_par_t *mpar;
 
-   /* Allocate the driver working area. */
-
-   if (!RemapFlag) {
-      wa = (CtrDrvrWorkingArea *) sysbrk(sizeof(CtrDrvrWorkingArea));
-      if (!wa) {
-	 cprintf("CtrDrvrInstall: NOT ENOUGH MEMORY(WorkingArea)\n");
-	 pseterr(ENOMEM);
-	 return (char *) SYSERR;
-      }
-      bzero((void *) wa,sizeof(CtrDrvrWorkingArea));  /* Clear working area */
-      Wa = wa;                                        /* Global working area pointer */
-   } else wa = Wa;
+   Wa = (CtrDrvrWorkingArea *) sysbrk(sizeof(CtrDrvrWorkingArea));
+   if (!Wa) {
+     cprintf("CtrDrvrInstall: NOT ENOUGH MEMORY(WorkingArea)\n");
+     pseterr(ENOMEM);
+     return (char *) SYSERR;
+   }
+   bzero((void *) Wa,sizeof(CtrDrvrWorkingArea));  /* Clear working area */
+   wa = Wa;
 
    SetEndian(); /* Set Big/Little endian flag in driver working area */
 
-   for (modix=0; modix<CtrDrvrMODULE_CONTEXTS; modix++) {
-      cc = drm_get_handle(PCI_BUSLAYER,CERN_VENDOR_ID,CTRP_DEVICE_ID,&handle);
-      if (cc) {
-	 if (modix == 0)
-	    cc = drm_get_handle(PCI_BUSLAYER,PLX9030_VENDOR_ID,PLX9030_DEVICE_ID,&handle);
-	 if (cc) {
-	    if (modix) break;
-	    sysfree((void *) wa,sizeof(CtrDrvrWorkingArea)); Wa = NULL;
-	    cprintf("CtrDrvrInstall: No PLX9030 found: No hardware: Fatal\n");
-	    pseterr(ENODEV);
-	    return (char *) SYSERR;
-	 } else {
-	    mcon = &(wa->ModuleContexts[modix]);
-	    drm_device_read(handle,PCI_RESID_DEVNO,0,0,&mid);
-	    mcon->PciSlot     = mid;
-	    mcon->ModuleIndex = modix;
-	    mcon->Handle      = handle;
-	    mcon->InUse       = 1;
-	    mcon->DeviceId    = PLX9030_DEVICE_ID;
-	 }
-      }
+   if (!check_args("ctrp"))
+      cprintf("CtrDrvrInstall: No/Bad hardware installation parameters\n");
 
-      mcon = &(wa->ModuleContexts[modix]);
+
+   if (!init_mod_pars("ctrp",CERN_VENDOR_ID,CTRP_DEVICE_ID,CTRP_BARS)) {
+      cprintf("CtrDrvrInstall: No hardware installed\n");
+      return NULL;
+   }
+
+   for (modix=0; modix<CtrDrvrMODULE_CONTEXTS; modix++) {
+      mpar = &mods[modix];
+      if (!mpar->dev) break;
+      handle = mpar->dev;
+
+      old_drm_crap("ctrp",mpar->dev);
+
+      mcon = &(wa->ModuleContexts[mpar->lun -1]);
+
       if (mcon->InUse == 0) {
 	 drm_device_read(handle,PCI_RESID_DEVNO,0,0,&mid);
 	 mcon->PciSlot     = mid;
@@ -1891,27 +2178,16 @@ int cmd;
       }
 
       /* Ensure using memory mapped I/O */
+
       drm_device_read(handle,  PCI_RESID_REGS, 1, 0, &cmd);
       cmd |= 2;
       drm_device_write(handle, PCI_RESID_REGS, 1, 0, &cmd);
 
-      cc = drm_map_resource(handle,PCI_RESID_BAR2,&vadr);
-      if ((cc) || (!vadr)) {
-	 cprintf("CtrDrvrInstall: Can't map memory (BAR2) for timing module: %d\n",modix+1);
-	 return((char *) SYSERR);
-      }
+      vadr = (unsigned long) mpar->map[2];
       mcon->Map = (CtrDrvrMemoryMap *) vadr;
-      cprintf("CtrDrvrInstall: BAR2 is mapped to address: 0x%08X\n",(int) vadr);
 
-      vadr = (int) NULL;
-      cc = drm_map_resource(handle,PCI_RESID_BAR0,&vadr);
-      if ((cc) || (!vadr)) {
-	 cprintf("CtrDrvrInstall: Can't map plx9030 (BAR0) local configuration: %d\n",modix+1);
-	 return((char *) SYSERR);
-      }
+      vadr = (unsigned long) mpar->map[0];
       mcon->Local = (unsigned int *) vadr;
-      cprintf("CtrDrvrInstall: BAR0 is mapped to address: 0x%08X\n",(int) vadr);
-
 
       /* Set up the LAS0BRD local configuration register to do appropriate */
       /* endian mapping, and enable the address space for CTR hardware.    */
@@ -1925,47 +2201,38 @@ int cmd;
       DrmLocalReadWrite(mcon,PLX9030_LAS0BRD,&las0brd,4,1);
 
       /* register the ISR */
-      cc = drm_register_isr(handle,IntrHandler, (void *)mcon);
+      cc = drm_register_isr(handle,(void *) IntrHandler, (void *) mcon);
       if (cc == SYSERR) {
-        cprintf("CtrDrvrInstall: Can't register ISR for timing module: %d\n",
-          modix + 1);
-        return (char *)SYSERR;
+	cprintf("CtrDrvrInstall: Can't register ISR for timing module: %d\n",
+	  modix + 1);
+	return (char *)SYSERR;
       } else {
-        mcon->LinkId = cc;
+	mcon->LinkId = cc;
 
-	ivec = (unsigned int)handle->irq;
-        mcon->IVector = 0xFF & ivec;
+	ivec = (unsigned int) handle->irq;
+	mcon->IVector = 0xFF & ivec;
 
-        cprintf("CtrDrvrInstall: Isr installed OK: LinkId: %d Vector: 0x%2X\n",
-          cc, (int)mcon->IVector);
+	cprintf("CtrDrvrInstall: Isr installed OK: LinkId: %d Vector: 0x%2X\n",
+		cc, (int)mcon->IVector);
       }
 
-      wa->Modules = modix+1;
+      wa->Modules = iluns;
 
-      if (mcon->DeviceId == PLX9030_DEVICE_ID)
-	 cprintf("CtrDrvrInstall: Installed: PLX9030 ModuleNumber: %d In Slot: %d OK\n",
-		 (int) modix+1, (int) mid);
-      else {
-	 cprintf("CtrDrvrInstall: Installed: CTR ModuleNumber: %d In Slot: %d OK\n",
-		 (int) modix+1, (int) mid);
+      mcon->IrqBalance = 1; /* don't enable IRQ twice */
+      if (Reset(mcon) == SYSERR) {   /* Soft reset and initialize module */
+	 cprintf("CtrDrvrInstall: Error returned from Reset on module: %d Recovering\n",(int) modix+1);
+	 if (Reset(mcon) == OK) cprintf("CtrDrvrInstall: Recovered from error OK\n");
+      } else {
 
-	 mcon->IrqBalance = 1; /* don't enable IRQ twice */
-	 if (Reset(mcon) == SYSERR) {   /* Soft reset and initialize module */
-	    cprintf("CtrDrvrInstall: Error returned from Reset on module: %d Recovering\n",(int) modix+1);
-	    if (Reset(mcon) == OK) cprintf("CtrDrvrInstall: Recovered from error OK\n");
-	 } else {
+	 /* Wipe out any old triggers left in Ram after a warm reboot */
 
-	    /* Wipe out any old triggers left in Ram after a warm reboot */
-
-	    mmap = mcon->Map;
-	    for (j=0; j<CtrDrvrRamTableSIZE; j++) {
-	       mmap->Trigs[j].Frame.Long = 0;
-	       mmap->Trigs[j].Trigger    = 0;
-	    }
+	 mmap = mcon->Map;
+	 for (j=0; j<CtrDrvrRamTableSIZE; j++) {
+	    mmap->Trigs[j].Frame.Long = 0;
+	    mmap->Trigs[j].Trigger    = 0;
 	 }
       }
    }
-   if (!RemapFlag) cprintf("CtrDrvrInstall: %d Modules installed: OK\n",(int) wa->Modules);
    return (char *) wa;
 }
 
@@ -1973,8 +2240,15 @@ int cmd;
 /* Uninstall                                                              */
 /*========================================================================*/
 
-int CtrDrvrUninstall(wa)
-CtrDrvrWorkingArea * wa; {     /* Drivers working area pointer */
+void release_device(struct pci_dev *pdev, void *mem, int bar)
+{
+	pci_iounmap(pdev, mem);
+	pci_release_region(pdev, bar);
+	pci_disable_device(pdev);
+	pci_dev_put(pdev);
+}
+
+int CtrDrvrUninstall(CtrDrvrWorkingArea * wa) {
 
 CtrDrvrMemoryMap *mmap;
 CtrDrvrClientContext *ccon;
@@ -1993,13 +2267,16 @@ CtrDrvrModuleContext *mcon;
 	 drm_free_handle(mcon->Handle);
 
 	 if (mcon->Local) {
-	    drm_unmap_resource(mcon->Handle,PCI_RESID_BAR0);
+	    release_device((struct pci_dev *) mcon->Handle, (void *) mcon->Local, 0);
+	    cprintf("CtrDrvrUninstall: Unmap BAR0 Module:%d 0x%X\n",mcon->ModuleIndex+1,(int) (mcon->Local));
+
 	    mcon->LocalOpen = 0;
 	    mcon->Local = NULL;
 	 }
 
 	 if (mcon->Map) {
-	    drm_unmap_resource(mcon->Handle,PCI_RESID_BAR2);
+	    release_device((struct pci_dev *) mcon->Handle, (void *) mcon->Map, 2);
+	    cprintf("CtrDrvrUninstall: Unmap BAR2 Module:%d 0x%X\n",mcon->ModuleIndex+1,(int) (mcon->Map));
 	    mcon->Map = NULL;
 	 }
 
@@ -2029,11 +2306,7 @@ CtrDrvrModuleContext *mcon;
 /* IOCTL                                                                  */
 /*========================================================================*/
 
-int CtrDrvrIoctl(wa, flp, cm, arg)
-CtrDrvrWorkingArea * wa;       /* Working area */
-struct LynxFile * flp;         /* File pointer */
-CtrDrvrControlFunction cm;     /* IOCTL command */
-char * arg; {                  /* Data for the IOCTL */
+int CtrDrvrIoctl(CtrDrvrWorkingArea *wa, struct LynxFile *flp, CtrDrvrControlFunction cm, char *arg) {
 
 CtrDrvrModuleContext           *mcon;   /* Module context */
 CtrDrvrClientContext           *ccon;   /* Client context */
@@ -2069,7 +2342,7 @@ volatile CtrDrvrMemoryMap   *mmap;
 int i, j, k, n, msk, pid, hmsk, found, size, start;
 
 int cnum;                 /* Client number */
-int lav, *lap;           /* Long Value pointed to by Arg */
+long lav, *lap;           /* Long Value pointed to by Arg */
 unsigned short sav;       /* Short argument and for Jtag IO */
 int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
 
@@ -2092,8 +2365,8 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
 	 pseterr(EINVAL);        /* Invalid argument */
 	 return SYSERR;
       }
-      lav = *((int *) arg);       /* Long argument value */
-      lap =   (int *) arg ;       /* Long argument pointer */
+      lav = *((long *) arg);       /* Long argument value */
+      lap =   (long *) arg ;       /* Long argument pointer */
    } else {
       rcnt = 0; wcnt = 0; lav = 0; lap = NULL; /* Null arg = zero read/write counts */
    }
@@ -2459,7 +2732,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
 	 /* Wait 1S for the module to settle */
 
 	 sreset(&(mcon->Semaphore));
-	 mcon->Timer = timeout(ResetTimeout, (char *) mcon, 100);
+	 mcon->Timer = timeout((void *) ResetTimeout, (char *) mcon, 100);
 	 if (mcon->Timer < 0) mcon->Timer = 0;
 	 if (mcon->Timer) swait(&(mcon->Semaphore), SEM_SIGABORT);
 	 if (mcon->Timer) CancelTimeout(&(mcon->Timer));

@@ -252,7 +252,7 @@ int        nb, pos, line, newline;
     
       case Numeric:
 	 atom->Value = (int) strtoul(cp,&ep,0);
-	 nb = ((unsigned int) ep - (unsigned int) cp);
+	 nb = (int) (ep - cp);
 	 cp = ep;
 	 atom->Type = Numeric;
 	 atom->Position = pos;
@@ -712,31 +712,31 @@ int i, ok;
    } else Error(SYNTAX,atom,"Missing OnZero in REMOTE spec");
    if (!ok) Error(SYNTAX,atom,"Illegal OnZero name in REMOTE spec");
 
-   if (ioctl(ctr,CtrDrvrSET_MODULE,&modn) < 0) {
+   if (ioctl(ctr,CtrIoctlSET_MODULE,&modn) < 0) {
       Error(RUN_TIME,atom,"Can't select module in REMOTE spec");
    }
 
    crmb.Counter = ch;
    crmb.Remote = 1;
 
-   if (ioctl(ctr,CtrDrvrSET_MODULE,&modn) < 0) {
+   if (ioctl(ctr,CtrIoctlSET_MODULE,&modn) < 0) {
       Error(FATAL_RUN_TIME,NULL,"Can't select that module");
    }
 
-   if (ioctl(ctr,CtrDrvrSET_REMOTE,&crmb) < 0) {
+   if (ioctl(ctr,CtrIoctlSET_REMOTE,&crmb) < 0) {
       Error(RUN_TIME,atom,"Can't set channel in remote in REMOTE spec");
    }
 
    cbuf.Counter = ch;
 
-   if (ioctl(ctr,CtrDrvrSET_CONFIG,&cbuf) < 0) {
+   if (ioctl(ctr,CtrIoctlSET_CONFIG,&cbuf) < 0) {
       Error(RUN_TIME,atom,"Can't set remote configuration in REMOTE spec");
    }
 
    crmb.Counter = ch;
    crmb.Remote = CtrDrvrRemoteLOAD;
 
-   if (ioctl(ctr,CtrDrvrREMOTE,&crmb) < 0) {
+   if (ioctl(ctr,CtrIoctlREMOTE,&crmb) < 0) {
       Error(RUN_TIME,atom,"Can't issue remote command LOAD in REMOTE spec");
    }
 
@@ -790,14 +790,14 @@ int i, ok;
    } else Error(SYNTAX,atom,"Missing Polarity in OUTMSK spec");
    if (!ok) Error(SYNTAX,atom,"Illegal polarity name in OUTMSK spec");
 
-   if (ioctl(ctr,CtrDrvrSET_MODULE,&modn) < 0) {
+   if (ioctl(ctr,CtrIoctlSET_MODULE,&modn) < 0) {
       Error(RUN_TIME,atom,"Can't select module in OUTMSK spec");
    }
 
    cmsb.Counter = ch;
    cmsb.Mask = msk;
 
-   if (ioctl(ctr,CtrDrvrSET_OUT_MASK,&cmsb) < 0) {
+   if (ioctl(ctr,CtrIoctlSET_OUT_MASK,&cmsb) < 0) {
       Error(RUN_TIME,atom,"Can't set output mask in OUTMSK spec");
    }
 
@@ -828,12 +828,12 @@ unsigned int oby;
       atom = atom->Next;
    } else Error(SYNTAX,atom,"Missing output byte number in OUTMSK spec");
 
-   if (ioctl(ctr,CtrDrvrSET_MODULE,&modn) < 0) {
+   if (ioctl(ctr,CtrIoctlSET_MODULE,&modn) < 0) {
       Error(RUN_TIME,atom,"Can't select module in OUTBYTE spec");
    }
 
 #ifdef CTR_VME
-   if (ioctl(ctr,CtrDrvrSET_OUTPUT_BYTE,&oby) < 0) {
+   if (ioctl(ctr,CtrIoctlSET_OUTPUT_BYTE,&oby) < 0) {
       Error(RUN_TIME,atom,"Can't set output byte in OUTBYTE spec");
    }
 #endif
@@ -855,10 +855,10 @@ CtrDrvrAction actn;
    ptim.Size = rows;
    if (rowm[modn-1]) ptim.StartIndex = rowm[modn-1] -1;
 
-   if (ioctl(ctr,CtrDrvrCREATE_PTIM_OBJECT,&(ptim)) < 0) {
+   if (ioctl(ctr,CtrIoctlCREATE_PTIM_OBJECT,&(ptim)) < 0) {
       sprintf(ermes,"Cant create PTIM object: %u\n",(int) ptim.EqpNum);
       Error(RUN_TIME,NULL,ermes);
-      if (ioctl(ctr,CtrDrvrGET_PTIM_BINDING,&(ptim)) < 0) {
+      if (ioctl(ctr,CtrIoctlGET_PTIM_BINDING,&(ptim)) < 0) {
 	 sprintf(ermes,"Cant read PTIM object: %u\n",(int) ptim.EqpNum);
 	 Error(FATAL_RUN_TIME,NULL,ermes);
       }
@@ -866,7 +866,7 @@ CtrDrvrAction actn;
    }
 
    modn = ptim.ModuleIndex+1;
-   if (ioctl(ctr,CtrDrvrSET_MODULE,&modn) < 0) {
+   if (ioctl(ctr,CtrIoctlSET_MODULE,&modn) < 0) {
       sprintf(ermes,"No such module: %d installed\n",modn);
       Error(FATAL_RUN_TIME,NULL,ermes);
    }
@@ -881,7 +881,7 @@ CtrDrvrAction actn;
       actn.Config          = conf[i][modn-1];
       actn.Trigger.Counter = ptim.Counter;
 
-      if (ioctl(ctr,CtrDrvrSET_ACTION,&actn) < 0) {
+      if (ioctl(ctr,CtrIoctlSET_ACTION,&actn) < 0) {
 	 sprintf(ermes,"Cant set Action: %u for PTIM: %u\n",i+1,(int) ptim.EqpNum);
 	 Error(FATAL_RUN_TIME,NULL,ermes);
       }
@@ -949,7 +949,7 @@ unsigned int modn, modcnt;
       fprintf(stderr,"\nFATAL: Could not open CTR driver");
       exit(1);
    }
-   ioctl(ctr,CtrDrvrLIST_CTIM_OBJECTS,&ctimo);
+   ioctl(ctr,CtrIoctlLIST_CTIM_OBJECTS,&ctimo);
 
    if (argc < 2) strcpy(ass,INFO);
    else          strcpy(ass,argv[1]);
@@ -997,14 +997,14 @@ unsigned int modn, modcnt;
       }
    }
 
-   ioctl(ctr,CtrDrvrGET_MODULE_COUNT,&modcnt);
+   ioctl(ctr,CtrIoctlGET_MODULE_COUNT,&modcnt);
    for (i=0; i<modcnt; i++) {
       modn = i+1;
-      ioctl(ctr,CtrDrvrSET_MODULE,&modn);
+      ioctl(ctr,CtrIoctlSET_MODULE,&modn);
       for (j=0; j<CtrDrvrRamTableSIZE; j++) {
 	 bzero((void *) &tact, sizeof(CtrDrvrAction));
 	 tact.TriggerNumber = j+1;
-	 ioctl(ctr,CtrDrvrGET_ACTION,&tact);
+	 ioctl(ctr,CtrIoctlGET_ACTION,&tact);
 	 if (tact.EqpNum == 0) {
 	    rowm[i] = j;
 	    break;

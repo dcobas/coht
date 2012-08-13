@@ -29,11 +29,11 @@
 #include <linux/version.h>
 #include <linux/mutex.h>
 
-#include <EmulateLynxOs.h>
-#include <DrvrSpec.h>
+#include "EmulateLynxOs.h"
+#include "DrvrSpec.h"
 
 extern void *LynxOsInfoTable;
-extern int LynxOsInitInfoTable();
+extern int LynxOsInitInfoTable(int);
 extern int LynxOsMemoryGetSize(int cmd, int *dirp);
 
 extern LynxOsIsr lynxos_isrs[LynxOsMAX_DEVICE_COUNT];
@@ -41,6 +41,7 @@ extern LynxOsIsr lynxos_isrs[LynxOsMAX_DEVICE_COUNT];
 int debug              = 0;
 int recover            = 0;
 int modules            = 1;
+int first_module       = 1;
 unsigned long infoaddr = 0;
 static char dname[64]  = { 0 };
 
@@ -55,10 +56,11 @@ MODULE_SUPPORTED_DEVICE(LynxOsSUPPORTED_DEVICE);
 /* To get instalation full debug info:  insmod <module> debug=7 */
 /* Then look to: /var/log/messeage for the install debug output */
 
-module_param(debug,     int,   0644);
-module_param(recover,   int,   0644);
-module_param(modules,   int,   0644);
-module_param(infoaddr,  ulong, 0644);
+module_param(debug,        int,   0644);
+module_param(recover,      int,   0644);
+module_param(modules,      int,   0644);
+module_param(first_module, int,   0644);
+module_param(infoaddr,     ulong, 0644);
 
 module_param(LynxOs_major,int,0644);
 MODULE_PARM_DESC(LynxOs_major,"Major device number");
@@ -83,6 +85,7 @@ long LynxIoctl64(struct file *filp, unsigned int cmd, unsigned long arg) {
 int res;
 
    mutex_lock(&ctr_drvr_mutex);
+   if (_IOC_TYPE(cmd) == 'C') cmd = _IOC_NR(cmd);
    res = LynxOsIoctl(filp->f_dentry->d_inode, filp, cmd, arg);
    mutex_unlock(&ctr_drvr_mutex);
    return res;
@@ -92,6 +95,7 @@ int LynxIoctl32(struct inode *inode, struct file *filp, unsigned int cmd, unsign
 int res;
 
    mutex_lock(&ctr_drvr_mutex);
+   if (_IOC_TYPE(cmd) == 'C') cmd = _IOC_NR(cmd);
    res = LynxOsIoctl(inode, filp, cmd, arg);
    mutex_unlock(&ctr_drvr_mutex);
    return res;
@@ -101,17 +105,18 @@ struct file_operations LynxOs_fops = {
    read:           LynxOsRead,
    write:          LynxOsWrite,
    ioctl:          LynxIoctl32,
+   unlocked_ioctl: LynxIoctl64,
    compat_ioctl:   LynxIoctl64,
    open:           LynxOsOpen,
    release:        LynxOsClose
 };
 
-#include <EmulateLynxOs.h>
-#include <DrvrSpec.h>
+#include "EmulateLynxOs.h"
+#include "DrvrSpec.h"
 
 extern struct dldd entry_points;
 
-char *LynxOsWorkingArea = NULL;
+void *LynxOsWorkingArea = NULL;
 
 /* ===================================================== */
 /* Open                                                  */
