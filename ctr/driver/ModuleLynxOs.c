@@ -104,7 +104,6 @@ int res;
 struct file_operations LynxOs_fops = {
    read:           LynxOsRead,
    write:          LynxOsWrite,
-   ioctl:          LynxIoctl32,
    unlocked_ioctl: LynxIoctl64,
    compat_ioctl:   LynxIoctl64,
    open:           LynxOsOpen,
