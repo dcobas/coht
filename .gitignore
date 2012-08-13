@@ -26,6 +26,7 @@
 *.bin
 *.gz
 !.gitignore
+!.gitmodules
 
 #
 # Top-level generic files
