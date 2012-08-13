@@ -181,7 +181,7 @@ int i;
 /* LynxOs interrupt masking routines                                            */
 /* ============================================================================ */
 
-spinlock_t lynxos_cpu_lock = SPIN_LOCK_UNLOCKED;
+DEFINE_SPINLOCK(lynxos_cpu_lock);
 
 /* ============================================================================ */
 /* LynxOs bus error trap mechanism                                              */
