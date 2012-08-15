@@ -2,9 +2,8 @@
 # Makefile to produce standard CTR-P test program
 #================================================================
 
-include /acc/dsc/src/co/Make.auto
-
 CPU=L865
+include /acc/dsc/src/co/Make.auto
 
 DDIR = acdx
 
