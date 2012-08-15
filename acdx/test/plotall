@@ -1,0 +1,51 @@
+set datafile commentschars "#"
+
+set multiplot;
+set size 0.5,0.3;
+
+set origin 0.0,0.0;
+unset label
+#set xlabel "Microseconds"
+#set ylabel "Amps"
+#set label "Magnet Current"
+#plot "/tmp/AcdxAqn.mac" using ($1):(0.001*$2) with line
+plot "MagnetCurrent" using ($1):($2*10000/32767) with line
+
+unset label
+set origin 0.5,0.0;
+#set ylabel "Volts"
+#set label "Magnet Voltage"
+#plot "/tmp/AcdxAqn.mav" using ($1):(400.00/32767*$2) with line
+plot "MagnetVoltage" using ($1):($2*400/32767) with line
+
+unset label
+set origin 0.0,0.3;
+#set ylabel "Amps"
+#set label "Amplifier One Current"
+#plot "/tmp/AcdxAqn.loc" using ($1):(0.01*$2) with line
+plot "AmplifierOneCurrent" using ($1):($2*1000/32767) with line
+
+unset label
+set origin 0.5,0.3;
+#set ylabel "Volts"
+#set label "Amplifier One Voltage"
+#plot "/tmp/AcdxAqn.lov" using ($1):(40.00*$2) with line
+plot "AmplifierOneVoltage" using ($1):($2*400.00/32767) with line
+
+unset label
+set origin 0.0,0.6;
+#set ylabel "Amps"
+#set label "Amplifier Two Current"
+#plot "/tmp/AcdxAqn.roc" using ($1):(0.01*$2) with line
+plot "AmplifierTwoCurrent" using ($1):(1000*$2/32767) with line
+
+unset label
+set origin 0.5,0.6;
+#set ylabel "Volts"
+#set label "Amplifier Two Voltage"
+#plot "/tmp/AcdxAqn.rov" using ($1):(40.00*$2) with line
+plot "AmplifierTwoVoltage" using ($1):($2*400.00/32767) with line
+
+unset multiplot
+
+pause -1 "Hit carrige return to continue"

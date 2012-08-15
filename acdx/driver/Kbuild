@@ -1,0 +1,12 @@
+EXTRA_CFLAGS += \
+	-Wno-strict-prototypes \
+	-DCTR_PCI \
+	-DEMULATE_LYNXOS_ON_LINUX \
+	-DHARD_FLOAT \
+	-mhard-float \
+	-I $(src)/../common \
+	-I $(src)
+
+obj-m := acdx.o
+acdx-objs := acdxdrvr.o DrvrSpec.o EmulateLynxOs.o ModuleLynxOs.o
+

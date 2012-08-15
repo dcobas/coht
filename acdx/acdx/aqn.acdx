@@ -1,0 +1,14 @@
+date
+
+chmod 664 /tmp/Acdx*
+
+cp /tmp/AcdxAqn.mav /tmp/AcdxAqn.mav.old
+cp /tmp/AcdxAqn.mac /tmp/AcdxAqn.mac.old
+cp /tmp/AcdxAqn.lov /tmp/AcdxAqn.lov.old
+cp /tmp/AcdxAqn.loc /tmp/AcdxAqn.loc.old
+cp /tmp/AcdxAqn.rov /tmp/AcdxAqn.rov.old
+cp /tmp/AcdxAqn.roc /tmp/AcdxAqn.roc.old
+
+echo "batch 0 (do) q" | /usr/local/drivers/acdx/test/acdxtest
+
+ls -l /tmp/Acdx*

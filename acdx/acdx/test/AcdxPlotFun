@@ -1,0 +1,6 @@
+set xrange[0:2000]
+plot "/tmp/AcdxFunc" with line
+pause -1
+set xrange[1000:3000]
+replot
+pause -1

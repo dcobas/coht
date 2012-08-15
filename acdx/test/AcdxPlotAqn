@@ -1,0 +1,6 @@
+set xrange[0:2000]
+plot "/tmp/AcdxAqn" with line
+pause -1 "Hit carrige return to continue"
+set xrange[1000:3000]
+replot
+pause -1 "Hit carrige return to continue"

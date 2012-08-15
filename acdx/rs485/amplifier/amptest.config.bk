@@ -1,0 +1,17 @@
+
+;File name             ;Location of File             ;Comment
+
+amp_news               /usr/local/drivers/acdx/test/ ;News about PowerSoft Amp software/hardware
+e                      /usr/local/bin/               ;RAND Editor
+vi                     /bin/                         ;VI Editor
+nedit                  /usr/bin/X11/                 ;NEDIT X-Window Editor
+emacs                  /usr/local/bin/               ;EMACS Editor
+gnuplot                /usr/bin/                     ;X11 Plot program
+
+AmpDevice              /dev/ttyMI0/                  ;Default device serial port
+
+RefAmpDspBin           /usr/local/drivers/acdx/test/ ;Reference file to store DSP binary block 0=Ch1 1=Ch2 2=Com
+AmpDspBin              /tmp/                         ;Temp file to store DSP binary block 0=Ch1 1=Ch2 2=Com
+
+RefAmpStatus           /usr/local/drivers/acdx/test/ ;Reference amplifier status
+AmpStatus              /tmp/                         ;Temp file to store amplifier status
