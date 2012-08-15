@@ -1,29 +1,12 @@
-###############################################################################
-# @file Kbuild
-#
-# @brief Specific kbuild
-#
-# @author Yury GEORGIEVSKIY. CERN BE/CO
-#
-# @date Created on 17/04/2009
-###############################################################################
-INC = /acc/src/dsc/drivers/coht/include
-EML = ../common
-
-ccflags-y = \
+EXTRA_CFLAGS += \
 	-Wno-strict-prototypes \
 	-DCTR_PCI \
 	-DEMULATE_LYNXOS_ON_LINUX \
 	-DHARD_FLOAT \
 	-mhard-float \
-	-I$(INC) \
-	-I$(M)/$(EML)
+	-I $(src)/../common \
+	-I $(src)
 
+obj-m := acdx.o
+acdx-objs := acdxdrvr.o DrvrSpec.o EmulateLynxOs.o ModuleLynxOs.o
 
-#  Use XTRA_DRSC to add driver files to compile from other
-#+ than ./driver directories
-XTRA_DSRC = $(addprefix $(EML)/, \
-	       DrvrSpec.c EmulateLynxOs.c ModuleLynxOs.c)
-
-# include general kbuild
-include $(M)/../../makefiles/Kbuild
