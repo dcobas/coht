@@ -1,0 +1,94 @@
+===============================================================================
+README Help about the AC-Dipole driver, library, test program and installation.
+Julian Lewis CO/HT Fri 5th June 2009
+===============================================================================
+
+The ACDX software needs a directory on the host DSC in the local path as follows...
+
+/usr/local/drivers/acdx
+
+An exact copy of this directory is kept here in the acdx directory.
+
+A rather unusual install is acomplished by simply copying this local directory
+to the final target location using these commands ...
+
+sudo cp -R acdx /acc/dsc/oplhc/L865/2.6.24.7-rt21
+sudo cp -R acdx /acc/dsc/lab/L865/2.6.24.7-rt21
+
+After rebuilding the driver the object file should be copied to the local acdx directory prior
+to issuing the copy command ...
+
+cp /dsrc/drivers/coht/acdx/object_acdx/acdx.2.6.24.7-rt21.ko /dsrc/drivers/coht/acdx/acdx
+
+The FPGA image that is used by the loader is pointed to by the link Acdx.bit in the test directory,
+at the time of writing the link looks like this ...
+
+Acdx.bit -> x3_servo_v2.10.bit
+
+The places where the software and libraries look for files is controlled through the file ...
+
+acdxtest.config
+
+The actual file is kept in the test directory, but a link to this file is needed in acdx ...
+
+acdxtest.config -> test/acdxtest.config
+
+This is because the built in path name for the front end software is ...
+
+/usr/local/drivers/acdx/acdxtest.config
+
+After compiling the test program acdxtest copy /dsrc/drivers/coht/acdx/test/acdxtest.L865 to
+this place ...
+
+/dsrc/drivers/coht/acdx/acdx/test/acdxtest
+
+this results in the test program path /usr/local/drivers/acdx/test/acdxtest on the target system.
+A symbolic link has been set up in /usr/local/bin so that the testprogram can be launched with
+the simple command acdxtest
+
+Driver installation and hardware setup on the front end is acomplished by running the local scripts
+in /usr/local/driver/acdx/install via the scripts install.native and setup.acdx.
+A symbolic link in the install directory is used to load the driver for the correct kernel ...
+
+acdx.2.6.24.7-rt21.ko -> ../acdx.2.6.24.7-rt21.ko
+
+If we change kernel the install.native script looks for "acdx.`uname -r`.ko" so you would need to
+change the above link. I did not use an anonymus link delibratley to ensure the kernel change does
+not attempt to load the driver for the wrong kernel version.
+Once the driver has been installed correctly the setup.acdx shell script is run. This script calls
+on acdxtest to load the FPGA firmware and to initialize the PLL parameters on the x3servo module.
+These commands are driven from the transfer.ref file in the usual way as follows ...
+
+#
+# Install, load VHDL and configure X3-SERVO driver for AC Dipole
+#% cd /usr/local/drivers/acdx/install; ./install.native; ./setup.acdx
+
+The final settings are applied from the acdx library (libacdx.a) when the FESA class starts.
+Here the sinwave is generated and loaded, and the ADC and DAC enabled.
+A call to AcdxArm is made from FESA and the system then waits for a trigger comming from the
+CTR to generate the function.
+
+A shell script is available to do the acquisitions of the 6
+currents and voltages for postmortem purposes...
+
+/usr/local/drivers/acdx/aqn.acdx
+
+This script keeps two copies current and previous (old) in the /tmp directory...
+
+-rw-rw-r-- 1 root  root  2038885 Jun  5 11:56 /tmp/AcdxAqn.loc.old
+-rw-rw-r-- 1 lewis pz    1644272 Jun  5 14:39 /tmp/AcdxAqn.lov
+-rw-rw-r-- 1 root  root  1639487 Jun  5 11:56 /tmp/AcdxAqn.lov.old
+-rw-rw-r-- 1 lewis pz    1894377 Jun  5 14:39 /tmp/AcdxAqn.mac
+-rw-rw-r-- 1 root  root  1894375 Jun  5 11:56 /tmp/AcdxAqn.mac.old
+-rw-rw-r-- 1 lewis pz    1719718 Jun  5 14:39 /tmp/AcdxAqn.mav
+-rw-rw-r-- 1 root  root  1719720 Jun  5 11:56 /tmp/AcdxAqn.mav.old
+-rw-rw-r-- 1 lewis pz    1719723 Jun  5 14:39 /tmp/AcdxAqn.roc
+-rw-rw-r-- 1 root  root  1719724 Jun  5 11:56 /tmp/AcdxAqn.roc.old
+-rw-rw-r-- 1 lewis pz    1639204 Jun  5 14:39 /tmp/AcdxAqn.rov
+-rw-rw-r-- 1 root  root  1637706 Jun  5 11:56 /tmp/AcdxAqn.rov.old
+
+the script is best run with root privaleges.
+
+===================================================================
+
+Julian

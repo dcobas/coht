@@ -1,0 +1,8 @@
+# Driver name
+DRIVER_NAME = acdx
+
+# If driver is using skeleton
+IS_SKEL = n
+
+# If drier is CDCM compliant
+IS_CDCM = n

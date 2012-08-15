@@ -1,0 +1,14 @@
+#!/bin/sh
+
+echo install ACDX driver
+
+/sbin/insmod ../acdx.ko debug=0
+
+MAJOR=`cat /proc/devices | awk '{if ($2 == "acdx") printf $1}'`
+
+echo Making nodes for ${MODULE} major device acdx ${MAJOR}
+
+for m in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16; do \
+	rm -f /dev/acdx.$m; \
+	mknod  -m 0666 /dev/acdx.$m c ${MAJOR} $m; \
+done
