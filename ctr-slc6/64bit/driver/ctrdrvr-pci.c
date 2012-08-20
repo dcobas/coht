@@ -2648,7 +2648,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrSET_UTC:                /* Set Universal Coordinated Time for next PPS tick */
-	 if (lap) return SetTime(mcon,lav);
+	 if (lap) return SetTime(mcon,(unsigned int) lav);
       break;
 
       case CtrDrvrGET_UTC:                /* Latch and read the current UTC time */
