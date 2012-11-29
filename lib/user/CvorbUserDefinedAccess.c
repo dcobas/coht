@@ -880,6 +880,8 @@ int cvorb_func_load(int h, int ch, int func, struct fv *fv, int sz)
 		/* first -- round to the nearest multiple of
 		   MIN_STEP (5us) size */
 		lldt_int = MIN_STEP * (uint64_t)(lldt / MIN_STEP + 0.5);
+		if (lldt_int <= 0)
+			return -CVORB_OUT_OF_RANGE;
 
 		/* get minimum step size needed to hit dt range */
 		par.fv[i].ss = ((lldt_int-1)/MTMS) + 1;
