@@ -10,11 +10,6 @@
 #include <dg/port_ops_linux.h>
 #endif /* __LYNXOS */
 
-/* for kernel only */
-#if defined(__LYNXOS) || defined(__KERNEL__)
-struct sel; /* preliminary structure declaration to supress warnings during
-	       user code compilation */
-
 /**
  * @brief PLL configuration structure
  *
@@ -41,6 +36,11 @@ struct pll {
         int force;
         int external;
 };
+
+/* for kernel only */
+#if defined(__LYNXOS) || defined(__KERNEL__)
+struct sel; /* preliminary structure declaration to supress warnings during
+	       user code compilation */
 
 /* enable/disable i/o access debugging printout */
 //#define __DEBUG

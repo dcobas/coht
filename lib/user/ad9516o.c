@@ -17,6 +17,7 @@
 #include <stdint.h>
 #include <math.h>
 #include <CvorbUserDefinedAccess.h>
+#include <CvorbUserDefinedDrvr.h>
 #include <CvorbDrvrDefs.h>
 #include <ad9516o-drvr.h>
 
