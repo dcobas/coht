@@ -25,6 +25,8 @@ enum irqreturn {
 struct cvorb_module _m[2];
 
 #define FW_VERSION	0x420317
+#define FW_MODEL	((FW_VERSION & 0xffff0000) >> 16)
+#define MIN_FW_VERSION	(FW_VERSION & 0xffff)
 
 /**
  * @brief Interrupt Service Routine.
@@ -372,6 +374,29 @@ int CvorbUserIoctl(int *proceed, register CVORBStatics_t *sptr,
 	return OK;
 }
 
+int firmware_ok(CVORBUserStatics_t *usp, int lun)
+{
+	uint serial;
+	uint model;
+	uint version;
+
+	serial = _rr(0, VHDL_V);
+	model = (serial & 0xffff0000) >> 16;
+	version = (serial & 0x0000ffff);
+	kkprintf("cvorb firmware version: 0x%08x\n", serial);
+	if (model != FW_MODEL) {
+		kkprintf("Board with lun %d has a wrong FW model: 0x%x. Should be 0x%x\n",
+							lun, model, FW_MODEL);
+		return 0;
+	}
+	if (version < MIN_FW_VERSION) {
+		kkprintf("Board with lun %d has too old FW version: "
+			"0x%x. Should be 0x%x or higher\n",
+			lun, version, MIN_FW_VERSION);
+		return 1;
+	}
+	return 1;
+}
 /**
  * @brief User entry point in driver/simulator installation routine.
  *
@@ -396,7 +421,6 @@ char* CvorbUserInst(int *proceed, register DevInfo_t *info,
 	CVORBUserStatics_t *usp = sptr->usrst; /* user statistics table */
 	int iVec = 0; /* interrupt vector */
 	int m, c;
-	uint serial;
 
 	iVec = info->iVector;		/* set up interrupt vector */
 
@@ -406,15 +430,10 @@ char* CvorbUserInst(int *proceed, register DevInfo_t *info,
 	usp->md[0].md = (mod *)sptr->card->block00;
 	usp->md[1].md = (mod *)((long)sptr->card->block00 + 0x200);
 	
-	serial = _rr(0, VHDL_V);
-
-	if (serial != FW_VERSION) {
-		kkprintf("Board with lun %d has a wrong FW version: 0x%x. Should be 0x%x\n",
-							info->mlun, serial, FW_VERSION);
+	if (!firmware_ok(usp, info->mlun)) {
 		sysfree((char *)usp->md, sizeof(_m));
 		return (char *)SYSERR;
 	}
-		
 	for (m = 0; m < SMAM; m++) {
 		/* reset subModules */
 		_wr(m, SOFT_PULSE, SPR_FGR);
