@@ -14,8 +14,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <general_both.h>
-
+#include "cvorb_errno.h"
 #include "libinternal.h"
 
 char *__cvorb_error_strings[] = {
@@ -25,6 +24,8 @@ char *__cvorb_error_strings[] = {
 	"No such device",
 	"Feature not supported"
 };
+
+#define ARRAY_SIZE(x)	(sizeof(x)/sizeof((x)[0]))
 #define LIBCVORB_NR_ERRCODES ARRAY_SIZE(__cvorb_error_strings)
 
 int __cvorb_loglevel = 1;
