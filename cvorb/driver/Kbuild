@@ -1,0 +1,9 @@
+EXTRA_CFLAGS += \
+	     -Wstrict-prototypes \
+             -I$(M) \
+             -I$(M)/../include \
+             -I$(M)/../../include 
+
+obj-m += cvorb.o
+
+cvorb-objs := cvorb_func.o cvorb_sysfs.o cvorb_drvr.o cvorb_dma.o
