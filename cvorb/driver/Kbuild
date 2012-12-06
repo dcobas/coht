@@ -1,8 +1,8 @@
 EXTRA_CFLAGS += \
 	     -Wstrict-prototypes \
              -I$(M) \
-             -I$(M)/../include \
-             -I$(M)/../../include 
+	     -I $(M)/../include \
+	     -I /acc/src/dsc/drivers/coht/vmebridge/include
 
 obj-m += cvorb.o
 
