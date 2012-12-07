@@ -8,7 +8,7 @@ CPU=L865
 KVER=2.6.24.7-rt27
 
 KERNELSRC=/acc/sys/$(CPU)/usr/src/kernels/$(KVER)
-OUTPUTDIR=$(PWD)/$(CPU)/$(KVER)
+OUTPUTDIR=$(CURDIR)/$(CPU)/$(KVER)
 
 CFLAGS=-g -Wall -Wstrict-prototypessss
 all: driver 
