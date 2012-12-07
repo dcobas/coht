@@ -11,7 +11,6 @@
 #ifndef _GENERAL_BOTH_HEADER_H_INCLUDE_
 #define _GENERAL_BOTH_HEADER_H_INCLUDE_
 
-#include <lynx_ioctls.h>
 #include <stddef.h> /* both, Lynx && Linux have them */
 
 #define MAX_UCA      (16+1)     /**< MAX allowed user contexts
