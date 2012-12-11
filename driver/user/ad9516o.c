@@ -12,7 +12,6 @@
  * @section license_sec License
  * Released under the GPL v2. (and only v2, not any later version)
  */
-#include <cdcm/cdcm.h>
 #include <cdcm/cdcmBoth.h>
 #include <cdcm/cdcmIo.h>
 #include <ad9516o-drvr.h>
