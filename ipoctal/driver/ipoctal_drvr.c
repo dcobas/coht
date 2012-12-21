@@ -24,6 +24,7 @@
 #include "ipoctal_drvr.h"
 #include "carrier.h"
 #include "scc2698.h"
+#include <linux/debugfs.h>
 
 static int lun[IPOCTAL_MAX_BOARDS];
 static unsigned int num_lun;
@@ -151,6 +152,29 @@ struct tty_operations ipoctalFops =
 	.chars_in_buffer =	ipoctal_chars_in_buffer,
 };
 
+static struct dentry *debugfsdir;
+static struct dentry *debugfsstats;
+static int file_value;
+
+int debug_read(struct file *file, char __user *userbuf,
+                                size_t count, loff_t *ppos)
+{
+	int i, copied;
+	copied = 0;
+	for (i = 0; i < num_lun; i++) {
+		if (copy_to_user(userbuf + copied,
+				ipoctal_installed[i].chan_stats,
+			sizeof(ipoctal_installed[i].chan_stats)))
+			return -EINVAL;
+		copied += sizeof(ipoctal_installed[i].chan_stats);
+	}
+	return copied;
+}
+
+static struct file_operations debug_fops = {
+	.read = debug_read,
+};
+
 static int __init ipoctal_init(void)
 {
 
@@ -160,6 +184,12 @@ static int __init ipoctal_init(void)
 		printk(KERN_ERR PFX "the number of parameters doesn't match or are invalid.\n");
 		return -1;
 	}
+	if ((debugfsdir = debugfs_create_dir("ipoctal", NULL)) == NULL)
+		pr_err("%s: could not create debugfs tree\n", __func__);
+	if ((debugfsstats = debugfs_create_file("stats", 0777, debugfsdir, &file_value, &debug_fops)) == NULL)
+		pr_err("%s: could not create debugfs file\n", __func__);
+	pr_info("%s: read from debugfs files in blocks of %d bytes\n", __func__,
+			sizeof(ipoctal_installed[0].chan_stats));
 	ipoctal_install_all();
 	printk(KERN_ERR PFX "IP octal driver loaded ( %s ).\n", MODULE_NAME);
 	return 0;
@@ -171,6 +201,8 @@ static void __exit ipoctal_exit(void)
 
 	printk(KERN_INFO PFX "IP octal driver unloading... ( %s )\n", MODULE_NAME);
 	
+	debugfs_remove(debugfsstats);
+	debugfs_remove(debugfsdir);
 	if(ipoctal_installed == NULL)
 		goto print_exit;	
 
