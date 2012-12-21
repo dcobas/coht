@@ -403,8 +403,8 @@ static int ipoctal_inst_slot(struct ipoctal *ipoctal, unsigned int carrier_numbe
 		ipoctal_write_io_reg(
 				ipoctal, 
 				&ipoctal->block_regs[i].u.w.imr,
-				IMR_TxRDY_A | IMR_RxRDY_FFULL_A | IMR_DELTA_BREAK_A |
-				IMR_TxRDY_B | IMR_RxRDY_FFULL_B | IMR_DELTA_BREAK_B);
+				IMR_TxRDY_A | IMR_RxRDY_FFULL_A |
+				IMR_TxRDY_B | IMR_RxRDY_FFULL_B);
 	}
 
 	for(i=0; i<NR_CHANNELS ; i++){
@@ -885,6 +885,7 @@ void ipoctal_set_termios(struct tty_struct *tty, struct ktermios *old_termios)
 		return;
 	}
 
+#if 0
  	/* Set ignore break status */
  	imr = ipoctal_read_io_reg(
  			ipoctal,
@@ -903,7 +904,7 @@ void ipoctal_set_termios(struct tty_struct *tty, struct ktermios *old_termios)
  	ipoctal_write_io_reg(
  		ipoctal,
  		&ipoctal->block_regs[block].u.w.imr, imr);
- 
+#endif 
 	mr1 |= MR1_ERROR_CHAR;
 	mr1 |= MR1_RxINT_RxRDY;
 
