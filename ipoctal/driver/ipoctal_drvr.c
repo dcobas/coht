@@ -165,6 +165,9 @@ static u32 p2;
 static u32 p3;
 static u32 p4;
 static u32 p5;
+static u32 rxrdy[NR_CHANNELS];
+static u32 txrdy[NR_CHANNELS];
+static u32 intx[3];
 
 int debug_read(struct file *file, char __user *userbuf,
                                 size_t count, loff_t *ppos)
@@ -185,6 +188,25 @@ static struct file_operations debug_fops = {
 	.read = debug_read,
 };
 
+static struct debugfs_blob_wrapper wtxrdy = {
+	.data = txrdy,
+	.size = sizeof(txrdy),
+};
+
+static struct debugfs_blob_wrapper wrxrdy = {
+	.data = rxrdy,
+	.size = sizeof(rxrdy),
+};
+
+static struct debugfs_blob_wrapper wintx = {
+	.data = intx,
+	.size = sizeof(intx),
+};
+
+struct dentry *drxrdy;
+struct dentry *dtxrdy;
+struct dentry *dintx;
+
 static int __init ipoctal_init(void)
 {
 
@@ -203,6 +225,8 @@ static int __init ipoctal_init(void)
 	dp3 = debugfs_create_u32("p3", 0777, debugfsdir, &p3);
 	dp4 = debugfs_create_u32("p4", 0777, debugfsdir, &p4);
 	dp5 = debugfs_create_u32("p5", 0777, debugfsdir, &p5);
+	drxrdy = debugfs_create_blob("rxrdy", 0777, debugfsdir, &wrxrdy);
+	dtxrdy = debugfs_create_blob("txrdy", 0777, debugfsdir, &wtxrdy);
 	ipoctal_install_all();
 	printk(KERN_ERR PFX "IP octal driver loaded ( %s ).\n", MODULE_NAME);
 	return 0;
@@ -214,6 +238,8 @@ static void __exit ipoctal_exit(void)
 
 	printk(KERN_INFO PFX "IP octal driver unloading... ( %s )\n", MODULE_NAME);
 	
+	debugfs_remove(drxrdy);
+	debugfs_remove(dtxrdy);
 	debugfs_remove(dp1);
 	debugfs_remove(dp2);
 	debugfs_remove(dp3);
@@ -692,6 +718,15 @@ static int ipoctal_irq_handler(void *arg)
 			isrRxRdy = isr & ISR_RxRDY_FFULL_A;
 		}
 
+		if (isrRxRdy)
+			rxrdy[channel]++;
+		if (isrTxRdy)
+			txrdy[channel]++;
+		index = ipoctal->index;
+		if (index == 0 || index == 1)
+			intx[index]++;
+		else
+			intx[2]++;
 		/* In case of RS-485, change from TX to RX. Half-duplex. */
 		if ((ipoctal->board_id == IP_OCTAL_485_ID) && (sr & SR_TX_EMPTY) && (ipoctal->nb_bytes[channel] == 0)) {
 			ipoctal_write_io_reg(ipoctal, &ipoctal->chan_regs[channel].u.w.cr, CR_DISABLE_TX);
