@@ -160,6 +160,7 @@ static struct dentry *dp5;
 static struct dentry *dp6;
 static struct dentry *dp7;
 static struct dentry *dp8;
+static struct dentry *denable_tx;
 static struct dentry *debugfsdir;
 static struct dentry *debugfsstats;
 static int file_value;
@@ -171,6 +172,7 @@ static u32 p5;
 static u32 p6;
 static u32 p7;
 static u32 p8;
+static u32 enable_tx;
 static u32 rxrdy[NR_CHANNELS];
 static u32 txrdy[NR_CHANNELS];
 static u32 intx[3];
@@ -234,6 +236,7 @@ static int __init ipoctal_init(void)
 	dp6 = debugfs_create_u32("p6", 0777, debugfsdir, &p6);
 	dp7 = debugfs_create_u32("p7", 0777, debugfsdir, &p7);
 	dp8 = debugfs_create_u32("p8", 0777, debugfsdir, &p8);
+	denable_tx = debugfs_create_u32("enable_tx", 0777, debugfsdir, &enable_tx);
 	drxrdy = debugfs_create_blob("rxrdy", 0777, debugfsdir, &wrxrdy);
 	dtxrdy = debugfs_create_blob("txrdy", 0777, debugfsdir, &wtxrdy);
 	dintx  = debugfs_create_blob("intx", 0777, debugfsdir, &wintx);
@@ -248,6 +251,7 @@ static void __exit ipoctal_exit(void)
 
 	printk(KERN_INFO PFX "IP octal driver unloading... ( %s )\n", MODULE_NAME);
 	
+	debugfs_remove(denable_tx);
 	debugfs_remove(drxrdy);
 	debugfs_remove(dtxrdy);
 	debugfs_remove(dintx);
@@ -673,6 +677,7 @@ static int ipoctal_write(struct ipoctal *ipoctal, unsigned int channel, const un
 								CR_CMD_ASSERT_RTSN);
 	}
 
+	enable_tx++;
 	ipoctal_write_io_reg(ipoctal, &ipoctal->chan_regs[channel].u.w.cr, CR_ENABLE_TX);
 	wait_event_interruptible(ipoctal->queue[channel], ipoctal->write);
 
