@@ -227,6 +227,7 @@ static int __init ipoctal_init(void)
 	dp5 = debugfs_create_u32("p5", 0777, debugfsdir, &p5);
 	drxrdy = debugfs_create_blob("rxrdy", 0777, debugfsdir, &wrxrdy);
 	dtxrdy = debugfs_create_blob("txrdy", 0777, debugfsdir, &wtxrdy);
+	dintx  = debugfs_create_blob("intx", 0777, debugfsdir, &wintx);
 	ipoctal_install_all();
 	printk(KERN_ERR PFX "IP octal driver loaded ( %s ).\n", MODULE_NAME);
 	return 0;
@@ -240,6 +241,7 @@ static void __exit ipoctal_exit(void)
 	
 	debugfs_remove(drxrdy);
 	debugfs_remove(dtxrdy);
+	debugfs_remove(dintx);
 	debugfs_remove(dp1);
 	debugfs_remove(dp2);
 	debugfs_remove(dp3);
@@ -701,6 +703,7 @@ static int ipoctal_irq_handler(void *arg)
 	unsigned char isrTxRdy, isrRxRdy;
 	unsigned char value;
 	struct ipoctal *ipoctal = (struct ipoctal *) arg;
+	int index;
 
 	p1++;
 	for (channel=0; channel<NR_CHANNELS; channel++) {
