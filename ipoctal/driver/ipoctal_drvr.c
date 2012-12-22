@@ -157,6 +157,9 @@ static struct dentry *dp2;
 static struct dentry *dp3;
 static struct dentry *dp4;
 static struct dentry *dp5;
+static struct dentry *dp6;
+static struct dentry *dp7;
+static struct dentry *dp8;
 static struct dentry *debugfsdir;
 static struct dentry *debugfsstats;
 static int file_value;
@@ -165,6 +168,9 @@ static u32 p2;
 static u32 p3;
 static u32 p4;
 static u32 p5;
+static u32 p6;
+static u32 p7;
+static u32 p8;
 static u32 rxrdy[NR_CHANNELS];
 static u32 txrdy[NR_CHANNELS];
 static u32 intx[3];
@@ -225,6 +231,9 @@ static int __init ipoctal_init(void)
 	dp3 = debugfs_create_u32("p3", 0777, debugfsdir, &p3);
 	dp4 = debugfs_create_u32("p4", 0777, debugfsdir, &p4);
 	dp5 = debugfs_create_u32("p5", 0777, debugfsdir, &p5);
+	dp6 = debugfs_create_u32("p6", 0777, debugfsdir, &p6);
+	dp7 = debugfs_create_u32("p7", 0777, debugfsdir, &p7);
+	dp8 = debugfs_create_u32("p8", 0777, debugfsdir, &p8);
 	drxrdy = debugfs_create_blob("rxrdy", 0777, debugfsdir, &wrxrdy);
 	dtxrdy = debugfs_create_blob("txrdy", 0777, debugfsdir, &wtxrdy);
 	dintx  = debugfs_create_blob("intx", 0777, debugfsdir, &wintx);
@@ -247,6 +256,9 @@ static void __exit ipoctal_exit(void)
 	debugfs_remove(dp3);
 	debugfs_remove(dp4);
 	debugfs_remove(dp5);
+	debugfs_remove(dp6);
+	debugfs_remove(dp7);
+	debugfs_remove(dp8);
 	debugfs_remove(debugfsstats);
 	debugfs_remove(debugfsdir);
 	if(ipoctal_installed == NULL)
@@ -752,11 +764,15 @@ static int ipoctal_irq_handler(void *arg)
 
 		/* TX of each character */
 		p3++;
+		if (isrTxRdy)
+			p6++;
 		if (isrTxRdy && (sr & SR_TX_READY) && (ipoctal->chan_status[channel] == CHAN_WRITE)) {
 			unsigned int *pointer_write = &ipoctal->pointer_write[channel];
 
+			p7++;
 			if(ipoctal->nb_bytes[channel] <= 0) {
 				ipoctal->nb_bytes[channel] = 0;
+				p8++;
 				continue;
 			}
 			spin_lock(&ipoctal->lock[channel]);
