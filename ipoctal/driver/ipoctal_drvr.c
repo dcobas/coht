@@ -156,6 +156,7 @@ static struct dentry *dp1;
 static struct dentry *dp2;
 static struct dentry *dp3;
 static struct dentry *dp4;
+static struct dentry *dp5;
 static struct dentry *debugfsdir;
 static struct dentry *debugfsstats;
 static int file_value;
@@ -163,6 +164,7 @@ static u32 p1;
 static u32 p2;
 static u32 p3;
 static u32 p4;
+static u32 p5;
 
 int debug_read(struct file *file, char __user *userbuf,
                                 size_t count, loff_t *ppos)
@@ -200,6 +202,7 @@ static int __init ipoctal_init(void)
 	dp2 = debugfs_create_u32("p2", 0777, debugfsdir, &p2);
 	dp3 = debugfs_create_u32("p3", 0777, debugfsdir, &p3);
 	dp4 = debugfs_create_u32("p4", 0777, debugfsdir, &p4);
+	dp5 = debugfs_create_u32("p5", 0777, debugfsdir, &p5);
 	ipoctal_install_all();
 	printk(KERN_ERR PFX "IP octal driver loaded ( %s ).\n", MODULE_NAME);
 	return 0;
@@ -215,6 +218,7 @@ static void __exit ipoctal_exit(void)
 	debugfs_remove(dp2);
 	debugfs_remove(dp3);
 	debugfs_remove(dp4);
+	debugfs_remove(dp5);
 	debugfs_remove(debugfsstats);
 	debugfs_remove(debugfsdir);
 	if(ipoctal_installed == NULL)
@@ -699,6 +703,8 @@ static int ipoctal_irq_handler(void *arg)
 
 		/* RX data */
 		p2++;
+		if (isrRxRdy && (sr & SR_RX_READY) && (ipoctal->chan_status[channel] != CHAN_READ))
+			p5++;
 		if (isrRxRdy && (sr & SR_RX_READY) && (ipoctal->chan_status[channel] == CHAN_READ)) {
 			value = ipoctal_read_io_reg(ipoctal, &ipoctal->chan_regs[channel].u.r.rhr);
 			tty_insert_flip_char(ipoctal->tty[channel], value, TTY_NORMAL);
