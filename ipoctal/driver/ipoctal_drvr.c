@@ -703,6 +703,7 @@ static int ipoctal_irq_handler(void *arg)
 			value = ipoctal_read_io_reg(ipoctal, &ipoctal->chan_regs[channel].u.r.rhr);
 			tty_insert_flip_char(ipoctal->tty[channel], value, TTY_NORMAL);
 			tty_flip_buffer_push(ipoctal->tty[channel]);
+			ipoctal->chan_stats[channel].rx++;
 		}
 
 		/* TX of each character */
