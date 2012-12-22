@@ -152,9 +152,17 @@ struct tty_operations ipoctalFops =
 	.chars_in_buffer =	ipoctal_chars_in_buffer,
 };
 
+static struct dentry *dp1;
+static struct dentry *dp2;
+static struct dentry *dp3;
+static struct dentry *dp4;
 static struct dentry *debugfsdir;
 static struct dentry *debugfsstats;
 static int file_value;
+static u32 p1;
+static u32 p2;
+static u32 p3;
+static u32 p4;
 
 int debug_read(struct file *file, char __user *userbuf,
                                 size_t count, loff_t *ppos)
@@ -188,8 +196,10 @@ static int __init ipoctal_init(void)
 		pr_err("%s: could not create debugfs tree\n", __func__);
 	if ((debugfsstats = debugfs_create_file("stats", 0777, debugfsdir, &file_value, &debug_fops)) == NULL)
 		pr_err("%s: could not create debugfs file\n", __func__);
-	pr_info("%s: read from debugfs files in blocks of %d bytes\n", __func__,
-			sizeof(ipoctal_installed[0].chan_stats));
+	dp1 = debugfs_create_u32("p1", 0777, debugfsdir, &p1);
+	dp2 = debugfs_create_u32("p2", 0777, debugfsdir, &p2);
+	dp3 = debugfs_create_u32("p3", 0777, debugfsdir, &p3);
+	dp4 = debugfs_create_u32("p4", 0777, debugfsdir, &p4);
 	ipoctal_install_all();
 	printk(KERN_ERR PFX "IP octal driver loaded ( %s ).\n", MODULE_NAME);
 	return 0;
@@ -201,6 +211,10 @@ static void __exit ipoctal_exit(void)
 
 	printk(KERN_INFO PFX "IP octal driver unloading... ( %s )\n", MODULE_NAME);
 	
+	debugfs_remove(dp1);
+	debugfs_remove(dp2);
+	debugfs_remove(dp3);
+	debugfs_remove(dp4);
 	debugfs_remove(debugfsstats);
 	debugfs_remove(debugfsdir);
 	if(ipoctal_installed == NULL)
@@ -658,6 +672,7 @@ static int ipoctal_irq_handler(void *arg)
 	unsigned char value;
 	struct ipoctal *ipoctal = (struct ipoctal *) arg;
 
+	p1++;
 	for (channel=0; channel<NR_CHANNELS; channel++) {
 
 		/* The HW is organized in pair of channels. See which register we need to read from */
@@ -683,6 +698,7 @@ static int ipoctal_irq_handler(void *arg)
 		}
 
 		/* RX data */
+		p2++;
 		if (isrRxRdy && (sr & SR_RX_READY) && (ipoctal->chan_status[channel] == CHAN_READ)) {
 			value = ipoctal_read_io_reg(ipoctal, &ipoctal->chan_regs[channel].u.r.rhr);
 			tty_insert_flip_char(ipoctal->tty[channel], value, TTY_NORMAL);
@@ -690,6 +706,7 @@ static int ipoctal_irq_handler(void *arg)
 		}
 
 		/* TX of each character */
+		p3++;
 		if (isrTxRdy && (sr & SR_TX_READY) && (ipoctal->chan_status[channel] == CHAN_WRITE)) {
 			unsigned int *pointer_write = &ipoctal->pointer_write[channel];
 
@@ -720,6 +737,7 @@ static int ipoctal_irq_handler(void *arg)
 		}
 
 		/* Error: count statistics */
+		p4++;
 		if (sr & SR_ERROR) {
 			ipoctal_write_cr_cmd(ipoctal, &ipoctal->chan_regs[channel].u.w.cr, 
 									CR_CMD_RESET_ERR_STATUS);
