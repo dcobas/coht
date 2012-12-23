@@ -105,7 +105,7 @@ struct ipoctal {
 	unsigned int			pointer_write[NR_CHANNELS];		
 	unsigned int			open[NR_CHANNELS];
 	unsigned char			read;
-	unsigned char			write;
+	unsigned char			write[NR_CHANNELS];
 	struct tty_struct 		*tty[NR_CHANNELS];
 	struct ktermios			oldtermios[NR_CHANNELS];
 	struct tty_driver		*tty_drv;
@@ -688,10 +688,10 @@ static int ipoctal_write(struct ipoctal *ipoctal, unsigned int channel, const un
 
 	enable_tx++;
 	ipoctal_write_io_reg(ipoctal, &ipoctal->chan_regs[channel].u.w.cr, CR_ENABLE_TX);
-	wait_event_interruptible(ipoctal->queue[channel], ipoctal->write);
+	wait_event_interruptible(ipoctal->queue[channel], ipoctal->write[channel]);
 
 	/* End Write operation */
-	ipoctal->write = 0;
+	ipoctal->write[channel] = 0;
 	ipoctal->chan_status[channel] = CHAN_READ;
 
 	if(ipoctal->board_id != IP_OCTAL_485_ID) {
@@ -763,7 +763,7 @@ static int ipoctal_irq_handler(void *arg)
 			ipoctal_write_io_reg(ipoctal, &ipoctal->chan_regs[channel].u.w.cr, CR_DISABLE_TX);
 			ipoctal_write_cr_cmd(ipoctal, &ipoctal->chan_regs[channel].u.w.cr, CR_CMD_NEGATE_RTSN);
 			ipoctal_write_io_reg(ipoctal, &ipoctal->chan_regs[channel].u.w.cr, CR_ENABLE_RX);
-			ipoctal->write = 1;
+			ipoctal->write[channel] = 1;
 			wake_up_interruptible(&ipoctal->queue[channel]);
 		}
 
@@ -804,7 +804,7 @@ static int ipoctal_irq_handler(void *arg)
 				if (ipoctal->board_id != IP_OCTAL_485_ID) {
 					ipoctal_write_io_reg(ipoctal, &ipoctal->chan_regs[channel].u.w.cr, CR_DISABLE_TX);
 					ipoctal_write_io_reg(ipoctal, &ipoctal->chan_regs[channel].u.w.cr, CR_ENABLE_RX);
-					ipoctal->write = 1;
+					ipoctal->write[channel] = 1;
 					wake_up_interruptible(&ipoctal->queue[channel]);
 				} else {
 					ipoctal->chan_status[channel] = CHAN_OPEN;
