@@ -178,6 +178,12 @@ static u32 txrdy[IPOCTAL_MAX_BOARDS][NR_CHANNELS];
 static u32 nb_bytes[IPOCTAL_MAX_BOARDS][NR_CHANNELS];
 static u32 intx[3];
 
+static char rxbuf[4096];
+static char txbuf[4096];
+static int rxidx, txidx;
+static struct dentry *drxbuf;
+static struct dentry *dtxbuf;
+
 int debug_read(struct file *file, char __user *userbuf,
                                 size_t count, loff_t *ppos)
 {
@@ -217,6 +223,16 @@ static struct debugfs_blob_wrapper wnb_bytes = {
 	.size = sizeof(nb_bytes),
 };
 
+static struct debugfs_blob_wrapper wtxbuf = {
+	.data = txbuf,
+	.size = sizeof(txbuf),
+};
+
+static struct debugfs_blob_wrapper wrxbuf = {
+	.data = txbuf,
+	.size = sizeof(txbuf),
+};
+
 struct dentry *drxrdy;
 struct dentry *dtxrdy;
 struct dentry *dintx;
@@ -247,6 +263,8 @@ static int __init ipoctal_init(void)
 	drxrdy = debugfs_create_blob("rxrdy", 0777, debugfsdir, &wrxrdy);
 	dtxrdy = debugfs_create_blob("txrdy", 0777, debugfsdir, &wtxrdy);
 	dintx  = debugfs_create_blob("intx", 0777, debugfsdir, &wintx);
+	dtxbuf  = debugfs_create_blob("txbuf", 0777, debugfsdir, &wtxbuf);
+	drxbuf  = debugfs_create_blob("rxbuf", 0777, debugfsdir, &wrxbuf);
 	dnb_bytes  = debugfs_create_blob("nb_bytes", 0777, debugfsdir, &wnb_bytes);
 	ipoctal_install_all();
 	printk(KERN_ERR PFX "IP octal driver loaded ( %s ).\n", MODULE_NAME);
@@ -259,6 +277,8 @@ static void __exit ipoctal_exit(void)
 
 	printk(KERN_INFO PFX "IP octal driver unloading... ( %s )\n", MODULE_NAME);
 	
+	debugfs_remove(drxbuf);
+	debugfs_remove(dtxbuf);
 	debugfs_remove(dnb_bytes);
 	debugfs_remove(denable_tx);
 	debugfs_remove(drxrdy);
@@ -772,6 +792,9 @@ static int ipoctal_irq_handler(void *arg)
 			tty_insert_flip_char(ipoctal->tty[channel], value, TTY_NORMAL);
 			tty_flip_buffer_push(ipoctal->tty[channel]);
 			ipoctal->chan_stats[channel].rx++;
+			rxbuf[rxidx++] = value;
+			if (rxidx >= 4096)
+				rxidx = 0;
 		}
 
 		/* TX of each character */
@@ -787,6 +810,9 @@ static int ipoctal_irq_handler(void *arg)
 				value = ipoctal->buffer[channel][*pointer_write];
 				ipoctal_write_io_reg(ipoctal, &ipoctal->chan_regs[channel].u.w.thr, value);
 				ipoctal->chan_stats[channel].tx++;
+				txbuf[txidx++] = value;
+				if (txidx >= 4096)
+					txidx = 0;
 				ipoctal->count_wr[channel]++;
 				(*pointer_write)++;
 				*pointer_write = *pointer_write % MAX_CHAR;
