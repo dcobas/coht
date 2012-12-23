@@ -783,25 +783,24 @@ static int ipoctal_irq_handler(void *arg)
 			unsigned int *pointer_write = &ipoctal->pointer_write[channel];
 
 			p7++;
-			if(ipoctal->nb_bytes[channel] <= 0) {
-				ipoctal->nb_bytes[channel] = 0;
-				p8++;
-				continue;
+			if(ipoctal->nb_bytes[channel] > 0) {
+				spin_lock(&ipoctal->lock[channel]);
+				value = ipoctal->buffer[channel][*pointer_write];
+				ipoctal_write_io_reg(ipoctal, &ipoctal->chan_regs[channel].u.w.thr, value);
+				ipoctal->chan_stats[channel].tx++;
+				ipoctal->count_wr[channel]++;
+				(*pointer_write)++;
+				*pointer_write = *pointer_write % MAX_CHAR;
+				ipoctal->nb_bytes[channel]--;
+				spin_unlock(&ipoctal->lock[channel]);
 			}
-			spin_lock(&ipoctal->lock[channel]);
-			value = ipoctal->buffer[channel][*pointer_write];
-			ipoctal_write_io_reg(ipoctal, &ipoctal->chan_regs[channel].u.w.thr, value);
-			ipoctal->chan_stats[channel].tx++;
-			ipoctal->count_wr[channel]++;
-			(*pointer_write)++;
-			*pointer_write = *pointer_write % MAX_CHAR;
-			ipoctal->nb_bytes[channel]--;
-			spin_unlock(&ipoctal->lock[channel]);
 
 			if ((ipoctal->nb_bytes[channel] == 0) &&
 					(waitqueue_active(&ipoctal->queue[channel]))){
 
 				if (ipoctal->board_id != IP_OCTAL_485_ID) {
+					ipoctal_write_io_reg(ipoctal, &ipoctal->chan_regs[channel].u.w.cr, CR_DISABLE_TX);
+					ipoctal_write_io_reg(ipoctal, &ipoctal->chan_regs[channel].u.w.cr, CR_ENABLE_RX);
 					ipoctal->write = 1;
 					wake_up_interruptible(&ipoctal->queue[channel]);
 				} else {
