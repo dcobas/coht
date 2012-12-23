@@ -173,8 +173,9 @@ static u32 p6;
 static u32 p7;
 static u32 p8;
 static u32 enable_tx;
-static u32 rxrdy[NR_CHANNELS];
-static u32 txrdy[NR_CHANNELS];
+static u32 rxrdy[IPOCTAL_MAX_BOARDS][NR_CHANNELS];
+static u32 txrdy[IPOCTAL_MAX_BOARDS][NR_CHANNELS];
+static u32 nb_bytes[IPOCTAL_MAX_BOARDS][NR_CHANNELS];
 static u32 intx[3];
 
 int debug_read(struct file *file, char __user *userbuf,
@@ -211,9 +212,15 @@ static struct debugfs_blob_wrapper wintx = {
 	.size = sizeof(intx),
 };
 
+static struct debugfs_blob_wrapper wnb_bytes = {
+	.data = nb_bytes,
+	.size = sizeof(nb_bytes),
+};
+
 struct dentry *drxrdy;
 struct dentry *dtxrdy;
 struct dentry *dintx;
+static struct dentry *dnb_bytes;
 
 static int __init ipoctal_init(void)
 {
@@ -240,6 +247,7 @@ static int __init ipoctal_init(void)
 	drxrdy = debugfs_create_blob("rxrdy", 0777, debugfsdir, &wrxrdy);
 	dtxrdy = debugfs_create_blob("txrdy", 0777, debugfsdir, &wtxrdy);
 	dintx  = debugfs_create_blob("intx", 0777, debugfsdir, &wintx);
+	dnb_bytes  = debugfs_create_blob("nb_bytes", 0777, debugfsdir, &wnb_bytes);
 	ipoctal_install_all();
 	printk(KERN_ERR PFX "IP octal driver loaded ( %s ).\n", MODULE_NAME);
 	return 0;
@@ -251,6 +259,7 @@ static void __exit ipoctal_exit(void)
 
 	printk(KERN_INFO PFX "IP octal driver unloading... ( %s )\n", MODULE_NAME);
 	
+	debugfs_remove(dnb_bytes);
 	debugfs_remove(denable_tx);
 	debugfs_remove(drxrdy);
 	debugfs_remove(dtxrdy);
@@ -738,15 +747,14 @@ static int ipoctal_irq_handler(void *arg)
 			isrRxRdy = isr & ISR_RxRDY_FFULL_A;
 		}
 
-		if (isrRxRdy)
-			rxrdy[channel]++;
-		if (isrTxRdy)
-			txrdy[channel]++;
+		/* update debug stats */
 		index = ipoctal->index;
-		if (index == 0 || index == 1)
-			intx[index]++;
-		else
-			intx[2]++;
+		if (isrRxRdy)
+			rxrdy[index][channel]++;
+		if (isrTxRdy)
+			txrdy[index][channel]++;
+		nb_bytes[index][channel] = ipoctal->nb_bytes[channel];
+
 		/* In case of RS-485, change from TX to RX. Half-duplex. */
 		if ((ipoctal->board_id == IP_OCTAL_485_ID) && (sr & SR_TX_EMPTY) && (ipoctal->nb_bytes[channel] == 0)) {
 			ipoctal_write_io_reg(ipoctal, &ipoctal->chan_regs[channel].u.w.cr, CR_DISABLE_TX);
