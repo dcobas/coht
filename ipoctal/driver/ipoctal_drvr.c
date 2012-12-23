@@ -802,6 +802,7 @@ static int ipoctal_irq_handler(void *arg)
 					(waitqueue_active(&ipoctal->queue[channel]))){
 
 				if (ipoctal->board_id != IP_OCTAL_485_ID) {
+					p8++;
 					ipoctal_write_io_reg(ipoctal, &ipoctal->chan_regs[channel].u.w.cr, CR_DISABLE_TX);
 					ipoctal_write_io_reg(ipoctal, &ipoctal->chan_regs[channel].u.w.cr, CR_ENABLE_RX);
 					ipoctal->write[channel] = 1;
