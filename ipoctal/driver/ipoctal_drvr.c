@@ -746,6 +746,7 @@ static int ipoctal_irq_handler(void *arg)
 			isrTxRdy = isr & ISR_TxRDY_A;
 			isrRxRdy = isr & ISR_RxRDY_FFULL_A;
 		}
+
 		/* update debug stats */
 		index = ipoctal->index;
 		if (isrRxRdy)
@@ -753,12 +754,6 @@ static int ipoctal_irq_handler(void *arg)
 		if (isrTxRdy)
 			txrdy[index][channel]++;
 		nb_bytes[index][channel] = ipoctal->nb_bytes[channel];
-
-		/* Disable TX when no characters to transmit */
-        	if ((sr & SR_TX_EMPTY) && (ipoctal->nb_bytes[channel] == 0)) {
-			p2++;
-			ipoctal_write_io_reg(ipoctal, &ipoctal->chan_regs[channel].u.w.cr, CR_DISABLE_TX);
-		}
 
 		/* In case of RS-485, change from TX to RX. Half-duplex. */
 		if ((ipoctal->board_id == IP_OCTAL_485_ID) && (sr & SR_TX_EMPTY) && (ipoctal->nb_bytes[channel] == 0)) {
