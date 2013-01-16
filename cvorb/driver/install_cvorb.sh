@@ -20,7 +20,7 @@ do	case $o in
 done
 
 $OUTPUT "Installing $DEVICE_NAME driver..."
-INSMOD_ARGS=`awk -f mil1553.awk $DEVICE_NAME $CRATECONFIG $TRANSFER`
+INSMOD_ARGS=`awk -f $DRIVER_NAME.awk $DEVICE_NAME $CRATECONFIG $TRANSFER`
 if [ x"$INSMOD_ARGS" == x"" ] ; then
     echo "No $DEVICE_NAME declared in $TRANSFER, exiting"
     exit 1

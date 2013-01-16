@@ -20,7 +20,7 @@ BEGIN {
 /^#\+#/ && $6 == device_name  && $4 == "VME" {
 	# decode transfer.ref line
 	lun = lun "," $7
-	base_address = base_address "," $11
+	base_address = base_address "," "0x" $11
 }
 
 END {
