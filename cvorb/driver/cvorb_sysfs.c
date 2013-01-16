@@ -17,6 +17,7 @@
 #include <linux/stat.h>
 #include <asm/uaccess.h>
 #include <linux/types.h>
+#include <linux/version.h>
 
 #include "cvorb.h"
 #include "cvorb_priv.h"
@@ -221,17 +222,23 @@ static struct kobj_type ktype_cvorb_channel = {
         .default_attrs = (struct attribute **)default_cvorb_channel_attr,
 };
 
-/* Channel binary attribute load_fcn*/
+/* Channel binary attribute fcn*/
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,27)
+static ssize_t cvorb_store_fcn(struct file *file, struct kobject *channels_dir,
+                struct bin_attribute *bin_attr,
+                char *buffer, loff_t off, size_t count)
+#else
 static ssize_t cvorb_store_fcn(struct kobject *channels_dir,
                 struct bin_attribute *bin_attr,
                 char *buffer, loff_t off, size_t count)
+#endif
 {
         struct cvorb_channel *channel = to_cvorb_channel(channels_dir);
         int ret = cvorb_sysfs_set_fcn(channel, (void *)buffer);
         return (ret) ? ret : count;
 }
 
-static struct bin_attribute cvorb_set_fcn_attr = {
+static struct bin_attribute cvorb_fcn_attr = {
         .attr = {
                 .name = "load_fcn",
                 .mode = S_IWUSR
@@ -240,6 +247,7 @@ static struct bin_attribute cvorb_set_fcn_attr = {
         .read = NULL,
         .write = cvorb_store_fcn,
 };
+
 /*end of Channel attributes */
 
 /* ====================================================================================
@@ -559,11 +567,16 @@ static int cvorb_dev_add_attributes(struct cvorb_dev *card)
 
         for (submoduleIdx = 0; submoduleIdx < CVORB_SUBMODULES; ++submoduleIdx) {
                 submodule = &card->submodules[submoduleIdx];
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,27)
+            ret = kobject_init_and_add(&submodule->submodules_dir, &ktype_cvorb_submodule,
+                                        &card->dev->kobj, "submodule.%d", submoduleIdx);
+#else
                 kobject_init(&submodule->submodules_dir);
                 kobject_set_name(&submodule->submodules_dir, "submodule.%d", submoduleIdx);
                 submodule->submodules_dir.parent = &card->dev->kobj;
                 submodule->submodules_dir.ktype = &ktype_cvorb_submodule;
                 ret = kobject_register(&submodule->submodules_dir);
+#endif
                 if (ret) {
                         --submoduleIdx; /* rollback only successful registration */
                         if (channelIdx == CVORB_CHANNELS)
@@ -573,16 +586,21 @@ static int cvorb_dev_add_attributes(struct cvorb_dev *card)
                 }
                 for (channelIdx = 0; channelIdx < CVORB_CHANNELS; ++channelIdx) {
                         channel = &submodule->channels[channelIdx];
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,27)
+                        ret = kobject_init_and_add(&channel->channels_dir, &ktype_cvorb_channel,
+                        &submodule->submodules_dir, "channel.%d", channelIdx);
+#else
                         kobject_init(&channel->channels_dir);
                         kobject_set_name(&channel->channels_dir, "channel.%d", channelIdx);
                         channel->channels_dir.parent = &submodule->submodules_dir;
                         channel->channels_dir.ktype = &ktype_cvorb_channel;
                         ret = kobject_register(&channel->channels_dir);
+#endif
                         if (ret) {
                                 --channelIdx; /* rollback only successful registration */
                                 goto unregister_kobjects;
                         }
-                        ret = sysfs_create_bin_file(&channel->channels_dir, &cvorb_set_fcn_attr);
+                        ret = sysfs_create_bin_file(&channel->channels_dir, &cvorb_fcn_attr);
                         if(ret)
                                 goto rm_bin_file;
                 }
@@ -590,7 +608,7 @@ static int cvorb_dev_add_attributes(struct cvorb_dev *card)
         return 0;
 
 rm_bin_file:
-        sysfs_remove_bin_file(&channel->channels_dir, &cvorb_set_fcn_attr);
+        sysfs_remove_bin_file(&channel->channels_dir, &cvorb_fcn_attr);
 unregister_kobjects:
         /* Rollback: unregister any kobject previously registered successfully*/
         /* Instead of using submoduleIdx and channelIdx to unregister kobject */
@@ -598,13 +616,21 @@ unregister_kobjects:
         /* But apparently there is nothing in the structure stating clearly */
         /* that the registration has failed. Therefore the indexes are used*/
         for (; submoduleIdx >=0; --submoduleIdx) {
-                submodule = &card->submodules[submoduleIdx];
-                kobject_unregister(&submodule->submodules_dir);
-                for (; channelIdx >= 0; --channelIdx) {
-                        channel = &submodule->channels[channelIdx];
-                        kobject_unregister(&channel->channels_dir);
-                }
-                channelIdx = CVORB_CHANNELS-1;
+            submodule = &card->submodules[submoduleIdx];
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,27)
+            kobject_del(&submodule->submodules_dir);
+#else
+            kobject_unregister(&submodule->submodules_dir);
+#endif
+            for (; channelIdx >= 0; --channelIdx) {
+                channel = &submodule->channels[channelIdx];
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,27)
+                kobject_del(&channel->channels_dir);
+#else
+                kobject_unregister(&channel->channels_dir);
+#endif
+            }
+            channelIdx = CVORB_CHANNELS-1;
         }
         return ret;
 }
@@ -633,18 +659,26 @@ static void cvorb_dev_del_attributes(struct cvorb_dev *card)
         unsigned int smIdx, chIdx=0;
 
         for (smIdx=0; smIdx < CVORB_SUBMODULES; ++smIdx) {
-                sm = &card->submodules[smIdx];
-                for (chIdx=0; chIdx < CVORB_CHANNELS; ++chIdx) {
-                        ch = &sm->channels[chIdx];
-                        kobject_unregister(&ch->channels_dir);
-                }
-                kobject_unregister(&sm->submodules_dir);
+            sm = &card->submodules[smIdx];
+            for (chIdx=0; chIdx < CVORB_CHANNELS; ++chIdx) {
+                ch = &sm->channels[chIdx];
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,27)
+                kobject_del(&ch->channels_dir);
+#else
+                kobject_unregister(&ch->channels_dir);
+#endif
+            }
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,27)
+            kobject_del(&sm->submodules_dir);
+#else
+            kobject_unregister(&sm->submodules_dir);
+#endif
         }
 }
 
 void cvorb_remove_sysfs_files(struct cvorb_dev *card)
 {
-        printk(KERN_INFO PFX "cvorb_remove_sysfs_files board with lun %d.\n", card->lun);
+    printk(KERN_INFO PFX "cvorb_remove_sysfs_files board with lun %d.\n", card->lun);
 	cvorb_dev_del_attributes(card);
 	sysfs_remove_group(&card->dev->kobj, &cvorb_attr_group);
 }

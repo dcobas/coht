@@ -590,11 +590,11 @@ static int get_hw_fcn_size32(unsigned int n_vector)
  *
  * @return 0 on success, -1 on failure
  */
-int cvorb_ch_set_fcn( cvorb_t *dev, unsigned int chnr, unsigned int fcnnr, struct cvorb_vector_fcn *value, unsigned int n_vector/*, int ioctl_call*/) {
+int cvorb_ch_set_fcn( cvorb_t *dev, unsigned int chnr, unsigned int fcnnr, struct cvorb_vector_fcn *value, unsigned int n_vector) {
         struct cvorb_hw_fcn fcn;
         unsigned int sz32, i, res=0, n_vtr;
         uint16_t *vp, ss, nos;
-        int ioctl_call = 1; /* remove from the API and set by default to ioctl: it was only to make some benchmark between ioctl and sysfs*/
+        int ioctl_call = 1; /* set_fcn is implemented via sysfs to be symetric with get_function*/
 #if __CVORB_DEBUG__
         uint16_t *lp;
 #endif
@@ -657,7 +657,7 @@ int cvorb_ch_set_fcn( cvorb_t *dev, unsigned int chnr, unsigned int fcnnr, struc
                         res = -1;
                 }
         }
-        else /* via sysfs */
+        else /* via sysfs: driver implements set function via sysfs but by default ioctl is used */
         {
                 len = snprintf(attr_path, CVORB_PATH_SIZE, "%s/submodule.%d/channel.%d/%s",
                                 dev->sysfs_path, fcn.submodulenr, fcn.channr, "load_fcn");
@@ -665,7 +665,7 @@ int cvorb_ch_set_fcn( cvorb_t *dev, unsigned int chnr, unsigned int fcnnr, struc
                 ret = cvorbdev_set_attr_bin(attr_path, (void *)&fcn, sizeof(struct cvorb_hw_fcn));
                 if (ret < 0) {
                         __cvorb_libc_error(__func__);
-                        return -1;
+                        res = -1;
                 }
         }
 
@@ -675,18 +675,6 @@ error:
         return res;
 }
 
-/*
- * Not used anymore
-int cvorb_ch_ioctl_set_fcn( cvorb_t *dev, unsigned int chnr, unsigned int fcnnr, struct cvorb_vector_fcn *value, unsigned int n_vector)
-{
-        return (cvorb_ch_set_fcn(dev, chnr, fcnnr, value, n_vector, 1));
-}
-
-int cvorb_ch_sysfs_set_fcn( cvorb_t *dev, unsigned int chnr, unsigned int fcnnr, struct cvorb_vector_fcn *value, unsigned int n_vector)
-{
-        return (cvorb_ch_set_fcn(dev, chnr, fcnnr, value, n_vector, 0));
-}
-*/
  /**
  * @brief Get channel function from the board (SRAM)
  * @param dev           - CVORB device handle
@@ -701,8 +689,9 @@ int cvorb_ch_sysfs_set_fcn( cvorb_t *dev, unsigned int chnr, unsigned int fcnnr,
  */
 int cvorb_ch_get_fcn( cvorb_t *dev, unsigned int chnr, unsigned int fcnnr, struct cvorb_vector_fcn *buff, unsigned int n_vector, unsigned int *fcn_sz) {
         struct cvorb_hw_fcn fcn;
-        unsigned int sz32, i, res=0, n_vtr;
+        unsigned int sz32, i, res=0, n_vtr, len;
         uint16_t *vp;
+        char attr_path[CVORB_PATH_SIZE];
 
         /* check input parameters */
         if ( (!WITHIN_RANGE(1, chnr, CVORB_MAX_CH_NR)) ||
@@ -725,12 +714,14 @@ int cvorb_ch_get_fcn( cvorb_t *dev, unsigned int chnr, unsigned int fcnnr, struc
         /* function index in the HW is in the range [0-63] */
         fcn.fcnnr = fcnnr-1;
 
-        /* call the driver */
+        /* call the driver : read function cannot be implemented via sysfs because */
+        /* reading a function requires an input parameter to specify submod,ch,etc... */
         if (ioctl(dev->fd, CVORB_IOCTL_GET_FCT, &fcn)) {
-                __cvorb_libc_error(__func__);
-                res = -1;
-                goto error;
+            __cvorb_libc_error(__func__);
+            res = -1;
+            goto error;
         }
+
 #if __CVORB_DEBUG__
         printf("cvorb_ch_get_fcn hw-function:\n");
         vp = (uint16_t *)fcn.hw_fcn;

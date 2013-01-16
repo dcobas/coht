@@ -8,15 +8,21 @@
  * Released under the GPL v2. (and only v2, not any later version)
  */
 
+#include <asm/io.h>
 #include <linux/kernel.h>
 #include <linux/err.h>
 #include <asm/uaccess.h>
 #include <linux/cdev.h>
 #include <linux/fs.h>
 #include <linux/version.h>
+#include <linux/slab.h>
 #include <linux/delay.h>
+#include <linux/module.h>
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,27)
+#include <linux/swab.h>
+#else
 #include <linux/byteorder/swab.h>
-
+#endif
 #include <vmebus.h>
 
 #include <cvorb.h>
@@ -562,7 +568,7 @@ out_free_lock:
         return ret;
 }
 
-static int cvorb_ioctl(struct inode *inode, struct file *fp, unsigned op, unsigned long arg)
+static long cvorb_ioctl(struct file *fp, unsigned op, unsigned long arg)
 {
         struct cvorb_dev *cvorb = fp->private_data;
 
@@ -679,7 +685,7 @@ static const struct file_operations cvorb_fops = {
         .owner          = THIS_MODULE,
         .open           = cvorb_open,
         .release        = cvorb_release,
-        .ioctl          = cvorb_ioctl
+        .unlocked_ioctl          = cvorb_ioctl
 };
 
 /*

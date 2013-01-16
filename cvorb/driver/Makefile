@@ -1,11 +1,7 @@
 CPU=L865
 
-# KVER=2.6.24.7-rt21
-# KVER=2.6.24.7-rt27
-# KVER=2.6.29.4-rt15
-# KVER=2.6.31.6-rt19
-
-KVER=2.6.24.7-rt27
+#KVER=2.6.24.7-rt27
+KVER=3.2.33-rt50
 
 KERNELSRC=/acc/sys/$(CPU)/usr/src/kernels/$(KVER)
 OUTPUTDIR=$(CURDIR)/$(CPU)/$(KVER)

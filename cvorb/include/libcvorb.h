@@ -46,10 +46,6 @@ int cvorb_ch_enable(cvorb_t *dev, unsigned int channelnr);
 int cvorb_ch_disable(cvorb_t *dev, unsigned int channelnr);
 int cvorb_ch_get_repeat_count(cvorb_t *device, unsigned int channelnr, unsigned int *count);
 int cvorb_ch_set_repeat_count(cvorb_t *device, unsigned int channelnr, unsigned int count);
-/*
-int cvorb_ch_ioctl_set_fcn( cvorb_t *dev, unsigned int channelnr, unsigned int functionnr, struct cvorb_vector_fcn *value, unsigned int size);
-int cvorb_ch_sysfs_set_fcn( cvorb_t *dev, unsigned int channelnr, unsigned int functionnr, struct cvorb_vector_fcn *value, unsigned int size);
-*/
 int cvorb_ch_set_fcn( cvorb_t *dev, unsigned int channelnr, unsigned int functionnr, struct cvorb_vector_fcn *value, unsigned int size);
 int cvorb_ch_get_fcn( cvorb_t *dev, unsigned int channelnr, unsigned int functionnr, struct cvorb_vector_fcn *value, unsigned int max_size, unsigned int *size);
 int cvorb_ch_enable_fcn( cvorb_t *dev, unsigned int channelnr, unsigned int functionnr);

@@ -9,6 +9,7 @@
  */
 #include <unistd.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <fcntl.h>
 #include <time.h>
 #include <sys/dir.h>
@@ -17,8 +18,8 @@
 #include <sys/types.h>
 #include <math.h>
 
-#include <general_usr.h>  /* for handy definitions (mperr etc..) and macros coming from general_both.h */
-#include <extest.h>
+#include <extest/general_usr.h>  /* for handy definitions (mperr etc..) and macros coming from general_both.h */
+#include <extest/extest.h>
 #include <cvorb.h>
 #include <libcvorb.h>
 #include <cvorbdev.h>
@@ -1089,7 +1090,7 @@ int main(int argc, char *argv[], char *envp[])
         }
         /* set current device to the first one*/
         __h_device(indexes[0]);
-        return extest_init(argc, argv);
+        return extest_init(argc, argv, DRIVER_NAME);
 }
 
 enum _tag_cmd_id {

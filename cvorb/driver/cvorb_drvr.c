@@ -11,6 +11,8 @@
 #include <linux/kernel.h>
 #include <linux/fs.h>
 #include <vmebus.h>
+#include <linux/slab.h>
+#include <linux/module.h>
 
 #include <cvorb.h>
 #include <cvorb_priv.h>

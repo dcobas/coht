@@ -1,5 +1,3 @@
-new cvorb driver by Michel Arruat
-
 * lib functions prototypes:
 	There is some inconsistencies in the meaning of what a function returns : value or error?
 	One possible convention:

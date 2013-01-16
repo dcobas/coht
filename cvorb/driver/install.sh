@@ -3,4 +3,4 @@
 rmmod cvorb
 rm /dev/cvorb.*
 
-insmod L865/2.6.24.7-rt27/cvorb.ko lun=0,1 base_address=0x800,0x1000
+insmod L865/3.2.33-rt50/cvorb.ko lun=0,1 base_address=0x400,0x800
