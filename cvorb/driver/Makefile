@@ -18,7 +18,6 @@ modules:
 	mv *.o *.ko $(OUTPUTDIR)
 clean:
 	rm -f *.o *.a *.pyc *.so $(TESTS)
-	rm -f *.mod.c
 	rm -rf L865 L864 ppc 
 	make -C $(KERNELSRC) M=`pwd` clean
 
