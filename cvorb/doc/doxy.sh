@@ -45,7 +45,7 @@ done
 shift $((OPTIND-1))
 OPTIND=1
 
-if [[ -z "$*" ]]
+if [ -z "$*" ]
 then
     echo "No input files given"
     usage
@@ -53,8 +53,9 @@ then
 fi
 
 cat $(dirname $0)/default.doxycfg | \
-    sed "s!__MAGIC_PROJECT_NAME__!$NAME!" | \
-    sed "s!__MAGIC_OUTPUT_DIRECTORY__!$OUTPUT_DIR!" | \
-    sed "s!__MAGIC_INPUT__!$*!" | \
+    sed "/^[ 	]*PROJECT_NAME[ 	]*=/s!!& $NAME!" | \
+    sed "/^[ 	]*OUTPUT_DIRECTORY[ 	]*=/s!!& $OUTPUT_DIR!" | \
+    sed "/^[ 	]*INPUT[ 	]*=/s!!& $*!" | \
     sed "/^[ 	]*QUIET[ 	]/s!.*!QUIET	= YES!" | \
+    sed "/^[ 	]*EXTRACT_ALL[ 	]/s!.*!EXTRACT_ALL	= YES!" | \
     doxygen -
