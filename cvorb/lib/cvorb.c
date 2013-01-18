@@ -272,7 +272,7 @@ int cvorb_sm_get_status(cvorb_t *device, unsigned int submodule, unsigned int *s
  * @brief Allows to send a software trigger like a start, stop, event_start and event_stop for the given submodule of the board
  * @param device        - CVORB device handle
  * @param submodule     - desired submodule (0 or 1)
- * @param polarity      - desired software trigger
+ * @param trigger       - desired software trigger
  *
  * @return 0 on success, -1 on failure
  */
@@ -336,8 +336,8 @@ static int cvorb_get_ch_attribute_path(cvorb_t *dev, unsigned int chnr, char* at
 
 /**
  * @brief Get the status of the given channel.
- * @param device        - CVORB device handle
- * @param submodule     - desired channel in the range [1,16]
+ * @param dev           - CVORB device handle
+ * @param chnr          - desired channel in the range [1,16]
  * @param[out] status   - output parameter used to return the current status
  *
  * @return 0 on success, -1 on failure
@@ -362,8 +362,8 @@ int cvorb_ch_get_status(cvorb_t *dev, unsigned int chnr, unsigned int *status) {
 
 /**
  * @brief Enable the given channel.
- * @param device        - CVORB device handle
- * @param submodule     - desired channel in the range [1,16]
+ * @param dev        - CVORB device handle
+ * @param chnr       - desired channel in the range [1,16]
  *
  * @return 0 on success, -1 on failure
  */
@@ -385,8 +385,8 @@ int cvorb_ch_enable(cvorb_t *dev, unsigned int chnr) {
 
 /**
  * @brief Disable the given channel.
- * @param device        - CVORB device handle
- * @param submodule     - desired channel in the range [1,16]
+ * @param dev           - CVORB device handle
+ * @param chnr          - desired channel in the range [1,16]
  *
  * @return 0 on success, -1 on failure
  */
@@ -408,7 +408,7 @@ int cvorb_ch_disable(cvorb_t *dev, unsigned int chnr) {
 
 /**
  * @brief Get the repeat count defining the number of time a function will be generated for the given channel. By default this value is 1.
- * @param device        - CVORB device handle
+ * @param dev           - CVORB device handle
  * @param chnr          - desired channel in the range [1,16]
  * @param[out] count    - output parameter used to return the current repeat count
  *
@@ -434,7 +434,7 @@ int cvorb_ch_get_repeat_count(cvorb_t *dev, unsigned int chnr, unsigned int *cou
 
 /**
  * @brief Set the repeat count defining the number of time a function will be generated for the given channel. By default this value is 1.
- * @param device        - CVORB device handle
+ * @param dev           - CVORB device handle
  * @param chnr          - desired channel in the range [1,16]
  * @param count         - the new repeat count
  *
@@ -458,7 +458,7 @@ int cvorb_ch_set_repeat_count(cvorb_t *dev, unsigned int chnr, unsigned int coun
 
 /**
  * @brief Get the function enable mask for the given channel
- * @param device        - CVORB device handle
+ * @param dev           - CVORB device handle
  * @param chnr          - desired channel in the range [1,16]
  * @param[out] enbl_mask    - output parameter used to return the function enable mask
  *
@@ -776,7 +776,7 @@ static int cvorb_get_fcn_attribute_path(cvorb_t *dev, unsigned int chnr, unsigne
  * @brief Enable a function for the given channel.
  * @param dev           - CVORB device handle
  * @param chnr          - desired channel in the range [1,16]
- * @param fcnr          - desired function in the range [1,64]
+ * @param fcnnr         - desired function in the range [1,64]
  *
  * @return 0 on success, -1 on failure
  */
@@ -799,7 +799,7 @@ int cvorb_ch_enable_fcn( cvorb_t *dev, unsigned int chnr, unsigned int fcnnr)
  * @brief Disable a function for the given channel.
  * @param dev           - CVORB device handle
  * @param chnr          - desired channel in the range [1,16]
- * @param fcnr          - desired function in the range [1,64]
+ * @param fcnnr         - desired function in the range [1,64]
  *
  * @return 0 on success, -1 on failure
  */
@@ -822,7 +822,7 @@ int cvorb_ch_disable_fcn( cvorb_t *dev, unsigned int chnr, unsigned int fcnnr)
  * @brief Select a function for the given channel.
  * @param dev           - CVORB device handle
  * @param chnr          - desired channel in the range [1,16]
- * @param fcnr          - desired function in the range [1,64]
+ * @param fcnnr         - desired function in the range [1,64]
  *
  * @return 0 on success, -1 on failure
  */
@@ -844,7 +844,7 @@ int cvorb_ch_select_fcn( cvorb_t *dev, unsigned int chnr, unsigned int fcnnr)
 /**
  * @brief Get the submodule number corresponding to the channel
  * @param ch_nr         - desired channel number in the range [1,16]
- * @param sm_nr[out]    - output parameter used to return the submodule number.
+ * @param[out] sm_nr    - output parameter used to return the submodule number.
  *
  * @return 0 on success, -1 on failure
  */
