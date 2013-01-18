@@ -58,4 +58,5 @@ cat $(dirname $0)/default.doxycfg | \
     sed "/^[ 	]*INPUT[ 	]*=/s!!& $*!" | \
     sed "/^[ 	]*QUIET[ 	]/s!.*!QUIET	= YES!" | \
     sed "/^[ 	]*EXTRACT_ALL[ 	]/s!.*!EXTRACT_ALL	= YES!" | \
+    sed "/^[ 	]*FULL_PATH_NAMES[ 	]/s!.*!FULL_PATH_NAMES	= NO!" | \
     doxygen -
