@@ -10,7 +10,7 @@ extern int __cvorb_errno;
 void __cvorb_internal_error(int error_number);
 void __cvorb_param_error(int err);
 void __cvorb_libc_error(const char *string);
-void __cvorb_lib_error(const char* string, int err);
+void __cvorb_lib_error(const char *string, int err);
 
 #define LIBCVORB_DEBUG(level, format, args...) \
 	do { \
@@ -20,4 +20,4 @@ void __cvorb_lib_error(const char* string, int err);
 		}					\
 	} while (0)
 
-#endif /* _CVORB_LIBINTERNAL_H_ */
+#endif				/* _CVORB_LIBINTERNAL_H_ */

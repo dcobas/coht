@@ -104,7 +104,9 @@ static int list_devices(const char *path, int *indexes, int elems)
 		if (indexes) {
 			if (i >= elems)
 				break;
-			indexes[i] = strtol(dent->d_name + strlen("cvorb."), NULL, 0);
+			indexes[i] =
+			    strtol(dent->d_name + strlen("cvorb."), NULL,
+				   0);
 		}
 		i++;
 	}
@@ -150,18 +152,18 @@ int cvorbdev_get_device_list(int *indexes, int elems)
 /* Note: this function returns 1 on success */
 int cvorbdev_device_exists(int index)
 {
-        struct stat statbuf;
-        char path[CVORB_PATH_SIZE];
+	struct stat statbuf;
+	char path[CVORB_PATH_SIZE];
 
-        if (build_devpath(index, path, sizeof(path)) < 0)
-                return 0;
-        if (stat(path, &statbuf))
-                return 0;
-        return 1;
+	if (build_devpath(index, path, sizeof(path)) < 0)
+		return 0;
+	if (stat(path, &statbuf))
+		return 0;
+	return 1;
 }
 
 /* Note: this function returns 1 on success */
-int cvorbdev_get_sysfs_path(int lun, char* path, int size)
+int cvorbdev_get_sysfs_path(int lun, char *path, int size)
 {
 	struct stat statbuf;
 
@@ -173,14 +175,16 @@ int cvorbdev_get_sysfs_path(int lun, char* path, int size)
 }
 
 /*Upon success returns the number of characters read. On failure -1 is returned*/
-static int cvorbdev_get_attr(const char *attr_path, void *value, size_t len)
+static int cvorbdev_get_attr(const char *attr_path, void *value,
+			     size_t len)
 {
 	struct stat statbuf;
 	size_t size;
 	int fd;
 
 	if (lstat(attr_path, &statbuf) != 0) {
-		fprintf(stderr, "warning: Attribute is not found %s\n", attr_path);
+		fprintf(stderr, "warning: Attribute is not found %s\n",
+			attr_path);
 		return -1;
 	}
 
@@ -197,7 +201,7 @@ static int cvorbdev_get_attr(const char *attr_path, void *value, size_t len)
 		return -1;
 	}
 	size = read(fd, value, len);
-    if (close(fd) < 0)
+	if (close(fd) < 0)
 		return -1;
 	if (size < 0)
 		return -1;
@@ -220,16 +224,16 @@ int cvorbdev_get_attr_int32(const char *attr_path, int *valp)
 
 int cvorbdev_get_attr_char(const char *attr_path, char *valp, int size)
 {
-        int ret;
+	int ret;
 	ret = cvorbdev_get_attr(attr_path, valp, size);
-        if (ret == -1)
-                return ret;
-        valp[ret] = '\0';
-        remove_trailing_chars(valp, '\n');
-        return 0;
+	if (ret == -1)
+		return ret;
+	valp[ret] = '\0';
+	remove_trailing_chars(valp, '\n');
+	return 0;
 }
 
-int cvorbdev_get_attr_uint32(const char *attr_path, uint32_t *valp)
+int cvorbdev_get_attr_uint32(const char *attr_path, uint32_t * valp)
 {
 	char value[32];
 	int ret;
@@ -241,32 +245,34 @@ int cvorbdev_get_attr_uint32(const char *attr_path, uint32_t *valp)
 	return 0;
 }
 
-int cvorbdev_get_attr_uint64(const char *attr_path, uint64_t *valp)
+int cvorbdev_get_attr_uint64(const char *attr_path, uint64_t * valp)
 {
-        char value[64];
-        int ret;
+	char value[64];
+	int ret;
 
-        ret = cvorbdev_get_attr(attr_path, value, sizeof(value));
-        if (ret == -1)
-                return ret;
-        *valp = strtoull(value, NULL, 0);
-        return 0;
+	ret = cvorbdev_get_attr(attr_path, value, sizeof(value));
+	if (ret == -1)
+		return ret;
+	*valp = strtoull(value, NULL, 0);
+	return 0;
 }
 
 int cvorbdev_get_attr_bin(const char *attr_path, void *value, size_t count)
 {
-        return cvorbdev_get_attr(attr_path, value, count);
+	return cvorbdev_get_attr(attr_path, value, count);
 }
 
 /*Upon success returns the number of characters read. On failure -1 is returned*/
-static int cvorbdev_set_attr(const char *attr_path, const void *value, size_t size)
+static int cvorbdev_set_attr(const char *attr_path, const void *value,
+			     size_t size)
 {
 	struct stat statbuf;
 	size_t len;
 	int fd;
 
 	if (lstat(attr_path, &statbuf) != 0) {
-		fprintf(stderr, "warning: Attribute not found %s\n", attr_path);
+		fprintf(stderr, "warning: Attribute not found %s\n",
+			attr_path);
 		return -1;
 	}
 
@@ -284,7 +290,8 @@ static int cvorbdev_set_attr(const char *attr_path, const void *value, size_t si
 	}
 	len = write(fd, value, size);
 	if (len == -1)
-	        fprintf(stderr, "cvorbdev_set_attr failed: %s (%d)", strerror(errno), errno);
+		fprintf(stderr, "cvorbdev_set_attr failed: %s (%d)",
+			strerror(errno), errno);
 	if (close(fd) < 0)
 		return -1;
 	return len;
@@ -292,24 +299,25 @@ static int cvorbdev_set_attr(const char *attr_path, const void *value, size_t si
 
 int cvorbdev_set_attr_int32(const char *attr_path, int32_t value)
 {
-        char buf[32];
-        int len;
+	char buf[32];
+	int len;
 
-        len = snprintf(buf, sizeof(buf) - 1, "%d", value);
-        return cvorbdev_set_attr(attr_path, buf, len);
+	len = snprintf(buf, sizeof(buf) - 1, "%d", value);
+	return cvorbdev_set_attr(attr_path, buf, len);
 }
 
 int cvorbdev_set_attr_uint32(const char *attr_path, uint32_t value)
 {
-        char buf[32];
-        int len;
+	char buf[32];
+	int len;
 
-        len = snprintf(buf, sizeof(buf) - 1, "%u", value);
-        return cvorbdev_set_attr(attr_path, buf, len);
+	len = snprintf(buf, sizeof(buf) - 1, "%u", value);
+	return cvorbdev_set_attr(attr_path, buf, len);
 }
 
 
-int cvorbdev_set_attr_bin(const char *attr_path, const void *value, size_t count)
+int cvorbdev_set_attr_bin(const char *attr_path, const void *value,
+			  size_t count)
 {
-        return cvorbdev_set_attr(attr_path, value, count);
+	return cvorbdev_set_attr(attr_path, value, count);
 }
