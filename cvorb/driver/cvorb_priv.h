@@ -28,12 +28,6 @@
 #ifndef BIG_ENDIAN
 #define BIG_ENDIAN 1
 #endif
-/* Table to save the pointers to all cvorb devices */
-/*extern struct cvorb* cvorb_table[CVORB_MAX_BOARDS];*/
-
-/* Needed to create the sysfs files */
-/*extern struct class *cvorb_class;*/
-/*extern dev_t cvorb_devno; */
 
 /**
  * struct cvorb_channel - internal channel structure
@@ -48,13 +42,13 @@
  */
 struct cvorb_channel
 {
-        uint32_t                enable;
-        uint64_t                enable_fcn_mask;
-        uint32_t                selected_fcn;
-        uint32_t                repeat_count;
-        struct kobject 		channels_dir;
-        uint32_t                reg_offset;
-	uint32_t 	        chan_nr;
+    int32_t                 enable;
+    uint64_t                enable_fcn_mask;
+    uint32_t                selected_fcn;
+    uint32_t                repeat_count;
+    struct kobject 		    channels_dir;
+    uint32_t                reg_offset;
+	uint32_t 	            chan_nr;
 	struct cvorb_submodule 	*parent;
 };
 
@@ -73,16 +67,16 @@ struct cvorb_channel
  */
 struct cvorb_submodule
 {
-	uint32_t 		inpol;
+	uint32_t 		        inpol;
 	uint32_t                optical_out_enabled;
 	uint32_t                dac_source;
 	uint32_t                led_source;
 	uint32_t                optical_source;
-        struct kobject          submodules_dir;
-	uint32_t 		reg_offset;
+    struct kobject          submodules_dir;
+	uint32_t 		        reg_offset;
 	uint32_t                submod_nr;
 	struct cvorb_channel 	channels[CVORB_CHANNELS];
-	struct cvorb_dev 	*parent;
+	struct cvorb_dev 	    *parent;
 };
 
 /**
@@ -99,15 +93,15 @@ struct cvorb_submodule
  */
 struct cvorb_dev
 {
-	struct cdev 		cdev;
+	struct cdev 		    cdev;
 	struct device*          dev;
-	uint64_t 		pcb_id;
-	char 		        hw_rev[CVORB_VERSION_AS_STRING_SZ];
+	uint64_t 		        pcb_id;
+	char 		            hw_rev[CVORB_VERSION_AS_STRING_SZ];
 	uint32_t                vme_base;
-	struct mutex 		lock;
-	void 			*iomap;
+	struct mutex 		    lock;
+	void 			        *iomap;
 	struct cvorb_submodule	submodules[CVORB_SUBMODULES];
-	uint32_t 		lun;
+	uint32_t 		        lun;
 };
 
 enum cvorb_reset {
@@ -165,12 +159,15 @@ int cvorb_select_fcn(struct cvorb_channel *ch, uint32_t value);
 int cvorb_enable_fcn(struct cvorb_channel *ch, uint32_t value);
 int cvorb_disable_fcn(struct cvorb_channel *ch, uint32_t value);
 int cvorb_ch_repeat_count(struct cvorb_channel *ch, uint32_t value);
-int cvorb_sysfs_set_fcn(struct cvorb_channel *channel, void *arg);
+int cvorb_sysfs_set_fcn(struct cvorb_channel *channel, uint32_t fcn_nr, void *arg);
+int cvorb_sysfs_get_fcn(struct cvorb_channel *channel, uint32_t fcn_nr, void *arg, ssize_t *count);
 
 /* Functions used by cvorbdrv.c */
 int cvorb_install(struct class *class, struct device *parentDev, dev_t cvorb_devno, struct cvorb_dev *cvorb);
 void cvorb_uninstall(struct class* class, struct cvorb_dev *cvorb, dev_t cvorb_devno);
 int cvorb_create_sysfs_files(struct cvorb_dev *cvorb);
 void cvorb_remove_sysfs_files(struct cvorb_dev *cvorb);
+void cvorb_sysfs_exit_module(void);
+int cvorb_sysfs_init_module(void);
 
 #endif /* _CVORB_PRIV_H_ */

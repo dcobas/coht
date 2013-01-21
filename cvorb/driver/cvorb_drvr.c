@@ -121,36 +121,40 @@ static int __init cvorb_init_module(void)
 	 * Check if the difference between base addresses
 	 *  is more that the board size
 	 */
-	for (i=1; i<num_lun; ++i)
-	{
-	        if ((base_address[i] - base_address[i-1]) < CVORB_WINDOW_LENGTH)
-	        {
-	                printk(KERN_ERR PFX "base address are not correct(doesn't respect \n");
-	                return -EINVAL;
-	        }
+	for (i=1; i<num_lun; ++i) {
+        if ((base_address[i] - base_address[i-1]) < CVORB_WINDOW_LENGTH) {
+	        printk(KERN_ERR PFX "base address are not correct(doesn't respect \n");
+	        return -EINVAL;
+	    }
 	}
-        /* create device class*/
-        cvorb_class = class_create(THIS_MODULE, "cvorb");
-        if (IS_ERR(cvorb_class)) {
-                printk(KERN_ERR PFX "Failed to create cvorb class\n");
-                error = PTR_ERR(cvorb_class);
-                /* nothing to clean, just returns the error */
-                return error;
-        }
+    /* create device class*/
+    cvorb_class = class_create(THIS_MODULE, "cvorb");
+    if (IS_ERR(cvorb_class)) {
+        printk(KERN_ERR PFX "Failed to create cvorb class\n");
+        error = PTR_ERR(cvorb_class);
+        /* nothing to clean, just returns the error */
+        return error;
+    }
 
-        /* Get a range of minor numbers (starting with 0) to work with */
+    /* Get a range of minor numbers (starting with 0) to work with */
 	error = alloc_chrdev_region(&cvorb_devno, 0, num_lun, DRIVER_NAME);
-        if (error < 0) {
-                printk(KERN_ERR PFX "Failed to allocate chrdev region\n");
-                goto alloc_chrdev_region_failed;
-        }
+    if (error < 0) {
+        printk(KERN_ERR PFX "Failed to allocate chrdev region\n");
+        goto alloc_chrdev_region_failed;
+    }
 
-        return vme_register_driver(&cvorb_driver, num_lun);
+    /* some sysfs initialization before instantiating the devices*/
+    error = cvorb_sysfs_init_module();
+    if (error) {
+        printk(KERN_ERR PFX "Failed initializing sysfs at module installation.(-ENOMEM) \n");
+        goto alloc_chrdev_region_failed;
+    }
+    return vme_register_driver(&cvorb_driver, num_lun);
 
 alloc_chrdev_region_failed:
-        class_destroy(cvorb_class);
+    class_destroy(cvorb_class);
 
-        return error;
+    return error;
 }
 
 static void __exit cvorb_exit_module(void)
@@ -159,6 +163,8 @@ static void __exit cvorb_exit_module(void)
 
 	vme_unregister_driver(&cvorb_driver);
 	unregister_chrdev_region(devno, num_lun);
+    /* some sysfs cleaning before leaving the module */
+    cvorb_sysfs_exit_module(); 
 	class_destroy(cvorb_class);
 }
 

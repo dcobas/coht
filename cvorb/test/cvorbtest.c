@@ -824,7 +824,7 @@ int h_fcn_read(struct cmd_desc *cmdd, struct atom *atoms)
                 display_type = atoms->val;
 
         bzero(fv, sizeof(struct cvorb_vector_fcn)*CVORB_MAX_VECTOR);
-        if(cvorb_ch_get_fcn(current_dev, current_ch, fcn_nr, fv, CVORB_MAX_VECTOR, &n_vector) == -1) {
+        if(cvorb_ch_get_fcn(current_dev, current_ch, fcn_nr, fv, CVORB_MAX_VECTOR, &n_vector) < 0) {
                 printf("Read function failed\n");
                 return -1;
         }

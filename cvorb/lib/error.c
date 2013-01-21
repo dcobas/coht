@@ -20,8 +20,9 @@
 char *__cvorb_error_strings[] = {
 	"No error",
 	"Invalid vector table: time between two consecutive vector is negative",
-        "Invalid vector table: vector duration exceed HW limits(should be split)",
+    "Invalid vector table: vector duration exceed HW limits(should be split)",
 	"No such device",
+    "User buffer too small",
 	"Feature not supported"
 };
 
@@ -142,6 +143,9 @@ void __cvorb_libc_error(const char *string)
 		pre[sizeof(pre) - 1] = '\0';
 		cvorb_perror(pre);
 	}
+    else {
+        cvorb_perror(string);
+    }
 }
 
 void __cvorb_lib_error(const char *string, int err)
@@ -155,4 +159,8 @@ void __cvorb_lib_error(const char *string, int err)
                 pre[sizeof(pre) - 1] = '\0';
                 cvorb_perror(pre);
 	}
+    else
+    {
+        cvorb_perror(string);
+    }
 }

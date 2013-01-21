@@ -180,6 +180,7 @@
  */
 #define CVORB_CH_ENABLE_FCN_MASK_H      0x08C
 #define CVORB_CH_ENABLE_FCN_MASK_L      0x090
+#define CVORB_FCN_MAX_BYTE_SIZE         0x01000
 
 /*
  * Channel Function occurrences used to specify how many times a function will be generated

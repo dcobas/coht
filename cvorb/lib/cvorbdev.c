@@ -197,7 +197,7 @@ static int cvorbdev_get_attr(const char *attr_path, void *value, size_t len)
 		return -1;
 	}
 	size = read(fd, value, len);
-	if (close(fd) < 0)
+    if (close(fd) < 0)
 		return -1;
 	if (size < 0)
 		return -1;

@@ -18,7 +18,7 @@
 #include <asm/uaccess.h>
 #include <linux/types.h>
 #include <linux/version.h>
-
+#include <linux/slab.h>
 #include "cvorb.h"
 #include "cvorb_priv.h"
 
@@ -208,11 +208,23 @@ static struct cvorb_channel_attribute *default_cvorb_channel_attr[] = {
         &channel_attr_enable_fcn,
         &channel_attr_disable_fcn,
         &channel_attr_enable_fcn_mask,
-        NULL
+        NULL,
 };
+
+/* fcn attribute name is formated as "fcn_xx" with xx in the range [0,64] */
+#define CCVORB_FCN_ATTR_NAME_SIZE 7
+static struct bin_attribute **cvorb_fcn_bin_attrs = NULL;
+static int is_sysfs_fcn_enabled = 0; 
 
 static void cvorb_channel_instance_release(struct kobject *kobj)
 {
+    unsigned int fcnIdx;
+
+    if (is_sysfs_fcn_enabled) {            
+        for (fcnIdx = 0; fcnIdx < CVORB_MAX_FCT_NR; ++fcnIdx) {
+            sysfs_remove_bin_file(kobj, cvorb_fcn_bin_attrs[fcnIdx]);
+        }
+    }
 }
 
 /* the kobj_type instance for a CSROW */
@@ -233,20 +245,48 @@ static ssize_t cvorb_store_fcn(struct kobject *channels_dir,
                 char *buffer, loff_t off, size_t count)
 #endif
 {
-        struct cvorb_channel *channel = to_cvorb_channel(channels_dir);
-        int ret = cvorb_sysfs_set_fcn(channel, (void *)buffer);
-        return (ret) ? ret : count;
+    static const int FCN_ATTR_HEADER_SIZE = 4;
+    uint32_t fcn_nr;
+    int ret;
+    struct cvorb_channel *channel = to_cvorb_channel(channels_dir);
+
+    /* Extract the value as an int from the sysfs file*/
+    /* attribute name is formatted this way fcn_x with xx = function number*/
+    ret = cvorb_get_int(bin_attr->attr.name + FCN_ATTR_HEADER_SIZE, /* points to the number */
+                        strlen(bin_attr->attr.name)-FCN_ATTR_HEADER_SIZE, /* number of chars */
+                        &fcn_nr);
+    if (ret)
+        return ret;
+    ret = cvorb_sysfs_set_fcn(channel, fcn_nr, (void *)buffer);
+    return (ret) ? ret : count;
 }
 
-static struct bin_attribute cvorb_fcn_attr = {
-        .attr = {
-                .name = "load_fcn",
-                .mode = S_IWUSR
-        },
-        .size = sizeof(struct cvorb_hw_fcn),
-        .read = NULL,
-        .write = cvorb_store_fcn,
-};
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,27)
+static ssize_t cvorb_read_fcn(struct file *file, struct kobject *channels_dir,
+                struct bin_attribute *bin_attr,
+                char *buffer, loff_t off, size_t count)
+#else
+static ssize_t cvorb_read_fcn(struct kobject *channels_dir,
+                struct bin_attribute *bin_attr,
+                char *buffer, loff_t off, size_t count)
+#endif
+{
+    static const int FCN_ATTR_HEADER_SIZE = 4;
+    uint32_t fcn_nr;
+    int ret;
+    ssize_t ret_count;
+    struct cvorb_channel *channel = to_cvorb_channel(channels_dir);
+
+    /* Extract the value as an int from the sysfs file*/
+    /* attribute name is formatted this way fcn_x with xx = function number*/
+    ret = cvorb_get_int(bin_attr->attr.name + FCN_ATTR_HEADER_SIZE, /* points to the number */
+                        strlen(bin_attr->attr.name)-FCN_ATTR_HEADER_SIZE, /* number of chars */
+                        &fcn_nr);
+    if (ret)
+        return ret;
+    ret = cvorb_sysfs_get_fcn(channel, fcn_nr, (void *)buffer, &ret_count);
+    return (ret) ? ret : ret_count;
+}
 
 /*end of Channel attributes */
 
@@ -450,13 +490,13 @@ static struct cvorb_submodule_attribute *default_cvorb_submodule_attr[] = {
         &submodule_attr_stop,
         &submodule_attr_event_start,
         &submodule_attr_event_stop,
-	&submodule_attr_input_polarity,
+    	&submodule_attr_input_polarity,
         &submodule_attr_status,
         &submodule_attr_dac_source,
         &submodule_attr_optical_source,
         &submodule_attr_led_source,
         &submodule_attr_enable_optical_output,
-        NULL
+        NULL,
 };
 
 static void cvorb_submodule_instance_release(struct kobject *kobj)
@@ -519,12 +559,20 @@ static ssize_t cvorb_store_reset(struct device *pdev, struct device_attribute *a
 }
 static DEVICE_ATTR(reset, S_IWUSR, NULL, cvorb_store_reset);
 
+static ssize_t cvorb_show_sysfs_fcn_enabled(struct device *pdev, struct device_attribute *attr, 
+        char *buf)
+{
+        return snprintf(buf, PAGE_SIZE, "%d\n", is_sysfs_fcn_enabled);
+}
+static DEVICE_ATTR(sysfs_fcn_enabled, S_IRUGO, cvorb_show_sysfs_fcn_enabled, NULL);
+
 static struct attribute *cvorb_attrs[] = {
 	&dev_attr_hw_version.attr,
 	&dev_attr_temperature.attr,
 	&dev_attr_pcb_id.attr,
-        &dev_attr_description.attr,
+    &dev_attr_description.attr,
 	&dev_attr_reset.attr,
+    &dev_attr_sysfs_fcn_enabled.attr,
 	NULL,
 };
 
@@ -560,79 +608,86 @@ static struct attribute_group cvorb_attr_group = {
  */
 static int cvorb_dev_add_attributes(struct cvorb_dev *card)
 {
-        int ret;
-        unsigned int submoduleIdx=0, channelIdx=0;
-        struct cvorb_submodule *submodule = NULL;
-        struct cvorb_channel *channel = NULL;
-
-        for (submoduleIdx = 0; submoduleIdx < CVORB_SUBMODULES; ++submoduleIdx) {
-                submodule = &card->submodules[submoduleIdx];
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,27)
-            ret = kobject_init_and_add(&submodule->submodules_dir, &ktype_cvorb_submodule,
-                                        &card->dev->kobj, "submodule.%d", submoduleIdx);
-#else
-                kobject_init(&submodule->submodules_dir);
-                kobject_set_name(&submodule->submodules_dir, "submodule.%d", submoduleIdx);
-                submodule->submodules_dir.parent = &card->dev->kobj;
-                submodule->submodules_dir.ktype = &ktype_cvorb_submodule;
-                ret = kobject_register(&submodule->submodules_dir);
-#endif
-                if (ret) {
-                        --submoduleIdx; /* rollback only successful registration */
-                        if (channelIdx == CVORB_CHANNELS)
-                                /* the previous channel loop let channelIdx=channelIdx +1 */
-                                --channelIdx;
-                        goto unregister_kobjects;
-                }
-                for (channelIdx = 0; channelIdx < CVORB_CHANNELS; ++channelIdx) {
-                        channel = &submodule->channels[channelIdx];
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,27)
-                        ret = kobject_init_and_add(&channel->channels_dir, &ktype_cvorb_channel,
-                        &submodule->submodules_dir, "channel.%d", channelIdx);
-#else
-                        kobject_init(&channel->channels_dir);
-                        kobject_set_name(&channel->channels_dir, "channel.%d", channelIdx);
-                        channel->channels_dir.parent = &submodule->submodules_dir;
-                        channel->channels_dir.ktype = &ktype_cvorb_channel;
-                        ret = kobject_register(&channel->channels_dir);
-#endif
-                        if (ret) {
-                                --channelIdx; /* rollback only successful registration */
-                                goto unregister_kobjects;
-                        }
-                        ret = sysfs_create_bin_file(&channel->channels_dir, &cvorb_fcn_attr);
-                        if(ret)
-                                goto rm_bin_file;
-                }
-        }
-        return 0;
-
-rm_bin_file:
-        sysfs_remove_bin_file(&channel->channels_dir, &cvorb_fcn_attr);
-unregister_kobjects:
-        /* Rollback: unregister any kobject previously registered successfully*/
-        /* Instead of using submoduleIdx and channelIdx to unregister kobject */
-        /* it will be easier to check a field of a kobject in case the registration fail */
-        /* But apparently there is nothing in the structure stating clearly */
-        /* that the registration has failed. Therefore the indexes are used*/
-        for (; submoduleIdx >=0; --submoduleIdx) {
+    int ret;
+    volatile int submoduleIdx=0, channelIdx=0, fcnIdx=0;
+    struct cvorb_submodule *submodule = NULL;
+    struct cvorb_channel *channel = NULL;
+    
+    for (submoduleIdx = 0; submoduleIdx < CVORB_SUBMODULES; ++submoduleIdx) {
             submodule = &card->submodules[submoduleIdx];
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,27)
-            kobject_del(&submodule->submodules_dir);
+        ret = kobject_init_and_add(&submodule->submodules_dir, &ktype_cvorb_submodule,
+                                    &card->dev->kobj, "submodule.%d", submoduleIdx);
 #else
-            kobject_unregister(&submodule->submodules_dir);
+        kobject_init(&submodule->submodules_dir);
+        kobject_set_name(&submodule->submodules_dir, "submodule.%d", submoduleIdx);
+        submodule->submodules_dir.parent = &card->dev->kobj;
+        submodule->submodules_dir.ktype = &ktype_cvorb_submodule;
+        ret = kobject_register(&submodule->submodules_dir);
 #endif
-            for (; channelIdx >= 0; --channelIdx) {
-                channel = &submodule->channels[channelIdx];
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,27)
-                kobject_del(&channel->channels_dir);
-#else
-                kobject_unregister(&channel->channels_dir);
-#endif
-            }
-            channelIdx = CVORB_CHANNELS-1;
+        if (ret) {
+            --submoduleIdx; /* set properly the index for the removal */
+            goto unregister_kobjects;
         }
-        return ret;
+        for (channelIdx = 0; channelIdx < CVORB_CHANNELS; ++channelIdx) {
+            channel = &submodule->channels[channelIdx];
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,27)
+            ret = kobject_init_and_add(&channel->channels_dir, &ktype_cvorb_channel,
+                            &submodule->submodules_dir, "channel.%d", channelIdx);
+#else
+            kobject_init(&channel->channels_dir);
+            kobject_set_name(&channel->channels_dir, "channel.%d", channelIdx);
+            channel->channels_dir.parent = &submodule->submodules_dir;
+            channel->channels_dir.ktype = &ktype_cvorb_channel;
+            ret = kobject_register(&channel->channels_dir);
+#endif
+            if (ret) {
+                --channelIdx;  /* set properly the index for the removal */
+                goto unregister_kobjects;
+            }
+            if (is_sysfs_fcn_enabled) {
+                for (fcnIdx = 0; fcnIdx < CVORB_MAX_FCT_NR; ++fcnIdx) {
+                    ret = sysfs_create_bin_file(&channel->channels_dir, cvorb_fcn_bin_attrs[fcnIdx]);
+                    if(ret) {
+                        goto unregister_kobjects;
+                        --fcnIdx; /* set properly the index for the removal */
+                    }
+                }
+            }
+        }
+    }
+    return 0;
+
+unregister_kobjects:
+    /* Rollback: unregister any kobject previously registered successfully*/
+    /* Done by stepping_down the various indexes */
+    while(submoduleIdx >= 0) {
+        while(channelIdx >= 0) {
+            channel = &submodule->channels[channelIdx];
+            if (is_sysfs_fcn_enabled) {            
+                while(fcnIdx >= 0) {
+                    sysfs_remove_bin_file(&channel->channels_dir, cvorb_fcn_bin_attrs[fcnIdx]);
+                    --fcnIdx;
+                }
+                fcnIdx = CVORB_MAX_FCT_NR-1;
+            }
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,27)
+            kobject_del(&channel->channels_dir);
+#else
+            kobject_unregister(&channel->channels_dir);
+#endif
+            --channelIdx;
+        }
+        channelIdx = CVORB_CHANNELS-1;
+        submodule = &card->submodules[submoduleIdx];
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,27)
+        kobject_del(&submodule->submodules_dir);
+#else
+        kobject_unregister(&submodule->submodules_dir);
+#endif
+        --submoduleIdx;
+    }
+    return ret;
 }
 
 int cvorb_create_sysfs_files(struct cvorb_dev *card)
@@ -681,6 +736,75 @@ void cvorb_remove_sysfs_files(struct cvorb_dev *card)
     printk(KERN_INFO PFX "cvorb_remove_sysfs_files board with lun %d.\n", card->lun);
 	cvorb_dev_del_attributes(card);
 	sysfs_remove_group(&card->dev->kobj, &cvorb_attr_group);
+}
+
+/* 
+ * Implementing get/set cvorb function via sysfs requires that the
+ * PAGE_SIZE (size of the buffer used with sysfs) is at least equal
+ * to the maximum function size defined by the hardware which is 4kb 
+ */
+int cvorb_sysfs_init_module(void)
+{
+    int fcnIdx;
+    char *attr_name;
+    struct bin_attribute *fcn_bin_attr;
+    
+    /* check first if teh size of teh PAGE_SIZE is big enough */
+    /* compare to teh cvorb function size in bytes */
+    if (PAGE_SIZE < CVORB_FCN_MAX_BYTE_SIZE) {
+        printk(KERN_INFO PFX "PAGE_SIZE is not big enough to support get/set function via sysfs.\n"
+                "Please use ioctl calls (PAGE_SIZE: %ld CVORB_FCN_MAX_SIZE:4096).\n",
+                 PAGE_SIZE);
+        is_sysfs_fcn_enabled = 0;
+        return 0;
+    }
+    
+    cvorb_fcn_bin_attrs = kzalloc(sizeof(struct bin_attribute *)*CVORB_MAX_FCT_NR, GFP_KERNEL);
+    if (cvorb_fcn_bin_attrs == NULL)
+        return -ENOMEM; /* Out of memory */
+    for (fcnIdx = 0; fcnIdx < CVORB_MAX_FCT_NR; ++fcnIdx) {
+        fcn_bin_attr = kzalloc(sizeof(struct bin_attribute), GFP_KERNEL);
+        if(fcn_bin_attr == NULL)
+            goto error1;
+        attr_name = kzalloc(CCVORB_FCN_ATTR_NAME_SIZE, GFP_KERNEL);
+        if(attr_name == NULL)
+            goto error2;
+        snprintf(attr_name, CCVORB_FCN_ATTR_NAME_SIZE, "fcn_%d", fcnIdx);
+        fcn_bin_attr->attr.name = attr_name;
+        fcn_bin_attr->attr.mode = S_IWUSR | S_IRUGO;
+        /* fcn size is dynamic tehrefore no point to set it */
+        fcn_bin_attr->size = 0;
+        fcn_bin_attr->read = cvorb_read_fcn;
+        fcn_bin_attr->write = cvorb_store_fcn;
+        cvorb_fcn_bin_attrs[fcnIdx] = fcn_bin_attr;
+    }
+    is_sysfs_fcn_enabled = 1; /* get/set fcn via sysfs is enabled */
+    return 0;
+
+error2:
+    kfree(fcn_bin_attr); /* This one is not registered in the array */   
+error1:
+    while(--fcnIdx) { /* Rollback: step_down the idx */
+        kfree(cvorb_fcn_bin_attrs[fcnIdx]->attr.name);
+        kfree(cvorb_fcn_bin_attrs[fcnIdx]);
+    }
+    kfree(cvorb_fcn_bin_attrs);
+    return -ENOMEM; /* Out of memory */ 
+}
+
+void cvorb_sysfs_exit_module(void)
+{
+    int fcnIdx;
+    if (is_sysfs_fcn_enabled) {
+        /* All the cvorb devices have been uninstalled */
+        /* It's time to clean dynamic memory allocated to build dynamic attributes(fcn) */
+        /* before leaving the module itself */
+        for (fcnIdx = 0; fcnIdx < CVORB_MAX_FCT_NR; ++fcnIdx) {
+            kfree(cvorb_fcn_bin_attrs[fcnIdx]->attr.name);
+            kfree(cvorb_fcn_bin_attrs[fcnIdx]);
+        }
+        kfree(cvorb_fcn_bin_attrs);
+    } 
 }
 
 #else
