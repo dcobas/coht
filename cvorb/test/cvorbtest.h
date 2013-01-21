@@ -9,18 +9,18 @@
 #define CVORB_CH_STATE_MASK 0xF
 static const int CVORB_CH_MAX_STATES = 11;
 static const char *channel_state_machine[] = {
-        "Idle",
-        "Load internal RAM",
-        "Wait start event",
-        "Init counters",
-        "Enable function generation",
-        "Wait stop event",
-        "Stop event",
-        "Internal stop",
-        "Load next vector",
-        "Reload internal RAM(after internal stop)",
-        "Wait event start(internal stop)",
-        "Write current vector(internal stop)"
+	"Idle",
+	"Load internal RAM",
+	"Wait start event",
+	"Init counters",
+	"Enable function generation",
+	"Wait stop event",
+	"Stop event",
+	"Internal stop",
+	"Load next vector",
+	"Reload internal RAM(after internal stop)",
+	"Wait event start(internal stop)",
+	"Write current vector(internal stop)"
 };
 
 /*
@@ -33,4 +33,4 @@ static const char *submodule_status_bit_meaning[] = {
 };
 */
 
-#endif /* _CVORBTEST_H_ */
+#endif				/* _CVORBTEST_H_ */

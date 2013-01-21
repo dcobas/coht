@@ -38,12 +38,13 @@
 #include <sys/time.h>
 #endif
 
-#define S_UNIT          1.0  //express delay in second
-#define MS_UNIT         1.e3 //express delay in milli-second
-#define YS_UNIT         1.e6 //express delay in micro-second
-#define NS_UNIT         1.e9 //express delay in nano-second
+#define S_UNIT          1.0	//express delay in second
+#define MS_UNIT         1.e3	//express delay in milli-second
+#define YS_UNIT         1.e6	//express delay in micro-second
+#define NS_UNIT         1.e9	//express delay in nano-second
 
 double ts_getValue(double unit);
-void ts_calibrateCountPeriod(unsigned int inDelay/*ms*/, unsigned int inTimes);
+void ts_calibrateCountPeriod(unsigned int inDelay /*ms */ ,
+			     unsigned int inTimes);
 
 #endif
