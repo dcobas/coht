@@ -20,8 +20,9 @@
 #define PCI_SOURCE 2
 
 static int
-__cvorb_dma(struct device *dev, unsigned int vme_addr, enum vme_address_modifier am,
-	    void *addr, ssize_t size, int src)
+__cvorb_dma(struct device *dev, unsigned int vme_addr,
+	    enum vme_address_modifier am, void *addr, ssize_t size,
+	    int src)
 {
 	struct vme_dma desc;
 	struct vme_dma_attr *vme;
@@ -31,17 +32,18 @@ __cvorb_dma(struct device *dev, unsigned int vme_addr, enum vme_address_modifier
 	memset(&desc, 0, sizeof(desc));
 
 	vme = (src == VME_SOURCE) ? &desc.src : &desc.dst;
-	pci = (src == PCI_SOURCE) ? &desc.src: &desc.dst;
-	desc.dir = (src == PCI_SOURCE) ? VME_DMA_TO_DEVICE : VME_DMA_FROM_DEVICE;
+	pci = (src == PCI_SOURCE) ? &desc.src : &desc.dst;
+	desc.dir =
+	    (src == PCI_SOURCE) ? VME_DMA_TO_DEVICE : VME_DMA_FROM_DEVICE;
 	desc.length = size;
 
-	desc.ctrl.pci_block_size	= VME_DMA_BSIZE_2048;
-	desc.ctrl.pci_backoff_time	= VME_DMA_BACKOFF_0;
-	desc.ctrl.vme_block_size	= VME_DMA_BSIZE_2048;
-	desc.ctrl.vme_backoff_time	= VME_DMA_BACKOFF_0;
+	desc.ctrl.pci_block_size = VME_DMA_BSIZE_2048;
+	desc.ctrl.pci_backoff_time = VME_DMA_BACKOFF_0;
+	desc.ctrl.vme_block_size = VME_DMA_BSIZE_2048;
+	desc.ctrl.vme_backoff_time = VME_DMA_BACKOFF_0;
 
 	pci->addru = 0;
-	pci->addrl = (unsigned int)addr;
+	pci->addrl = (unsigned int) addr;
 
 	vme->addru = 0;
 	vme->addrl = vme_addr;
@@ -68,10 +70,13 @@ __cvorb_dma(struct device *dev, unsigned int vme_addr, enum vme_address_modifier
  *
  * returns 0 on success, negative error code on failure
  */
-int cvorb_dma_read_mblt(struct device *dev, unsigned int vme_addr, void __kernel *addr, ssize_t size)
+int cvorb_dma_read_mblt(struct device *dev, unsigned int vme_addr,
+			void __kernel * addr, ssize_t size)
 {
-	return __cvorb_dma(dev, vme_addr, VME_A16_USER, (void __force *)addr, size, 0);
+	return __cvorb_dma(dev, vme_addr, VME_A16_USER,
+			   (void __force *) addr, size, 0);
 }
+
 EXPORT_SYMBOL_GPL(cvorb_dma_read_mblt);
 
 /**
@@ -83,9 +88,12 @@ EXPORT_SYMBOL_GPL(cvorb_dma_read_mblt);
  *
  * returns 0 on success, negative error code on failure
  */
-int cvorb_dma_write_mblt(struct device *dev, unsigned int vme_addr, void __kernel *addr, ssize_t size)
+int cvorb_dma_write_mblt(struct device *dev, unsigned int vme_addr,
+			 void __kernel * addr, ssize_t size)
 {
-        return __cvorb_dma(dev, vme_addr, VME_A16_USER, (void __force *)addr, size, 2);
+	return __cvorb_dma(dev, vme_addr, VME_A16_USER,
+			   (void __force *) addr, size, 2);
 }
+
 EXPORT_SYMBOL_GPL(cvorb_dma_write_mblt);
 #endif

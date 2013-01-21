@@ -78,12 +78,12 @@
  * Note that only one bit can be written at a time on this register
  */
 #define CVORB_SUBMODULE_CTL	0x024
-#define CVORB_SUBMODULE_RESET	BIT(0) 	/* Submodule software reset */
-#define CVORB_FPGA_RESET	BIT(3) 	/* FPGA hardware reset: reset both submodules in one goal*/
-#define CVORB_SUBMODULE_START	BIT(4) 	/* Simulate submodule Start trigger: start execution of a function */
-#define CVORB_SUBMODULE_EVSTART	BIT(5) 	/* Simulate submodule event Start trigger : allows to continue the execution of a function suspended by a stop event*/
-#define CVORB_SUBMODULE_STOP	BIT(6) 	/* Simulate submodule Stop trigger: allows to suspend the execution of a function */
-#define CVORB_SUBMODULE_EVSTOP	BIT(7) 	/* Simulate submodule event Stop trigger: ends execution of a function */
+#define CVORB_SUBMODULE_RESET	BIT(0)	/* Submodule software reset */
+#define CVORB_FPGA_RESET	BIT(3)	/* FPGA hardware reset: reset both submodules in one goal */
+#define CVORB_SUBMODULE_START	BIT(4)	/* Simulate submodule Start trigger: start execution of a function */
+#define CVORB_SUBMODULE_EVSTART	BIT(5)	/* Simulate submodule event Start trigger : allows to continue the execution of a function suspended by a stop event */
+#define CVORB_SUBMODULE_STOP	BIT(6)	/* Simulate submodule Stop trigger: allows to suspend the execution of a function */
+#define CVORB_SUBMODULE_EVSTOP	BIT(7)	/* Simulate submodule event Stop trigger: ends execution of a function */
 
 /*
  * chunk of 4 bytes not used: from 0x0030 to 0x003c
@@ -93,10 +93,10 @@
  * Status (R)
  */
 #define CVORB_SUBMODULE_STATUS	        0x040
-#define CVORB_SUBMODULE_READY	        BIT(0) 	/* Ready to run (on 0) */
-#define CVORB_SUBMODULE_SRAM_BUSY	BIT(1) 	/* SRAM data write in progress: raised don't write to SRAM register */
-#define CVORB_SUBMODULE_BUSY	        BIT(2) 	/* waveform is being played: "logical or" of all channels of the module */
-#define CVORB_SUBMODULE_IDLED	        BIT(3) 	/* no waveform being executed: "logical or" of all channels of the module */
+#define CVORB_SUBMODULE_READY	        BIT(0)	/* Ready to run (on 0) */
+#define CVORB_SUBMODULE_SRAM_BUSY	BIT(1)	/* SRAM data write in progress: raised don't write to SRAM register */
+#define CVORB_SUBMODULE_BUSY	        BIT(2)	/* waveform is being played: "logical or" of all channels of the module */
+#define CVORB_SUBMODULE_IDLED	        BIT(3)	/* no waveform being executed: "logical or" of all channels of the module */
 /* remaining bits not used */
 
 /*
@@ -124,7 +124,7 @@
  * This register is a pointer to the external SRAM. The pointer auto-increments
  * on read or write of SRAMDATA. External SRAM is 512k x 32 bits.
  */
-#define CVORB_SUBMODULE_SRAM_ADDR       0x04c   /* Byte addresses must be written into this reg */
+#define CVORB_SUBMODULE_SRAM_ADDR       0x04c	/* Byte addresses must be written into this reg */
 /* SRAM address is computed by applying to channel nr and function nr respective shift*/
 #define CVORB_SUBMODULE_SRAM_CHAN_SHIFT 18
 #define CVORB_SUBMODULE_SRAM_FUNC_SHIFT 12
@@ -142,10 +142,10 @@
  */
 #define CVORB_DACCTL		0x060
 #define CVORB_DACCTL_DATA 	(0xff<<0)	/* DAC register data */
-#define CVORB_DACCTL_ADDR	(0x1ff<<8) 	/* DAC register address */
+#define CVORB_DACCTL_ADDR	(0x1ff<<8)	/* DAC register address */
 /* bits 13-14: do not care about them */
-#define CVORB_DACCTL_RW		BIT(15) 	/* DAC register read/write (1/0) */
-#define CVORB_DACCTL_UP2DATE	BIT(16) 	/* set when data in DACCTL are updated; cleared on SPI read */
+#define CVORB_DACCTL_RW		BIT(15)	/* DAC register read/write (1/0) */
+#define CVORB_DACCTL_UP2DATE	BIT(16)	/* set when data in DACCTL are updated; cleared on SPI read */
 /* bits 17-31: not used */
 
 /**********************************************************************************/
@@ -188,4 +188,4 @@
  */
 #define CVORB_CH_REPEAT_FCN     0x98
 
-#endif /* _CVORB_HW_H_ */
+#endif				/* _CVORB_HW_H_ */

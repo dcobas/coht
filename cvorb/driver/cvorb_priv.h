@@ -40,16 +40,15 @@
  * @chan_nr:            channel number in the range of [0,7]
  * @parent:	        parent CVORB submodule
  */
-struct cvorb_channel
-{
-    int32_t                 enable;
-    uint64_t                enable_fcn_mask;
-    uint32_t                selected_fcn;
-    uint32_t                repeat_count;
-    struct kobject 		    channels_dir;
-    uint32_t                reg_offset;
-	uint32_t 	            chan_nr;
-	struct cvorb_submodule 	*parent;
+struct cvorb_channel {
+	int32_t enable;
+	uint64_t enable_fcn_mask;
+	uint32_t selected_fcn;
+	uint32_t repeat_count;
+	struct kobject channels_dir;
+	uint32_t reg_offset;
+	uint32_t chan_nr;
+	struct cvorb_submodule *parent;
 };
 
 /**
@@ -65,18 +64,17 @@ struct cvorb_channel
  * @channels:                   the 8 channels of the submodule
  * @parent:	                parent CVORB board
  */
-struct cvorb_submodule
-{
-	uint32_t 		        inpol;
-	uint32_t                optical_out_enabled;
-	uint32_t                dac_source;
-	uint32_t                led_source;
-	uint32_t                optical_source;
-    struct kobject          submodules_dir;
-	uint32_t 		        reg_offset;
-	uint32_t                submod_nr;
-	struct cvorb_channel 	channels[CVORB_CHANNELS];
-	struct cvorb_dev 	    *parent;
+struct cvorb_submodule {
+	uint32_t inpol;
+	uint32_t optical_out_enabled;
+	uint32_t dac_source;
+	uint32_t led_source;
+	uint32_t optical_source;
+	struct kobject submodules_dir;
+	uint32_t reg_offset;
+	uint32_t submod_nr;
+	struct cvorb_channel channels[CVORB_CHANNELS];
+	struct cvorb_dev *parent;
 };
 
 /**
@@ -91,33 +89,34 @@ struct cvorb_submodule
  * @submodules  the two submodules of the cvorb board
  * @lun         Logical Unit number of the board [0,n]
  */
-struct cvorb_dev
-{
-	struct cdev 		    cdev;
-	struct device*          dev;
-	uint64_t 		        pcb_id;
-	char 		            hw_rev[CVORB_VERSION_AS_STRING_SZ];
-	uint32_t                vme_base;
-	struct mutex 		    lock;
-	void 			        *iomap;
-	struct cvorb_submodule	submodules[CVORB_SUBMODULES];
-	uint32_t 		        lun;
+struct cvorb_dev {
+	struct cdev cdev;
+	struct device *dev;
+	uint64_t pcb_id;
+	char hw_rev[CVORB_VERSION_AS_STRING_SZ];
+	uint32_t vme_base;
+	struct mutex lock;
+	void *iomap;
+	struct cvorb_submodule submodules[CVORB_SUBMODULES];
+	uint32_t lun;
 };
 
 enum cvorb_reset {
-        CVORB_FULL,
-        CVORB_SUBMODULE_1,
-        CVORB_SUBMODULE_2
+	CVORB_FULL,
+	CVORB_SUBMODULE_1,
+	CVORB_SUBMODULE_2
 };
 
-static inline uint32_t cvorb_readw(struct cvorb_dev *cvorb, unsigned int offset)
+static inline uint32_t cvorb_readw(struct cvorb_dev *cvorb,
+				   unsigned int offset)
 {
-        return ioread32be(cvorb->iomap + offset);
+	return ioread32be(cvorb->iomap + offset);
 }
 
-static inline void cvorb_writew(struct cvorb_dev *cvorb, unsigned int offset, uint32_t value)
+static inline void cvorb_writew(struct cvorb_dev *cvorb,
+				unsigned int offset, uint32_t value)
 {
-        iowrite32be(value, cvorb->iomap + offset);
+	iowrite32be(value, cvorb->iomap + offset);
 }
 
 /*
@@ -125,49 +124,61 @@ static inline void cvorb_writew(struct cvorb_dev *cvorb, unsigned int offset, ui
  * @param mask: identifies the bit field
  * @param value: desired value to set in the bit field.
  */
-static inline void cvorb_writebitfields(struct cvorb_dev* cvorb, unsigned int offset,
-        uint32_t mask, uint32_t value)
+static inline void cvorb_writebitfields(struct cvorb_dev *cvorb,
+					unsigned int offset, uint32_t mask,
+					uint32_t value)
 {
-        uint32_t regval;
+	uint32_t regval;
 
-        /* reads the current value from the HW */
-        regval = cvorb_readw(cvorb, offset);
-        /* clear the bits corresponding to the mask by doing a bitwise AND with the mask complement*/
-        regval &= ~mask;
-        /* set properly the bit fields */
-        regval |= value;
-        /* writes the new value to the HW */
-        cvorb_writew(cvorb, offset, regval);
+	/* reads the current value from the HW */
+	regval = cvorb_readw(cvorb, offset);
+	/* clear the bits corresponding to the mask by doing a bitwise AND with the mask complement */
+	regval &= ~mask;
+	/* set properly the bit fields */
+	regval |= value;
+	/* writes the new value to the HW */
+	cvorb_writew(cvorb, offset, regval);
 }
 
 /* Functions used on sysfs callbacks */
 void cvorb_reset(struct cvorb_dev *cvorb);
-void cvorb_get_pcb_id(struct cvorb_dev *cvorb, uint64_t *value);
-void cvorb_get_temperature(struct cvorb_dev *cvorb, int32_t *value);
+void cvorb_get_pcb_id(struct cvorb_dev *cvorb, uint64_t * value);
+void cvorb_get_temperature(struct cvorb_dev *cvorb, int32_t * value);
 
 void cvorb_submodule_reset(struct cvorb_submodule *submodule);
-int cvorb_submodule_trigger(struct cvorb_submodule *submodule, enum cvorb_trigger event);
-int cvorb_submodule_inpol(struct cvorb_submodule *submodule, uint32_t value);
-void cvorb_submodule_status(struct cvorb_submodule *submodule, uint32_t *value);
-void cvorb_submodule_dacsource(struct cvorb_submodule *submodule, uint32_t value);
-void cvorb_submodule_ledsource(struct cvorb_submodule *submodule, uint32_t value);
-void cvorb_submodule_opticalsource(struct cvorb_submodule *submodule, uint32_t value);
-void cvorb_submodule_enable_opticalout(struct cvorb_submodule *submodule, uint32_t value);
-int cvorb_ch_status(struct cvorb_channel *channel, uint32_t *status);
+int cvorb_submodule_trigger(struct cvorb_submodule *submodule,
+			    enum cvorb_trigger event);
+int cvorb_submodule_inpol(struct cvorb_submodule *submodule,
+			  uint32_t value);
+void cvorb_submodule_status(struct cvorb_submodule *submodule,
+			    uint32_t * value);
+void cvorb_submodule_dacsource(struct cvorb_submodule *submodule,
+			       uint32_t value);
+void cvorb_submodule_ledsource(struct cvorb_submodule *submodule,
+			       uint32_t value);
+void cvorb_submodule_opticalsource(struct cvorb_submodule *submodule,
+				   uint32_t value);
+void cvorb_submodule_enable_opticalout(struct cvorb_submodule *submodule,
+				       uint32_t value);
+int cvorb_ch_status(struct cvorb_channel *channel, uint32_t * status);
 int cvorb_ch_enable(struct cvorb_channel *ch, uint32_t value);
 int cvorb_select_fcn(struct cvorb_channel *ch, uint32_t value);
 int cvorb_enable_fcn(struct cvorb_channel *ch, uint32_t value);
 int cvorb_disable_fcn(struct cvorb_channel *ch, uint32_t value);
 int cvorb_ch_repeat_count(struct cvorb_channel *ch, uint32_t value);
-int cvorb_sysfs_set_fcn(struct cvorb_channel *channel, uint32_t fcn_nr, void *arg);
-int cvorb_sysfs_get_fcn(struct cvorb_channel *channel, uint32_t fcn_nr, void *arg, ssize_t *count);
+int cvorb_sysfs_set_fcn(struct cvorb_channel *channel, uint32_t fcn_nr,
+			void *arg);
+int cvorb_sysfs_get_fcn(struct cvorb_channel *channel, uint32_t fcn_nr,
+			void *arg, ssize_t * count);
 
 /* Functions used by cvorbdrv.c */
-int cvorb_install(struct class *class, struct device *parentDev, dev_t cvorb_devno, struct cvorb_dev *cvorb);
-void cvorb_uninstall(struct class* class, struct cvorb_dev *cvorb, dev_t cvorb_devno);
+int cvorb_install(struct class *class, struct device *parentDev,
+		  dev_t cvorb_devno, struct cvorb_dev *cvorb);
+void cvorb_uninstall(struct class *class, struct cvorb_dev *cvorb,
+		     dev_t cvorb_devno);
 int cvorb_create_sysfs_files(struct cvorb_dev *cvorb);
 void cvorb_remove_sysfs_files(struct cvorb_dev *cvorb);
 void cvorb_sysfs_exit_module(void);
 int cvorb_sysfs_init_module(void);
 
-#endif /* _CVORB_PRIV_H_ */
+#endif				/* _CVORB_PRIV_H_ */

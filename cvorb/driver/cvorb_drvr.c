@@ -17,7 +17,8 @@
 #include <cvorb.h>
 #include <cvorb_priv.h>
 
-MODULE_AUTHOR("Samuel Iglesias Gonsalvez <siglesia@cern.ch>, Michel Arruat <michel.arruat@cern.ch>");
+MODULE_AUTHOR ("Samuel Iglesias Gonsalvez <siglesia@cern.ch>,"
+		"Michel Arruat <michel.arruat@cern.ch>");
 MODULE_DESCRIPTION("Linux Device Driver for the CVORB board at CERN.");
 MODULE_VERSION("1.0");
 MODULE_LICENSE("GPL");
@@ -26,13 +27,13 @@ MODULE_LICENSE("GPL");
 /*====================================================================*/
 /* Initialized with -1 because it's used to check bad configuration,  */
 /* like two times the same lun etc...                                 */
-static int lun[CVORB_MAX_BOARDS] = { [0 ... CVORB_MAX_BOARDS-1] = -1 };
-static unsigned int num_lun=0;
+static int lun[CVORB_MAX_BOARDS] = {[0 ... CVORB_MAX_BOARDS - 1] = -1 };
+static unsigned int num_lun = 0;
 module_param_array(lun, int, &num_lun, S_IRUGO);
 MODULE_PARM_DESC(lun, "Logical Unit Number");
 
 static int base_address[CVORB_MAX_BOARDS];
-static unsigned int num_base_address=0;
+static unsigned int num_base_address = 0;
 module_param_array(base_address, int, &num_base_address, S_IRUGO);
 MODULE_PARM_DESC(base_address, "VME Base Address for each CVORB");
 
@@ -68,18 +69,23 @@ static int __devinit cvorb_probe(struct device *pdev, unsigned int ndev)
 		if (lun[j] == lun[ndev])
 			return -EBUSY;
 	}
-	/* Allocate the software representation of the cvorb board*/
-        cvorb = (struct cvorb_dev *) kzalloc(sizeof(struct cvorb_dev), GFP_KERNEL);
-        if (cvorb == NULL) {
-                return -ENOMEM;
-        }
-        /* Set VME 32bits address and Lun*/
+	/* Allocate the software representation of the cvorb board */
+	cvorb = (struct cvorb_dev *) kzalloc(sizeof(struct cvorb_dev),
+					 GFP_KERNEL);
+	if (cvorb == NULL) {
+		return -ENOMEM;
+	}
+	/* Set VME 32bits address and Lun */
 	cvorb->vme_base = base_address[ndev];
 	cvorb->lun = lun[ndev];
-	printk(KERN_INFO PFX "Installing board with lun %d and vme address 0x%08x. Board %d/%d\n", cvorb->lun, cvorb->vme_base, ndev, num_lun);
+	printk(KERN_INFO PFX "Installing board with lun %d"
+		"and vme address 0x%08x. Board %d/%d\n",
+		cvorb->lun, cvorb->vme_base, ndev, num_lun);
 	ret = cvorb_install(cvorb_class, pdev, cvorb_devno, cvorb);
 	if (ret) {
-		printk(KERN_INFO PFX "board with lun %d cannot be installed\n", lun[ndev]);
+		printk(KERN_INFO PFX
+		       "board with lun %d cannot be installed\n",
+		       lun[ndev]);
 		return ret;
 	}
 	printk(KERN_INFO PFX "board with lun %d installed\n", lun[ndev]);
@@ -90,13 +96,14 @@ static int __devinit cvorb_probe(struct device *pdev, unsigned int ndev)
 
 static int __devexit cvorb_remove(struct device *pdev, unsigned int ndev)
 {
-        struct cvorb_dev *cvorb = dev_get_drvdata(pdev);
+	struct cvorb_dev *cvorb = dev_get_drvdata(pdev);
 
-        printk(KERN_INFO PFX "uninstalling board with lun %d.\n", cvorb->lun);
-        cvorb_uninstall(cvorb_class, cvorb, cvorb_devno);
-        cvorb_installed--;
+	printk(KERN_INFO PFX "uninstalling board with lun %d.\n",
+	       cvorb->lun);
+	cvorb_uninstall(cvorb_class, cvorb, cvorb_devno);
+	cvorb_installed--;
 
-        return 0;
+	return 0;
 }
 
 static struct vme_driver cvorb_driver = {
@@ -104,8 +111,7 @@ static struct vme_driver cvorb_driver = {
 	.probe = cvorb_probe,
 	.remove = __devexit_p(cvorb_remove),
 	.driver = {
-		.name = DRIVER_NAME
-	},
+		   .name = DRIVER_NAME},
 };
 
 static int __init cvorb_init_module(void)
@@ -114,47 +120,52 @@ static int __init cvorb_init_module(void)
 
 	/* Check Parameters */
 	if (num_lun > CVORB_MAX_BOARDS) {
-		printk(KERN_ERR PFX "Number of boards to install exceed the limit (%d)\n", CVORB_MAX_BOARDS);
+		printk(KERN_ERR PFX
+		       "Number of boards to install exceed the limit (%d)\n",
+		       CVORB_MAX_BOARDS);
 		return -EINVAL;
 	}
 	/*
 	 * Check if the difference between base addresses
 	 *  is more that the board size
 	 */
-	for (i=1; i<num_lun; ++i) {
-        if ((base_address[i] - base_address[i-1]) < CVORB_WINDOW_LENGTH) {
-	        printk(KERN_ERR PFX "base address are not correct(doesn't respect \n");
-	        return -EINVAL;
-	    }
+	for (i = 1; i < num_lun; ++i) {
+		if ((base_address[i] - base_address[i - 1]) <
+		    CVORB_WINDOW_LENGTH) {
+			printk(KERN_ERR PFX
+			       "base address are not correct(doesn't respect \n");
+			return -EINVAL;
+		}
 	}
-    /* create device class*/
-    cvorb_class = class_create(THIS_MODULE, "cvorb");
-    if (IS_ERR(cvorb_class)) {
-        printk(KERN_ERR PFX "Failed to create cvorb class\n");
-        error = PTR_ERR(cvorb_class);
-        /* nothing to clean, just returns the error */
-        return error;
-    }
+	/* create device class */
+	cvorb_class = class_create(THIS_MODULE, "cvorb");
+	if (IS_ERR(cvorb_class)) {
+		printk(KERN_ERR PFX "Failed to create cvorb class\n");
+		error = PTR_ERR(cvorb_class);
+		/* nothing to clean, just returns the error */
+		return error;
+	}
 
-    /* Get a range of minor numbers (starting with 0) to work with */
+	/* Get a range of minor numbers (starting with 0) to work with */
 	error = alloc_chrdev_region(&cvorb_devno, 0, num_lun, DRIVER_NAME);
-    if (error < 0) {
-        printk(KERN_ERR PFX "Failed to allocate chrdev region\n");
-        goto alloc_chrdev_region_failed;
-    }
+	if (error < 0) {
+		printk(KERN_ERR PFX "Failed to allocate chrdev region\n");
+		goto alloc_chrdev_region_failed;
+	}
 
-    /* some sysfs initialization before instantiating the devices*/
-    error = cvorb_sysfs_init_module();
-    if (error) {
-        printk(KERN_ERR PFX "Failed initializing sysfs at module installation.(-ENOMEM) \n");
-        goto alloc_chrdev_region_failed;
-    }
-    return vme_register_driver(&cvorb_driver, num_lun);
+	/* some sysfs initialization before instantiating the devices */
+	error = cvorb_sysfs_init_module();
+	if (error) {
+		printk(KERN_ERR PFX
+		       "Failed initializing sysfs at module installation.(-ENOMEM) \n");
+		goto alloc_chrdev_region_failed;
+	}
+	return vme_register_driver(&cvorb_driver, num_lun);
 
 alloc_chrdev_region_failed:
-    class_destroy(cvorb_class);
+	class_destroy(cvorb_class);
 
-    return error;
+	return error;
 }
 
 static void __exit cvorb_exit_module(void)
@@ -163,8 +174,8 @@ static void __exit cvorb_exit_module(void)
 
 	vme_unregister_driver(&cvorb_driver);
 	unregister_chrdev_region(devno, num_lun);
-    /* some sysfs cleaning before leaving the module */
-    cvorb_sysfs_exit_module(); 
+	/* some sysfs cleaning before leaving the module */
+	cvorb_sysfs_exit_module();
 	class_destroy(cvorb_class);
 }
 
