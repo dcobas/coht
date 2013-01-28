@@ -1652,6 +1652,7 @@ unsigned long          ps;
 
       /* EINTR = "Interrupted system call" */
 
+      CancelTimeout(&(ccon->Timer));
       pseterr(EINTR);   /* We have been signaled */
       return 0;
    }
