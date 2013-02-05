@@ -1,14 +1,17 @@
-CPU=L865
-KVER=2.6.24.7-rt27
+CPU ?= L865
+# KVER=2.6.24.7-rt27
 
 # KVER=2.6.24.7-rt21
 # KVER=2.6.24.7-rt27
 # KVER=2.6.29.4-rt15
 # KVER=2.6.31.6-rt19
-KVER64=2.6.33.9-rt31.66.el6rt.x86_64
+KVER32 ?= 3.2.33-rt50
+KVER64 ?= 3.2.33-rt50.66.el6rt.x86_64
 
 ifeq ($(CPU), L866)
 	KVER=$(KVER64)
+else
+	KVER=$(KVER32)
 endif
 
 KERNELSRC=/acc/sys/$(CPU)/usr/src/kernels/$(KVER)
