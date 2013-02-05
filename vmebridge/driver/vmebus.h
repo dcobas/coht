@@ -24,6 +24,7 @@
 #ifdef __KERNEL__
 #include <linux/device.h>
 #include <linux/kernel.h>
+#include <linux/module.h>
 #endif /* __KERNEL__ */
 
 #include <linux/types.h>
