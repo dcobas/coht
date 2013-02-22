@@ -9,7 +9,9 @@ LDVER=1.0
 
 include /acc/dsc/src/co/Make.auto
 
-CFLAGS= -g -Wall -I. -I./ctr/driver -fPIC -DLDVER=$(LDVER) -DSOVER=$(SOVER)
+DRVR = ../../driver
+
+CFLAGS= -g -Wall -I. -I$(DRVR) -fPIC -DLDVER=$(LDVER) -DSOVER=$(SOVER)
 
 SRCS=libctr.c libctr.h libctrP.h libctrp.c libctrv.c
 
@@ -59,9 +61,11 @@ install-lib: $(INSTFILES)
 	@echo "Installing libctr.a and libctr.h in /acc/local/"$(CPU)"tim/libctr."$(LDVER)
 	dsc_install libctr.$(CPU).a /acc/local/$(CPU)/tim/libctr.$(LDVER)
 	dsc_install libctr.h /acc/local/$(CPU)/tim/libctr.$(LDVER)
+	dsc_install $(DRVR)/*.h /acc/local/$(CPU)/tim/libctr.$(LDVER)
 	rm -f /acc/local/$(CPU)/ctr/libctr.h
 	@echo "Installing libctr.h in /acc/local/"$(CPU)"/ctr"
 	dsc_install libctr.h /acc/local/$(CPU)/ctr
+
 	@echo -e "Done install-lib\n"
 
 install-lab: $(INSTFILES)

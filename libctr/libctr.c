@@ -38,7 +38,7 @@ int ctr_ctime_to_unix(CtrDrvrTime *ctime, struct timeval *utime)
 	double fus;
 	fus = ctime->TicksHPTDC / 2.56;
 	utime->tv_sec = ctime->Second;
-	utime->tv_usec = (suseconds_t) (fus / 1000.0);
+	utime->tv_usec = (suseconds_t) (fus /* / 1000.0 */);
 	return 0;
 }
 

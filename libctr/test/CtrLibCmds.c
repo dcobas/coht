@@ -144,7 +144,7 @@ struct timeval utime;
       sprintf (tbuf, "%s-%s/%s/%s %s"  , dy, md, mn, yr, ti);
 
       if (utime.tv_usec) {
-	  sprintf(&tbuf[strlen(tbuf)],".%06lu",utime.tv_usec);
+	  sprintf(&tbuf[strlen(tbuf)],".%09lu",utime.tv_usec);
       }
    }
 
@@ -223,6 +223,10 @@ static char *inter_names[CtrDrvrInterruptSOURCES] = {"Ch0","Ch1","Ch2","Ch3",
 /*****************************************************************/
 
 char *counter_mask_to_str(CtrDrvrCounterMask cmsk) {
+
+#ifndef CtrDrvrCOUNTER_MASKS
+#define CtrDrvrCOUNTER_MASKS 12
+#endif
 
 static char *cmask_names[CtrDrvrCOUNTER_MASKS] = {"Ctim", "Cntr1","Cntr2","Cntr3",
 						  "Cntr4","Cntr5","Cntr6","Cntr7",
@@ -828,9 +832,9 @@ struct ctr_module_address_s module_address;
       return arg;
    }
 
-   printf("Mmap:0x%p\n",module_address.memory_map);
+   printf("Mmap:0x%p\n",(void *) module_address.memory_map);
    if (module_address.jtag_address)
-      printf("Jtag:0x%p\n",module_address.jtag_address);
+      printf("Jtag:0x%p\n",(void *) module_address.jtag_address);
 
    for (i=0; i<4; i++)
       printf("Spec:%d 0x%X\n",i,module_address.specific[i]);

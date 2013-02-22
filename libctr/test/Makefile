@@ -6,7 +6,9 @@ CPU=L865
 
 include /acc/dsc/src/co/Make.auto
 
-CFLAGS = -g -Wall -I. -I.. -I../ctr/driver -rdynamic
+DRVR = ../../../driver
+
+CFLAGS = -g -Wall -I. -I.. -I$(DRVR) -rdynamic
 LDLIBS = ../libctr.$(CPU).a -ldl
 
 ALL = libctrtest.$(CPU)

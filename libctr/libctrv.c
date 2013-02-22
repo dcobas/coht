@@ -29,8 +29,8 @@ int ctr_get_module_address(void *handle, struct ctr_module_address_s *module_add
 		return -1;
 
 	module_address->device_type  = CtrDrvrDeviceCTRV;
-	module_address->memory_map   = moad.VMEAddress;
-	module_address->jtag_address = moad.JTGAddress;
+	module_address->memory_map   = (uintptr_t) moad.VMEAddress;
+	module_address->jtag_address = (uintptr_t) moad.JTGAddress;
 	module_address->specific[0]  = moad.InterruptVector;
 	module_address->specific[1]  = moad.InterruptLevel;
 

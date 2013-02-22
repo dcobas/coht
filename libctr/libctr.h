@@ -16,20 +16,20 @@
 #include <ctrhard.h>
 
 struct ctr_ccv_s {
-	int enable;                         /* Enable = 2, Bus = 1 Enable+Bus = 3 */
+	uint32_t enable;                         /* Enable = 2, Bus = 1 Enable+Bus = 3 */
 	CtrDrvrCounterStart start;          /* The counters start. */
 	CtrDrvrCounterMode mode;            /* The counters operating mode. */
 	CtrDrvrCounterClock clock;          /* Clock specification. */
-	int pulse_width;                    /* Number of 40MHz ticks, 0 = as fast as possible. */
-	int delay;                          /* 32 bit delay to load into counter. */
+	uint32_t pulse_width;                    /* Number of 40MHz ticks, 0 = as fast as possible. */
+	uint32_t delay;                          /* 32 bit delay to load into counter. */
 	CtrDrvrCounterMask counter_mask;    /* Output lemo connectors mask, invited signals */
 	CtrDrvrPolarity polarity;           /* Polarity of output */
-	int ctim;                           /* CTIM triggering event of this action */
-	int payload;                        /* 16-Bit Payload */
+	uint32_t ctim;                           /* CTIM triggering event of this action */
+	uint32_t payload;                        /* 16-Bit Payload */
 	CtrDrvrTriggerCondition cmp_method; /* Payload compare method */
-	int grnum;                          /* Telegram group number or zero */
-	int grval;                          /* Telegram group value */
-	int tgnum;                          /* Telegram number or zero */
+	uint32_t grnum;                          /* Telegram group number or zero */
+	uint32_t grval;                          /* Telegram group value */
+	uint32_t tgnum;                          /* Telegram number or zero */
 };
 
 typedef enum {
@@ -51,9 +51,9 @@ typedef enum {
 
 struct ctr_interrupt_s {
 	CtrDrvrConnectionClass ctr_class; /** CTR interrupt class */
-	int equip;                        /** LTIM id, hardware mask, CTIM id */
-	int payload;                      /** 16-Bit payload of the event if CTIM */
-	int modnum;                       /** Module number of interrupting device */
+	uint32_t equip;                        /** LTIM id, hardware mask, CTIM id */
+	uint32_t payload;                      /** 16-Bit payload of the event if CTIM */
+	uint32_t modnum;                       /** Module number of interrupting device */
 	CtrDrvrCTime onzero;              /** Time of end of action */
 	CtrDrvrCTime trigger;             /** Trigger time of action */
 	CtrDrvrCTime start;               /** Counter start time */
@@ -61,9 +61,9 @@ struct ctr_interrupt_s {
 
 struct ctr_module_address_s {
 	CtrDrvrDevice device_type;        /** Which kind of device PCI/VME */
-	void *memory_map;                 /** Main FPGA address (VME A24/BAR2) */
-	void *jtag_address;               /** JTAG IO address (VME D16/BAR0) */
-	unsigned int specific[4];         /** If VME vec-level. If PCI pci_slot-module-vid-did */
+	uintptr_t memory_map;              /** Main FPGA address (VME A24/BAR2) */
+	uintptr_t jtag_address;            /** JTAG IO address (VME D16/BAR0) */
+	uint32_t specific[4];         /** If VME vec-level. If PCI pci_slot-module-vid-did */
 };
 
 /**
