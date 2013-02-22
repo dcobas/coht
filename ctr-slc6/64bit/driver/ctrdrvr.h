@@ -10,6 +10,10 @@
 #ifndef CTRDRVR
 #define CTRDRVR
 
+#ifndef __kernel
+#include <stdint.h>
+#endif
+
 #include "ctrhard.h"   /* Hardware interface for expert and diagnostic clients */
 #include "hptdc.h"     /* HPTDC (Time to Digital Convertor) definitions */
 
@@ -53,27 +57,27 @@ typedef enum {
  } CtrDrvrConnectionClass;
 
 typedef struct {
-   unsigned int            Module;       /* The module 1..n */
+   uint32_t                Module;       /* The module 1..n */
    CtrDrvrConnectionClass  EqpClass;     /* Incomming CTIM or local PTIM timing */
-   unsigned int            EqpNum;       /* Either a MASK or PTIM or CTIM object  */
+   uint32_t                EqpNum;       /* Either a MASK or PTIM or CTIM object  */
  } CtrDrvrConnection;
 
 typedef struct {
-   unsigned int Size;
-   unsigned int Pid[CtrDrvrCLIENT_CONTEXTS];
+   uint32_t     Size;
+   uint32_t     Pid[CtrDrvrCLIENT_CONTEXTS];
  } CtrDrvrClientList;
 
 typedef struct {
-   unsigned int      Pid;
-   unsigned int      Size;
+   uint32_t          Pid;
+   uint32_t          Size;
    CtrDrvrConnection  Connections[CtrDrvrCONNECTIONS];
  } CtrDrvrClientConnections;
 
 typedef struct {
    CtrDrvrConnection Connection;       /* PTIM, CTIM or HARD object */
-   unsigned int      TriggerNumber;    /* Trigger number 1..n */
-   unsigned int      InterruptNumber;  /* 0,1..8 (Counter) 9..n Hardware */
-   unsigned int      Ctim;             /* Ctim trigger */
+   uint32_t          TriggerNumber;    /* Trigger number 1..n */
+   uint32_t          InterruptNumber;  /* 0,1..8 (Counter) 9..n Hardware */
+   uint32_t          Ctim;             /* Ctim trigger */
    CtrDrvrEventFrame Frame;            /* Triggering event frame */
    CtrDrvrCTime      TriggerTime;      /* Time counter loaded */
    CtrDrvrCTime      StartTime;        /* Time counter was started */
@@ -81,9 +85,9 @@ typedef struct {
  } CtrDrvrReadBuf;
 
 typedef struct {
-   unsigned int      TriggerNumber;    /* Trigger number 0..n 0=>First in connection */
+   uint32_t          TriggerNumber;    /* Trigger number 0..n 0=>First in connection */
    CtrDrvrConnection Connection;       /* Connection for trigger */
-   unsigned int      Payload;          /* Used when simulating CTIMs */
+   uint32_t          Payload;          /* Used when simulating CTIMs */
  } CtrDrvrWriteBuf;
 
 /* ******************************************************* */
@@ -91,8 +95,8 @@ typedef struct {
 /* stored in the CTR ram.                                  */
 
 typedef struct {
-   unsigned int                TriggerNumber;   /* 1..n    */
-   unsigned int                EqpNum;          /* Object  */
+   uint32_t                    TriggerNumber;   /* 1..n    */
+   uint32_t                    EqpNum;          /* Object  */
    CtrDrvrConnectionClass      EqpClass;        /* Class   */
    CtrDrvrTrigger              Trigger;         /* Trigger */
    CtrDrvrCounterConfiguration Config;          /* Counter */
@@ -104,12 +108,12 @@ typedef struct {
 #define CtrDrvrCtimOBJECTS 2048
 
 typedef struct {
-   unsigned int      EqpNum;
+   uint32_t          EqpNum;
    CtrDrvrEventFrame Frame;
  } CtrDrvrCtimBinding;
 
 typedef struct {
-   unsigned short     Size;
+   uint16_t           Size;
    CtrDrvrCtimBinding Objects[CtrDrvrCtimOBJECTS];
  } CtrDrvrCtimObjects;
 
@@ -119,15 +123,15 @@ typedef struct {
 #define CtrDrvrPtimOBJECTS 2048
 
 typedef struct {
-   unsigned int  EqpNum;
-   unsigned char  ModuleIndex;
-   unsigned char  Counter;
-   unsigned short Size;
-   unsigned short StartIndex;
+   uint32_t       EqpNum;
+   uint8_t        ModuleIndex;
+   uint8_t        Counter;
+   uint16_t       Size;
+   uint16_t       StartIndex;
  } CtrDrvrPtimBinding;
 
 typedef struct {
-   unsigned short     Size;
+   uint16_t           Size;
    CtrDrvrPtimBinding Objects[CtrDrvrPtimOBJECTS];
  } CtrDrvrPtimObjects;
 
@@ -143,23 +147,23 @@ typedef enum {
 /* Beware: sizeof(CtrDrvrModuleAddress) = 28 on 32 bits, 40 on 64 bits) */
 typedef struct {
    CtrDrvrModuleType ModuleType;
-   unsigned int      PciSlot;
-   unsigned int      ModuleNumber;
-   unsigned int      DeviceId;
-   unsigned int      VendorId;
-   unsigned long     MemoryMap;
-   unsigned long     LocalMap;
+   uint32_t          PciSlot;
+   uint32_t          ModuleNumber;
+   uint32_t          DeviceId;
+   uint32_t          VendorId;
+   uintptr_t         MemoryMap;
+   uintptr_t         LocalMap;
  } CtrDrvrModuleAddress;
 #endif
 
 #ifdef CTR_VME
 /* Beware: sizeof(CtrDrvrModuleAddress) = 20 on 32 bits, 32 on 64 bits) */
 typedef struct {
-   unsigned int   *VMEAddress;         /* Base address for main logic A24,D32 */
-   unsigned short *JTGAddress;         /* Base address for       JTAG A16,D16 */
-   unsigned int    InterruptVector;    /* Interrupt vector number */
-   unsigned int    InterruptLevel;     /* Interrupt level (2 usually) */
-   unsigned int   *CopyAddress;        /* Copy of VME address */
+   uint32_t       *VMEAddress;         /* Base address for main logic A24,D32 */
+   uint16_t       *JTGAddress;         /* Base address for       JTAG A16,D16 */
+   uint32_t        InterruptVector;    /* Interrupt vector number */
+   uint32_t        InterruptLevel;     /* Interrupt level (2 usually) */
+   uint32_t       *CopyAddress;        /* Copy of VME address */
  } CtrDrvrModuleAddress;
 #endif
 
@@ -176,8 +180,8 @@ typedef enum {
 #define CtrDrvrHardwareTYPES 4
 
 typedef struct {
-   unsigned int        VhdlVersion;  /* VHDL Compile date */
-   unsigned int        DrvrVersion;  /* Drvr Compile date */
+   uint32_t            VhdlVersion;  /* VHDL Compile date */
+   uint32_t            DrvrVersion;  /* Drvr Compile date */
    CtrDrvrHardwareType HardwareType; /* Hardware type of module */
  } CtrDrvrVersion;
 
@@ -185,9 +189,9 @@ typedef struct {
 /* HPTDC IO buffer                                       */
 /* Beware: sizeof(CtrDrvrHptdcIoBuf)=24 on 32 bits, 32 on 64 bits */
 typedef struct {
-   unsigned int        Size;   /* Number of HPTDC regs   */
-   unsigned int        Pflg;   /* Parity flag            */
-   unsigned int        Rflg;   /* Reset state flag       */
+   uint32_t            Size;   /* Number of HPTDC regs   */
+   uint32_t            Pflg;   /* Parity flag            */
+   uint32_t            Rflg;   /* Reset state flag       */
    HptdcCmd            Cmd;    /* Command                */
    HptdcRegisterVlaue  *Wreg;  /* Write  to HPTDC buffer */
    HptdcRegisterVlaue  *Rreg;  /* Read from HPTDC buffer */
@@ -244,29 +248,29 @@ typedef struct {
 
 /* Beware: sizeof(CtrDrvrRawIoBlock)=12 on 32 bits, 16 on 64 bits */
 typedef struct {
-   unsigned int Size;       /* Number int to read/write */
-   unsigned int Offset;     /* Long offset address space */
-   unsigned int *UserArray; /* Callers data area for  IO */
+   uint32_t     Size;       /* Number int to read/write */
+   uint32_t     Offset;     /* Long offset address space */
+   uint32_t     *UserArray; /* Callers data area for  IO */
  } CtrDrvrRawIoBlock;
 
 /* ***************************************************** */
 /* Reception errors                                      */
 
 typedef struct {
-   unsigned int LastReset;     /* UTC Second of last reset */
-   unsigned int PartityErrs;   /* Number of parity errors since last reset */
-   unsigned int SyncErrs;      /* Number of frame synchronization errors since last reset */
-   unsigned int TotalErrs;     /* Total number of IO errors since last reset */
-   unsigned int CodeViolErrs;  /* Number of code violations since last reset */
-   unsigned int QueueErrs;     /* Number of input Queue overflows since last reset */
+   uint32_t     LastReset;     /* UTC Second of last reset */
+   uint32_t     PartityErrs;   /* Number of parity errors since last reset */
+   uint32_t     SyncErrs;      /* Number of frame synchronization errors since last reset */
+   uint32_t     TotalErrs;     /* Total number of IO errors since last reset */
+   uint32_t     CodeViolErrs;  /* Number of code violations since last reset */
+   uint32_t     QueueErrs;     /* Number of input Queue overflows since last reset */
  } CtrDrvrReceptionErrors;
 
 /* ***************************************************** */
 /* Board chip identity                                   */
 
 typedef struct {
-   unsigned int IdLSL;         /* ID Chip value Least Sig 32-bits */
-   unsigned int IdMSL;         /* ID Chip value Most  Sig 32-bits */
+   uint32_t     IdLSL;         /* ID Chip value Least Sig 32-bits */
+   uint32_t     IdMSL;         /* ID Chip value Most  Sig 32-bits */
  } CtrDrvrBoardId;
 
 /* ***************************************************** */
