@@ -2,7 +2,7 @@
 # Makefile to produce timing library
 #================================================================
 
-CPU=L865
+CPU=L866
 KVER=2.6.24.7-rt27
 SOVER=1.0
 LDVER=1.0
