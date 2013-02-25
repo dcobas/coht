@@ -1,4 +1,29 @@
 PLease use stuff from the 64bit directory even for 32bit platforms
-The directories here should probably be depricated, but I keep them because
+The 32bit directory should probably be depricated, but I keep it because
 there may still be issues that I am not currently aware of.
+
+in the 32/64bit directories you will find
+
+driver/             This is the CTR driver using <stdint.h> integer definitions
+		    The driver can be compiled for L865 and L866
+		    The driver include files are delivered to the libctr includes
+
+test/               This is the raw ioctl call test program suite, it compiles on L865/6 ok
+		    I have added SizeVme.L865/6 and SizePci.L865/6 for comparrison of structure sizes
+
+timlib/libctr/      This is the new library used exclusivley by the timing section
+		    Its NOT for public consumption
+
+timlib/libctr/test/ This is the library test program
+
+timlib/tim/         This is the old timing library that call Tgm and Tgv, its still in use
+		    This version runs on L866 and L865 and is based on the new driver includes
+
+timlib/tim/test     The timlib test program
+		    The subdirectory TcpStuff contains all the CNGS (Grand Sasso) UDP sender
+		    It also contains the event stream pusher JavTgmServer and other important stuff
+		    The subdirectory DiagStuff contains the timing surveilance, I think this is no longer used
+
+About the git repo, there is a git repo at the directory root, and another at libctr
+
 Julian
