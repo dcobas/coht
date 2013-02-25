@@ -50,10 +50,10 @@ static int vme1[MAX_DEVS];      /* First VME base address */
 static int vme2[MAX_DEVS];      /* Second VME base address */
 static int vecs[MAX_DEVS];      /* Interrupt vectors */
 
-static unsigned int luns_num;
-static unsigned int vme1_num;
-static unsigned int vme2_num;
-static unsigned int vecs_num;
+static uint32_t luns_num;
+static uint32_t vme1_num;
+static uint32_t vme2_num;
+static uint32_t vecs_num;
 
 module_param_array(luns, int, &luns_num, 0444);        /* Vector */
 module_param_array(vme1, int, &vme1_num, 0444);        /* Vector */
@@ -101,20 +101,20 @@ static int PingModule(CtrDrvrModuleContext *mcon);
 
 static int EnableInterrupts(CtrDrvrModuleContext *mcon, int msk);
 
-static int DisableInterrupts(unsigned int           tndx,
-			     unsigned int           midx,
+static int DisableInterrupts(uint32_t               tndx,
+			     uint32_t               midx,
 			     CtrDrvrConnectionClass clss,
 			     CtrDrvrClientContext  *ccon);
 
 static int Reset(CtrDrvrModuleContext *mcon);
 
-static unsigned int  GetStatus(CtrDrvrModuleContext *mcon);
+static uint32_t      GetStatus(CtrDrvrModuleContext *mcon);
 
-static unsigned int  HptdcBitTransfer(unsigned int  *jtg,
-				      unsigned int   tdi,
-				      unsigned int   tms);
+static uint32_t      HptdcBitTransfer(uint32_t      *jtg,
+				      uint32_t       tdi,
+				      uint32_t       tms);
 
-static void HptdcStateReset(unsigned int  *jtg);
+static void HptdcStateReset(uint32_t      *jtg);
 
 static int HptdcCommand(CtrDrvrModuleContext *mcon,
 			 HptdcCmd              cmd,
@@ -126,12 +126,12 @@ static int HptdcCommand(CtrDrvrModuleContext *mcon,
 
 static CtrDrvrCTime *GetTime(CtrDrvrModuleContext *mcon);
 
-static int SetTime(CtrDrvrModuleContext *mcon, unsigned int  tod);
+static int SetTime(CtrDrvrModuleContext *mcon, uint32_t      tod);
 
 static int RawIo(CtrDrvrModuleContext *mcon,
 		 CtrDrvrRawIoBlock    *riob,
-		 unsigned int          flag,
-		 unsigned int          debg);
+		 uint32_t              flag,
+		 uint32_t              debg);
 
 static CtrDrvrHwTrigger *TriggerToHard(CtrDrvrTrigger *strg);
 
@@ -141,17 +141,17 @@ static CtrDrvrHwCounterConfiguration *ConfigToHard(CtrDrvrCounterConfiguration *
 
 static CtrDrvrCounterConfiguration *HardToConfig(CtrDrvrHwCounterConfiguration *hcnf);
 
-static unsigned int  AutoShiftLeft(unsigned int  mask, unsigned int  value);
+static uint32_t      AutoShiftLeft(uint32_t      mask, uint32_t      value);
 
-static unsigned int  AutoShiftRight(unsigned int  mask, unsigned int  value);
+static uint32_t      AutoShiftRight(uint32_t      mask, uint32_t      value);
 
-static unsigned int  GetPtimModule(unsigned int  eqpnum);
+static uint32_t      GetPtimModule(uint32_t      eqpnum);
 
 static int Connect(CtrDrvrConnection    *conx,
 		   CtrDrvrClientContext *ccon);
 
-static int DisConnectOne(unsigned int           tndx,
-			 unsigned int           midx,
+static int DisConnectOne(uint32_t               tndx,
+			 uint32_t               midx,
 			 CtrDrvrConnectionClass clss,
 			 CtrDrvrClientContext  *ccon);
 
@@ -168,20 +168,20 @@ static int AddModule(CtrDrvrModuleContext *mcon,
 static int HRd(void *x);
 static void HWr(int v, void *x);
 
-static void Io32Write(unsigned int  *dst, /* Hardware destination address */
-		      unsigned int  *src,
-		      unsigned int  size);
+static void Io32Write(uint32_t      *dst, /* Hardware destination address */
+		      uint32_t      *src,
+		      uint32_t      size);
 
-static void Io32Read(unsigned int  *dst,
-		     unsigned int  *src, /* Hardware Source address */
-		     unsigned int  size);
+static void Io32Read(uint32_t      *dst,
+		     uint32_t      *src, /* Hardware Source address */
+		     uint32_t      size);
 
-static void Int32Copy(unsigned int  *dst,
-		      unsigned int  *src,
-		      unsigned int  size);
+static void Int32Copy(uint32_t      *dst,
+		      uint32_t      *src,
+		      uint32_t      size);
 
-static void SwapWords(unsigned int  *dst,
-		      unsigned int  size);
+static void SwapWords(uint32_t      *dst,
+		      uint32_t      size);
 
 /*========================================================================*/
 /* Perform VME access and check bus errors, always                        */
@@ -299,12 +299,12 @@ unsigned long ps;
 /* 32 Bit int access for CTR structure to write to hardware               */
 /*========================================================================*/
 
-static void Io32Write(unsigned int *dst, /* Hardware destination address */
-		      unsigned int *src,
-		      unsigned int size) {
+static void Io32Write(uint32_t     *dst, /* Hardware destination address */
+		      uint32_t     *src,
+		      uint32_t     size) {
 int i, sb;
 
-   sb = size/sizeof(unsigned int);
+   sb = size/sizeof(uint32_t    );
    for (i=0; i<sb; i++) HWr(src[i], (void *) &(dst[i]));
 }
 
@@ -312,12 +312,12 @@ int i, sb;
 /* 32 Bit int access for CTR structure to read from hardware             */
 /*========================================================================*/
 
-static void Io32Read(unsigned int *dst,
-		     unsigned int *src, /* Hardware Source address */
-		     unsigned int size) {
+static void Io32Read(uint32_t     *dst,
+		     uint32_t     *src, /* Hardware Source address */
+		     uint32_t     size) {
 int i, sb;
 
-   sb = size/sizeof(unsigned int);
+   sb = size/sizeof(uint32_t    );
    for (i=0; i<sb; i++) dst[i] = HRd((void *) &(src[i]));
 }
 
@@ -325,12 +325,12 @@ int i, sb;
 /* 32 Bit int access copy                                                 */
 /*========================================================================*/
 
-static void Int32Copy(unsigned int *dst,
-		      unsigned int *src,
-		      unsigned int size) {
+static void Int32Copy(uint32_t     *dst,
+		      uint32_t     *src,
+		      uint32_t     size) {
 int i, sb;
 
-   sb = size/sizeof(unsigned int);
+   sb = size/sizeof(uint32_t    );
    for (i=0; i<sb; i++) dst[i] = src[i];
 }
 
@@ -338,13 +338,13 @@ int i, sb;
 /* Swap words                                                             */
 /*========================================================================*/
 
-static void SwapWords(unsigned int *dst,
-		      unsigned int size) {
+static void SwapWords(uint32_t     *dst,
+		      uint32_t     size) {
 
 int i, sb;
-unsigned int lft, rgt;
+uint32_t     lft, rgt;
 
-   sb = size/sizeof(unsigned int);
+   sb = size/sizeof(uint32_t    );
    for (i=0; i<sb; i++) {
       rgt = lft = dst[i];
       lft = (lft & 0xFFFF0000) >> 16;
@@ -454,8 +454,8 @@ int cc;
 
    vme_unregister_berr_handler(mcon->BerrHandler);
 
-   return_controller((unsigned long) moad->VMEAddress,0x10000);
-   return_controller((unsigned long) moad->JTGAddress,0x100);
+   return_controller((uintptr_t) moad->VMEAddress,0x10000);
+   return_controller((uintptr_t) moad->JTGAddress,0x100);
 
 }
 
@@ -469,8 +469,8 @@ static int AddModule(
 	int flag) {                        /* Check again */
 
 CtrDrvrModuleAddress *moad; /* Module address, vector, level, ssch */
-unsigned long                  addr; /* VME base address */
-unsigned int                   coco; /* Completion code */
+uintptr_t             addr; /* VME base address */
+uint32_t              coco; /* Completion code */
 struct vme_bus_error berr;
 struct pdparam_master param;
 void *vmeaddr;
@@ -485,7 +485,7 @@ void *vmeaddr;
 
       /* CES: build an address window (64 kbyte) for VME A16-D16 accesses */
 
-      addr = (unsigned long) moad->JTGAddress;
+      addr = (uintptr_t) moad->JTGAddress;
       addr &= 0x0000ffff;                      /* A16 */
 
       param.iack   = 1;                /* no iack */
@@ -512,13 +512,13 @@ void *vmeaddr;
 		  moad->JTGAddress);
 	 vmeaddr = NULL;
       }
-      moad->JTGAddress = (unsigned short *) vmeaddr;
+      moad->JTGAddress = (uint16_t *) vmeaddr;
    }
 
    /* CES: build an address window (64 kbyte) for VME A24-D32 accesses */
 
-   addr = (unsigned long) moad->VMEAddress;
-   if (addr == 0) addr = (unsigned long) moad->CopyAddress;
+   addr = (uintptr_t) moad->VMEAddress;
+   if (addr == 0) addr = (uintptr_t) moad->CopyAddress;
    addr &= 0x00ffffff;                      /* A24 */
 
    param.iack   = 1;                /* no iack */
@@ -544,7 +544,7 @@ void *vmeaddr;
       if (moad->JTGAddress == NULL) return 1;
       else                          return 2;
    }
-   moad->VMEAddress = (unsigned int *) vmeaddr;
+   moad->VMEAddress = (uint32_t     *) vmeaddr;
 
    berr.address = addr;
    berr.am = amd1;
@@ -554,7 +554,7 @@ void *vmeaddr;
 	       index+1,
 	       win1,
 	       amd1,
-	       (unsigned int) addr);
+	       (uint32_t    ) addr);
    }
 
    /* Now set up the interrupt handler */
@@ -591,7 +591,7 @@ static int GetVersion(CtrDrvrModuleContext *mcon,
 		      CtrDrvrVersion       *ver) {
 
 CtrDrvrMemoryMap *mmap;    /* Module Memory map */
-unsigned int      stat;    /* Module status */
+uint32_t          stat;    /* Module status */
 
    mmap = mcon->Map;
    ver->VhdlVersion  = HRd(&mmap->VhdlVersion);
@@ -648,8 +648,8 @@ CtrDrvrMemoryMap *mmap; /* Module Memory map */
 /* Disable Interrupt                                          */
 /* ========================================================== */
 
-static int DisableInterrupts(unsigned int           tndx,
-			     unsigned int           midx,
+static int DisableInterrupts(uint32_t               tndx,
+			     uint32_t               midx,
 			     CtrDrvrConnectionClass clss,
 			     CtrDrvrClientContext  *ccon) {
 
@@ -693,7 +693,7 @@ static int Reset(CtrDrvrModuleContext *mcon) {
 CtrDrvrModuleAddress *moad; /* Module address, vector, level, ssch */
 
 CtrDrvrMemoryMap *mmap;     /* Module Memory map */
-unsigned int     *jtg;      /* Hptdc JTAG register */
+uint32_t         *jtg;      /* Hptdc JTAG register */
 int i;
 
 int interval = 10;
@@ -726,7 +726,7 @@ int interval_jiffies = msecs_to_jiffies(interval * 10); /* 10ms granularity */
    if (mcon->OutputByte) HWr(0x100 | (1 << (mcon->OutputByte -1)),&mmap->OutputByte);
    else                  HWr(0x100,&mmap->OutputByte);
    moad = &(mcon->Address);
-   HWr((unsigned int) ((moad->InterruptLevel << 8) | (moad->InterruptVector & 0xFF)),&mmap->Setup);
+   HWr((uint32_t    ) ((moad->InterruptLevel << 8) | (moad->InterruptVector & 0xFF)),&mmap->Setup);
 
    if (mcon->Pll.KP == 0) {
       mcon->Pll.KP = 337326;
@@ -734,9 +734,9 @@ int interval_jiffies = msecs_to_jiffies(interval * 10); /* 10ms granularity */
       mcon->Pll.NumAverage = 100;
       mcon->Pll.Phase = 1950;
    }
-   Io32Write((unsigned int *) &(mmap->Pll),
-	     (unsigned int *) &(mcon->Pll),
-	     (unsigned int  ) sizeof(CtrDrvrPll));
+   Io32Write((uint32_t     *) &(mmap->Pll),
+	     (uint32_t     *) &(mcon->Pll),
+	     (uint32_t      ) sizeof(CtrDrvrPll));
 
    EnableInterrupts(mcon,mcon->InterruptEnable);
 
@@ -750,10 +750,10 @@ int interval_jiffies = msecs_to_jiffies(interval * 10); /* 10ms granularity */
 /* Get Status                                                 */
 /* ========================================================== */
 
-static unsigned int GetStatus(CtrDrvrModuleContext *mcon) {
+static uint32_t     GetStatus(CtrDrvrModuleContext *mcon) {
 
 CtrDrvrMemoryMap *mmap;    /* Module Memory map */
-unsigned int              stat;    /* Status */
+uint32_t                  stat;    /* Status */
 
    if (PingModule(mcon) == OK) {
       mmap = mcon->Map;
@@ -778,10 +778,10 @@ unsigned int              stat;    /* Status */
 /* HPTDC JTAG Bit transfer                                    */
 /* ========================================================== */
 
-static unsigned int HptdcBitTransfer(unsigned int *jtg,
-				     unsigned int  tdi,
-				     unsigned int  tms) {
-unsigned int jwd, tdo;
+static uint32_t     HptdcBitTransfer(uint32_t     *jtg,
+				     uint32_t      tdi,
+				     uint32_t      tms) {
+uint32_t     jwd, tdo;
 
    jwd = HptdcJTAG_TRST | tdi | tms;
    HWr(jwd,jtg);
@@ -798,8 +798,8 @@ unsigned int jwd, tdo;
 /* HPTDC JTAG State machine reset                             */
 /* ========================================================== */
 
-static void HptdcStateReset(unsigned int *jtg) {
-unsigned int jwd;
+static void HptdcStateReset(uint32_t     *jtg) {
+uint32_t     jwd;
 
    jwd = HptdcJTAG_TRST; /* TRST is active on zero */
    HWr(jwd,jtg);
@@ -828,9 +828,9 @@ static int HptdcCommand(CtrDrvrModuleContext *mcon,
 			 int                   rflg) {  /* Reset state flag */
 
 CtrDrvrMemoryMap *mmap;    /* Module Memory map */
-unsigned int     *jtg;
+uint32_t         *jtg;
 
-unsigned int tdi, msk, parity, bits, wval, rval, cval;
+uint32_t     tdi, msk, parity, bits, wval, rval, cval;
 int i, j;
 
    if (PingModule(mcon) == OK) {
@@ -927,7 +927,7 @@ CtrDrvrMemoryMap *mmap;    /* Module Memory map */
 /* Set the time on the CTR                                    */
 /* ========================================================== */
 
-static int SetTime(CtrDrvrModuleContext *mcon, unsigned int tod) {
+static int SetTime(CtrDrvrModuleContext *mcon, uint32_t     tod) {
 
 CtrDrvrMemoryMap *mmap;    /* Module Memory map */
 
@@ -948,16 +948,16 @@ CtrDrvrMemoryMap *mmap;    /* Module Memory map */
 
 static int RawIo(CtrDrvrModuleContext *mcon,
 		 CtrDrvrRawIoBlock    *riob,
-		 unsigned int          flag,
-		 unsigned int          debg) {
+		 uint32_t              flag,
+		 uint32_t              debg) {
 
-unsigned int              *mmap; /* Module Memory map */
+uint32_t                  *mmap; /* Module Memory map */
 int                        rval; /* Return value */
 int                        i, j;
-unsigned int              *uary;
+uint32_t                  *uary;
 char                      *iod;
 
-   mmap = (unsigned int *) mcon->Map;
+   mmap = (uint32_t     *) mcon->Map;
    uary = riob->UserArray;
    rval = OK;
    if (flag)  iod = "Write"; else iod = "Read";
@@ -989,7 +989,7 @@ char                      *iod;
 /* Auto shift left  a value for a given mask                  */
 /* ========================================================== */
 
-static unsigned int AutoShiftLeft(unsigned int mask, unsigned int value) {
+static uint32_t     AutoShiftLeft(uint32_t     mask, uint32_t     value) {
 int i,m;
 
    m = mask;
@@ -1004,7 +1004,7 @@ int i,m;
 /* Auto shift right a value for a given mask                  */
 /* ========================================================== */
 
-static unsigned int AutoShiftRight(unsigned int mask, unsigned int value) {
+static uint32_t     AutoShiftRight(uint32_t     mask, uint32_t     value) {
 int i,m;
 
    m = mask;
@@ -1025,7 +1025,7 @@ int i,m;
 
 static CtrDrvrHwTrigger *TriggerToHard(CtrDrvrTrigger *strg) {
 static CtrDrvrHwTrigger htrg;
-unsigned int trigger;
+uint32_t     trigger;
 
    trigger  = AutoShiftLeft(CtrDrvrTrigGROUP_VALUE_MASK ,strg->Group.GroupValue);
    trigger |= AutoShiftLeft(CtrDrvrTrigCONDITION_MASK   ,strg->TriggerCondition);
@@ -1045,7 +1045,7 @@ unsigned int trigger;
 
 static CtrDrvrTrigger *HardToTrigger(CtrDrvrHwTrigger *htrg) {
 static CtrDrvrTrigger strg;
-unsigned int trigger;
+uint32_t     trigger;
 
    strg.Frame.Long = HRd(&htrg->Frame);
    trigger         = HRd(&htrg->Trigger);
@@ -1065,7 +1065,7 @@ unsigned int trigger;
 
 static CtrDrvrHwCounterConfiguration *ConfigToHard(CtrDrvrCounterConfiguration *scnf) {
 static CtrDrvrHwCounterConfiguration hcnf;
-unsigned int config;
+uint32_t     config;
 
    config  = AutoShiftLeft(CtrDrvrCounterConfigPULSE_WIDTH_MASK,scnf->PulsWidth);
    config |= AutoShiftLeft(CtrDrvrCounterConfigCLOCK_MASK      ,scnf->Clock);
@@ -1085,7 +1085,7 @@ unsigned int config;
 
 static CtrDrvrCounterConfiguration *HardToConfig(CtrDrvrHwCounterConfiguration *hcnf) {
 static CtrDrvrCounterConfiguration scnf;
-unsigned int config;
+uint32_t     config;
 
    config     = HRd(&hcnf->Config);
    scnf.Delay = HRd(&hcnf->Delay);
@@ -1103,7 +1103,7 @@ unsigned int config;
 /* Get a PTIM module number                                   */
 /* ========================================================== */
 
-static unsigned int GetPtimModule(unsigned int eqpnum) {
+static uint32_t     GetPtimModule(uint32_t     eqpnum) {
 int i;
 
    for (i=0; i<Wa->Ptim.Size; i++) {
@@ -1217,13 +1217,13 @@ int i, midx, cmsk, hmsk, count, valu;
 		  conf.PulsWidth        = 0;
 		  mcon->Configs[i]      = conf;
 
-		  Io32Write((unsigned int *) &(mmap->Trigs[i]),
-			    (unsigned int *) TriggerToHard(&trig),
-			    (unsigned int  ) sizeof(CtrDrvrHwTrigger));
+		  Io32Write((uint32_t     *) &(mmap->Trigs[i]),
+			    (uint32_t     *) TriggerToHard(&trig),
+			    (uint32_t      ) sizeof(CtrDrvrHwTrigger));
 
-		  Io32Write((unsigned int *) &(mmap->Configs[i]),
-			    (unsigned int *) ConfigToHard(&conf),
-			    (unsigned int  ) sizeof(CtrDrvrHwCounterConfiguration));
+		  Io32Write((uint32_t     *) &(mmap->Configs[i]),
+			    (uint32_t     *) ConfigToHard(&conf),
+			    (uint32_t      ) sizeof(CtrDrvrHwCounterConfiguration));
 
 		  mcon->Clients[i]      |= cmsk;
 		  mcon->InterruptEnable |= CtrDrvrInterruptMaskCOUNTER_0;
@@ -1268,8 +1268,8 @@ int i, midx, cmsk, hmsk, count, valu;
 /* Disconnect from one specified trigger                      */
 /* ========================================================== */
 
-static int DisConnectOne(unsigned int           tndx,
-			 unsigned int           midx,
+static int DisConnectOne(uint32_t               tndx,
+			 uint32_t               midx,
 			 CtrDrvrConnectionClass clss,
 			 CtrDrvrClientContext  *ccon) {
 
@@ -1277,7 +1277,7 @@ CtrDrvrModuleContext       *mcon;
 CtrDrvrMemoryMap           *mmap;
 CtrDrvrTrigger              trig;
 CtrDrvrCounterConfiguration conf;
-unsigned int ncmsk, cmsk;
+uint32_t     ncmsk, cmsk;
 int valu;
 
    cmsk = 1 << ccon->ClientIndex; ncmsk = ~cmsk;
@@ -1294,13 +1294,13 @@ int valu;
 	       bzero((void *) &trig,sizeof(CtrDrvrTrigger));
 	       bzero((void *) &conf,sizeof(CtrDrvrCounterConfiguration));
 
-	       Io32Write((unsigned int *) &(mmap->Trigs[tndx]),
-			 (unsigned int *) TriggerToHard(&trig),
-			 (unsigned int  ) sizeof(CtrDrvrHwTrigger));
+	       Io32Write((uint32_t     *) &(mmap->Trigs[tndx]),
+			 (uint32_t     *) TriggerToHard(&trig),
+			 (uint32_t      ) sizeof(CtrDrvrHwTrigger));
 
-	       Io32Write((unsigned int *) &(mmap->Configs[tndx]),
-			 (unsigned int *) ConfigToHard(&conf),
-			 (unsigned int  ) sizeof(CtrDrvrHwCounterConfiguration));
+	       Io32Write((uint32_t     *) &(mmap->Configs[tndx]),
+			 (uint32_t     *) ConfigToHard(&conf),
+			 (uint32_t      ) sizeof(CtrDrvrHwCounterConfiguration));
 
 	       mcon->EqpNum[tndx]   = 0;
 	       mcon->EqpClass[tndx] = 0;
@@ -1379,7 +1379,7 @@ static int debug_isr = 0;
 
 irqreturn_t IntrHandler(CtrDrvrModuleContext *mcon) {
 
-unsigned int isrc, clients, msk, i, hlock, tndx = 0;
+uint32_t     isrc, clients, msk, i, hlock, tndx = 0;
 unsigned char inum;
 
 unsigned long ps;
@@ -1704,7 +1704,7 @@ CtrDrvrReadBuf        rb;
 CtrDrvrWriteBuf      *wb;
 unsigned long         ps;
 int                   i, tndx, midx, hmsk;
-unsigned int          clients;
+uint32_t              clients;
 
    wb = (CtrDrvrWriteBuf *) u_buf;
    conx = &(wb->Connection);
@@ -1891,10 +1891,10 @@ CtrDrvrModuleAddress *moad;
        * get declared here as pointers. This changes the
        * size of moad unnecessarily on 64-bit platforms.
        */
-      moad->VMEAddress      = (unsigned int   *) (long)vme1[i];
-      moad->JTGAddress      = (unsigned short *) (long)vme2[i];
-      moad->InterruptVector = (unsigned int    ) vecs[i];
-      moad->InterruptLevel  = (unsigned int    ) ilvl;
+      moad->VMEAddress      = (uint32_t *) (long)vme1[i];
+      moad->JTGAddress      = (uint16_t *) (long)vme2[i];
+      moad->InterruptVector = (uint32_t  ) vecs[i];
+      moad->InterruptLevel  = (uint32_t  ) ilvl;
       moad->CopyAddress     = moad->VMEAddress;
    }
    return 1;
@@ -1960,7 +1960,7 @@ CtrDrvrMemoryMap              *mmap;
 		 j+1,
 		 moad->VMEAddress,
 		 moad->JTGAddress,
-		 (unsigned int) moad->InterruptVector,
+		 (uint32_t    ) moad->InterruptVector,
 		 moad->InterruptLevel);
 	 i++;
       }
@@ -1977,8 +1977,8 @@ CtrDrvrMemoryMap              *mmap;
 		 i+1,
 		 moad->VMEAddress,
 		 moad->JTGAddress,
-		 (unsigned int) moad->InterruptVector,
-		 (unsigned int) moad->InterruptLevel);
+		 (uint32_t    ) moad->InterruptVector,
+		 (uint32_t    ) moad->InterruptLevel);
 
 	 /* Wipe out any old triggers left in Ram after a warm reboot */
 
@@ -2353,7 +2353,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
       break;
 
       case CtrDrvrSET_UTC:                /* Set Universal Coordinated Time for next PPS tick */
-	 if (lap) return SetTime(mcon,(unsigned int) lav);
+	 if (lap) return SetTime(mcon,(uint32_t    ) lav);
       break;
 
       case CtrDrvrGET_UTC:                /* Latch and read the current UTC time */
@@ -2398,7 +2398,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
 	    sav = HRdJtag(mcon->Address.JTGAddress);
 	    if (ccon->DebugOn == 2)
 	       cprintf("Jtag: Addr: %p Read %x\n",mcon->Address.JTGAddress,(int) sav);
-	    *lap = (0x000000FF & (unsigned int) sav);
+	    *lap = (0x000000FF & (uint32_t    ) sav);
 	    return OK;
 	 }
 	 pseterr(EBUSY);                    /* Device busy, not opened */
@@ -2454,7 +2454,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
 	 if (wcnt >= sizeof(CtrDrvrRawIoBlock)) {
 	    riob = (CtrDrvrRawIoBlock *) arg;
 	    if ((riob->UserArray != NULL)
-	    &&  (wcnt > riob->Size * sizeof(unsigned int))) {
+	    &&  (wcnt > riob->Size * sizeof(uint32_t    ))) {
 	       return RawIo(mcon,riob,0,ccon->DebugOn);
 	    }
 	 }
@@ -2464,7 +2464,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
 	 if (rcnt >= sizeof(CtrDrvrRawIoBlock)) {
 	    riob = (CtrDrvrRawIoBlock *) arg;
 	    if ((riob->UserArray != NULL)
-	    &&  (rcnt > riob->Size * sizeof(unsigned int))) {
+	    &&  (rcnt > riob->Size * sizeof(uint32_t    ))) {
 	       return RawIo(mcon,riob,1,ccon->DebugOn);
 	    }
 	 }
@@ -2475,12 +2475,12 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
 	    act = (CtrDrvrAction *) arg;
 	    if ((act->TriggerNumber > 0) && (act->TriggerNumber <= CtrDrvrRamTableSIZE)) {
 	       i = act->TriggerNumber -1;
-	       Int32Copy((unsigned int *) &(act->Trigger),
-			 (unsigned int *) HardToTrigger(&(mmap->Trigs[i])),
-			 (unsigned int  ) sizeof(CtrDrvrTrigger));
-	       Int32Copy((unsigned int *) &(act->Config ),
-			 (unsigned int *) HardToConfig(&(mmap->Configs[i])),
-			 (unsigned int  ) sizeof(CtrDrvrCounterConfiguration));
+	       Int32Copy((uint32_t     *) &(act->Trigger),
+			 (uint32_t     *) HardToTrigger(&(mmap->Trigs[i])),
+			 (uint32_t      ) sizeof(CtrDrvrTrigger));
+	       Int32Copy((uint32_t     *) &(act->Config ),
+			 (uint32_t     *) HardToConfig(&(mmap->Configs[i])),
+			 (uint32_t      ) sizeof(CtrDrvrCounterConfiguration));
 	       act->Trigger.Ctim = mcon->Trigs[i].Ctim;
 	       act->EqpNum       = mcon->EqpNum[i];
 	       act->EqpClass     = mcon->EqpClass[i];
@@ -2523,9 +2523,9 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
 		  mcon->Trigs[i].Counter = act->Trigger.Counter;
 	       }
 
-	       Io32Write((unsigned int *) &(mmap->Trigs[i]),
-			 (unsigned int *) TriggerToHard(&act->Trigger),
-			 (unsigned int  ) sizeof(CtrDrvrHwTrigger));
+	       Io32Write((uint32_t     *) &(mmap->Trigs[i]),
+			 (uint32_t     *) TriggerToHard(&act->Trigger),
+			 (uint32_t      ) sizeof(CtrDrvrHwTrigger));
 	       mcon->Trigs[i] = act->Trigger;
 
 	       /* Override bus interrupt settings for connected clients */
@@ -2535,9 +2535,9 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
 	       else
 		  act->Config.OnZero &= ~CtrDrvrCounterOnZeroBUS;
 
-	       Io32Write((unsigned int *) &(mmap->Configs[i]),
-			 (unsigned int *) ConfigToHard(&(act->Config)),
-			 (unsigned int  ) sizeof(CtrDrvrHwCounterConfiguration));
+	       Io32Write((uint32_t     *) &(mmap->Configs[i]),
+			 (uint32_t     *) ConfigToHard(&(act->Config)),
+			 (uint32_t      ) sizeof(CtrDrvrHwCounterConfiguration));
 	       mcon->Configs[i] = act->Config;
 
 	       return OK;
@@ -2697,17 +2697,17 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
 		  &&  (mcon->EqpClass[i] == CtrDrvrConnectionClassPTIM)) {
 
 		     htrg = &((CtrDrvrHwTrigger) {{0},0});
-		     Io32Write((unsigned int *) &(mmap->Trigs[i]),
-			       (unsigned int *) htrg,
-			       (unsigned int  ) sizeof(CtrDrvrHwTrigger));
+		     Io32Write((uint32_t     *) &(mmap->Trigs[i]),
+			       (uint32_t     *) htrg,
+			       (uint32_t      ) sizeof(CtrDrvrHwTrigger));
 
 		     mcon->EqpNum[i]   = 0;
 		     mcon->EqpClass[i] = 0;
 		     bzero((void *) &(mcon->Configs[i]),sizeof(CtrDrvrCounterConfiguration));
 		     bzero((void *) &(mcon->Trigs[i]  ),sizeof(CtrDrvrTrigger));
-		     Io32Write((unsigned int *) &(mmap->Configs[i]),
-			       (unsigned int *) ConfigToHard(&(mcon->Configs[i])),
-			       (unsigned int  ) sizeof(CtrDrvrHwCounterConfiguration));
+		     Io32Write((uint32_t     *) &(mmap->Configs[i]),
+			       (uint32_t     *) ConfigToHard(&(mcon->Configs[i])),
+			       (uint32_t      ) sizeof(CtrDrvrHwCounterConfiguration));
 		  }
 	       }
 
@@ -2845,9 +2845,9 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
       case CtrDrvrGET_MODULE_STATS:
 	 if (wcnt >= sizeof(CtrDrvrModuleStats)) {
 	    mods = (CtrDrvrModuleStats *) arg;
-	    Io32Read((unsigned int *) mods,
-		     (unsigned int *) &(mmap->ModStats),
-		     (unsigned int  ) sizeof(CtrDrvrModuleStats));
+	    Io32Read((uint32_t     *) mods,
+		     (uint32_t     *) &(mmap->ModStats),
+		     (uint32_t      ) sizeof(CtrDrvrModuleStats));
 	    return OK;
 	 }
       break;
@@ -2886,9 +2886,9 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
 	 if (wcnt >= sizeof(CtrDrvrCounterConfigurationBuf)) {
 	    conf = (CtrDrvrCounterConfigurationBuf *) arg;
 	    if ((conf->Counter >= CtrDrvrCounter0) && (conf->Counter <= CtrDrvrCounter8)) {
-	       Int32Copy((unsigned int *) &(conf->Config),
-			 (unsigned int *) HardToConfig(&mmap->Counters[conf->Counter].Config),
-			 (unsigned int  ) sizeof(CtrDrvrCounterConfiguration));
+	       Int32Copy((uint32_t     *) &(conf->Config),
+			 (uint32_t     *) HardToConfig(&mmap->Counters[conf->Counter].Config),
+			 (uint32_t      ) sizeof(CtrDrvrCounterConfiguration));
 	       if ((conf->Config.OnZero > (CtrDrvrCounterOnZeroBUS | CtrDrvrCounterOnZeroOUT))
 	       ||  (conf->Config.Start  > CtrDrvrCounterSTARTS)
 	       ||  (conf->Config.Mode   > CtrDrvrCounterMODES)
@@ -2906,9 +2906,9 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
 	    conf = (CtrDrvrCounterConfigurationBuf *) arg;
 	    if (mmap->Counters[conf->Counter].Control.LockConfig) {
 	       if ((conf->Counter >= CtrDrvrCounter0) && (conf->Counter <= CtrDrvrCounter8)) {
-		  Io32Write((unsigned int *) &(mmap->Counters[conf->Counter].Config),
-			    (unsigned int *) ConfigToHard(&conf->Config),
-			    (unsigned int  ) sizeof(CtrDrvrHwCounterConfiguration));
+		  Io32Write((uint32_t     *) &(mmap->Counters[conf->Counter].Config),
+			    (uint32_t     *) ConfigToHard(&conf->Config),
+			    (uint32_t      ) sizeof(CtrDrvrHwCounterConfiguration));
 		  return OK;
 	       }
 	    }
@@ -2919,9 +2919,9 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
 	 if (wcnt >= sizeof(CtrDrvrCounterHistoryBuf)) {
 	    hisb = (CtrDrvrCounterHistoryBuf *) arg;
 	    if ((hisb->Counter >= CtrDrvrCounter1) && (hisb->Counter <= CtrDrvrCounter8)) {
-	       Io32Read((unsigned int *) &(hisb->History),
-			(unsigned int *) &(mmap->Counters[hisb->Counter].History),
-			(unsigned int  ) sizeof(CtrDrvrCounterHistory));
+	       Io32Read((uint32_t     *) &(hisb->History),
+			(uint32_t     *) &(mmap->Counters[hisb->Counter].History),
+			(uint32_t      ) sizeof(CtrDrvrCounterHistory));
 	       return OK;
 	    }
 	 }
@@ -2930,9 +2930,9 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
       case CtrDrvrGET_PLL:                /* Get phase locked loop parameters */
 	 if (wcnt >= sizeof(CtrDrvrPll)) {
 	    pll = (CtrDrvrPll *) arg;
-	    Io32Read((unsigned int *) pll,
-		     (unsigned int *) &(mmap->Pll),
-		     (unsigned int  ) sizeof(CtrDrvrPll));
+	    Io32Read((uint32_t     *) pll,
+		     (uint32_t     *) &(mmap->Pll),
+		     (uint32_t      ) sizeof(CtrDrvrPll));
 	    return OK;
 	 }
       break;
@@ -2940,12 +2940,12 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
       case CtrDrvrSET_PLL:                /* Set phase locked loop parameters */
 	 if (rcnt >= sizeof(CtrDrvrPll)) {
 	    pll = (CtrDrvrPll *) arg;
-	    Io32Write((unsigned int *) &(mmap->Pll),
-		      (unsigned int *) pll,
-		      (unsigned int  ) sizeof(CtrDrvrPll));
-	    Int32Copy((unsigned int *) &(mcon->Pll),
-		      (unsigned int *) pll,
-		      (unsigned int  ) sizeof(CtrDrvrPll));
+	    Io32Write((uint32_t     *) &(mmap->Pll),
+		      (uint32_t     *) pll,
+		      (uint32_t      ) sizeof(CtrDrvrPll));
+	    Int32Copy((uint32_t     *) &(mcon->Pll),
+		      (uint32_t     *) pll,
+		      (uint32_t      ) sizeof(CtrDrvrPll));
 	    return OK;
 	 }
       break;
@@ -2973,10 +2973,10 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
 	 if (wcnt >= sizeof(CtrDrvrTgmBuf)) {
 	    tgmb = (CtrDrvrTgmBuf *) arg;
 	    if ((tgmb->Machine > CtrDrvrMachineNONE) && (tgmb->Machine <= CtrDrvrMachineMACHINES)) {
-	       Io32Read((unsigned int *) tgmb->Telegram,
-			 (unsigned int *) mmap->Telegrams[(int) (tgmb->Machine) -1],
-			 (unsigned int  ) sizeof(CtrDrvrTgm));
-	       SwapWords((unsigned int *) tgmb->Telegram, (unsigned int  ) sizeof(CtrDrvrTgm));
+	       Io32Read((uint32_t     *) tgmb->Telegram,
+			 (uint32_t     *) mmap->Telegrams[(int) (tgmb->Machine) -1],
+			 (uint32_t      ) sizeof(CtrDrvrTgm));
+	       SwapWords((uint32_t     *) tgmb->Telegram, (uint32_t      ) sizeof(CtrDrvrTgm));
 	       return OK;
 	    }
 	 }
@@ -2985,9 +2985,9 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
       case CtrDrvrREAD_EVENT_HISTORY:     /* Read incomming event history */
 	 if (wcnt >= sizeof(CtrDrvrEventHistory)) {
 	    evhs = (CtrDrvrEventHistory *) arg;
-	    Io32Read((unsigned int *) evhs,
-		     (unsigned int *) &(mmap->EventHistory),
-		     (unsigned int  ) sizeof(CtrDrvrEventHistory));
+	    Io32Read((uint32_t     *) evhs,
+		     (uint32_t     *) &(mmap->EventHistory),
+		     (uint32_t      ) sizeof(CtrDrvrEventHistory));
 	    return OK;
 	 }
       break;

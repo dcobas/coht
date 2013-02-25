@@ -263,15 +263,15 @@ typedef uint32_t     CtrDrvrFrameLong;
 
 #ifdef __LITTLE_ENDIAN__
 typedef struct {
-   unsigned short Value;    /* Can be a WILD card in which case value is ignored */
-   unsigned char  Code;
-   unsigned char  Header;   /* Like 01 for C-Train, usually Mch:4 Type:4 */
+   uint16_t Value;    /* Can be a WILD card in which case value is ignored */
+   uint8_t  Code;
+   uint8_t  Header;   /* Like 01 for C-Train, usually Mch:4 Type:4 */
  } CtrDrvrFrameStruct;
 #else
 typedef struct {
-   unsigned char  Header;   /* Like 01 for C-Train, usually Mch:4 Type:4 */
-   unsigned char  Code;
-   unsigned short Value;    /* Can be a WILD card in which case value is ignored */
+   uint8_t  Header;   /* Like 01 for C-Train, usually Mch:4 Type:4 */
+   uint8_t  Code;
+   uint16_t Value;    /* Can be a WILD card in which case value is ignored */
  } CtrDrvrFrameStruct;
 #endif
 
@@ -515,12 +515,12 @@ typedef enum {
 
 #define CtrDrvrTgmGROUP_VALUES 64
 
-typedef unsigned short CtrDrvrTgm[CtrDrvrTgmGROUP_VALUES];      /* 64x16 bit values */
-typedef CtrDrvrTgm     CtrDrvrTgmBlock[CtrDrvrMachineMACHINES]; /* One telegram per machine */
+typedef uint16_t   CtrDrvrTgm[CtrDrvrTgmGROUP_VALUES];      /* 64x16 bit values */
+typedef CtrDrvrTgm CtrDrvrTgmBlock[CtrDrvrMachineMACHINES]; /* One telegram per machine */
 
 typedef struct {
-   unsigned short GroupNumber;  /* The serial position in the telegram starting at one */
-   unsigned short GroupValue;   /* The value of the parameter at this position */
+   uint16_t GroupNumber;  /* The serial position in the telegram starting at one */
+   uint16_t GroupValue;   /* The value of the parameter at this position */
  } CtrDrvrTgmGroup;
 
 /* OK now we define a trigger. This consists of an event frame and a telegram condition. */

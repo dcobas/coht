@@ -2132,7 +2132,7 @@ static char *CtrDrvrInstall(CtrDrvrInfoTable *info)
 CtrDrvrWorkingArea *wa;
 drm_node_handle handle;
 CtrDrvrModuleContext *mcon;
-unsigned long vadr;
+uintptr_t vadr;
 unsigned int las0brd, ivec;
 int modix, mid, cc, j;
 CtrDrvrMemoryMap *mmap;
@@ -2184,10 +2184,10 @@ int cmd;
       cmd |= 2;
       drm_device_write(handle, PCI_RESID_REGS, 1, 0, &cmd);
 
-      vadr = (unsigned long) mpar->map[2];
+      vadr = (uintptr_t) mpar->map[2];
       mcon->Map = (CtrDrvrMemoryMap *) vadr;
 
-      vadr = (unsigned long) mpar->map[0];
+      vadr = (uintptr_t) mpar->map[0];
       mcon->Local = (unsigned int *) vadr;
 
       /* Set up the LAS0BRD local configuration register to do appropriate */
@@ -2517,14 +2517,14 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
 	       moad->ModuleType = CtrDrvrModuleTypeCTR;
 	       moad->DeviceId   = CTRP_DEVICE_ID;
 	       moad->VendorId   = CERN_VENDOR_ID;
-	       moad->MemoryMap  = (unsigned long) mcon->Map;
-	       moad->LocalMap   = (unsigned long) mcon->Local;
+	       moad->MemoryMap  = (uintptr_t) mcon->Map;
+	       moad->LocalMap   = (uintptr_t) mcon->Local;
 	    } else {
 	       moad->ModuleType = CtrDrvrModuleTypePLX;
 	       moad->DeviceId   = PLX9030_DEVICE_ID;
 	       moad->VendorId   = PLX9030_VENDOR_ID;
 	       moad->MemoryMap  = 0;
-	       moad->LocalMap   = (unsigned long) mcon->Local;
+	       moad->LocalMap   = (uintptr_t) mcon->Local;
 	    }
 	    moad->ModuleNumber  = mcon->ModuleIndex +1;
 	    moad->PciSlot       = mcon->PciSlot;
