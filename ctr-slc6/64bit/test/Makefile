@@ -15,7 +15,9 @@ ALL  =	ctrptest.$(CPU) \
 	CtrWriteInfo.$(CPU) \
 	CtrLookat.$(CPU) \
 	CtrClock.$(CPU) \
-	Launch.$(CPU)
+	Launch.$(CPU) \
+	SizeVme.$(CPU) \
+	SizePci.$(CPU)
 
 NOPSALL = ctrptest.$(CPU) \
 	ctrvtest.$(CPU)
@@ -28,6 +30,8 @@ WRIT = CtrWriteInfo.c CtrOpen.c
 LOOK = CtrLookat.c DisplayLine.c CtrOpen.c
 CLOK = CtrClock.c CtrOpen.c
 LNCH = Launch.c
+SIZV = SizeVme.c
+SIZP = SizePci.c
 
 all: $(ALL)
 all: CFLAGS += -DPS_VER -I/acc/local/$(CPU)/include/tgm 
@@ -46,6 +50,8 @@ CtrClock.$(CPU).o: $(CLOK) $(HDRS)
 CtrLookat.$(CPU).o: $(LOOK) $(HDRS)
 CtrClock.$(CPU): CtrClock.$(CPU).o
 CtrLookat.$(CPU): CtrLookat.$(CPU).o
+SizeVme.$(CPU): SizeVme.$(CPU).o
+SizePci.$(CPU): SizePci.$(CPU).o
 
 clean:
 	$(RM) $(ALL) $(BAKS) *.o
