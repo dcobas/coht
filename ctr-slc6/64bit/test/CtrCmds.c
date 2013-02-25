@@ -5627,7 +5627,6 @@ CtrDrvrAction act;
    con.EqpNum   = sctim;
    if (ioctl(ctr,CtrIoctlCONNECT,&con) < 0) {
       IErr("CONNECT",NULL);
-      fclose(lgf);
       return arg;
    }
 
