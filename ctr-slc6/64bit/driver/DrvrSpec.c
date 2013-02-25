@@ -37,12 +37,12 @@ int cnt, dir;
    switch ((CtrDrvrControlFunction) cmd) {
 
    case CtrDrvrSET_SW_DEBUG:           /* Set driver debug mode */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = READ_FLAG;
       break;
 
    case CtrDrvrGET_SW_DEBUG:
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = WRIT_FLAG;
       break;
 
@@ -52,32 +52,32 @@ int cnt, dir;
       break;
 
    case CtrDrvrSET_TIMEOUT:            /* Set the read timeout value */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = READ_FLAG;
       break;
 
    case CtrDrvrGET_TIMEOUT:            /* Get the read timeout value */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = WRIT_FLAG;
       break;
 
    case CtrDrvrSET_QUEUE_FLAG:         /* Set queuing capabiulities on off */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = READ_FLAG;
       break;
 
    case CtrDrvrGET_QUEUE_FLAG:         /* 1=Q_off 0=Q_on */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = WRIT_FLAG;
       break;
 
    case CtrDrvrGET_QUEUE_SIZE:         /* Number of events on queue */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = WRIT_FLAG;
       break;
 
    case CtrDrvrGET_QUEUE_OVERFLOW:     /* Number of missed events */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = WRIT_FLAG;
       break;
 
@@ -87,42 +87,42 @@ int cnt, dir;
       break;
 
    case CtrDrvrSET_MODULE:             /* Select the module to work with */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = READ_FLAG;
       break;
 
    case CtrDrvrGET_MODULE:             /* Which module am I working with */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = WRIT_FLAG;
       break;
 
    case CtrDrvrGET_MODULE_COUNT:       /* The number of installed modules */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = WRIT_FLAG;
       break;
 
    case CtrDrvrRESET:                  /* Reset the module, re-establish connections */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = READ_FLAG;
       break;
 
    case CtrDrvrENABLE:                 /* Enable CTR module event reception */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = READ_FLAG;
       break;
 
    case CtrDrvrGET_STATUS:             /* Read module status */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = WRIT_FLAG;
       break;
 
    case CtrDrvrGET_INPUT_DELAY:        /* Get input delay in 25ns ticks */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = WRIT_FLAG;
       break;
 
    case CtrDrvrSET_INPUT_DELAY:        /* Set input delay in 25ns ticks */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = READ_FLAG;
       break;
 
@@ -157,7 +157,7 @@ int cnt, dir;
       break;
 
    case CtrDrvrGET_CABLE_ID:           /* Cables telegram ID */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = WRIT_FLAG;
       break;
 
@@ -286,27 +286,27 @@ int cnt, dir;
    /* the chips on the CTR board. Not for normal timing users.     */
 
    case CtrDrvrJTAG_OPEN:              /* Open JTAG interface to the Xilinx FPGA */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = READ_FLAG;
       break;
 
    case CtrDrvrJTAG_READ_BYTE:         /* Read back uploaded VHDL bit stream byte */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = WRIT_FLAG;
       break;
 
    case CtrDrvrJTAG_WRITE_BYTE:        /* Write compiled VHDL bit stream byte */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = READ_FLAG;
       break;
 
    case CtrDrvrJTAG_CLOSE:             /* Close JTAG interface */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = READ_FLAG;
       break;
 
    case CtrDrvrHPTDC_OPEN:             /* Open HPTDC JTAG interface */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = READ_FLAG;
       break;
 
@@ -316,7 +316,7 @@ int cnt, dir;
       break;
 
    case CtrDrvrHPTDC_CLOSE:            /* Close HPTDC JTAG interface */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = READ_FLAG;
       break;
 
@@ -336,7 +336,7 @@ int cnt, dir;
       break;
 
    case CtrDrvrGET_IO_STATUS:
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = WRIT_FLAG | READ_FLAG;
       break;
 
@@ -346,12 +346,12 @@ int cnt, dir;
       break;
 
    case CtrDrvrSET_DEBUG_HISTORY:
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = READ_FLAG;
       break;
 
    case CtrDrvrSET_BRUTAL_PLL:
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = READ_FLAG;
       break;
 
@@ -361,7 +361,7 @@ int cnt, dir;
       break;
 
    case CtrDrvrSET_CABLE_ID:
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = READ_FLAG;
       break;
 
@@ -371,40 +371,40 @@ int cnt, dir;
    case CtrDrvrIOCTL_67:
    case CtrDrvrIOCTL_68:
    case CtrDrvrIOCTL_69:
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = READ_FLAG;
       break;
 
 #ifdef CTR_VME
    case CtrDrvrGET_OUTPUT_BYTE:        /* VME P2 output byte number */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = WRIT_FLAG;
       break;
 
    case CtrDrvrSET_OUTPUT_BYTE:        /* VME P2 output byte number */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = READ_FLAG;
       break;
 #endif
 
 #ifdef CTR_PCI
    case CtrDrvrSET_MODULE_BY_SLOT:     /* Select the module to work with by slot ID */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = READ_FLAG;
       break;
 
    case CtrDrvrGET_MODULE_SLOT:        /* Get the slot ID of the selected module */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = WRIT_FLAG;
       break;
 
    case CtrDrvrREMAP:                  /* Remap BAR2 after a config change */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = READ_FLAG;
       break;
 
    case CtrDrvr93LC56B_EEPROM_OPEN:    /* Open the PLX9030 configuration EEPROM 93LC56B for write */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = READ_FLAG;
       break;
 
@@ -419,22 +419,22 @@ int cnt, dir;
       break;
 
    case CtrDrvr93LC56B_EEPROM_ERASE:   /* Erase the EEPROM 93LC56B, deletes PLX9030 configuration */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = READ_FLAG;
       break;
 
    case CtrDrvr93LC56B_EEPROM_CLOSE:   /* Close EEPROM 93LC56B and load new PLX9030 configuration */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = READ_FLAG;
       break;
 
    case CtrDrvrPLX9030_RECONFIGURE:    /* Load EEPROM configuration into the PLX9030 */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = READ_FLAG;
       break;
 
    case CtrDrvrPLX9030_CONFIG_OPEN:    /* Open the PLX9030 configuration */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = READ_FLAG;
       break;
 
@@ -449,12 +449,12 @@ int cnt, dir;
       break;
 
    case CtrDrvrPLX9030_CONFIG_CLOSE:   /* Close the PLX9030 configuration */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = READ_FLAG;
       break;
 
    case CtrDrvrPLX9030_LOCAL_OPEN:     /* Open the PLX9030 local configuration */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = READ_FLAG;
       break;
 
@@ -469,7 +469,7 @@ int cnt, dir;
       break;
 
    case CtrDrvrPLX9030_LOCAL_CLOSE:    /* Close the PLX9030 local configuration */
-      cnt = sizeof(unsigned long);
+      cnt = sizeof(uint32_t);
       dir = READ_FLAG;
       break;
 
