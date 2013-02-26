@@ -588,7 +588,7 @@ Vd80Err err;
 
    err = SetModule(fd,mod);
    if (err != Vd80ErrSUCCESS) return err;
-   if (ioctl(fd,Vd80IoctlGET_POSTSAMPLES,&post) < 0) return Vd80ErrIO;
+   if (ioctl(fd,Vd80IoctlGET_POSTSAMPLES,post) < 0) return Vd80ErrIO;
    return Vd80ErrSUCCESS;
 }
 
