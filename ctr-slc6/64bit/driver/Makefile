@@ -47,12 +47,30 @@ install-all: install-lab install-oper install-oplhc
 
 install-lab: ./$(CPU)/$(KVER)/ctrp.ko ./$(CPU)/$(KVER)/ctrv.ko
 	dsc_install ./$(CPU)/$(KVER)/ctrp.ko /acc/dsc/lab/$(CPU)/$(KVER)/ctrp;
+	dsc_install ./ipp /acc/dsc/lab/$(CPU)/$(KVER)/ctrp;
 	dsc_install ./$(CPU)/$(KVER)/ctrv.ko /acc/dsc/lab/$(CPU)/$(KVER)/ctrv;
+	dsc_install ./ivv /acc/dsc/lab/$(CPU)/$(KVER)/ctrv;
+	dsc_install ./$(CPU)/$(KVER)/ctrp.ko /acc/dsc/lab/$(CPU)/$(KVER)/ctr;
+	dsc_install ./ipp /acc/dsc/lab/$(CPU)/$(KVER)/ctr;
+	dsc_install ./$(CPU)/$(KVER)/ctrv.ko /acc/dsc/lab/$(CPU)/$(KVER)/ctr;
+	dsc_install ./ivv /acc/dsc/lab/$(CPU)/$(KVER)/ctr;
 
 install-oper: ./$(CPU)/$(KVER)/ctrp.ko ./$(CPU)/$(KVER)/ctrv.ko
+	dsc_install ./$(CPU)/$(KVER)/ctrp.ko /acc/dsc/oper/$(CPU)/$(KVER)/ctr;
+	dsc_install ./ipp /acc/dsc/oper/$(CPU)/$(KVER)/ctr;
+	dsc_install ./$(CPU)/$(KVER)/ctrv.ko /acc/dsc/oper/$(CPU)/$(KVER)/ctr;
+	dsc_install ./ivv /acc/dsc/oper/$(CPU)/$(KVER)/ctr;
 	dsc_install ./$(CPU)/$(KVER)/ctrp.ko /acc/dsc/oper/$(CPU)/$(KVER)/ctrp;
+	dsc_install ./ipp /acc/dsc/oper/$(CPU)/$(KVER)/ctrp;
 	dsc_install ./$(CPU)/$(KVER)/ctrv.ko /acc/dsc/oper/$(CPU)/$(KVER)/ctrv;
+	dsc_install ./ivv /acc/dsc/oper/$(CPU)/$(KVER)/ctrv;
 
 install-oplhc: ./$(CPU)/$(KVER)/ctrp.ko ./$(CPU)/$(KVER)/ctrv.ko
+	dsc_install ./$(CPU)/$(KVER)/ctrp.ko /acc/dsc/oplhc/$(CPU)/$(KVER)/ctr;
+	dsc_install ./ipp /acc/dsc/oplhc/$(CPU)/$(KVER)/ctr;
+	dsc_install ./$(CPU)/$(KVER)/ctrv.ko /acc/dsc/oplhc/$(CPU)/$(KVER)/ctr;
+	dsc_install ./ivv /acc/dsc/oplhc/$(CPU)/$(KVER)/ctrv;
 	dsc_install ./$(CPU)/$(KVER)/ctrp.ko /acc/dsc/oplhc/$(CPU)/$(KVER)/ctrp;
+	dsc_install ./ipp /acc/dsc/oplhc/$(CPU)/$(KVER)/ctrp;
 	dsc_install ./$(CPU)/$(KVER)/ctrv.ko /acc/dsc/oplhc/$(CPU)/$(KVER)/ctrv;
+	dsc_install ./ivv /acc/dsc/oplhc/$(CPU)/$(KVER)/ctrv;

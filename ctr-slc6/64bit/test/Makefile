@@ -56,7 +56,15 @@ SizePci.$(CPU): SizePci.$(CPU).o
 clean:
 	$(RM) $(ALL) $(BAKS) *.o
 
-install: ctrptest.$(CPU) ctrvtest.$(CPU)
+install:
+	echo "Please use install-lab/oper/lhc"
+
+install-lab: ctrptest.$(CPU) ctrvtest.$(CPU)
 	dsc_install $(ALL) /acc/dsc/lab/$(CPU)/ctr
+
+install-oper: ctrptest.$(CPU) ctrvtest.$(CPU)
 	dsc_install $(ALL) /acc/dsc/oper/$(CPU)/ctr
+
+
+install-lhc: ctrptest.$(CPU) ctrvtest.$(CPU)
 	dsc_install $(ALL) /acc/dsc/oplhc/$(CPU)/ctr
