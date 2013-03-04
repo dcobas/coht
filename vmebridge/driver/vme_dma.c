@@ -205,12 +205,19 @@ static int vme_dma_setup(struct dma_channel *channel, int to_user)
 	int rc = 0;
 	struct vme_dma *desc = &channel->desc;
 	unsigned int length = desc->length;
-	unsigned int uaddr;
+	uint64_t uaddr;
 	int nr_pages;
 
 	/* Create the scatter gather list */
-	uaddr = (desc->dir == VME_DMA_TO_DEVICE) ?
-		desc->src.addrl : desc->dst.addrl;
+	if (desc->dir == VME_DMA_TO_DEVICE) {
+		uaddr = desc->src.addru;
+		uaddr <<= 32;
+		uaddr |= desc->src.addrl;
+	} else {
+		uaddr = desc->dst.addru;
+		uaddr <<= 32;
+		uaddr |= desc->dst.addrl;
+	}
 
 	/* Check for overflow */
 	if ((uaddr + length) < uaddr)
@@ -357,7 +364,7 @@ static int __vme_do_dma(struct vme_dma *desc, int to_user)
 	}
 
 	/* Check we're within a 32-bit address space */
-	if (desc->src.addru || desc->dst.addru) {
+	if (BITS_PER_LONG < 64 && (desc->src.addru || desc->dst.addru)) {
 		printk(KERN_ERR PFX "%s: Addresses are not 32-bit\n", __func__);
 		return -EINVAL;
 	}

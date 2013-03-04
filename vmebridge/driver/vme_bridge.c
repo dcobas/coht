@@ -694,7 +694,7 @@ static int __devinit vme_bridge_init(struct pci_dev *pdev,
 	if ((rc = vme_bridge_map_regs(pdev)) != 0)
 		goto out_err;
 
-	if ((rc = pci_set_dma_mask(pdev, DMA_BIT_MASK(32))) != 0) {
+	if ((rc = pci_set_dma_mask(pdev, DMA_BIT_MASK(BITS_PER_LONG))) != 0) {
 		printk(KERN_ERR PFX "Bridge does not support 32 bit PCI DMA\n");
 		/* Indicate to the DMA handling code that DMA is unusable */
 		dma_ok = 0;
