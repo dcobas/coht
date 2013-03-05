@@ -716,7 +716,7 @@ static void sis33_dev_del_attributes(struct sis33_card *card)
 	kobject_unregister(&card->channels_dir);
 }
 
-int sis33_create_sysfs_files(struct sis33_card *card)
+ssize_t sis33_create_sysfs_files(struct sis33_card *card)
 {
 	int error;
 
