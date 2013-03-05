@@ -7,6 +7,7 @@
  */
 #include <linux/device.h>
 #include <linux/ctype.h>
+#include <linux/version.h>
 
 #include "sis33core.h"
 #include "sis33core_internal.h"
@@ -663,6 +664,47 @@ static struct kobj_type chan_dir_type = {
 	.release	= chan_dir_release,
 };
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,25)
+/*
+ * kobject_init_and_add (and its helper kobject_set_name_vargs) are
+ * lifted here from 2.6.25, for the case of 2.6.24 compilation
+ */
+static int kobject_set_name_vargs(struct kobject *kobj, const char *fmt,
+                                  va_list vargs)
+{
+        va_list aq;
+        char *name;
+
+        va_copy(aq, vargs);
+        name = kvasprintf(GFP_KERNEL, fmt, vargs);
+        va_end(aq);
+
+        if (!name)
+                return -ENOMEM;
+
+        /* Free the old name, if necessary. */
+        kfree(kobj->k_name);
+
+        /* Now, set the new name */
+        kobj->k_name = name;
+
+        return 0;
+}
+
+int kobject_init_and_add(struct kobject *kobj, struct kobj_type *ktype,
+		         struct kobject *parent, const char *fmt, ...)
+{
+	va_list args;
+
+	va_start(args, fmt);
+	kobject_set_name_vargs(kobj, fmt, args);
+	va_end(args);
+	kobj->parent = parent;
+	kobj->ktype = ktype;
+	return kobject_register(kobj);
+}
+#endif
+
 static int sis33_dev_add_attributes(struct sis33_card *card)
 {
 	struct sis33_channel *channel;
@@ -670,10 +712,8 @@ static int sis33_dev_add_attributes(struct sis33_card *card)
 	int i;
 
 	memset(&card->channels_dir, 0, sizeof(struct kobject));
-	kobject_set_name(&card->channels_dir, "channels");
-	card->channels_dir.parent	= &card->dev->kobj;
-	card->channels_dir.ktype	= &chan_dir_type;
-	ret = kobject_register(&card->channels_dir);
+	ret = kobject_init_and_add(&card->channels_dir, &chan_dir_type,
+					&card->dev->kobj, "channels");
 	if (ret)
 		return ret;
 
@@ -681,16 +721,15 @@ static int sis33_dev_add_attributes(struct sis33_card *card)
 		return 0;
 
 	for (i = 0; i < card->n_channels; i++) {
+		struct kobj_type *ktype;
 		channel = &card->channels[i];
 		memset(&channel->kobj, 0, sizeof(struct kobject));
-		kobject_init(&channel->kobj);
-		kobject_set_name(&channel->kobj, "channel%d", i);
-		channel->kobj.parent	= &card->channels_dir;
 		if (channel->show_attrs)
-			channel->kobj.ktype = &chan_attr_type;
+			ktype = &chan_attr_type;
 		else
-			channel->kobj.ktype = &chan_attr_type_no_attrs;
-		ret = kobject_add(&channel->kobj);
+			ktype = &chan_attr_type_no_attrs;
+		ret = kobject_init_and_add(&channel->kobj, ktype,
+				&card->channels_dir, "channel%d", i);
 		if (ret)
 			goto error;
 	}
@@ -698,9 +737,9 @@ static int sis33_dev_add_attributes(struct sis33_card *card)
  error:
 	for (i--; i >= 0; i--) {
 		channel = &card->channels[i];
-		kobject_unregister(&channel->kobj);
+		kobject_put(&channel->kobj);
 	}
-	kobject_unregister(&card->channels_dir);
+	kobject_put(&card->channels_dir);
 	return ret;
 }
 
@@ -711,9 +750,9 @@ static void sis33_dev_del_attributes(struct sis33_card *card)
 
 	for (i = 0; i < card->n_channels; i++) {
 		channel = &card->channels[i];
-		kobject_unregister(&channel->kobj);
+		kobject_put(&channel->kobj);
 	}
-	kobject_unregister(&card->channels_dir);
+	kobject_put(&card->channels_dir);
 }
 
 ssize_t sis33_create_sysfs_files(struct sis33_card *card)
