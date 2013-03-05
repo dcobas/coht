@@ -151,7 +151,7 @@ uint32_t *regs;
 
 void BuildDmaReadDesc(SkelDrvrModuleContext *mcon,
 		      uintptr_t              dest,
-		      unsigned int           len,
+		      uint32_t               len,
 		      struct vme_dma        *dma_desc) {
 
    memset(dma_desc, 0, sizeof(struct vme_dma));
@@ -320,10 +320,10 @@ SkelUserReturn SkelUserJtagWriteByte(SkelDrvrModuleContext *mcon,
 /* debug name strings.                                         */
 
 /* sleep until IDLE is settled or things time out */
-void wait_for_idle(SkelDrvrModuleContext *mcon, int maxdelay)
+void wait_for_idle(SkelDrvrModuleContext *mcon, uint32_t maxdelay)
 {
-	int state;
-	int delay;
+	uint32_t state;
+	uint32_t delay;
 
 	for (delay = 0; delay < maxdelay; delay += 10) {
 		state = GetReg(GetRegs(mcon), VD80_GSR, mcon) & VD80_STATE_MASK;
@@ -348,7 +348,7 @@ void wait_for_idle(SkelDrvrModuleContext *mcon, int maxdelay)
  */
 SkelUserReturn SkelUserIoctls(SkelDrvrClientContext *ccon,
 			      SkelDrvrModuleContext *mcon,
-			      int                    cm,
+			      uint32_t               cm,
 			      char                  *arg)
 {
 
@@ -356,8 +356,8 @@ struct vme_dma dma_desc;    /* Vme driver DMA structure */
 int    tcnt, psze;          /* Transfer count and short page size */
 
 uint32_t *regs = NULL;   /* Mapped A24D32 address space for Vd80 module */
-int *lap  = NULL;   /* Long-Value pointer to argument */
-int lval, tval, bms;/* Long-Value from argument, temp-value, bit-mask */
+int *lap  = NULL;        /* Long-Value pointer to argument */
+int lval, tval, bms;     /* Long-Value from argument, temp-value, bit-mask */
 int i;
 
 int actpostrig = 0; /* The actual number of post trigger samples */

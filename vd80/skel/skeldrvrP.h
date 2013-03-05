@@ -196,7 +196,7 @@ extern SkelUserReturn SkelUserJtagWriteByte(SkelDrvrModuleContext *mcon,
 
 extern SkelUserReturn SkelUserIoctls(SkelDrvrClientContext *ccon, /* Calling clients context */
 				     SkelDrvrModuleContext *mcon, /* Calling clients selected module */
-				     int cm,                      /* Ioctl number */
+				     uint32_t cm,                 /* Ioctl number */
 				     char *arg);                  /* Pointer to argument space */
 
 /*
