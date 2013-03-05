@@ -6,6 +6,12 @@
 #ifndef SKELINCLUDE
 #define SKELINCLUDE
 
+#ifdef __KERNEL__
+#include <linux/types.h>
+#else
+#include <stdint.h>
+#endif
+
 /* ========================================== */
 /* Start of standard SKEL driver declarations */
 
@@ -58,7 +64,7 @@ typedef struct {
    uint32_t  DataWidth;    /* 0 Default, 8, 16, 32 */
    uint32_t  AddrIncr;     /* Address increment (0=FIFO) (1=Normal) */
    uint32_t  BytesTr;      /* Byte size of the transfer */
-   char     *Data;         /* Data buffer */
+   uint8_t  *Data;         /* Data buffer */
  } SkelDrvrRawIoTransferBlock;
 
 /* Single transfer */
@@ -66,7 +72,7 @@ typedef struct {
 typedef struct {
    uint32_t	SpaceNumber;/* Address space to read/write */
    uint32_t	Offset;     /* Hardware address byte offset */
-   unsigned int	DataWidth;  /* 0 Default, 8, 16, 32 */
+   uint32_t     DataWidth;  /* 0 Default, 8, 16, 32 */
    uint32_t	Data;       /* Callers IO data, max 32 bits */
  } SkelDrvrRawIoBlock;
 
@@ -100,13 +106,13 @@ typedef struct {
  } SkelDrvrReadBuf;                 /* Returned from read() */
 
 struct mapping_info {
-   unsigned int	 SpaceNumber;
-   unsigned long Mapped;
+   uint32_t  SpaceNumber;
+   uintptr_t Mapped;
 };
 
 typedef struct {
-   unsigned int		Mappings;
-   struct mapping_info 	Maps[SkelDrvrMAX_MAPS];
+   uint32_t            Mappings;
+   struct mapping_info Maps[SkelDrvrMAX_MAPS];
 } SkelDrvrMaps;
 
 /* ============================================================= */

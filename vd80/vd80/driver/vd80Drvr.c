@@ -20,6 +20,20 @@
 #include <linux/delay.h>
 #include <asm/io.h>
 
+/**
+ * ===========================================================
+ * @brief Given a pointer split it into upr and lwr parts
+ * @param upr address where upper part of arddress will be stored
+ * @param lwr address where lower part of arddress will be stored
+ * @param ptr is the given pointer value to be split
+ */
+
+void split_address(uint32_t *upr, uint32_t *lwr, uintptr_t ptr)
+{
+	*upr = (uint32_t) ((uint64_t) ptr >> 32);
+	*lwr = (uint32_t) (ptr  & 0xFFFFFFFF);
+}
+
 /* =========================================================== */
 /* Client and module asociated error messages                  */
 
@@ -65,7 +79,7 @@ InsLibVmeAddressSpace  *vmeas = NULL;   /* VME address spaces linked list */
 /* =========================================================== */
 /* As above but return the corresponding base address instead  */
 
-uint32_t *GetVmeBaseAddress(SkelDrvrModuleContext *mcon,
+uint32_t GetVmeBaseAddress(SkelDrvrModuleContext *mcon,
 			    int                    am) {
 
 InsLibModlDesc         *modld = NULL;
@@ -74,26 +88,26 @@ InsLibVmeAddressSpace  *vmeas = NULL;
 
    if (!mcon) {
       report_module(mcon, SkelDrvrDebugFlagWARNING, "GetVmeBaseAddress:NULL module context");
-      return NULL;
+      return 0;
    }
    modld = mcon->Modld;
    if (!modld) {
       report_module(mcon, SkelDrvrDebugFlagWARNING, "GetVmeBaseAddress:NULL module descriptor");
-      return NULL;
+      return 0;
    }
    vmema = modld->ModuleAddress;
    if (!vmema) {
       report_module(mcon, SkelDrvrDebugFlagWARNING, "GetVmeBaseAddress:NULL module address");
-      return NULL;
+      return 0;
    }
 
    vmeas = vmema->VmeAddressSpace;
    while (vmeas) {
-      if (vmeas->AddressModifier == am) return (uint32_t *) vmeas->BaseAddress;
+      if (vmeas->AddressModifier == am) return (uint32_t) vmeas->BaseAddress;
       vmeas = vmeas->Next;
    }
    report_module(mcon, SkelDrvrDebugFlagWARNING, "GetVmeBaseAddress:Address modifier 0x%X not found", am);
-   return NULL;
+   return 0;
 }
 
 /* =========================================================== */
@@ -136,7 +150,7 @@ uint32_t *regs;
 #define SAMPLES_IN_DMA_BLOCK  2048
 
 void BuildDmaReadDesc(SkelDrvrModuleContext *mcon,
-		      void                  *dest,
+		      uintptr_t              dest,
 		      unsigned int           len,
 		      struct vme_dma        *dma_desc) {
 
@@ -152,8 +166,8 @@ void BuildDmaReadDesc(SkelDrvrModuleContext *mcon,
    dma_desc->ctrl.vme_block_size   = VME_DMA_BSIZE_4096;
    dma_desc->ctrl.vme_backoff_time = VME_DMA_BACKOFF_0;
 
-   dma_desc->src.addrl = (unsigned int) GetVmeBaseAddress(mcon,VME_A24_USER_DATA_SCT);
-   dma_desc->dst.addrl = (unsigned int) dest;
+   split_address(&dma_desc->src.addru, &dma_desc->src.addrl, GetVmeBaseAddress(mcon,VME_A24_USER_DATA_SCT));
+   split_address(&dma_desc->dst.addru, &dma_desc->dst.addrl, dest);
    dma_desc->length    = len;
 
    if (mcon->Debug & SkelDrvrDebugFlagMODULE) {
@@ -782,7 +796,7 @@ int lvalue;                 /* For when arg is NULL */
 	    if (remaining > psze) tcnt = psze;
 	    else                  tcnt = remaining;
 
-	    BuildDmaReadDesc(mcon,&(sbuf->SampleBuf[samples]),tcnt*sizeof(short),&dma_desc);
+	    BuildDmaReadDesc(mcon,(uintptr_t) &(sbuf->SampleBuf[samples]),tcnt*sizeof(short),&dma_desc);
 	    if (vme_do_dma(&dma_desc)) {
 	       report_module(mcon, SkelDrvrDebugFlagASSERTION, "SkelUserIoctl:Error vme_do_dma");
 	       return SkelUserReturnFAILED;

@@ -31,6 +31,8 @@
 #include <linux/version.h>
 #include <linux/mutex.h>
 #include <asm/current.h>
+#include <linux/sched.h>
+#include <linux/wait.h>
 
 #include <skeluser.h>
 #include <skeluser_ioctl.h>
@@ -705,7 +707,7 @@ static irqreturn_t IntrHandler(void *cookie)
  * interrupt handler is used to serve interrupts.
  */
 
-irqreturn_t skel_isr(void *cookie)
+int skel_isr(void *cookie)
 {
 	int cc;
 	if (SkelConf.intrhandler) {
@@ -1222,7 +1224,6 @@ struct file_operations skel_drvr_fops = {
 	.owner          = THIS_MODULE,
 	.read           = skel_drv_read,
 	.write          = skel_drv_write,
-	.ioctl          = skel_drv_ioctl_lck,
 	.unlocked_ioctl = skel_drv_ioctl_ulck,
 	.open           = skel_drv_open,
 	.release        = skel_drv_close,

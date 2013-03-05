@@ -14,6 +14,8 @@ extern "C"
 {
 #endif
 
+#include <stdint.h>
+
 /* ==================================================================== */
 /* Some standard error codes                                            */
 

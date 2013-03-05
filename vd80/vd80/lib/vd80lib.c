@@ -31,8 +31,6 @@
 #include <unistd.h>
 #include <errno.h>
 
-#define uint32_t unsigned int
-
 #include <skeluser.h>
 #include <skeluser_ioctl.h>
 #include <skel.h>

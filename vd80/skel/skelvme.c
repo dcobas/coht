@@ -130,8 +130,8 @@ static int map_vmeas(SkelDrvrModuleContext * mcon,
 	}
 
 	/* mapping successful */
-	SK_INFO("VME mapping OK of 0x%x (-->virt 0x%x) for module #%d",
-		vas->BaseAddress, (int) vas->Mapped, mcon->ModuleNumber);
+	SK_INFO("VME mapping OK of 0x%x (-->virt %p) for module #%d",
+		vas->BaseAddress, vas->Mapped, mcon->ModuleNumber);
 
 	return 1;
 }
@@ -196,7 +196,7 @@ static void RemoveVmeModule(SkelDrvrModuleContext * mcon)
  * @return 1 - on success
  */
 
-irqreturn_t skel_isr(void *cookie);
+int skel_isr(void *cookie);
 
 static int AddVmeModule(SkelDrvrModuleContext * mcon)
 {
