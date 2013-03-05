@@ -14,6 +14,18 @@
 
 #ifdef CONFIG_COMPAT
 
+/*
+ * implementation of get_compat_timespec lifted from kernel/compat.c, as
+ * it is not exported consistently until 3.3 (3.4 in RHEL)
+ */
+static int sis33_get_compat_timespec(struct timespec *ts,
+			             const struct compat_timespec __user *cts)
+{
+	return (!access_ok(VERIFY_READ, cts, sizeof(*cts)) ||
+			__get_user(ts->tv_sec, &cts->tv_sec) ||
+			__get_user(ts->tv_nsec, &cts->tv_nsec)) ? -EFAULT : 0;
+}
+
 struct sis33_compat_acq_desc {
 	u32			segment;
 	u32			nr_events;
@@ -78,7 +90,7 @@ sis33_get_compat_acq_desc(struct sis33_acq_desc __user *desc, struct sis33_compa
 	err |= __put_user(uint, &desc->ev_length);
 	err |= __get_user(uint, &compat_desc->flags);
 	err |= __put_user(uint, &desc->flags);
-	err |= get_compat_timespec(&ts, &compat_desc->timeout);
+	err |= sis33_get_compat_timespec(&ts, &compat_desc->timeout);
 	err |= copy_to_user(&desc->timeout, &ts, sizeof(ts));
 	if (err)
 		return -EFAULT;
@@ -177,7 +189,7 @@ static int sis33_get_compat_acq_list(struct sis33_acq_list __user *list,
 	err |= __get_user(uint, &compat_list->flags);
 	err |= __put_user(uint, &list->flags);
 	err |= __put_user(acqs, &list->acqs);
-	err |= get_compat_timespec(&ts, &compat_list->timeout);
+	err |= sis33_get_compat_timespec(&ts, &compat_list->timeout);
 	err |= copy_to_user(&list->timeout, &ts, sizeof(ts));
 	err |= __get_user(ktime.tv_sec, &compat_list->endtime.tv_sec);
 	err |= __put_user(ktime.tv_sec, &list->endtime.tv_sec);
