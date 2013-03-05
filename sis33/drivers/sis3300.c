@@ -12,8 +12,10 @@
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/err.h>
+#include <linux/slab.h>
 #include <vmebus.h>
 
+#include <asm/delay.h>
 #include <asm/uaccess.h>
 
 #include "sis33core.h"

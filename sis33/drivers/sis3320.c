@@ -10,7 +10,9 @@
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/err.h>
+#include <linux/slab.h>
 
+#include <asm/delay.h>
 #include <asm/atomic.h>
 
 #include <vmebus.h>

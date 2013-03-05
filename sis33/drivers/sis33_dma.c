@@ -16,6 +16,7 @@
  * Released under the GPL v2. (and only v2, not any later version)
  */
 #include <vmebus.h>
+#include <linux/module.h>
 #include "sis33core.h"
 
 static int
