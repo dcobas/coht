@@ -89,7 +89,7 @@ static int sis33_check_acq_buffers(const struct sis33_card *card, int segment_nr
 
 	for (i = 0; i < n; i++) {
 		if (acqs[i].size == 0 || acqs[i].size != acq_minsize) {
-			dev_info(card->dev, "Invalid size %u of acquisition[%d]. Valid acq size: %u\n",
+			dev_info(card->dev, "Invalid size %u of acquisition[%d]. Valid acq size: %zu\n",
 				acqs[i].size, i, acq_minsize);
 			return -EINVAL;
 		}
