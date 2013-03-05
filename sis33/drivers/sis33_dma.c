@@ -17,7 +17,13 @@
  */
 #include <vmebus.h>
 #include <linux/module.h>
+#include <linux/kernel.h>
 #include "sis33core.h"
+
+/* FIXME: move to include again */
+#ifndef lower_32_bits 
+#define lower_32_bits(n) ((u32)(n))
+#endif /* lower_32_bits */
 
 static int
 __sis33_dma(struct device *dev, unsigned int vme_addr, enum vme_address_modifier am,
@@ -41,8 +47,8 @@ __sis33_dma(struct device *dev, unsigned int vme_addr, enum vme_address_modifier
 	desc.ctrl.vme_block_size	= VME_DMA_BSIZE_2048;
 	desc.ctrl.vme_backoff_time	= VME_DMA_BACKOFF_0;
 
-	pci->addru = 0;
-	pci->addrl = (unsigned int)addr;
+	pci->addru = upper_32_bits((unsigned long)addr);
+	pci->addrl = lower_32_bits((unsigned long)addr);
 
 	vme->addru = 0;
 	vme->addrl = vme_addr;
@@ -137,8 +143,8 @@ unsigned int sis33_dma_read(struct device *dev, unsigned int vme_addr)
 	desc.ctrl.vme_block_size	= VME_DMA_BSIZE_64;
 	desc.ctrl.vme_backoff_time	= VME_DMA_BACKOFF_0;
 
-	pci->addru = 0;
-	pci->addrl = (unsigned int)&val;
+	pci->addru = upper_32_bits((unsigned long)&val);
+	pci->addrl = lower_32_bits((unsigned long)&val);
 
 	vme->addru = 0;
 	vme->addrl = vme_addr;
@@ -183,8 +189,8 @@ void sis33_dma_write(struct device *dev, unsigned int vme_addr, unsigned int val
 	desc.ctrl.vme_block_size	= VME_DMA_BSIZE_64;
 	desc.ctrl.vme_backoff_time	= VME_DMA_BACKOFF_0;
 
-	pci->addru = 0;
-	pci->addrl = (unsigned int)&val_be;
+	pci->addru = upper_32_bits((unsigned long)&val_be);
+	pci->addrl = lower_32_bits((unsigned long)&val_be);
 
 	vme->addru = 0;
 	vme->addrl = vme_addr;
