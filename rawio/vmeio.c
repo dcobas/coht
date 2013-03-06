@@ -76,24 +76,24 @@ static __inline__ void __endian(const void *src, void *dest, unsigned int size)
  * @param eln -- number of elements to r/w
  * @param d   -- description table to init
  */
-static void setup_vme_desc(uint8_t t, void *ka, short am, uint8_t dps,
+static void setup_vme_desc(uint8_t t, uint32_t ka, short am, uint8_t dps,
 			   void *buf, int eln, struct vme_dma *d)
 {
-	ulong vmeaddr = (ulong) ka;
+	uint32_t vmeaddr = ka;
 	memset(d, 0, sizeof(*d));
 
         if (t == 'r') { /* read */
 		d->dir = VME_DMA_FROM_DEVICE;
                 d->src.data_width = dps;
 		d->src.am = am;
-                d->src.addrl = (unsigned int) vmeaddr;
-                d->dst.addrl = (unsigned int) buf;
+                d->src.addrl = (unsigned long) vmeaddr;
+                d->dst.addrl = (unsigned long) buf;
         } else { /* write */
 		d->dir = VME_DMA_TO_DEVICE;
                 d->dst.data_width = dps;
                 d->dst.am = am;
-                d->src.addrl = (unsigned int) buf;
-		d->dst.addrl = (unsigned int) vmeaddr;
+                d->src.addrl = (unsigned long) buf;
+		d->dst.addrl = (unsigned long) vmeaddr;
         }
         d->length = eln * dps/8; /* number of bytes to r/w */
         d->novmeinc = 0; /* FIFO r/w (1 -- yes, 0 -- no) */
@@ -235,7 +235,7 @@ static int vme_dma_error_decode(struct vme_dma *desc, char **ptr)
  * @return -1 -- if FAILED
  * @return  0 -- if OK
  */
-int do_dma(uint8_t t, void *vmeaddr, short am, uint8_t dps, void *buf, int eln)
+int do_dma(uint8_t t, uint32_t vmeaddr, short am, uint8_t dps, void *buf, int eln)
 {
 	struct vme_dma d;
 	char *errstr;
@@ -275,16 +275,16 @@ int do_dma(uint8_t t, void *vmeaddr, short am, uint8_t dps, void *buf, int eln)
 	return 0;
 }
 
-void get_obligitary_params(char *argv[], void **vmeaddr, int *am, int *dps)
+void get_obligitary_params(char *argv[], uint32_t *vmeaddr, int *am, int *dps)
 {
-	sscanf(argv[2], "%p", vmeaddr);
+	sscanf(argv[2], "%x", vmeaddr);
         sscanf(argv[3], "%x", am);
         sscanf(argv[4], "%d", dps);
 }
 
 void do_read(int argc, char *argv[], char *envp[])
 {
-	void *vmeaddr;
+	uint32_t vmeaddr;
 	int am;
 	int dps;
 	int eln;
@@ -336,7 +336,7 @@ void do_read(int argc, char *argv[], char *envp[])
 		printf("8 bytes long:\n");
 		lp = buf;
 		for (i = 0; i < eln; i++, lp++)
-			printf("[%d] --> %#llx\n", i, *lp);
+			printf("[%d] --> %#lx\n", i, *lp);
 		break;
 	default:
 		break;
@@ -380,7 +380,7 @@ void *get_data_from_cmd_line(char *argv[], int i, int dps, int eln)
 	case 64:
 		lp = buf;
 		while (eln--)
-			sscanf(argv[i++], "%llx", lp++);
+			sscanf(argv[i++], "%lx", lp++);
 		break;
 	}
 
@@ -389,7 +389,7 @@ void *get_data_from_cmd_line(char *argv[], int i, int dps, int eln)
 
 void do_write(int argc, char *argv[], char *envp[])
 {
-	void *vmeaddr;
+	uint32_t vmeaddr;
 	int am;
 	int dps;
 	int eln;
@@ -424,7 +424,7 @@ void do_write(int argc, char *argv[], char *envp[])
 		buf = get_data_from_cmd_line(argv, i, dps, eln);
 	}
 
-	printf("Will write %d element(s)@%p ", eln, vmeaddr);
+	printf("Will write %d element(s)@%x ", eln, vmeaddr);
 	i = 0;
 	switch (dps) {
 	case 8:
@@ -449,7 +449,7 @@ void do_write(int argc, char *argv[], char *envp[])
 		printf("8 bytes long:\n");
 		lp = buf;
 		while (i < eln)
-			printf("[%d] --> %#llx\n", i++, *lp++);
+			printf("[%d] --> %#lx\n", i++, *lp++);
 		break;
 	}
 
