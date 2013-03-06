@@ -83,3 +83,6 @@ patch/
 
 # doxygen docs generated with doxy.sh
 doxygen_output
+
+# old documents (not fit for git)
+olddocs
