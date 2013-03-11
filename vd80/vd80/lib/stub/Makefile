@@ -2,7 +2,7 @@ CPU=L866
 
 include /acc/dsc/src/co/Make.auto
 
-CFLAGS= -g -Wall -I. -I../driver -I../../skel -fPIC
+CFLAGS= -g -Wall -I. -I../driver -I../../skel -fPIC -DCOMPILE_TIME=$(shell date +%s)
 
 SRCS = stublib.c StubLib.h
 
