@@ -90,6 +90,23 @@ struct cmd_desc user_cmds[] = {
 };
 //@}
 
-int main(int argc, char *argv[], char *envp[]) {
-   return extest_init(argc, argv, "vd80");
+int main(int argc, char *argv[], char *envp[])
+{
+
+	SLbHandle hnd = NULL;
+	SLbErr err;
+
+	printf("Opening:libvd80.so.1.0 by default\n");
+	err = SLbOpenHandle(&hnd,"vd80","1.0");
+	if (err) {
+		fprintf(stderr,"OpenHandle:%s",SLbErrToStr(hnd,err));
+		exit(err);
+	}
+	if (InsertHandle(hnd) == 0) {
+		err = SLbCloseHandle(hnd);
+		if (err == SLbErrSUCCESS) err = SLbErrMEMORY;
+		fprintf(stderr,"OpenHandle:%s",SLbErrToStr(hnd,err));
+		exit(err);
+	}
+	return extest_init(argc, argv, "vd80");
 }
