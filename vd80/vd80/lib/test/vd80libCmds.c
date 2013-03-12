@@ -1314,7 +1314,7 @@ SLbQueueFlag qfl;
 
 /* ========================================================== */
 
-#define LOOPS 100
+#define LOOPS 4
 
 int WaitInterrupt(struct cmd_desc *cmddint, struct atom *atoms) {
 
@@ -1359,14 +1359,17 @@ int wi, loops;
 	 }
       }
    }
-   printf("WaitInterrupt:Msk:0x%X Mod:%d Chn:%d QSz:%d Msd:%d %s\n",
-	   (int) intr.Mask,
-	   (int) intr.Module,
-	   (int) intr.Channel,
-	   (int) intr.QueueSize,
-	   (int) intr.Missed,
-		 TimeToStr(&intr.Time));
-
+   if (intr.Mask & 0xF) {
+      printf("WaitInterrupt:Msk:0x%X Mod:%d Chn:%d QSz:%d Msd:%d %s\n",
+	      (int) intr.Mask,
+	      (int) intr.Module,
+	      (int) intr.Channel,
+	      (int) intr.QueueSize,
+	      (int) intr.Missed,
+		    TimeToStr(&intr.Time));
+   } else {
+      printf("WaitInterrupt:Timeout\n");
+   }
    return arg;
 }
 
