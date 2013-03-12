@@ -1118,10 +1118,12 @@ static int wa_init(InsLibDrvrDesc * drvrd)
 
 	memset(Wa, 0, sizeof(SkelDrvrWorkingArea));
 
-#ifdef __little_endian__
-	Wa->Endian = InsLibEndianLITTLE;
-#else
+#ifdef __BIG_ENDIAN__
 	Wa->Endian = InsLibEndianBIG;
+	printk("Skel:Big endian platform\n");
+#else
+	Wa->Endian = InsLibEndianLITTLE;
+	printk("Skel:Little endian platform\n");
 #endif
 
 	/* hook driver description onto Wa */
