@@ -168,7 +168,7 @@ typedef struct {
 #define SkelDrvrIoctlGET_CLIENT_LIST         SKEL_IOR  (14, SkelDrvrClientList)
 #define SkelDrvrIoctlGET_CLIENT_CONNECTIONS  SKEL_IOWR (15, SkelDrvrClientConnections)
 #define SkelDrvrIoctlENABLE                  SKEL_IOW  (16, uint32_t)
-#define SkelDrvrIoctlRESET                   SKEL_IOW  (22, uint32_t)
+#define SkelDrvrIoctlRESET                   SKEL_IOW  (17, uint32_t)
 #define SkelDrvrIoctlGET_STATUS              SKEL_IOR  (18, SkelDrvrStatus)
 #define SkelDrvrIoctlGET_CLEAR_STATUS        SKEL_IOR  (19, SkelDrvrStatus)
 #define SkelDrvrIoctlRAW_READ                SKEL_IOWR (20, SkelDrvrRawIoBlock)
