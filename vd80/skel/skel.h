@@ -151,80 +151,31 @@ typedef struct {
 
 /* Standard SKEL driver IOCTL call definitions and arguments. */
 
-#define SkelDrvrIoctlSET_DEBUG		SKEL_IOW( 0, SkelDrvrDebug)
-//!< Set driver debug mode (SkelDrvrDebug)
-#define SkelDrvrIoctlGET_DEBUG		SKEL_IOR( 1, SkelDrvrDebug)
-//!< Get driver debug mode (SkelDrvrDebug)
-
-#define SkelDrvrIoctlGET_VERSION	SKEL_IOR( 2, SkelDrvrVersion)
-//!< Get version date
-
-#define SkelDrvrIoctlSET_TIMEOUT	SKEL_IOW( 3, uint32_t)
-//!< Set the read timeout value
-#define SkelDrvrIoctlGET_TIMEOUT	SKEL_IOR( 4, uint32_t)
-//!< Get the read timeout value
-
-#define SkelDrvrIoctlSET_QUEUE_FLAG	SKEL_IOW( 5, uint32_t)
-//!< Set queuing capabilities on/off
-#define SkelDrvrIoctlGET_QUEUE_FLAG	SKEL_IOR( 6, uint32_t)
-//!< TRUE=Q_off FALSE=Q_on
-#define SkelDrvrIoctlGET_QUEUE_SIZE	SKEL_IOR( 7, uint32_t)
-//!< Number of events on queue
-#define SkelDrvrIoctlGET_QUEUE_OVERFLOW	SKEL_IOR( 8, uint32_t)
-//!< Number of missed events
-
-#define SkelDrvrIoctlSET_MODULE		SKEL_IOW( 9, uint32_t)
-//!< Select the module to work with
-#define SkelDrvrIoctlGET_MODULE		SKEL_IOR(10, uint32_t)
-//!< Which module am I working with
-#define SkelDrvrIoctlGET_MODULE_COUNT	SKEL_IOR(11, uint32_t)
-//!< The number of installed modules
-#define SkelDrvrIoctlGET_MODULE_MAPS	SKEL_IOWR(12, SkelDrvrMaps)
-//!< Get the VME module base address
-
-#define SkelDrvrIoctlCONNECT		SKEL_IOW(13, SkelDrvrConnection)
-//!< Connect to an object interrupt
-#define SkelDrvrIoctlGET_CLIENT_LIST	SKEL_IOR(14, SkelDrvrClientList)
-//!< Get list of driver client PIDs
-#define SkelDrvrIoctlGET_CLIENT_CONNECTIONS SKEL_IOWR(15, SkelDrvrClientConnections)
-//!< Get list of client connections
-
-#define SkelDrvrIoctlENABLE		SKEL_IOW(16, uint32_t)
-//!< Enable=TRUE Disable=FALSE module */
-#define SkelDrvrIoctlRESET		SKEL_IO (17)
-//!< Reset the module, initialise, re-establish all connections */
-
-#define SkelDrvrIoctlGET_STATUS		SKEL_IOR(18, SkelDrvrStatus)
-//!< Read standard module status
-#define SkelDrvrIoctlGET_CLEAR_STATUS	SKEL_IOR(19, SkelDrvrStatus)
-//!< Read and clear standard module status
-
-#define SkelDrvrIoctlRAW_READ		SKEL_IOWR(20, SkelDrvrRawIoBlock)
-//!< Raw read  access to card for debug
-#define SkelDrvrIoctlRAW_WRITE		SKEL_IOWR(21, SkelDrvrRawIoBlock)
-//!< Raw write access to card for debug
-
-#define SkelDrvrIoctlJTAG_OPEN		SKEL_IO (22)
-//!< Open JTAG interface to the Xilinx FPGA
-#define SkelDrvrIoctlJTAG_READ_BYTE	SKEL_IOR(23, uint32_t)
-//!< Read back uploaded VHDL bit stream byte
-#define SkelDrvrIoctlJTAG_WRITE_BYTE	SKEL_IOW(24, uint32_t)
-//!< Write compiled VHDL bit stream byte
-#define SkelDrvrIoctlJTAG_CLOSE		SKEL_IO (25)
-//!< Close JTAG interface
-
-#define SkelDrvrIoctlRAW_BLOCK_READ     SKEL_IOWR(26, SkelDrvrRawIoTransferBlock)
-//!< Raw read  access to card for debug
-#define SkelDrvrIoctlRAW_BLOCK_WRITE    SKEL_IOWR(27, SkelDrvrRawIoTransferBlock)
-//!< Raw write access to card for debug
-
-#define SkelDrvrIoctlLAST_STANDARD      SKEL_IO (28)
+#define SkelDrvrIoctlSET_DEBUG               SKEL_IOW  ( 0, SkelDrvrDebug)
+#define SkelDrvrIoctlGET_DEBUG               SKEL_IOR  ( 1, SkelDrvrDebug)
+#define SkelDrvrIoctlGET_VERSION             SKEL_IOR  ( 2, SkelDrvrVersion)
+#define SkelDrvrIoctlSET_TIMEOUT             SKEL_IOW  ( 3, uint32_t)
+#define SkelDrvrIoctlGET_TIMEOUT             SKEL_IOR  ( 4, uint32_t)
+#define SkelDrvrIoctlSET_QUEUE_FLAG          SKEL_IOW  ( 5, uint32_t)
+#define SkelDrvrIoctlGET_QUEUE_FLAG          SKEL_IOR  ( 6, uint32_t)
+#define SkelDrvrIoctlGET_QUEUE_SIZE          SKEL_IOR  ( 7, uint32_t)
+#define SkelDrvrIoctlGET_QUEUE_OVERFLOW      SKEL_IOR  ( 8, uint32_t)
+#define SkelDrvrIoctlSET_MODULE              SKEL_IOW  ( 9, uint32_t)
+#define SkelDrvrIoctlGET_MODULE              SKEL_IOR  (10, uint32_t)
+#define SkelDrvrIoctlGET_MODULE_COUNT        SKEL_IOR  (11, uint32_t)
+#define SkelDrvrIoctlGET_MODULE_MAPS         SKEL_IOWR (12, SkelDrvrMaps)
+#define SkelDrvrIoctlCONNECT                 SKEL_IOW  (13, SkelDrvrConnection)
+#define SkelDrvrIoctlGET_CLIENT_LIST         SKEL_IOR  (14, SkelDrvrClientList)
+#define SkelDrvrIoctlGET_CLIENT_CONNECTIONS  SKEL_IOWR (15, SkelDrvrClientConnections)
+#define SkelDrvrIoctlENABLE                  SKEL_IOW  (16, uint32_t)
+#define SkelDrvrIoctlRESET                   SKEL_IOW  (22, uint32_t)
+#define SkelDrvrIoctlGET_STATUS              SKEL_IOR  (18, SkelDrvrStatus)
+#define SkelDrvrIoctlGET_CLEAR_STATUS        SKEL_IOR  (19, SkelDrvrStatus)
+#define SkelDrvrIoctlRAW_READ                SKEL_IOWR (20, SkelDrvrRawIoBlock)
+#define SkelDrvrIoctlRAW_WRITE               SKEL_IOWR (21, SkelDrvrRawIoBlock)
+#define SkelDrvrIoctlRAW_BLOCK_READ          SKEL_IOWR (26, SkelDrvrRawIoTransferBlock)
+#define SkelDrvrIoctlRAW_BLOCK_WRITE         SKEL_IOWR (27, SkelDrvrRawIoTransferBlock)
+#define SkelDrvrIoctlLAST_STANDARD           SKEL_IO (28)
 
 #define SkelDrvrSPECIFIC_IOCTL_OFFSET (_IOC_NR(SkelDrvrIoctlLAST_STANDARD) + 1)
-
-/* compatibility with utils/fpga_loader/ports.c */
-#define JTAG_READ_BYTE	SkelDrvrIoctlJTAG_READ_BYTE
-#define JTAG_WRITE_BYTE	SkelDrvrIoctlJTAG_WRITE_BYTE
-
-
 #endif

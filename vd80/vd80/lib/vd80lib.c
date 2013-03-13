@@ -112,10 +112,11 @@ void vd80CloseHandle(int fd) {
 Vd80Err vd80ResetMod(int fd, int mod) {
 
 Vd80Err err;
+int reset = 1;
 
    err = SetModule(fd,mod);
    if (err != Vd80ErrSUCCESS) return err;
-   if (ioctl(fd,SkelDrvrIoctlRESET,NULL) < 0) return Vd80ErrIO;
+   if (ioctl(fd,SkelDrvrIoctlRESET,&reset) < 0) return Vd80ErrIO;
    return Vd80ErrSUCCESS;
 }
 

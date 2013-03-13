@@ -179,18 +179,6 @@ extern SkelUserReturn SkelUserHardwareEnable(SkelDrvrModuleContext *mcon,
 					     uint32_t flag);
 
 /* =========================================================== */
-/* Standard CO FPGA JTAG IO, Read a byte                       */
-
-extern SkelUserReturn SkelUserJtagReadByte(SkelDrvrModuleContext *mcon,
-					   uint32_t *byte);
-
-/* =========================================================== */
-/* Standard CO FPGA JTAG IO, Write a byte                      */
-
-extern SkelUserReturn SkelUserJtagWriteByte(SkelDrvrModuleContext *mcon,
-					    uint32_t byte);
-
-/* =========================================================== */
 /* Then decide on howmany IOCTL calls you want, and fill their */
 /* debug name strings.                                         */
 

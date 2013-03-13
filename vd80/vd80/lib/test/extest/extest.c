@@ -238,13 +238,6 @@ struct cmd_desc def_cmd[CmdUSR] = {
 		0, CmdSLEEP, "s", "Sleep", "seconds", 0, hndl_sleep,
 		.list = LIST_HEAD_INIT(def_cmd[CmdSLEEP].list)
 	}
-#if 0
-	[CmdJTAG]
-	{
-		0, CmdJTAG, "jtag", "VHDL Reload", "*.xsvf file", 1,
-		hndl_jtag_vhdl, .list = LIST_HEAD_INIT(def_cmd[CmdJTAG].list)
-	}
-#endif
 };
 
 /**
@@ -255,6 +248,7 @@ struct cmd_desc def_cmd[CmdUSR] = {
  *
  * @return number of atoms processed
  */
+
 static int get_atoms(char *input, struct atom *atoms)
 {
 	struct cmd_desc *cmdptr;  /* command description pointer */
@@ -628,7 +622,6 @@ static void enable_builtin_cmds(void)
 	def_cmd[CmdWINTR].valid		= 1;
 	def_cmd[CmdSINTR].valid		= 1;
 	def_cmd[CmdSLEEP].valid		= 1;
-//	def_cmd[CmdJTAG].valid		= 1;
 }
 
 /**

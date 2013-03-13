@@ -93,10 +93,3 @@ int hndl_simintr(struct cmd_desc* cmdd, struct atom *atoms)
 {
 	return 1;
 }
-
-#if 0 /* JTAG -- to be implemented */
-int hndl_jtag_vhdl(struct cmd_desc* cmdd, struct atom *atoms)
-{
-	return 1;
-}
-#endif /* JTAG */

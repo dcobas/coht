@@ -132,7 +132,6 @@ enum def_cmd_id {
 	CmdTIMEOUT,	//!< Get/Set timeout		<=> ioctl
 	CmdVER,		//!< Get versions		<=> ioctl
 	CmdWINTR,	//!< Wait for interrupt		<=> ioctl
-	CmdJTAG,	//!< JTAG VHDL files into FPGA	<=> 4 ioctls
 	CmdUSR		//!< first available command for the user
 };
 

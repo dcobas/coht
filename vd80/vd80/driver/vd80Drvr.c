@@ -300,26 +300,11 @@ SkelUserReturn SkelUserHardwareEnable(SkelDrvrModuleContext *mcon,
 }
 
 /* =========================================================== */
-/* Standard CO FPGA JTAG IO, Read a byte                       */
-
-SkelUserReturn SkelUserJtagReadByte(SkelDrvrModuleContext *mcon,
-				    uint32_t              *byte) {
-   return SkelUserReturnNOT_IMPLEMENTED;
-}
-
-/* =========================================================== */
-/* Standard CO FPGA JTAG IO, Write a byte                      */
-
-SkelUserReturn SkelUserJtagWriteByte(SkelDrvrModuleContext *mcon,
-				     uint32_t               byte) {
-   return SkelUserReturnNOT_IMPLEMENTED;
-}
-
-/* =========================================================== */
 /* Then decide on howmany IOCTL calls you want, and fill their */
 /* debug name strings.                                         */
 
 /* sleep until IDLE is settled or things time out */
+
 void wait_for_idle(SkelDrvrModuleContext *mcon, uint32_t maxdelay)
 {
 	uint32_t state;

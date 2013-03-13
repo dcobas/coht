@@ -72,8 +72,7 @@ static const char *SkelStandardIoctlNames[] = {
 
 	[_IOC_NR(SkelDrvrIoctlCONNECT)] = "CONNECT",
 	[_IOC_NR(SkelDrvrIoctlGET_CLIENT_LIST)] = "GET_CLIENT_LIST",
-	[_IOC_NR(SkelDrvrIoctlGET_CLIENT_CONNECTIONS)] =
-	    "GET_CLIENT_CONNECTIONS",
+	[_IOC_NR(SkelDrvrIoctlGET_CLIENT_CONNECTIONS)] = "GET_CLIENT_CONNECTIONS",
 
 	[_IOC_NR(SkelDrvrIoctlENABLE)] = "ENABLE",
 	[_IOC_NR(SkelDrvrIoctlRESET)] = "RESET",
@@ -84,10 +83,6 @@ static const char *SkelStandardIoctlNames[] = {
 	[_IOC_NR(SkelDrvrIoctlRAW_READ)] = "RAW_READ",
 	[_IOC_NR(SkelDrvrIoctlRAW_WRITE)] = "RAW_WRITE",
 
-	[_IOC_NR(SkelDrvrIoctlJTAG_OPEN)] = "JTAG_OPEN",
-	[_IOC_NR(SkelDrvrIoctlJTAG_READ_BYTE)] = "JTAG_READ_BYTE",
-	[_IOC_NR(SkelDrvrIoctlJTAG_WRITE_BYTE)] = "JTAG_WRITE_BYTE",
-	[_IOC_NR(SkelDrvrIoctlJTAG_CLOSE)] = "JTAG_CLOSE",
 	[_IOC_NR(SkelDrvrIoctlRAW_BLOCK_READ)] = "RAW_BLOCK_READ",
 	[_IOC_NR(SkelDrvrIoctlRAW_BLOCK_WRITE)] = "RAW_BLOCK_WRITE",
 };
@@ -1855,7 +1850,9 @@ int SkelDrvrIoctl(struct file *flp,     /* File pointer */
 
 	long lav, *lap; /* Long Value pointed to by Arg */
 	lap = arg;      /* Long argument pointer */
-	lav = *lap;     /* Long argument value */
+	lav = 0;
+	if (lap)
+		lav = *lap;     /* Long argument value */
 
 	ccon = flp->private_data;
 	if (ccon == NULL) {
@@ -1865,6 +1862,11 @@ int SkelDrvrIoctl(struct file *flp,     /* File pointer */
 	}
 
 	mcon = get_mcon(ccon->ModuleNumber);
+	if (mcon == NULL) {
+		printk("Skel:ModuleContext:%d:Null\n",ccon->ModuleNumber);
+		pseterr(EBADF);
+		return SYSERR;
+	}
 
 	DebugIoctl(ccon, cm, lav);
 
@@ -1994,41 +1996,6 @@ int SkelDrvrIoctl(struct file *flp,     /* File pointer */
 		if (GetStatus(mcon, ssts))
 			break;
 		return OK;
-
-	case SkelDrvrIoctlJTAG_OPEN:
-		if (mutex_lock_interruptible(&mcon->mutex)) {
-			pseterr(EINTR);
-			return SYSERR;
-		}
-		mcon->StandardStatus |= SkelDrvrStandardStatusFLASH_OPEN;
-		return OK;
-		break;
-
-	case SkelDrvrIoctlJTAG_CLOSE:
-		mcon->StandardStatus &= ~SkelDrvrStandardStatusFLASH_OPEN;
-		Reset(mcon);
-		mutex_unlock(&mcon->mutex);
-		return OK;
-
-	case SkelDrvrIoctlJTAG_READ_BYTE:
-		if (mcon->
-		    StandardStatus & SkelDrvrStandardStatusFLASH_OPEN) {
-			if (SkelUserJtagReadByte(mcon, (unsigned int *) lap) ==
-			    SkelUserReturnOK)
-				return OK;
-		}
-		pseterr(EBUSY);				   /* Device busy, not opened */
-		return SYSERR;
-
-	case SkelDrvrIoctlJTAG_WRITE_BYTE:		   /* Up date configuration bit stream accross JTAG */
-		if (mcon->
-		    StandardStatus & SkelDrvrStandardStatusFLASH_OPEN) {
-			if (SkelUserJtagWriteByte(mcon, (lav & 0xFF)) ==
-			    SkelUserReturnOK)
-				return OK;
-		}
-		pseterr(EBUSY);				   /* Device busy, not opened */
-		return SYSERR;
 
 	case SkelDrvrIoctlRAW_READ:
 		riob = (SkelDrvrRawIoBlock *) arg;
