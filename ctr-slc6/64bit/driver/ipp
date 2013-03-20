@@ -7,7 +7,7 @@ echo "======================================================="
 
 echo 8 > /proc/sys/kernel/printk
 
-/sbin/insmod /usr/local/drivers/ctrp/ctrp.ko debug=0 recover=0 modules=1
+/sbin/insmod /usr/local/drivers/ctr/ctrp.ko debug=0 recover=0 modules=1
 
 MAJOR=`cat /proc/devices | awk '{if ($2 == "ctrp") printf $1}'`
 if [ -z "$MAJOR" ]; then
