@@ -33,6 +33,6 @@ install: libctrtest.$(CPU)
 	rm -f /acc/dsc/lab/$(CPU)/bin/libctrtest
 	rm -f /acc/dsc/oper/$(CPU)/bin/libctrtest
 	rm -f /acc/dsc/oplhc/$(CPU)/bin/libctrtest
-	ln -s /acc/dsc/lab/$(CPU)/ctr/libctrtest /acc/dsc/lab/$(CPU)/bin/libctrtest
-	ln -s /acc/dsc/oper/$(CPU)/ctr/libctrtest /acc/dsc/oper/$(CPU)/bin/libctrtest
-	ln -s /acc/dsc/oplhc/$(CPU)/ctr/libctrtest /acc/dsc/oplhc/$(CPU)/bin/libctrtest
+	cd /acc/dsc/lab/$(CPU)/ctr; ln -s libctrtest ../bin/libctrtest
+	cd /acc/dsc/oper/$(CPU)/ctr; ln -s libctrtest ../bin/libctrtest
+	cd /acc/dsc/oplhc/$(CPU)/ctr; ln -s libctrtest ../bin/libctrtest

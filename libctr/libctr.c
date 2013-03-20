@@ -173,9 +173,9 @@ void *ctr_open(char *version)
 	}
 
 	if ((version == NULL) || (strlen(version) < strlen("1.0")))
-		sprintf(path,"/usr/local/drivers/%s/lib%s.so",cp,cp);
+		sprintf(path,"/usr/local/ctr/lib%s.so",cp);
 	else
-		sprintf(path,"/usr/local/drivers/%s/lib%s.so.%s",cp,cp,version);
+		sprintf(path,"/usr/local/ctr/lib%s.so.%s",cp,version);
 
 	h->dll_handle = dlopen(path, RTLD_LOCAL | RTLD_LAZY);
 	if (!h->dll_handle) {
