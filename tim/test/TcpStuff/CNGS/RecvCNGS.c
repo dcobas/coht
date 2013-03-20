@@ -161,7 +161,7 @@ char *yr, *ti, *md, *mn, *dy;
       yr = &(tmp[20]);
       sprintf (tbuf, "%s-%s/%s/%s %s"  , dy, md, mn, yr, ti);
       if (t->Nano) {
-      	  sprintf(&tbuf[strlen(tbuf)],".%09lu",t->Nano);
+	  sprintf(&tbuf[strlen(tbuf)],".%09d",t->Nano);
       }
 
    } else sprintf (tbuf, "--- Zero ---");
@@ -369,8 +369,8 @@ FILE *fp;
 
 	    /* Call some user code routine for CNGS and other cycles */
 
-	    if (strstr(pkt.CycleName,"CNGS")) CngsCycleUserRoutine(&pkt);
-	    else                             OtherCycleUserRoutine(&pkt);
+	    if (strstr((char *) pkt.CycleName,"CNGS")) CngsCycleUserRoutine(&pkt);
+	    else                                       OtherCycleUserRoutine(&pkt);
 
 	    errors = 0; /* Contiguous errors */
 

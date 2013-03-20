@@ -194,7 +194,6 @@ unsigned long sc, rm;
 
 int WaitForConnection(CngsPacket *pkt) {
 
-char          *cp;
 TimLibError   err;
 TimLibClass   iclss;
 TimLibTime    trigger;
@@ -250,7 +249,7 @@ CngsTime      *tod;
 	 pkt->SequenceNumber = seqnum++;
 
 	 if ((payload > 0) && (payload <= ltab.Size))
-	    strcpy(pkt->CycleName,ltab.Table[payload -1].Name);
+	    strcpy((char *) pkt->CycleName,ltab.Table[payload -1].Name);
 	 else pkt->CycleName[0] = 0;
 	 if (debug) printf("User:%s\n",pkt->CycleName);
 

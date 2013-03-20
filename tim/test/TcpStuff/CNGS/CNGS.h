@@ -13,6 +13,8 @@
 #ifndef CNGS
 #define CNGS
 
+#include <stdint.h>
+
 /* ============================================= */
 /* Configuration defaults for network and timing */
 
@@ -51,21 +53,21 @@
 #define CngsMAX_ERRORS 20
 
 typedef struct {
-   unsigned long Second;    /* UTC Second */
-   unsigned long Nano;      /* Nano second in the second */
-   unsigned long CTrain;    /* Machine millisecond in cycle */
-   unsigned long Machine;   /* Machine (4 = SPS) */
+   time_t   Second;    /* UTC Second */
+   uint32_t Nano;      /* Nano second in the second */
+   uint32_t CTrain;    /* Machine millisecond in cycle */
+   uint32_t Machine;   /* Machine (4 = SPS) */
  } CngsTime;
 
 typedef struct {
-   unsigned long MagicNumber;       /* Must be set correctly */
+   uint32_t MagicNumber;       /* Must be set correctly */
    CngsTime BasicPeriod;            /* Basic 1.2 second period */
    CngsTime StartCycle;             /* Start time of SPS cycle */
    CngsTime EndCycle;               /* End time of SPS cycle */
    CngsTime Extraction;             /* Next warning extraction */
    CngsTime SendTime;               /* Local time packet was sent */
-   unsigned long SequenceNumber;    /* Packet sequence number  */
-   char     CycleName[32];          /* Name of cycle */
+   uint32_t SequenceNumber;    /* Packet sequence number  */
+   uint8_t  CycleName[32];          /* Name of cycle */
  } CngsPacket;
 
 #endif
