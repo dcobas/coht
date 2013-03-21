@@ -2,9 +2,11 @@
 # Makefile to produce TimLib test program
 #================================================================
 
-include /ps/dsc/src/co/Make.auto
+CPU=L866
 
-CFLAGS = -g -Wall -fwritable-strings -I. -I/ps/local/$(CPU)/include
+include /acc/dsc/src/co/Make.auto
+
+CFLAGS = -g -Wall -I. -I/ps/local/$(CPU)/include
 
 LDLIBS =
 
@@ -27,7 +29,7 @@ PullTcp.$(CPU).o: PullTcp.c
 
 install: PushTcp.$(CPU) PullTcp.$(CPU)
 	@for a in $(ACCS); do \
-		d=/ps/dsc/$$a/$(CPU)/tim;\
+		d=/acc/dsc/$$a/$(CPU)/tim;\
 		echo Installing PushTcp in  $$d;\
 		dsc_install PushTcp.$(CPU)  $$d;\
 		echo Installing PullTcp in  $$d;\

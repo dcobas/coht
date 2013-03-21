@@ -141,9 +141,10 @@ struct sockaddr_in client;
 struct sigaction action, old;
 pid_t child;
 
-int   len, on, i, clsock;
+int   on, i, clsock;
+unsigned int len;
 char  *cp, *ep, buf[128];
-pid_t pid;
+pid_t pid = 0;
 
    if (argc <= 1) {
       printf("PushTcp: Parameters are ...\n\n"
@@ -187,11 +188,7 @@ pid_t pid;
 
    fprintf(stderr,"PushTcp: Sartup: Port:%d ", port);
 
-#ifdef __linux__
    setpgid (pid,getpgid(0));
-#else
-   setpgid (pid,getpgrp());
-#endif
 
    bzero((void *) &action, sizeof (action));
    action.sa_handler = (void (*)(int)) sigchildhand;
