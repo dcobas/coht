@@ -172,21 +172,25 @@ void *ctr_open(char *version)
 		return (void *) -1;
 	}
 
-	if ((version == NULL) || (strlen(version) < strlen("1.0")))
-		sprintf(path,"/usr/local/ctr/lib%s.so",cp);
-	else
-		sprintf(path,"/usr/local/ctr/lib%s.so.%s",cp,version);
-
+	sprintf(path,"lib%s.so.%1.1f",cp,SOVER);
 	h->dll_handle = dlopen(path, RTLD_LOCAL | RTLD_LAZY);
 	if (!h->dll_handle) {
-		errsv = errno;
-		fprintf(stderr,"ctr_open:%s\n",dlerror());
-		close(fd);
-		free(h);
-		errno = errsv;
-		return (void *) -1;
-	}
 
+		if ((version == NULL) || (strlen(version) < strlen("1.0")))
+			sprintf(path,"/usr/local/ctr/lib%s.so",cp);
+		else
+			sprintf(path,"/usr/local/ctr/lib%s.so.%s",cp,version);
+
+		h->dll_handle = dlopen(path, RTLD_LOCAL | RTLD_LAZY);
+		if (!h->dll_handle) {
+			errsv = errno;
+			fprintf(stderr,"ctr_open:%s\n",dlerror());
+			close(fd);
+			free(h);
+			errno = errsv;
+			return (void *) -1;
+		}
+	}
 	ptr = (unsigned long *) &h->api;
 	for (i=0; i<CTR_INDEX_LAST; i++) {
 		ptr[i] = (unsigned long) dlsym(h->dll_handle, ctr_api_names[i]);
