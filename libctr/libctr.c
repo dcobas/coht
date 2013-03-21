@@ -27,6 +27,8 @@
 #include <libctr.h>
 #include <libctrP.h>
 
+#define SO_PATH_DEFAULT "/usr/local/ctr"
+
 /**
  * @brief Convert the CTR driver time to standard unix time
  * @param ctime points to the CtrDrvrTime value  to be converted
@@ -118,7 +120,7 @@ char *ctr_get_ldver()
  * Allocated a libctr handle structure
  * Open the ctr driver at /dev/ctr.[0..15]
  * Call the GET_VERSION ioctl to find out if a ctrv or ctrp is installed
- * Load the corresponding shared object at /usr/local/drivers/ctr[v|p]/ctr[v|p].so.<version>
+ * Load the corresponding shared object at /usr/local/ctr[v|p]/ctr[v|p].so.<version>
  *    N.B. If version is either Null or an empty string its not used
  *         If the library is already open only a dlopen handle is returned
  * Bind symbols in the loaded library to the libctr handels API function pointers
@@ -177,9 +179,9 @@ void *ctr_open(char *version)
 	if (!h->dll_handle) {
 
 		if ((version == NULL) || (strlen(version) < strlen("1.0")))
-			sprintf(path,"/usr/local/ctr/lib%s.so",cp);
+			sprintf(path,"%s/lib%s.so.%1.1f",SO_PATH_DEFAULT,cp,SOVER);
 		else
-			sprintf(path,"/usr/local/ctr/lib%s.so.%s",cp,version);
+			sprintf(path,"%s/lib%s.so.%s",SO_PATH_DEFAULT,cp,version);
 
 		h->dll_handle = dlopen(path, RTLD_LOCAL | RTLD_LAZY);
 		if (!h->dll_handle) {
