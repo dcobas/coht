@@ -2,9 +2,11 @@
 # Makefile to produce TimLib test program
 #================================================================
 
-include /ps/dsc/src/co/Make.auto
+CPU=L866
 
-CFLAGS = -g -Wall -I. -I.. -I/dsrc/co/lib/tim -I/ps/local/$(CPU)/include -I/dsrc/drivers/ctr/src/driver
+include /acc/dsc/src/co/Make.auto
+
+CFLAGS = -g -Wall -I. -I.. -I../.. -I../../../../driver/ -I/acc/local/$(CPU)/include
 
 LDLIBS = ../../libtim.$(CPU).a -ltgm -lerr -lerr_dummy -ltgv -lm -lX11 -ldtm -lerr -lnc
 

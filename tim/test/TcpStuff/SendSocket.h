@@ -11,6 +11,8 @@
 #ifndef SEND_SOCKET
 #define SEND_SOCKET
 
+#include <stdint.h>
+
 /* =========================================== */
 /* Now the usual program definitions and types */
 
@@ -35,19 +37,19 @@ typedef enum {
  } Options;
 
 typedef struct {
-   unsigned long Eqp;
+   uint32_t Eqp;
    char Name[32];
  } PtmNames;
 
 
 typedef struct {
-   unsigned long Equipment;      /* Event doing the interrupt */
-   TimLibClass   Class;          /* Class of equipment */
-   unsigned long SequenceNumber; /* Packet sequence number  */
-   TimLibTime    Acquisition;    /* Acquisition time */
-   TimLibTime    StartCycle;     /* Start time of SPS cycle */
-   unsigned long Payload;        /* Cycle USER Id */
-   char          CycleName[32];  /* Name of cycle */
+   uint32_t    Equipment;      /* Event doing the interrupt */
+   TimLibClass Class;          /* Class of equipment */
+   uint32_t    SequenceNumber; /* Packet sequence number  */
+   TimLibTime  Acquisition;    /* Acquisition time */
+   TimLibTime  StartCycle;     /* Start time of SPS cycle */
+   uint32_t    Payload;        /* Cycle USER Id */
+   char        CycleName[32];  /* Name of cycle */
  } AcqPacket;
 
 #endif
