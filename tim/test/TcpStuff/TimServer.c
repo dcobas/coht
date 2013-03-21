@@ -523,9 +523,10 @@ pid_t child;
 TgvName   tname;
 AcqPacket pkt;
 
-int   len, on, i, clsock;
+int   on, i, clsock;
+unsigned int len;
 char  *cp, *ep;
-pid_t pid;
+pid_t pid = 0;
 
    if (argc <= 1) {
       printf("TimServer: Parameters are ...\n\n"
@@ -620,7 +621,7 @@ pid_t pid;
       exit(1);
    }
 
-   setpgid (pid,getpgid(0));
+   setpgid(pid,getpgid(0));
 
    ErrSetHandler((ErrHandler) error_handler);
 
