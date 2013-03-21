@@ -138,7 +138,7 @@ struct LynxFile lynx_file;
       printk(KERN_INFO "Debug: LynxOsOpen: Major: %d Minor: %ld\n",MAJOR(inode->i_rdev),num);
 
    if (LynxOsWorkingArea == NULL) {
-      printk(KERN_INFO "LynxOsOpen: No installed hardware\n");
+      printk(KERN_INFO "CTRP/V Driver: open: No installed hardware\n");
       return -ENODEV;
    }
 
