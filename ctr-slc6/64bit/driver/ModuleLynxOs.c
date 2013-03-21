@@ -137,6 +137,11 @@ struct LynxFile lynx_file;
    if (debug & LynxOsDEBUG_MODULE)
       printk(KERN_INFO "Debug: LynxOsOpen: Major: %d Minor: %ld\n",MAJOR(inode->i_rdev),num);
 
+   if (LynxOsWorkingArea == NULL) {
+      printk(KERN_INFO "LynxOsOpen: No installed hardware\n");
+      return -ENODEV;
+   }
+
    if (entry_points.dldd_open(LynxOsWorkingArea,num,&lynx_file) == OK) {
       filp->private_data = (void *) num;
       return 0;
