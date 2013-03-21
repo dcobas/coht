@@ -132,7 +132,7 @@ typedef enum {
 /* parameter in the TimLibTime structure.                               */
 
 typedef struct {
-   unsigned long Second;    /* UTC Second */
+   time_t Second;           /* UTC Second */
    unsigned long Nano;      /* Nano second in the second */
    unsigned long CTrain;    /* Machine millisecond in cycle */
    TgmMachine    Machine;   /* Machine */
