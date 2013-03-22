@@ -10,16 +10,30 @@
 # N.B These constants are supplied to the libctr code via the -D option at compile time
 #
 # Let SOVER=1.2 and SUBVER=99, then when installing the shared objects this is what happens
-# 1) libctr.$(CPU).so is copied to the target directory as libctr.so.1.2.99
+# 1) libctr.$(CPU).so is copied to the SO_TARGET directory as libctr.so.1.2.99
 # 2) A symbolic link is made in target libctr.so.1.2 -> libctr.so.1.2.99
 # 3) A second symbolic link is made in target libctr.so -> libctr.so.1.2
 # The stub library libctr.a always uses the link libctr.so.1.2 in this case
 #
-# Let LDVER=1.2, in this case a directory libctr.1.2 is created and libctr.a and includes
-# are stored there
+# Let LDVER=1.2, in this case a directory AH_TARGET/libctr.1.2 is created and libctr.a and
+# include files are stored in it
 #
 # SO_TARGET is where libctr(p/v).so gets stored
 # AH_TARGET is where libctr.a and its includes gets stored
+# Note that both AH_TARGET and SO_TARGET depend on CPU which has default value L866
+# Note that AH_TARGET depends on ACC which has the default value lab
+#
+# install_lib installs libctr.a and its asociated includes in AH_TARGET/libctr.LDVER
+#
+# install_lab   installs libctrp.so and libctrv.so in SO_TARGET as described above
+# install_oper  installs libctrp.so and libctrv.so in SO_TARGET as described above
+# install_oplhc installs libctrp.so and libctrv.so in SO_TARGET as described above
+#
+# install_all installs all of the above
+#
+# install_so installs libctrp.so and libctrv.so in SO_TARGET according to ACC
+#
+# Julian Lewis BE/CO/HT Fri March 22 2013
 #
 #================================================================
 
