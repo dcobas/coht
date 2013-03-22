@@ -6,14 +6,6 @@ CPU=L866
 SOVER=1.1
 LDVER=1.1
 
-ifeq ($(CPU),L865)
-KVER=2.6.24.7-rt27
-endif
-
-ifeq ($(CPU),L866)
-KVER=3.0.40-rt60
-endif
-
 include /acc/dsc/src/co/Make.auto
 
 DRVR = ../../driver
