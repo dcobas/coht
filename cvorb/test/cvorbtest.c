@@ -923,7 +923,7 @@ int h_fcn_disable(struct cmd_desc *cmdd, struct atom *atoms)
 
 int h_fcn_enable_mask(struct cmd_desc *cmdd, struct atom *atoms)
 {
-	unsigned long long enbl_mask;
+	uint64_t enbl_mask;
 
 	if (atoms == (struct atom *)VERBOSE_HELP) {
 		printf("%s - Get current channel's function enable mask\n",
