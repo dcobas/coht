@@ -43,7 +43,7 @@ static unsigned long long getCount(void)
 	struct timeval lCurrent;
 
 	if (mHardware) {
-#if defined (__GNUC__) && defined (__i386__)
+#if defined (__GNUC__) && ( defined (__i386__) || defined(__x86_64__) )
 		__asm__ volatile ("rdtsc":"=A" (lCount));
 #else
 #if defined (__GNUC__) && defined (__PPC__)
@@ -95,7 +95,7 @@ void ts_calibrateCountPeriod(unsigned int inDelay /*ms */ ,
 	long nsec;
 
 	if (mHardware) {
-#if defined (__GNUC__) && (defined (__i386__) || defined (__PPC__))
+#if defined (__GNUC__) && ( defined (__i386__) || defined(__x86_64__) || defined (__PPC__) )
 		// calibrate by matching the time-stamps with the micro-seconds of gettimeofday
 		for (i = 0; i < inTimes; ++i) {
 			gettimeofday(&lStartTime, 0);
