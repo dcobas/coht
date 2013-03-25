@@ -40,6 +40,10 @@ int cvorb_sm_set_input_polarity(cvorb_t *device, unsigned int submodule, enum cv
 int cvorb_sm_get_input_polarity(cvorb_t *device, unsigned int submodule, enum cvorb_input_polarity *polarity);
 int cvorb_sm_get_status(cvorb_t *device, unsigned int submodule, unsigned int *status);
 int cvorb_sm_set_trigger(cvorb_t *device, unsigned int submodule, enum cvorb_trigger trigger);
+int cvorb_sm_enable_optical_output(cvorb_t *device, unsigned int submodule);
+int cvorb_sm_disable_optical_output(cvorb_t *device, unsigned int submodule);
+int cvorb_sm_set_optical_output(cvorb_t *device, unsigned int submodule, unsigned int chnr);
+int cvorb_sm_get_optical_output(cvorb_t *device, unsigned int submodule, unsigned int *chnr);
 /* Channel */
 int cvorb_ch_get_status(cvorb_t *device, unsigned int channelnr, unsigned int *status);
 int cvorb_ch_enable(cvorb_t *dev, unsigned int channelnr);

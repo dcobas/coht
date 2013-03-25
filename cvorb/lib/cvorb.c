@@ -206,6 +206,133 @@ int cvorb_get_temperature(cvorb_t * device, int *temp)
 }
 
 /**
+ * @brief Enable optical output for the given submodule of the board
+ * @param device        - CVORB device handle
+ * @param submodule     - desired submodule (0 or 1)
+ *
+ * @return 0 on success, -1 on failure
+ */
+int cvorb_sm_enable_optical_output(cvorb_t *device, unsigned int submodule)
+{
+	int ret, len;
+	char attr_path[CVORB_PATH_SIZE];
+
+	LIBCVORB_DEBUG(4, "handle %p\n", device);
+	if (submodule != 0 && submodule != 1) {
+		__cvorb_lib_error(__func__, -EINVAL);
+		return -1;
+	}
+	len =
+	    snprintf(attr_path, CVORB_PATH_SIZE, "%s/submodule.%d/%s",
+		     device->sysfs_path, submodule, "enable_optical_output");
+	attr_path[len] = '\0';
+	ret = cvorbdev_set_attr_uint32(attr_path, 1);
+	if (ret < 0) {
+		__cvorb_libc_error(__func__);
+		return -1;
+	}
+	return 0;
+}
+
+/**
+ * @brief Disable optical output for the given submodule of the board
+ * @param device        - CVORB device handle
+ * @param submodule     - desired submodule (0 or 1)
+ *
+ * @return 0 on success, -1 on failure
+ */
+int cvorb_sm_disable_optical_output(cvorb_t *device, unsigned int submodule)
+{
+	int ret, len;
+	char attr_path[CVORB_PATH_SIZE];
+
+	LIBCVORB_DEBUG(4, "handle %p\n", device);
+	if (submodule != 0 && submodule != 1) {
+		__cvorb_lib_error(__func__, -EINVAL);
+		return -1;
+	}
+	len =
+	    snprintf(attr_path, CVORB_PATH_SIZE, "%s/submodule.%d/%s",
+		     device->sysfs_path, submodule, "enable_optical_output");
+	attr_path[len] = '\0';
+	ret = cvorbdev_set_attr_uint32(attr_path, 0);
+	if (ret < 0) {
+		__cvorb_libc_error(__func__);
+		return -1;
+	}
+	return 0;
+}
+
+/**
+ * @brief connect optical output for the given submodule of the board to the desired channel
+ * @param device        - CVORB device handle
+ * @param submodule     - desired submodule (0 or 1)
+ * @param chnr:		- desired channel number in the range [1..8]
+ *
+ * @return 0 on success, -1 on failure
+ */
+int cvorb_sm_set_optical_output(cvorb_t *device, unsigned int submodule, unsigned int chnr)
+{
+	int ret, len, hw_chnr;
+	char attr_path[CVORB_PATH_SIZE];
+
+	LIBCVORB_DEBUG(4, "handle %p\n", device);
+	if (submodule != 0 && submodule != 1) {
+		__cvorb_lib_error(__func__, -EINVAL);
+		return -1;
+	}
+	/* check input parameters: chnr should be defined in the context of submodule */
+	if (!WITHIN_RANGE(1, chnr, 8)) {
+		__cvorb_lib_error(__func__, -EINVAL);
+		return -1;
+	}
+	/* channel number in the hardware is in the range [0,7] */
+	hw_chnr = chnr - 1;
+	len =
+	    snprintf(attr_path, CVORB_PATH_SIZE, "%s/submodule.%d/%s",
+		     device->sysfs_path, submodule, "optical_source");
+	attr_path[len] = '\0';
+	ret = cvorbdev_set_attr_uint32(attr_path, hw_chnr);
+	if (ret < 0) {
+		__cvorb_libc_error(__func__);
+		return -1;
+	}
+	return 0;
+}
+
+/**
+ * @brief get ths channel connected to the optical output of the given submodule of the board
+ * @param device        - CVORB device handle
+ * @param submodule     - desired submodule (0 or 1)
+ * @param[out] chnr 	- output parameter used to return the channel connected
+ *
+ * @return 0 on success, -1 on failure
+ */
+int cvorb_sm_get_optical_output(cvorb_t *device, unsigned int submodule, unsigned int *chnr)
+{
+	unsigned int val;
+	int ret, len;
+	char attr_path[CVORB_PATH_SIZE];
+
+	LIBCVORB_DEBUG(4, "handle %p\n", device);
+	if (submodule != 0 && submodule != 1) {
+		__cvorb_lib_error(__func__, -EINVAL);
+		return -1;
+	}
+	len =
+	    snprintf(attr_path, CVORB_PATH_SIZE, "%s/submodule.%d/%s",
+		     device->sysfs_path, submodule, "optical_source");
+	attr_path[len] = '\0';
+	ret = cvorbdev_get_attr_uint32(attr_path, &val);
+	if (ret < 0) {
+		__cvorb_libc_error(__func__);
+		return -1;
+	}
+	*chnr = val;
+	return 0;
+}
+
+/**
  * @brief Set the input pulse polarity for the given submodule of the board
  * @param device        - CVORB device handle
  * @param submodule     - desired submodule (0 or 1)
