@@ -42,8 +42,8 @@ __cvorb_dma(struct device *dev, unsigned int vme_addr,
 	desc.ctrl.vme_block_size = VME_DMA_BSIZE_2048;
 	desc.ctrl.vme_backoff_time = VME_DMA_BACKOFF_0;
 
-	pci->addru = 0;
-	pci->addrl = (unsigned int) addr;
+	pci->addru = upper_32_bits((unsigned long) addr);
+	pci->addrl = lower_32_bits((unsigned long) addr);
 
 	vme->addru = 0;
 	vme->addrl = vme_addr;
@@ -74,7 +74,7 @@ int cvorb_dma_read_mblt(struct device *dev, unsigned int vme_addr,
 			void __kernel * addr, ssize_t size)
 {
 	return __cvorb_dma(dev, vme_addr, VME_A16_USER,
-			   (void __force *) addr, size, 0);
+			   (void __force *) addr, size, VME_SOURCE);
 }
 
 EXPORT_SYMBOL_GPL(cvorb_dma_read_mblt);
@@ -92,7 +92,7 @@ int cvorb_dma_write_mblt(struct device *dev, unsigned int vme_addr,
 			 void __kernel * addr, ssize_t size)
 {
 	return __cvorb_dma(dev, vme_addr, VME_A16_USER,
-			   (void __force *) addr, size, 2);
+			   (void __force *) addr, size, PCI_SOURCE);
 }
 
 EXPORT_SYMBOL_GPL(cvorb_dma_write_mblt);
