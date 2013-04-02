@@ -19,7 +19,6 @@
 #define LynxOsDESCRIPTION "CTRV 8 channel timing VME module driver"
 #endif
 
-#define LynxOsSUPPORTED_DEVICE "CTR-PMC, CTR-PCI or CTR-VME timing modules"
 #define LynxOsAUTHOR "Julian Lewis BE/CO/HT CERN"
 #define LynxOsLICENSE "GPL"
 

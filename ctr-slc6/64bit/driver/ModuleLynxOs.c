@@ -43,7 +43,6 @@ static int recover     = 0;
 int modules            = 1;
 int first_module       = 1;
 static unsigned long infoaddr = 0;
-static char dname[64]  = { 0 };
 
 static int   LynxOs_major      = LynxOsMAJOR;
 static char *LynxOs_major_name = LynxOsMAJOR_NAME;
@@ -62,17 +61,7 @@ module_param(modules,      int,   0644);
 module_param(first_module, int,   0644);
 module_param(infoaddr,     ulong, 0644);
 
-static char version_signature[] = GIT_VERSION;
-MODULE_VERSION(GIT_VERSION);
-
-module_param(LynxOs_major,int,0644);
-MODULE_PARM_DESC(LynxOs_major,"Major device number");
-
-module_param(LynxOs_major_name,charp,0);
-MODULE_PARM_DESC(LynxOs_major_name,"Name of major device");
-
-module_param_string(dname, dname, sizeof(dname), 0);
-MODULE_PARM_DESC(dname, "Driver name");
+MODULE_VERSION(GIT_REPO ":" GIT_VERSION);
 
 static int         LynxOsOpen(struct inode *inode, struct file *filp);
 static int         LynxOsClose(struct inode *inode, struct file *filp);
@@ -94,6 +83,7 @@ int res;
    mutex_unlock(&ctr_drvr_mutex);
    return res;
 }
+
 #ifndef HAVE_UNLOCKED_IOCTL
 static int LynxIoctl32(struct inode *inode, struct file *filp, unsigned int cmd, unsigned long arg) {
 int res;
