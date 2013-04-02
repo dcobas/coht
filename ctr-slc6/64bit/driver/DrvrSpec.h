@@ -11,12 +11,15 @@
 /* Linux Module exported symbols */
 #ifdef CTR_PCI
 #define LynxOsMAJOR_NAME "ctrp"
+#define LynxOsSUPPORTED_DEVICE "CTR-PMC, CTR-PCI timing modules"
+#define LynxOsDESCRIPTION "CTRP/I 3/4 channel timing PCI module driver"
 #else
 #define LynxOsMAJOR_NAME "ctrv"
+#define LynxOsSUPPORTED_DEVICE "CTR-VME timing modules"
+#define LynxOsDESCRIPTION "CTRV 8 channel timing VME module driver"
 #endif
 
 #define LynxOsSUPPORTED_DEVICE "CTR-PMC, CTR-PCI or CTR-VME timing modules"
-#define LynxOsDESCRIPTION "Emulate LynxOs 4.0 over DRM Under Linux 2.6 or later"
 #define LynxOsAUTHOR "Julian Lewis BE/CO/HT CERN"
 #define LynxOsLICENSE "GPL"
 

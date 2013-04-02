@@ -1,8 +1,10 @@
+GIT_VERSION = $(shell cd $(src); git describe --dirty --long)
+
 EXTRA_CFLAGS = -I$(src) -I$(src)/../../include -DHARD_FLOAT -mhard-float -Wno-strict-prototypes -DCOMPILE_TIME=$(shell date +%s)
 
 obj-m := ctrv.o ctrp.o
 ctrv-y := ctrvdrvr.o
 ctrp-y := ctrpdrvr.o
 
-CFLAGS_ctrvdrvr.o := -DCTR_VME
-CFLAGS_ctrpdrvr.o := -DCTR_PCI
+CFLAGS_ctrvdrvr.o := -DCTR_VME -DGIT_VERSION=\"$(GIT_VERSION)\"
+CFLAGS_ctrpdrvr.o := -DCTR_PCI -DGIT_VERSION=\"$(GIT_VERSION)\"

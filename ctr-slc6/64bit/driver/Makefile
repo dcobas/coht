@@ -6,6 +6,7 @@ endif
 
 ifeq ($(CPU),L866)
 KVER=3.2.33-rt50.66.el6rt.x86_64
+KVER=3.6.11-rt30.25.el6rt.x86_64
 endif
 
 KERNELSRC=/acc/sys/$(CPU)/usr/src/kernels/$(KVER)

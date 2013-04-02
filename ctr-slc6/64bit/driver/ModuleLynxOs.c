@@ -62,6 +62,9 @@ module_param(modules,      int,   0644);
 module_param(first_module, int,   0644);
 module_param(infoaddr,     ulong, 0644);
 
+static char version_signature[] = GIT_VERSION;
+MODULE_VERSION(GIT_VERSION);
+
 module_param(LynxOs_major,int,0644);
 MODULE_PARM_DESC(LynxOs_major,"Major device number");
 
