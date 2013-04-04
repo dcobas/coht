@@ -1,9 +1,0 @@
-GIT_VERSION = julian-20111207-39-gdba8b25
-GIT_REPO = $(src)
-
-EXTRA_CFLAGS = -I$(src) -DHARD_FLOAT -mhard-float -Wno-strict-prototypes -DCOMPILE_TIME=$(shell date +%s)
-
-obj-m := ctrp.o
-ctrp-y := ctrpdrvr.o
-
-CFLAGS_ctrpdrvr.o := -DCTR_PCI -DGIT_VERSION=\"$(GIT_VERSION)\" -DGIT_REPO=\"$(GIT_REPO)\"

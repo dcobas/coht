@@ -1,3 +1,4 @@
 #!/bin/sh
 echo Clean tar_pci directory
-rm tar_pci/*.[ch]
+
+cd tar_pci; make clean; rm -f *.[ch]
