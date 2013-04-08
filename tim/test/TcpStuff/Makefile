@@ -33,7 +33,7 @@ TimClient.$(CPU).o: TimClient.c
 
 install: SendSocket.$(CPU) RecvSocket.$(CPU)
 	@for a in $(ACCS); do \
-		d=/ps/dsc/$$a/$(CPU)/tim;\
+		d=/acc/dsc/$$a/$(CPU)/tim;\
 		echo Installing SendSocket in $$d;\
 		dsc_install SendSocket.$(CPU) $$d;\
 		echo Installing RecvSocket in $$d;\
