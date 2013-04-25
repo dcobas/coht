@@ -35,6 +35,7 @@ int cvorb_close(cvorb_t *device);
 int cvorb_get_hw_version(cvorb_t *device, char *hw_version, unsigned int size);
 int cvorb_get_pcb_id(cvorb_t *device, uint64_t *pcb_id);
 int cvorb_get_temperature(cvorb_t *device, int *temp);
+int cvorb_reset(cvorb_t *device);
 /* Submodule */
 int cvorb_sm_set_input_polarity(cvorb_t *device, unsigned int submodule, enum cvorb_input_polarity polarity);
 int cvorb_sm_get_input_polarity(cvorb_t *device, unsigned int submodule, enum cvorb_input_polarity *polarity);
@@ -44,6 +45,7 @@ int cvorb_sm_enable_optical_output(cvorb_t *device, unsigned int submodule);
 int cvorb_sm_disable_optical_output(cvorb_t *device, unsigned int submodule);
 int cvorb_sm_set_optical_output(cvorb_t *device, unsigned int submodule, unsigned int chnr);
 int cvorb_sm_get_optical_output(cvorb_t *device, unsigned int submodule, unsigned int *chnr);
+int cvorb_sm_reset(cvorb_t *device, unsigned int submodule);
 /* Channel */
 int cvorb_ch_get_status(cvorb_t *device, unsigned int channelnr, unsigned int *status);
 int cvorb_ch_enable(cvorb_t *dev, unsigned int channelnr);

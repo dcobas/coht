@@ -206,6 +206,59 @@ int cvorb_get_temperature(cvorb_t * device, int *temp)
 }
 
 /**
+ * @brief Reset the module (FPGA) 
+ * @param device        - CVORB device handle
+ *
+ * @return 0 on success, -1 on failure
+ */
+int cvorb_reset(cvorb_t * device)
+{
+	int ret, len;
+	char attr_path[CVORB_PATH_SIZE];
+
+	LIBCVORB_DEBUG(4, "handle %p\n", device);
+	len =
+	    snprintf(attr_path, CVORB_PATH_SIZE, "%s/%s",
+		     device->sysfs_path, "reset");
+	attr_path[len] = '\0';
+	ret = cvorbdev_set_attr_uint32(attr_path, 1);
+	if (ret < 0) {
+		__cvorb_libc_error(__func__);
+		return -1;
+	}
+	return 0;
+}
+
+/**
+ * @brief Reset the module (FPGA) 
+ * @param device        - CVORB device handle
+ * @param submodule     - desired submodule (0 or 1)
+ *
+ * @return 0 on success, -1 on failure
+ */
+int cvorb_sm_reset(cvorb_t * device, unsigned int submodule)
+{
+	int ret, len;
+	char attr_path[CVORB_PATH_SIZE];
+
+	LIBCVORB_DEBUG(4, "handle %p\n", device);
+	if (submodule != 0 && submodule != 1) {
+		__cvorb_lib_error(__func__, -EINVAL);
+		return -1;
+	}
+	len =
+	    snprintf(attr_path, CVORB_PATH_SIZE, "%s/submodule.%d/%s",
+		     device->sysfs_path, submodule, "reset");
+	attr_path[len] = '\0';
+	ret = cvorbdev_set_attr_uint32(attr_path, 1);
+	if (ret < 0) {
+		__cvorb_libc_error(__func__);
+		return -1;
+	}
+	return 0;
+}
+
+/**
  * @brief Enable optical output for the given submodule of the board
  * @param device        - CVORB device handle
  * @param submodule     - desired submodule (0 or 1)
@@ -655,9 +708,10 @@ int cvorb_ch_get_enable_fcn_mask(cvorb_t * dev, unsigned int chnr,
 	ret = cvorbdev_get_attr_uint64(attr_path, &val);
 	if (ret < 0) {
 		__cvorb_libc_error(__func__);
+		return -1;
 	}
 	*enbl_mask = val;
-	return ret;
+	return 0;
 }
 
 /**
@@ -887,7 +941,7 @@ int cvorb_ch_get_fcn(cvorb_t * dev, unsigned int chnr, unsigned int fcnnr,
 	struct cvorb_hw_fcn fcn;
 	unsigned int sz32, i, n_vtr;
 	uint16_t *vp;
-	int res, len;
+	int res=0, len;
 	char attr_path[CVORB_PATH_SIZE];
 
 	/* check input parameters */
@@ -923,11 +977,12 @@ int cvorb_ch_get_fcn(cvorb_t * dev, unsigned int chnr, unsigned int fcnnr,
 			     dev->sysfs_path, fcn.submodulenr, fcn.channr,
 			     fcn.fcnnr);
 		attr_path[len] = '\0';
-		res =
+		len =
 		    cvorbdev_get_attr_bin(attr_path, (void *) fcn.hw_fcn,
 					  sz32 * sizeof(uint32_t));
-		if (res < 0) {
+		if (len < 0) {
 			__cvorb_libc_error(__func__);
+			res = -1;
 			goto error;
 		}
 		/* set the real number of vectors (retrieved from the HW) */
@@ -962,11 +1017,11 @@ int cvorb_ch_get_fcn(cvorb_t * dev, unsigned int chnr, unsigned int fcnnr,
 	buff[0].v = vp[2];
 	for (i = 1, vp += 3; i <= fcn.n_vector; ++i, vp += 3) {
 		if (vp[1] == (uint16_t) - 1)
-			buff[i].t = 0;
-		else
+			buff[i].t = 0.0;
+		else 
 			buff[i].t =
-			    ((vp[0] * vp[1] * CVORB_MIN_STEP_SIZE) /
-			     1000) + buff[i - 1].t;
+			    (((double)(vp[0] * vp[1] * CVORB_MIN_STEP_SIZE)) /
+			     1000.0) + buff[i - 1].t;
 		buff[i].v = vp[2];
 	}
 
@@ -1023,8 +1078,9 @@ int cvorb_ch_enable_fcn(cvorb_t * dev, unsigned int chnr,
 	ret = cvorbdev_set_attr_uint32(attr_path, fcnnr - 1);
 	if (ret < 0) {
 		__cvorb_libc_error(__func__);
+		return -1;
 	}
-	return ret;
+	return 0;
 }
 
 /**
@@ -1049,8 +1105,9 @@ int cvorb_ch_disable_fcn(cvorb_t * dev, unsigned int chnr,
 	ret = cvorbdev_set_attr_uint32(attr_path, fcnnr - 1);
 	if (ret < 0) {
 		__cvorb_libc_error(__func__);
+		return -1;
 	}
-	return ret;
+	return 0;
 }
 
 /**
@@ -1075,8 +1132,9 @@ int cvorb_ch_select_fcn(cvorb_t * dev, unsigned int chnr,
 	ret = cvorbdev_set_attr_uint32(attr_path, fcnnr - 1);
 	if (ret < 0) {
 		__cvorb_libc_error(__func__);
+		return -1;
 	}
-	return ret;
+	return 0;
 }
 
 /**
