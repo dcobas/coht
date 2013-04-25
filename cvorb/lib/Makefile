@@ -1,5 +1,7 @@
 CPU ?= L865
 
+include /acc/src/dsc/co/Make.auto
+
 CFLAGS := -Wall -g -I. -I../include -I../../include
 LIBCVORB := libcvorb.$(CPU).a 
 HLIBCVORB := ../include/libcvorb.h

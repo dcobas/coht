@@ -1,7 +1,7 @@
-CPU=L865
-
-KVER=2.6.24.7-rt27
+CPU ?=L866
+#KVER=2.6.24.7-rt27
 #KVER=3.2.33-rt50
+KVER ?=3.2.33-rt50.66.el6rt.x86_64
 
 KERNELSRC=/acc/sys/$(CPU)/usr/src/kernels/$(KVER)
 OUTPUTDIR=$(CURDIR)/$(CPU)/$(KVER)
