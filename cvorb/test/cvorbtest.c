@@ -618,7 +618,7 @@ static int get_fcn_list(int display) {
 		dir = opendir(path);
 		if (!dir) {
 			/* No local directory try oper one*/
-			snprintf(path, CVORB_PATH_SIZE, "/usr/local/drivers/cvorb/vtf");
+			snprintf(path, CVORB_PATH_SIZE, "/usr/local/cvorb/vtf");
 			dir = opendir(path);
 		}
 
