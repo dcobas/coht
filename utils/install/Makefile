@@ -23,7 +23,7 @@ instprog.$(CPU): instprog.$(CPU).o libutils.$(CPU).a
 libutils.$(CPU).a: $(CPU_OBJECTS) libinst.$(CPU).o inst-utils.$(CPU).o
 	ar r $@ $^
 	mkdir -p $(OBJECTDIR)
-	ln -s $(PWD)/$@ $(OBJECTDIR)
+	ln -sf $(PWD)/$@ $(OBJECTDIR)
 
 clean:
 	rm -f *.o *.a *.L865 *.ppc4
