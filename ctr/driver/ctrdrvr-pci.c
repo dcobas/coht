@@ -77,7 +77,7 @@ typedef struct {
 	int pci_bus_num;         /* PCI bus number */
 	int pci_slot_num;        /* PCI slot number */
 	int bars;                /* Bit mask of used bars */
-	void *map[BARS];         /* Corresponding memory maps */
+	void __iomem *map[BARS]; /* Corresponding memory maps */
 	struct pci_dev *dev;     /* PCI device */
 } mod_par_t;                     /* Module parameter block */
 
@@ -153,7 +153,7 @@ static int check_args(char *name)
  * @return -1=NOT Found else lun number
  */
 
-int hunt_lun(int bus, int slot)
+static int hunt_lun(int bus, int slot)
 {
 	int i;
 	for (i=0; i<luns_num; i++)
@@ -171,7 +171,7 @@ int hunt_lun(int bus, int slot)
 
 static int used_luns = 0;
 
-int get_unused_lun()
+static int get_unused_lun(void)
 {
 
 	int i, lun, bit;
@@ -201,7 +201,7 @@ int get_unused_lun()
  * @return          Pointer to pci_device structure or NULL
  */
 
-struct pci_dev *add_next_dev(struct pci_dev *pcur,
+static struct pci_dev *add_next_dev(struct pci_dev *pcur,
 			     mod_par_t *mpar)
 {
 	struct pci_dev *pprev = pcur;
@@ -293,7 +293,7 @@ struct pci_dev *add_next_dev(struct pci_dev *pcur,
  * @return      number of modules initialized
  */
 
-int init_mod_pars(char *name, int vid, int did, int bars)
+static int init_mod_pars(char *name, int vid, int did, int bars)
 {
 	int i;
 	struct pci_dev *pcur = NULL;
@@ -326,11 +326,11 @@ int init_mod_pars(char *name, int vid, int did, int bars)
  * @return      1=OK else Fail
  */
 
-int old_drm_crap(char *name, struct pci_dev *dev)
+static int old_drm_crap(char *name, struct pci_dev *dev)
 {
 	int i;
 	for (i=0; i<MAX_DEVS; i++) {
-		if (lynxos_isrs[i].Handle == 0) {
+		if (lynxos_isrs[i].Handle == NULL) {
 			lynxos_isrs[i].Handle = dev;
 			lynxos_isrs[i].Slot = (dev->devfn >> 3);
 			if (dev->irq) {
@@ -347,9 +347,8 @@ int old_drm_crap(char *name, struct pci_dev *dev)
 /* Define prototypes and forward references for local driver routines.    */
 /*========================================================================*/
 
-int timeout(int (*func)(void *), char *arg, int interval);
-char *CtrDrvrInstall(CtrDrvrInfoTable *info);
-int CtrDrvrUninstall(CtrDrvrWorkingArea * wa);
+static char *CtrDrvrInstall(CtrDrvrInfoTable *info);
+static int CtrDrvrUninstall(CtrDrvrWorkingArea * wa);
 
 static void Int32Copy(volatile unsigned int *dst, volatile unsigned int *src, unsigned int size);
 
@@ -465,7 +464,7 @@ irqreturn_t IntrHandler(CtrDrvrModuleContext *);
 #define EIEIO
 #define SYNC
 
-CtrDrvrWorkingArea *Wa       = NULL;
+static CtrDrvrWorkingArea *Wa       = NULL;
 
 /*========================================================================*/
 /* 32 Bit int access for CTR structure to/from hardware copy              */
@@ -539,7 +538,7 @@ static int ResetTimeout(CtrDrvrModuleContext *mcon) {
 /* Print Debug message                                                                         */
 /* =========================================================================================== */
 
-char *ioctl_names[CtrDrvrLAST_IOCTL] = {
+static char *ioctl_names[CtrDrvrLAST_IOCTL] = {
 
 "SET_SW_DEBUG", "GET_SW_DEBUG", "GET_VERSION", "SET_TIMEOUT", "GET_TIMEOUT",
 "SET_QUEUE_FLAG", "GET_QUEUE_FLAG", "GET_QUEUE_SIZE", "GET_QUEUE_OVERFLOW",
@@ -1714,7 +1713,7 @@ int i, midx;
 /* The ISR                                                    */
 /* ========================================================== */
 
-int debug_isr = 0;
+static int debug_isr = 0;
 
 irqreturn_t IntrHandler(CtrDrvrModuleContext *mcon) {
 
@@ -1827,7 +1826,7 @@ CtrDrvrReadBuf         rbf;
 /* OPEN                                                                   */
 /*========================================================================*/
 
-int CtrDrvrOpen(CtrDrvrWorkingArea *wa, int dnm, struct LynxFile *flp) {
+static int CtrDrvrOpen(CtrDrvrWorkingArea *wa, int dnm, struct LynxFile *flp) {
 
 int cnum;                       /* Client number */
 CtrDrvrClientContext * ccon;    /* Client context */
@@ -1872,7 +1871,7 @@ CtrDrvrClientContext * ccon;    /* Client context */
 /* CLOSE                                                                  */
 /*========================================================================*/
 
-int CtrDrvrClose(CtrDrvrWorkingArea *wa, struct LynxFile *flp) {
+static int CtrDrvrClose(CtrDrvrWorkingArea *wa, struct LynxFile *flp) {
 
 int cnum;                   /* Client number */
 CtrDrvrClientContext *ccon; /* Client context */
@@ -1922,7 +1921,7 @@ CtrDrvrClientContext *ccon; /* Client context */
 /* READ                                                                   */
 /*========================================================================*/
 
-int CtrDrvrRead(CtrDrvrWorkingArea *wa, struct LynxFile *flp, char *u_buf, int cnt) {
+static int CtrDrvrRead(CtrDrvrWorkingArea *wa, struct LynxFile *flp, char *u_buf, int cnt) {
 
 CtrDrvrClientContext *ccon;    /* Client context */
 CtrDrvrQueue         *queue;
@@ -1965,6 +1964,8 @@ unsigned long         ps;
 
       /* EINTR = "Interrupted system call" */
 
+      CancelTimeout(&(ccon->Timer));
+
       pseterr(EINTR);   /* We have been signaled */
       return 0;
    }
@@ -2004,7 +2005,7 @@ unsigned long         ps;
 /* with the supplied CtrDrvrReadBuf.                                     */
 /*========================================================================*/
 
-int CtrDrvrWrite(CtrDrvrWorkingArea *wa, struct LynxFile *flp, char *u_buf, int cnt) {
+static int CtrDrvrWrite(CtrDrvrWorkingArea *wa, struct LynxFile *flp, char *u_buf, int cnt) {
 
 CtrDrvrClientContext *ccon;    /* Client context */
 CtrDrvrModuleContext *mcon;
@@ -2101,7 +2102,7 @@ unsigned int          clients;
 /* SELECT                                                                 */
 /*========================================================================*/
 
-int CtrDrvrSelect(CtrDrvrWorkingArea *wa, struct LynxFile *flp, int wch, struct sel *ffs) {
+static int CtrDrvrSelect(CtrDrvrWorkingArea *wa, struct LynxFile *flp, int wch, struct sel *myffs) {
 
 CtrDrvrClientContext * ccon;
 int cnum;
@@ -2110,7 +2111,7 @@ int cnum;
    ccon = &(wa->ClientContexts[cnum]);
 
    if (wch == SREAD) {
-      ffs->iosem = (int *) &(ccon->Semaphore); /* Watch out here I hope   */
+      myffs->iosem = (int *) &(ccon->Semaphore); /* Watch out here I hope   */
       return OK;                               /* the system dosn't swait */
    }                                           /* the read does it too !! */
 
@@ -2125,13 +2126,13 @@ int cnum;
 
 #define CTRP_BARS 0x5
 
-char *CtrDrvrInstall(CtrDrvrInfoTable *info)
+static char *CtrDrvrInstall(CtrDrvrInfoTable *info)
 {
 
 CtrDrvrWorkingArea *wa;
 drm_node_handle handle;
 CtrDrvrModuleContext *mcon;
-unsigned long vadr;
+uintptr_t vadr;
 unsigned int las0brd, ivec;
 int modix, mid, cc, j;
 CtrDrvrMemoryMap *mmap;
@@ -2183,10 +2184,10 @@ int cmd;
       cmd |= 2;
       drm_device_write(handle, PCI_RESID_REGS, 1, 0, &cmd);
 
-      vadr = (unsigned long) mpar->map[2];
+      vadr = (uintptr_t) mpar->map[2];
       mcon->Map = (CtrDrvrMemoryMap *) vadr;
 
-      vadr = (unsigned long) mpar->map[0];
+      vadr = (uintptr_t) mpar->map[0];
       mcon->Local = (unsigned int *) vadr;
 
       /* Set up the LAS0BRD local configuration register to do appropriate */
@@ -2240,15 +2241,15 @@ int cmd;
 /* Uninstall                                                              */
 /*========================================================================*/
 
-void release_device(struct pci_dev *pdev, void *mem, int bar)
+static void release_device(struct pci_dev *pdev, void *mem, int bar)
 {
-	pci_iounmap(pdev, mem);
+	pci_iounmap(pdev, (void __iomem *) mem);
 	pci_release_region(pdev, bar);
 	pci_disable_device(pdev);
 	pci_dev_put(pdev);
 }
 
-int CtrDrvrUninstall(CtrDrvrWorkingArea * wa) {
+static int CtrDrvrUninstall(CtrDrvrWorkingArea * wa) {
 
 CtrDrvrMemoryMap *mmap;
 CtrDrvrClientContext *ccon;
@@ -2268,7 +2269,7 @@ CtrDrvrModuleContext *mcon;
 
 	 if (mcon->Local) {
 	    release_device((struct pci_dev *) mcon->Handle, (void *) mcon->Local, 0);
-	    cprintf("CtrDrvrUninstall: Unmap BAR0 Module:%d 0x%X\n",mcon->ModuleIndex+1,(int) (mcon->Local));
+	    cprintf("CtrDrvrUninstall: Unmap BAR0 Module:%d 0x%lX\n",mcon->ModuleIndex+1,(long) (mcon->Local));
 
 	    mcon->LocalOpen = 0;
 	    mcon->Local = NULL;
@@ -2276,7 +2277,7 @@ CtrDrvrModuleContext *mcon;
 
 	 if (mcon->Map) {
 	    release_device((struct pci_dev *) mcon->Handle, (void *) mcon->Map, 2);
-	    cprintf("CtrDrvrUninstall: Unmap BAR2 Module:%d 0x%X\n",mcon->ModuleIndex+1,(int) (mcon->Map));
+	    cprintf("CtrDrvrUninstall: Unmap BAR2 Module:%d 0x%lX\n",mcon->ModuleIndex+1,(long) (mcon->Map));
 	    mcon->Map = NULL;
 	 }
 
@@ -2306,7 +2307,7 @@ CtrDrvrModuleContext *mcon;
 /* IOCTL                                                                  */
 /*========================================================================*/
 
-int CtrDrvrIoctl(CtrDrvrWorkingArea *wa, struct LynxFile *flp, CtrDrvrControlFunction cm, char *arg) {
+static int CtrDrvrIoctl(CtrDrvrWorkingArea *wa, struct LynxFile *flp, CtrDrvrControlFunction cm, char *arg) {
 
 CtrDrvrModuleContext           *mcon;   /* Module context */
 CtrDrvrClientContext           *ccon;   /* Client context */
@@ -2335,7 +2336,7 @@ CtrDrvrTgmBuf                  *tgmb;
 CtrDrvrEventHistory            *evhs;
 CtrDrvrReceptionErrors         *rcpe;
 CtrDrvrBoardId                 *bird;
-CtrDrvrModuleStats             *mods;
+CtrDrvrModuleStats             *mymods;
 
 volatile CtrDrvrMemoryMap   *mmap;
 
@@ -2357,7 +2358,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
 
    if (arg != NULL) {
       rcnt = rbounds((long) arg);       /* Number of readable bytes without error */
-      wcnt = wbounds((long) arg);       /* Number of writable bytes without error */
+      wcnt = 0;
       if (rcnt < sizeof(int)) {      /* We at least need to read one int */
 	 pid = getpid();
 	 cprintf("CtrDrvrIoctl:Illegal arg-pntr:0x%lX ReadCnt:%d(%d) Pid:%d Cmd:%d\n",
@@ -2444,6 +2445,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrGET_VERSION:            /* Get version date */
+         wcnt = wbounds((long) arg);       /* Number of writable bytes without error */
 	 if (wcnt >= sizeof(CtrDrvrVersion)) {
 	    ver = (CtrDrvrVersion *) arg;
 	    return GetVersion(mcon,ver);
@@ -2507,6 +2509,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrGET_MODULE_DESCRIPTOR:
+         wcnt = wbounds((long) arg);       /* Number of writable bytes without error */
 	 if (wcnt >= sizeof(CtrDrvrModuleAddress)) {
 	    moad = (CtrDrvrModuleAddress *) arg;
 
@@ -2514,14 +2517,14 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
 	       moad->ModuleType = CtrDrvrModuleTypeCTR;
 	       moad->DeviceId   = CTRP_DEVICE_ID;
 	       moad->VendorId   = CERN_VENDOR_ID;
-	       moad->MemoryMap  = (unsigned long) mcon->Map;
-	       moad->LocalMap   = (unsigned long) mcon->Local;
+	       moad->MemoryMap  = (uintptr_t) mcon->Map;
+	       moad->LocalMap   = (uintptr_t) mcon->Local;
 	    } else {
 	       moad->ModuleType = CtrDrvrModuleTypePLX;
 	       moad->DeviceId   = PLX9030_DEVICE_ID;
 	       moad->VendorId   = PLX9030_VENDOR_ID;
 	       moad->MemoryMap  = 0;
-	       moad->LocalMap   = (unsigned long) mcon->Local;
+	       moad->LocalMap   = (uintptr_t) mcon->Local;
 	    }
 	    moad->ModuleNumber  = mcon->ModuleIndex +1;
 	    moad->PciSlot       = mcon->PciSlot;
@@ -2573,6 +2576,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrGET_CLIENT_LIST:        /* Get the list of driver clients */
+         wcnt = wbounds((long) arg);       /* Number of writable bytes without error */
 	 if (wcnt >= sizeof(CtrDrvrClientList)) {
 	    cls = (CtrDrvrClientList *) arg;
 	    bzero((void *) cls, sizeof(CtrDrvrClientList));
@@ -2599,6 +2603,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrGET_CLIENT_CONNECTIONS: /* Get the list of a client connections on module */
+         wcnt = wbounds((long) arg);       /* Number of writable bytes without error */
 	 if (wcnt >= sizeof(CtrDrvrClientConnections)) {
 	    ccn = (CtrDrvrClientConnections *) arg;
 	    ccn->Size = 0;
@@ -2645,10 +2650,11 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrSET_UTC:                /* Set Universal Coordinated Time for next PPS tick */
-	 if (lap) return SetTime(mcon,lav);
+	 if (lap) return SetTime(mcon,(unsigned int) lav);
       break;
 
       case CtrDrvrGET_UTC:                /* Latch and read the current UTC time */
+         wcnt = wbounds((long) arg);       /* Number of writable bytes without error */
 	 if (wcnt >= sizeof(CtrDrvrCTime)) {
 	    ctod = (CtrDrvrCTime *) arg;
 	    *ctod = *GetTime(mcon);
@@ -2765,6 +2771,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
 	 return OK;
 
       case CtrDrvrRAW_READ:               /* Raw read  access to card for debug */
+         wcnt = wbounds((long) arg);       /* Number of writable bytes without error */
 	 if (wcnt >= sizeof(CtrDrvrRawIoBlock)) {
 	    riob = (CtrDrvrRawIoBlock *) arg;
 	    if ((riob->UserArray != NULL)
@@ -2804,6 +2811,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
 
       case CtrDrvr93LC56B_EEPROM_READ:    /* Read from the EEPROM 93LC56B the PLX9030 configuration */
 	 if (mcon->FlashOpen) {
+            wcnt = wbounds((long) arg);       /* Number of writable bytes without error */
 	    if (wcnt >= sizeof(CtrDrvrRawIoBlock)) {
 	       riob = (CtrDrvrRawIoBlock *) arg;
 	       if (riob->UserArray != NULL) {
@@ -2856,6 +2864,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
 
       case CtrDrvrPLX9030_CONFIG_READ:    /* Read the PLX9030 configuration registers */
 	 if (mcon->ConfigOpen) {
+            wcnt = wbounds((long) arg);       /* Number of writable bytes without error */
 	    if (wcnt >= sizeof(CtrDrvrRawIoBlock)) {
 	       riob = (CtrDrvrRawIoBlock *) arg;
 	       if ((riob->UserArray != NULL) &&  (wcnt > riob->Size)) {
@@ -2886,6 +2895,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
 
       case CtrDrvrPLX9030_LOCAL_READ:     /* Read the PLX9030 local configuration registers */
 	 if (mcon->LocalOpen) {
+            wcnt = wbounds((long) arg);       /* Number of writable bytes without error */
 	    if (wcnt >= sizeof(CtrDrvrRawIoBlock)) {
 	       riob = (CtrDrvrRawIoBlock *) arg;
 	       if ((riob->UserArray != NULL) &&  (wcnt >= riob->Size)) {
@@ -2911,6 +2921,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
 	 return OK;
 
       case CtrDrvrGET_ACTION:             /* Low level direct access to CTR RAM tables */
+         wcnt = wbounds((long) arg);       /* Number of writable bytes without error */
 	 if (wcnt >= sizeof(CtrDrvrAction)) {
 	    act = (CtrDrvrAction *) arg;
 	    if ((act->TriggerNumber > 0) && (act->TriggerNumber <= CtrDrvrRamTableSIZE)) {
@@ -3045,6 +3056,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrLIST_CTIM_OBJECTS:      /* Returns a list of created CTIM objects */
+         wcnt = wbounds((long) arg);       /* Number of writable bytes without error */
 	 if (wcnt >= sizeof(CtrDrvrCtimObjects)) {
 	    ctimo = (CtrDrvrCtimObjects *) arg;
 	    bcopy((void *) &(Wa->Ctim), (void *) ctimo, sizeof(CtrDrvrCtimObjects));
@@ -3164,6 +3176,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrLIST_PTIM_OBJECTS:      /* Returns a list of created PTIM objects */
+         wcnt = wbounds((long) arg);       /* Number of writable bytes without error */
 	 if (wcnt >= sizeof(CtrDrvrPtimObjects)) {
 	    ptimo = (CtrDrvrPtimObjects *) arg;
 	    bcopy((void *) &(Wa->Ptim), (void *) ptimo, sizeof(CtrDrvrPtimObjects));
@@ -3224,6 +3237,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
 	 return OK;
 
       case CtrDrvrGET_REMOTE:             /* Counter Remote/Local status */
+         wcnt = wbounds((long) arg);       /* Number of writable bytes without error */
 	 if (wcnt >= sizeof(CtrdrvrRemoteCommandBuf)) {
 	    remc = (CtrdrvrRemoteCommandBuf *) arg;
 	    if ((remc->Counter >= CtrDrvrCounter1) && (remc->Counter <= CtrDrvrCounter8)) {
@@ -3258,9 +3272,10 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrGET_MODULE_STATS:
+         wcnt = wbounds((long) arg);       /* Number of writable bytes without error */
 	 if (wcnt >= sizeof(CtrDrvrModuleStats)) {
-	    mods = (CtrDrvrModuleStats *) arg;
-	    Int32Copy((unsigned int *) mods,
+	    mymods = (CtrDrvrModuleStats *) arg;
+	    Int32Copy((unsigned int *) mymods,
 		     (unsigned int *) &(mmap->ModStats),
 		     (unsigned int  ) sizeof(CtrDrvrModuleStats));
 	    return OK;
@@ -3268,6 +3283,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrGET_OUT_MASK:           /* Counter output routing mask */
+         wcnt = wbounds((long) arg);       /* Number of writable bytes without error */
 	 if (wcnt >= sizeof(CtrDrvrCounterMaskBuf)) {
 	    cmsb = (CtrDrvrCounterMaskBuf *) arg;
 	    if ((cmsb->Counter >= CtrDrvrCounter1) && (cmsb->Counter <= CtrDrvrCounter8)) {
@@ -3298,6 +3314,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrGET_CONFIG:             /* Get a counter configuration */
+         wcnt = wbounds((long) arg);       /* Number of writable bytes without error */
 	 if (wcnt >= sizeof(CtrDrvrCounterConfigurationBuf)) {
 	    conf = (CtrDrvrCounterConfigurationBuf *) arg;
 	    if ((conf->Counter >= CtrDrvrCounter0) && (conf->Counter <= CtrDrvrCounter8)) {
@@ -3319,7 +3336,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       case CtrDrvrSET_CONFIG:             /* Set a counter configuration */
 	 if (rcnt >= sizeof(CtrDrvrCounterConfigurationBuf)) {
 	    conf = (CtrDrvrCounterConfigurationBuf *) arg;
-	    if (mmap->Counters[lav].Control.LockConfig) {
+	    if (mmap->Counters[conf->Counter].Control.LockConfig) {
 	       if ((conf->Counter >= CtrDrvrCounter0) && (conf->Counter <= CtrDrvrCounter8)) {
 		  Int32Copy((unsigned int *) &(mmap->Counters[conf->Counter].Config),
 			   (unsigned int *) ConfigToHard(&conf->Config),
@@ -3331,6 +3348,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrGET_COUNTER_HISTORY:    /* One deep history of counter */
+         wcnt = wbounds((long) arg);       /* Number of writable bytes without error */
 	 if (wcnt >= sizeof(CtrDrvrCounterHistoryBuf)) {
 	    hisb = (CtrDrvrCounterHistoryBuf *) arg;
 	    if ((hisb->Counter >= CtrDrvrCounter1) && (hisb->Counter <= CtrDrvrCounter8)) {
@@ -3343,6 +3361,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrGET_PLL:                /* Get phase locked loop parameters */
+         wcnt = wbounds((long) arg);       /* Number of writable bytes without error */
 	 if (wcnt >= sizeof(CtrDrvrPll)) {
 	    pll = (CtrDrvrPll *) arg;
 	    Int32Copy((unsigned int *) pll,
@@ -3366,6 +3385,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrGET_PLL_ASYNC_PERIOD:   /* Get PLL asynchronous period */
+         wcnt = wbounds((long) arg);       /* Number of writable bytes without error */
 	 if (wcnt >= sizeof(CtrDrvrPllAsyncPeriodNs)) {
 	    asyp = (CtrDrvrPllAsyncPeriodNs *) arg;
 	    if (mcon->PllAsyncPeriodNs != 0.0)
@@ -3385,6 +3405,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrREAD_TELEGRAM:          /* Read telegrams from CTR */
+         wcnt = wbounds((long) arg);       /* Number of writable bytes without error */
 	 if (wcnt >= sizeof(CtrDrvrTgmBuf)) {
 	    tgmb = (CtrDrvrTgmBuf *) arg;
 	    if ((tgmb->Machine > CtrDrvrMachineNONE) && (tgmb->Machine <= CtrDrvrMachineMACHINES)) {
@@ -3399,6 +3420,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrREAD_EVENT_HISTORY:     /* Read incomming event history */
+         wcnt = wbounds((long) arg);       /* Number of writable bytes without error */
 	 if (wcnt >= sizeof(CtrDrvrEventHistory)) {
 	    evhs = (CtrDrvrEventHistory *) arg;
 	    Int32Copy((unsigned int *) evhs,
@@ -3410,6 +3432,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
 
 
       case CtrDrvrGET_RECEPTION_ERRORS:   /* Timing frame reception error status */
+         wcnt = wbounds((long) arg);       /* Number of writable bytes without error */
 	 if (wcnt >= sizeof(CtrDrvrReceptionErrors)) {
 	    rcpe = (CtrDrvrReceptionErrors *) arg;
 	    rcpe->LastReset    = mmap->LastReset;
@@ -3430,6 +3453,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrGET_IDENTITY:           /* Identity of board from ID chip */
+         wcnt = wbounds((long) arg);       /* Number of writable bytes without error */
 	 if (wcnt >= sizeof(CtrDrvrBoardId)) {
 	    bird = (CtrDrvrBoardId *) arg;
 	    bird->IdLSL = mmap->IdLSL;

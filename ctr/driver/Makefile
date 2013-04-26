@@ -1,18 +1,12 @@
-CPU=L865
-
-# KVER=2.6.24.7-rt21
-# KVER=2.6.24.7-rt27
-# KVER=2.6.29.4-rt15
-# KVER=2.6.31.6-rt19
-# KVER=2.6.24.7-rt27
-# KVER=2.6.33.9-rt31.66.el6rt.x86_64
+CPU=L866
 
 ifeq ($(CPU),L865)
 KVER=2.6.24.7-rt27
 endif
 
 ifeq ($(CPU),L866)
-KVER=2.6.33.9-rt31.66.el6rt.x86_64
+KVER=3.2.33-rt50.66.el6rt.x86_64
+KVER=3.6.11-rt30.25.el6rt.x86_64
 endif
 
 KERNELSRC=/acc/sys/$(CPU)/usr/src/kernels/$(KVER)
@@ -33,20 +27,28 @@ clean:
 	rm -f *.mod.c
 	rm -rf $(CPU) L864 ppc
 	make -C $(KERNELSRC) M=`pwd` clean
+	rm -f ,* *~ *.bak *.BAK .es1* .B* %*% .ec1 .ek1 .*~ core a.out *JNL *.lst \\\#*\\\# .nfs* *%
+	rm -f a.out out 32 64
 
 install:
 	@echo "please specify one of {install-lab|install-oper|install-lhc|install-all}"
 
 install-all: install-lab install-oper install-oplhc
 
-install-lab: ./$(CPU)/$(KVER)/ctrp.ko
-	[ -d /acc/dsc/lab/$(CPU)/$(KVER)/ctrp ] || mkdir -m 2775 /acc/dsc/lab/$(CPU)/$(KVER)/ctrp; exit 0
-	dsc_install ./$(CPU)/$(KVER)/ctrp.ko /acc/dsc/lab/$(CPU)/$(KVER)/ctrp;
+install-lab: ./$(CPU)/$(KVER)/ctrp.ko ./$(CPU)/$(KVER)/ctrv.ko
+	dsc_install ./$(CPU)/$(KVER)/ctrp.ko /acc/dsc/lab/$(CPU)/$(KVER)/ctr;
+	dsc_install ./ipp /acc/dsc/lab/$(CPU)/$(KVER)/ctr;
+	dsc_install ./$(CPU)/$(KVER)/ctrv.ko /acc/dsc/lab/$(CPU)/$(KVER)/ctr;
+	dsc_install ./ivv /acc/dsc/lab/$(CPU)/$(KVER)/ctr;
 
-install-oper: ./$(CPU)/$(KVER)/ctrp.ko
-	[ -d /acc/dsc/oper/$(CPU)/$(KVER)/ctrp ] || mkdir -m 2775 /acc/dsc/oper/$(CPU)/$(KVER)/ctrp; exit 0
-	dsc_install ./$(CPU)/$(KVER)/ctrp.ko /acc/dsc/oper/$(CPU)/$(KVER)/ctrp;
+install-oper: ./$(CPU)/$(KVER)/ctrp.ko ./$(CPU)/$(KVER)/ctrv.ko
+	dsc_install ./$(CPU)/$(KVER)/ctrp.ko /acc/dsc/oper/$(CPU)/$(KVER)/ctr;
+	dsc_install ./ipp /acc/dsc/oper/$(CPU)/$(KVER)/ctr;
+	dsc_install ./$(CPU)/$(KVER)/ctrv.ko /acc/dsc/oper/$(CPU)/$(KVER)/ctr;
+	dsc_install ./ivv /acc/dsc/oper/$(CPU)/$(KVER)/ctr;
 
-install-oplhc: ./$(CPU)/$(KVER)/ctrp.ko
-	[ -d /acc/dsc/oplhc/$(CPU)/$(KVER)/ctrp ] || mkdir -m 2775 /acc/dsc/oplhc/$(CPU)/$(KVER)/ctrp; exit 0
-	dsc_install ./$(CPU)/$(KVER)/ctrp.ko /acc/dsc/oplhc/$(CPU)/$(KVER)/ctrp;
+install-oplhc: ./$(CPU)/$(KVER)/ctrp.ko ./$(CPU)/$(KVER)/ctrv.ko
+	dsc_install ./$(CPU)/$(KVER)/ctrp.ko /acc/dsc/oplhc/$(CPU)/$(KVER)/ctr;
+	dsc_install ./ipp /acc/dsc/oplhc/$(CPU)/$(KVER)/ctr;
+	dsc_install ./$(CPU)/$(KVER)/ctrv.ko /acc/dsc/oplhc/$(CPU)/$(KVER)/ctr;
+	dsc_install ./ivv /acc/dsc/oplhc/$(CPU)/$(KVER)/ctrv;

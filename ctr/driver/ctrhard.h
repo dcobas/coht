@@ -189,8 +189,8 @@ typedef struct {
    CtrDrvrCounterStart  Start;     /* The counters start. */
    CtrDrvrCounterMode   Mode;      /* The counters operating mode. */
    CtrDrvrCounterClock  Clock;     /* Clock specification. */
-   unsigned int         PulsWidth; /* Number of 40MHz ticks, 0 = as fast as possible. */
-   unsigned int         Delay;     /* 32 bit delay to load into counter. */
+   uint32_t             PulsWidth; /* Number of 40MHz ticks, 0 = as fast as possible. */
+   uint32_t             Delay;     /* 32 bit delay to load into counter. */
  } CtrDrvrCounterConfiguration;
 
 /* N.B. If the PulseWidth is large, then the output starts to look like a level */
@@ -206,8 +206,8 @@ typedef struct {
 #define CtrDrvrCounterConfigPULSE_WIDTH_MASK 0x003FFFFF  /* 22-Bits 0..104 ms */
 
 typedef struct {
-   unsigned int Config;         /* Comprised of the above bit fields. */
-   unsigned int Delay;          /* 32 bit delay to load into counter. */
+   uint32_t     Config;         /* Comprised of the above bit fields. */
+   uint32_t     Delay;          /* 32 bit delay to load into counter. */
 } CtrDrvrHwCounterConfiguration; /* Compact form in two 32-bit ints */
 
 /* ==================================================================================== */
@@ -259,19 +259,19 @@ typedef enum {
 
 /* Layout of an event frame, it occupies one 32bit frame on the timing cable. */
 
-typedef unsigned int CtrDrvrFrameLong;
+typedef uint32_t     CtrDrvrFrameLong;
 
 #ifdef __LITTLE_ENDIAN__
 typedef struct {
-   unsigned short Value;    /* Can be a WILD card in which case value is ignored */
-   unsigned char  Code;
-   unsigned char  Header;   /* Like 01 for C-Train, usually Mch:4 Type:4 */
+   uint16_t Value;    /* Can be a WILD card in which case value is ignored */
+   uint8_t  Code;
+   uint8_t  Header;   /* Like 01 for C-Train, usually Mch:4 Type:4 */
  } CtrDrvrFrameStruct;
 #else
 typedef struct {
-   unsigned char  Header;   /* Like 01 for C-Train, usually Mch:4 Type:4 */
-   unsigned char  Code;
-   unsigned short Value;    /* Can be a WILD card in which case value is ignored */
+   uint8_t  Header;   /* Like 01 for C-Train, usually Mch:4 Type:4 */
+   uint8_t  Code;
+   uint16_t Value;    /* Can be a WILD card in which case value is ignored */
  } CtrDrvrFrameStruct;
 #endif
 
@@ -407,14 +407,14 @@ typedef enum {
 /* =============================================================================== */
 
 typedef struct {
-   unsigned int Second;       /* UTC Second */
-   unsigned int TicksHPTDC;   /* 25/32 ns ticks, zero if no HPTDC */
+   uint32_t     Second;       /* UTC Second */
+   uint32_t     TicksHPTDC;   /* 25/32 ns ticks, zero if no HPTDC */
  } CtrDrvrTime;
 
 /* Sometimes we want not just the UTC time but the milli second modulo value as well */
 
 typedef struct {
-   unsigned int CTrain;        /* Milli second modulo at Time */
+   uint32_t     CTrain;        /* Milli second modulo at Time */
    CtrDrvrTime  Time;
  } CtrDrvrCTime;
 
@@ -445,8 +445,8 @@ typedef struct {
 
    /* The two lock flags give priority to bus accesses */
 
-   unsigned int               LockConfig;    /* Triggers do not overwrite the config  */
-   unsigned int               LockHistory;   /* CLEAR ON READ: Dont overwrite history */
+   uint32_t                   LockConfig;    /* Triggers do not overwrite the config  */
+   uint32_t                   LockHistory;   /* CLEAR ON READ: Dont overwrite history */
    CtrDrvrRemote              Remote;        /* Used to remote control the counter    */
    CtrDrvrCounterMask         OutMask;       /* Physical output pins                  */
  } CtrDrvrCounterControl;
@@ -454,9 +454,9 @@ typedef struct {
 /* Pack Remote and OutMask fields into a 32-bit int for the hardware */
 
 typedef struct {
-   unsigned int               LockConfig;    /* Triggers do not overwrite the config  */
-   unsigned int               LockHistory;   /* CLEAR ON READ: Dont overwrite history */
-   unsigned int               RemOutMask;    /* Remote and hardware mask combined */
+   uint32_t                   LockConfig;    /* Triggers do not overwrite the config  */
+   uint32_t                   LockHistory;   /* CLEAR ON READ: Dont overwrite history */
+   uint32_t                   RemOutMask;    /* Remote and hardware mask combined */
  } CtrDrvrHwCounterControl;
 
 #define CtrDrvrCntrCntrlREMOTE_MASK 0x3F
@@ -474,7 +474,7 @@ typedef struct {
 /* cards are in use. See Frame field */
 
 typedef struct {
-   unsigned int               Index;         /* Index into trigger table of loading trigger */
+   uint32_t                   Index;         /* Index into trigger table of loading trigger */
    CtrDrvrEventFrame          Frame;         /* The actual frame (without Wild Cards !) */
    CtrDrvrCTime               TriggerTime;   /* Time counter got loaded */
    CtrDrvrCTime               StartTime;     /* Time counter start arrived. */
@@ -515,12 +515,12 @@ typedef enum {
 
 #define CtrDrvrTgmGROUP_VALUES 64
 
-typedef unsigned short CtrDrvrTgm[CtrDrvrTgmGROUP_VALUES];      /* 64x16 bit values */
-typedef CtrDrvrTgm     CtrDrvrTgmBlock[CtrDrvrMachineMACHINES]; /* One telegram per machine */
+typedef uint16_t   CtrDrvrTgm[CtrDrvrTgmGROUP_VALUES];      /* 64x16 bit values */
+typedef CtrDrvrTgm CtrDrvrTgmBlock[CtrDrvrMachineMACHINES]; /* One telegram per machine */
 
 typedef struct {
-   unsigned short GroupNumber;  /* The serial position in the telegram starting at one */
-   unsigned short GroupValue;   /* The value of the parameter at this position */
+   uint16_t GroupNumber;  /* The serial position in the telegram starting at one */
+   uint16_t GroupValue;   /* The value of the parameter at this position */
  } CtrDrvrTgmGroup;
 
 /* OK now we define a trigger. This consists of an event frame and a telegram condition. */
@@ -528,7 +528,7 @@ typedef struct {
 /* driver API, and declare a second version packed into bit fields. */
 
 typedef struct {
-   unsigned int            Ctim;               /* Ctim equipment number */
+   uint32_t                Ctim;               /* Ctim equipment number */
    CtrDrvrEventFrame       Frame;              /* Timing frame with optional wild card */
    CtrDrvrTriggerCondition TriggerCondition;   /* Type of trigger */
    CtrDrvrMachine          Machine;            /* Which telegram if used */
@@ -551,7 +551,7 @@ typedef struct {
 
 typedef struct {
    CtrDrvrEventFrame Frame;     /* Timing frame with optional wild card */
-   unsigned int      Trigger;   /* Packed trigger bits as above */
+   uint32_t          Trigger;   /* Packed trigger bits as above */
  } CtrDrvrHwTrigger;            /* Compact hardware form of a trigger */
 
 /* This trigger table is searched by the ctr hardware for each incomming event.    */
@@ -584,7 +584,7 @@ typedef struct {
 /* entry address is zero. */
 
 typedef struct {
-   unsigned int Index;
+   uint32_t     Index;
    CtrDrgvrEventHistoryEntry Entries[CtrDrvrHISTORY_TABLE_SIZE];
  } CtrDrvrEventHistory;
 
@@ -676,14 +676,14 @@ typedef enum {
 /* ==================================================== */
 
 typedef struct {
-   unsigned int  Error;       /* RO: Pll phase error */
-   unsigned int  Integrator;  /* RW: Pll Integrator */
-   unsigned int  Dac;         /* RO: Value applied to DAC */
-   unsigned int  LastItLen;   /* RO: Last iteration length */
-   unsigned int  Phase;       /* RW: Pll phase */
-   unsigned int  NumAverage;  /* RW: Numeric average */
-   unsigned int  KP;          /* RW: Constant of proportionality */
-   unsigned int  KI;          /* RW: Constant of integration */
+   uint32_t      Error;       /* RO: Pll phase error */
+   uint32_t      Integrator;  /* RW: Pll Integrator */
+   uint32_t      Dac;         /* RO: Value applied to DAC */
+   uint32_t      LastItLen;   /* RO: Last iteration length */
+   uint32_t      Phase;       /* RW: Pll phase */
+   uint32_t      NumAverage;  /* RW: Numeric average */
+   uint32_t      KP;          /* RW: Constant of proportionality */
+   uint32_t      KI;          /* RW: Constant of integration */
  } CtrDrvrPll;
 
 /* The PLL asynchronous period is needed to convert PLL units into */
@@ -700,26 +700,26 @@ typedef float CtrDrvrPllAsyncPeriodNs;
 /* ==================================================== */
 
 typedef struct {
-   unsigned int PllErrorThreshold;     /* Pll error threshold to generate a pll error RW */
-   unsigned int PllDacLowPassValue;    /* Low Passed DAC value used if the GMT is missed (CIC filter) RO */
-   unsigned int PllDacCICConstant;     /* Log2 of the number of avarages of the DAC Value CIC low pass filter RW */
-   unsigned int PllMonitorCICConstant; /* Log2 of the interrupt reduction factor (averages over this count)  RW */
-   unsigned int PhaseDCM;              /* (Not used yet) Phase of the spartan DLL. Not used in the standard VHDL RW */
-   unsigned int UtcPllPhaseError;      /* Phase error Utc */
-   unsigned int Temperature;           /* Card temperature. Only valid in CTRIs V3 RO */
-   unsigned int MsMissedErrs;          /* Number of millisencods missed since last power up. (Latches the time)  RO */
+   uint32_t     PllErrorThreshold;     /* Pll error threshold to generate a pll error RW */
+   uint32_t     PllDacLowPassValue;    /* Low Passed DAC value used if the GMT is missed (CIC filter) RO */
+   uint32_t     PllDacCICConstant;     /* Log2 of the number of avarages of the DAC Value CIC low pass filter RW */
+   uint32_t     PllMonitorCICConstant; /* Log2 of the interrupt reduction factor (averages over this count)  RW */
+   uint32_t     PhaseDCM;              /* (Not used yet) Phase of the spartan DLL. Not used in the standard VHDL RW */
+   uint32_t     UtcPllPhaseError;      /* Phase error Utc */
+   uint32_t     Temperature;           /* Card temperature. Only valid in CTRIs V3 RO */
+   uint32_t     MsMissedErrs;          /* Number of millisencods missed since last power up. (Latches the time)  RO */
    CtrDrvrTime   LastMsMissed;
 
-   unsigned int PllErrors;             /* Number of pll errors since last power up (past threshold ) RO */
+   uint32_t     PllErrors;             /* Number of pll errors since last power up (past threshold ) RO */
    CtrDrvrTime  LastPllError;
 
-   unsigned int MissedFrames;          /* Number of missed frames since last power up */
+   uint32_t     MissedFrames;          /* Number of missed frames since last power up */
    CtrDrvrTime  LastFrameMissed;
 
-   unsigned int BadReceptionCycles;    /* Number of bad reception cycles since last power up */
-   unsigned int ReceivedFrames;        /* Number of received frames since last power up */
-   unsigned int SentFramesEvent;       /* Last Sent Frames Event */
-   unsigned int UtcPllErrs;            /* Number of utc pll errors since last reset */
+   uint32_t     BadReceptionCycles;    /* Number of bad reception cycles since last power up */
+   uint32_t     ReceivedFrames;        /* Number of received frames since last power up */
+   uint32_t     SentFramesEvent;       /* Last Sent Frames Event */
+   uint32_t     UtcPllErrs;            /* Number of utc pll errors since last reset */
 
    CtrDrvrTime  LastExt1Start;         /* External Start 1 time tag */
  } CtrDrvrModuleStats;
@@ -737,14 +737,14 @@ typedef struct {
    CtrDrvrInterruptMask InterruptSource;    /* Cleared on read */
    CtrDrvrInterruptMask InterruptEnable;    /* Enable interrupts */
 
-   unsigned int         HptdcJtag;          /* Jtag control reg for HpTdc */
+   uint32_t             HptdcJtag;          /* Jtag control reg for HpTdc */
 
    /* See below for the meaning of these fields */
 
-   unsigned int        InputDelay;  /* Specified in 40MHz ticks */
-   unsigned int        CableId;     /* ID of CTG piloting GMT */
-   unsigned int        VhdlVersion; /* UTC time of VHDL build */
-   unsigned int        OutputByte;  /* Output byte number 1..8 on VME P2 + Enable front pannel */
+   uint32_t            InputDelay;  /* Specified in 40MHz ticks */
+   uint32_t            CableId;     /* ID of CTG piloting GMT */
+   uint32_t            VhdlVersion; /* UTC time of VHDL build */
+   uint32_t            OutputByte;  /* Output byte number 1..8 on VME P2 + Enable front pannel */
 
    CtrDrvrStatus       Status;      /* Current status */
    CtrDrvrCommand      Command;     /* Write command to module */
@@ -752,7 +752,7 @@ typedef struct {
    CtrDrvrPll          Pll;         /* Pll parameters */
 
    CtrDrvrCTime        ReadTime;    /* Latched date time and CTrain */
-   unsigned int        SetTime;     /* Used to set UTC if no cable */
+   uint32_t            SetTime;     /* Used to set UTC if no cable */
 
    CtrDrvrCounterBlock Counters;    /* The counter configurations and status */
    CtrDrvrTgmBlock     Telegrams;   /* Active telegrams */
@@ -763,25 +763,25 @@ typedef struct {
    CtrDrvrRamConfigurationTable Configs;      /* 2048 Counter configurations */
    CtrDrvrEventHistory          EventHistory; /* 1024 Events deep */
 
-   unsigned int Setup;          /* VME Level and Interrupt vector */
+   uint32_t     Setup;          /* VME Level and Interrupt vector */
 
-   unsigned int LastReset;      /* UTC Second of last reset */
-   unsigned int PartityErrs;    /* Number of parity errors since last reset */
-   unsigned int SyncErrs;       /* Number of frame synchronization errors since last reset */
-   unsigned int TotalErrs;      /* Total number of IO errors since last reset */
-   unsigned int CodeViolErrs;   /* Number of code violations since last reset */
-   unsigned int QueueErrs;      /* Number of input Queue overflows since last reset */
+   uint32_t     LastReset;      /* UTC Second of last reset */
+   uint32_t     PartityErrs;    /* Number of parity errors since last reset */
+   uint32_t     SyncErrs;       /* Number of frame synchronization errors since last reset */
+   uint32_t     TotalErrs;      /* Total number of IO errors since last reset */
+   uint32_t     CodeViolErrs;   /* Number of code violations since last reset */
+   uint32_t     QueueErrs;      /* Number of input Queue overflows since last reset */
 
    /* New registers used only in recent VHDL, old makes a bus error ! */
 
    CtrDrvrIoStatus IoStat;      /* IO status */
 
-   unsigned int IdLSL;          /* ID Chip value Least Sig 32-bits */
-   unsigned int IdMSL;          /* ID Chip value Most  Sig 32-bits */
+   uint32_t     IdLSL;          /* ID Chip value Least Sig 32-bits */
+   uint32_t     IdMSL;          /* ID Chip value Most  Sig 32-bits */
 
    CtrDrvrModuleStats ModStats; /* Module statistics */
 
-   unsigned int SvnId[32];      /* SVN Archive string */
+   uint32_t     SvnId[32];      /* SVN Archive string */
 
  } CtrDrvrMemoryMap;
 

@@ -14,14 +14,6 @@
 #include <linux/interrupt.h>
 #endif
 
-extern int debug;
-
-#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,19)
-irqreturn_t LynxOsIntrHandler(int irq, void *arg, struct pt_regs *regs);
-#else
-irqreturn_t LynxOsIntrHandler(int irq, void *arg);
-#endif
-
 static DEFINE_MUTEX(emulate_mutex);
 
 LynxOsIsr lynxos_isrs[LynxOsMAX_DEVICE_COUNT];
@@ -78,11 +70,11 @@ typedef struct {
    char             *Arg;
  } LynxOsTimer;
 
-LynxOsTimer lynxos_timers[TIMERS];
+static LynxOsTimer lynxos_timers[TIMERS];
 
 /* ============================================================================ */
 
-void LynxOsTimersInitialize() {
+void LynxOsTimersInitialize(void) {
 
 int i;
 
@@ -97,7 +89,7 @@ int i;
 /* ============================================================================ */
 /* Generic timer callback                                                       */
 
-void timer_callback(unsigned long arg) {
+static void timer_callback(unsigned long arg) {
 int rubbish;
 
 int i;
@@ -162,7 +154,7 @@ int i;
    i = arg -1;
    if ((i >=0 ) && (i < TIMERS)) {
       if (lynxos_timers[i].TimerInUse) {
-	 del_timer_sync(&lynxos_timers[i].Timer);
+	 del_timer(&lynxos_timers[i].Timer);
 	 lynxos_timers[i].TimerInUse = 0;
 
 	 mutex_unlock(&emulate_mutex);
@@ -188,8 +180,8 @@ DEFINE_SPINLOCK(lynxos_cpu_lock);
 /* I see no way to do this for the time being under Linux                       */
 /* ============================================================================ */
 
-int recoset() {return 0; };     /* Assumes no bus errors */
-void noreco() {return  ; };
+int recoset(void) {return 0; };     /* Assumes no bus errors */
+void noreco(void) {return  ; };
 
 /* ============================================================================ */
 /* LynxOs Memory bound checking                                                 */
@@ -206,7 +198,7 @@ static unsigned char allocblks[LynxOsMEMORY_ALLOCATIONS * LynxOsALLOCATION_SIZE]
 
 static int max_alloc = 0;
 
-void LynxOsMemoryInitialize() {
+void LynxOsMemoryInitialize(void) {
 int i;
 
    if (debug & LynxOsDEBUG_MODULE)
@@ -216,7 +208,7 @@ int i;
 
    for (i=0; i<LynxOsMEMORY_ALLOCATIONS; i++) {
       allocations[i].Pntr  = &(allocblks[i * LynxOsALLOCATION_SIZE]);
-      allocations[i].Size  = 0;
+      allocations[i].Size  = 0L;
       allocations[i].Flgs  = 0;
       allocations[i].InUse = 0;
    }
@@ -233,7 +225,7 @@ char *LynxOsMemoryAllocate(size_t size, int flgs) {
 int i, j;
 
    if (size < sizeof(long)) size = sizeof(long);
-   if (size > LynxOsALLOCATION_SIZE) return (char *) -ENOMEM;
+   if (size > LynxOsALLOCATION_SIZE) return NULL;
 
    mutex_lock(&ctr_drvr_alloc);
 
@@ -262,7 +254,7 @@ int i, j;
 
    if (debug & LynxOsDEBUG_ERRORS)
       printk(KERN_WARNING "lynx_os: LynxOsMemoryAllocate: ENOMEM: No more allocation blocks\n");
-   return (char *) -ENOMEM;
+   return NULL;
 }
 
 int LynxOsMemoryFree(char *pntr) {
@@ -323,7 +315,7 @@ int i;
 
 	    mutex_unlock(&ctr_drvr_alloc);
 
-	    return 0;
+	    return 0L;
 	 }
       }
    }
@@ -333,7 +325,7 @@ int i;
    if (debug & LynxOsDEBUG_ERRORS)
       printk(KERN_WARNING "lynx_os: rbounds: EFAULT: Garbage pointer: 0x%x\n",
 	     (unsigned int) pntr);
-   return 0;
+   return 0L;
 }
 
 /* ============================================================================ */
@@ -364,7 +356,7 @@ int i;
 
 	    mutex_unlock(&ctr_drvr_alloc);
 
-	    return 0;
+	    return 0L;
 	 }
       }
    }
@@ -374,7 +366,7 @@ int i;
    if (debug & LynxOsDEBUG_ERRORS)
       printk(KERN_WARNING "lynx_os: wbounds: EFAULT: Garbage pointer: 0x%x\n",
 	     (unsigned int) pntr);
-   return 0;
+   return 0L;
 }
 
 /* ============================================================================ */
@@ -388,7 +380,7 @@ int pseterr(int err) { lynxos_error_num = err; return err; }
 /* Assorted crap that I have to implement                                       */
 /* ============================================================================ */
 
-int getpid() { return current->pid; }
+int getpid(void) { return current->pid; }
 
 /* ============================================================================ */
 
@@ -411,7 +403,7 @@ char *d, *s;
 
 /* ============================================================================ */
 
-void LynxOsIsrsInitialize() {
+void LynxOsIsrsInitialize(void) {
 
 int i;
 
@@ -453,7 +445,7 @@ struct pci_dev *old = NULL;
 
    *node_h = dev;
    for (i=0; i<LynxOsMAX_DEVICE_COUNT; i++) {
-      if (lynxos_isrs[i].Handle == 0) {
+      if (lynxos_isrs[i].Handle == NULL) {
 	 lynxos_isrs[i].Handle = dev;
 	 lynxos_isrs[i].Slot = (dev->devfn >> 3);
 
@@ -488,7 +480,7 @@ int i;
 	    lynxos_error_num = -EBUSY;
 	    return 1;
 	 }
-	 lynxos_isrs[i].Handle = 0;
+	 lynxos_isrs[i].Handle = NULL;
       }
    }
    return 0;
@@ -648,7 +640,7 @@ unsigned int *arg;
 	 free_irq(lynxos_isrs[i].Irq,arg);
 	 lynxos_isrs[i].Irq = 0;
 	 lynxos_isrs[i].Arg = 0;
-	 lynxos_isrs[i].Isr = 0;
+	 lynxos_isrs[i].Isr = NULL;
 	 return 0;
       }
    }
@@ -735,7 +727,7 @@ int i;
       if ((maps[i].Handle == node_h)
       &&  (maps[i].ResId == resource_id)) {
 
-	 iounmap((void *) maps[i].VAddr);
+	 iounmap((void __iomem *) maps[i].VAddr);
 	 release_mem_region(maps[i].Start,maps[i].Extent);
 
 	 maps[i].Handle = NULL;

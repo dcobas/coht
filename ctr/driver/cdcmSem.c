@@ -53,7 +53,7 @@ static struct cdcm_semaphore *get_sema(int *user_sem)
  * this happens depends on @timeout), to check if it's been marked to wake-up.
  */
 static inline int __cdcm_down_common(struct cdcm_sem *sem, long state,
-				     long timeout)
+				     long mytimeout)
 {
 	struct task_struct *task = current;
 	struct cdcm_sem_waiter waiter;
@@ -65,11 +65,11 @@ static inline int __cdcm_down_common(struct cdcm_sem *sem, long state,
 	for (;;) {
 		if (signal_pending_state(state, task))
 			goto interrupted;
-		if (timeout <= 0)
+		if (mytimeout <= 0)
 			goto timed_out;
 		__set_task_state(task, state);
 		spin_unlock_irq(&sem->lock);
-		timeout = schedule_timeout(timeout);
+		mytimeout = schedule_timeout(mytimeout);
 		spin_lock_irq(&sem->lock);
 		if (waiter.up)
 			return 0;
@@ -94,9 +94,9 @@ static noinline int __cdcm_down_interruptible(struct cdcm_sem *sem)
 	return __cdcm_down_common(sem, TASK_INTERRUPTIBLE, MAX_SCHEDULE_TIMEOUT);
 }
 
-static noinline int __cdcm_down_timeout(struct cdcm_sem *sem, long jiffies)
+static noinline int __cdcm_down_timeout(struct cdcm_sem *sem, long myjiffies)
 {
-	return __cdcm_down_common(sem, TASK_UNINTERRUPTIBLE, jiffies);
+	return __cdcm_down_common(sem, TASK_UNINTERRUPTIBLE, myjiffies);
 }
 
 static inline void cdcm_down(struct cdcm_sem *sem)
@@ -126,7 +126,7 @@ static inline int cdcm_down_interruptible(struct cdcm_sem *sem)
 	return result;
 }
 
-static inline int cdcm_down_timeout(struct cdcm_sem *sem, long jiffies)
+static inline int cdcm_down_timeout(struct cdcm_sem *sem, long myjiffies)
 {
 	unsigned long flags;
 	int result = 0;
@@ -135,7 +135,7 @@ static inline int cdcm_down_timeout(struct cdcm_sem *sem, long jiffies)
 	if (likely(sem->count > 0))
 		sem->count--;
 	else
-		result = __cdcm_down_timeout(sem, jiffies);
+		result = __cdcm_down_timeout(sem, myjiffies);
 	spin_unlock_irqrestore(&sem->lock, flags);
 
 	return result;

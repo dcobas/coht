@@ -6,7 +6,14 @@ echo "install No xml file will be used                       "
 echo "install This is a light weight installer for tests only"
 echo "======================================================="
 
-/sbin/insmod ../ctrp/ctrp.ko debug=0 recover=0
+SRC=/acc/src/dsc/drivers/cohtdrep/lewis/modpars/ctr/driver
+CPU=L865
+KVER=2.6.24.7-rt27
+
+echo 8 > /proc/sys/kernel/printk
+
+#/sbin/insmod $SRC/$CPU/$KVER/ctrp.ko luns=1 pci_buses=2 pci_slots=8
+/sbin/insmod $SRC/$CPU/$KVER/ctrp.ko
 
 MAJOR=`cat /proc/devices | awk '{if ($2 == "ctrp") printf $1}'`
 echo Making nodes for ${MODULE} major device ctr ${MAJOR}

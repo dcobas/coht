@@ -4,12 +4,16 @@ echo "======================================================="
 echo "install CTRV driver ../ctrv/ctrv.ko                    "
 echo "install modules=1 (1 module will auto install)         "
 echo "install infoaddr=0 (No xml file will be used)          "
-echo "install This is a light weight installer for tests only"
 echo "======================================================="
+
+SRC=/acc/src/dsc/drivers/cohtdrep/lewis/modpars/ctr/driver
+CPU=L865
+KVER=2.6.24.7-rt27
 
 echo 8 > /proc/sys/kernel/printk
 
-/sbin/insmod ../ctrv/ctrv.ko debug=0 recover=0 modules=1 infoaddr=0
+#/sbin/insmod $SRC/$CPU/$KVER/ctrv.ko modules=2
+/sbin/insmod $SRC/$CPU/$KVER/ctrv.ko luns=1,2 vme1=0xC00000,0xC10000 vme2=0x100,0x200 vecs=0xC8,0xC9
 
 MAJOR=`cat /proc/devices | awk '{if ($2 == "ctrv") printf $1}'`
 #echo Making nodes for ${MODULE} major device ctr ${MAJOR}

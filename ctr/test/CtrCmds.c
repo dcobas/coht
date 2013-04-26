@@ -75,7 +75,7 @@ static char *ioStatae             [CtrDrvrIoSTATAE]          = {"Eng","XIO","V1"
 
 /**************************************************************************/
 
-char *defaultconfigpath = "/usr/local/drivers/ctr/ctrtest.config";
+char *defaultconfigpath = "/usr/local/ctr/ctrtest.config";
 
 char *configpath = NULL;
 char localconfigpath[128];  /* After a CD */
@@ -138,7 +138,9 @@ int i, j;
 
 /**************************************************************************/
 
-static void IErr(char *name, long *value) {
+static void IErr(char *name, void *ival) {
+
+int *value = ival;
 
    if (value != NULL)
       printf("CtrDrvr: [%02d] ioctl=%s arg=%d :Error\n",
@@ -442,7 +444,7 @@ int n, earg;
 int Module(int arg) {
 ArgVal   *v;
 AtomType  at;
-long mod, cnt, cbl;
+int mod, cnt, cbl;
 CtrDrvrModuleAddress moad;
 
 #ifdef PS_VER
@@ -534,7 +536,7 @@ int wrc;
 /*****************************************************************/
 
 int NextModule(int arg) {
-long cnt;
+int cnt;
 
    arg++;
 
@@ -565,7 +567,7 @@ int NextChannel(int arg) {
 /*****************************************************************/
 
 int PrevModule(int arg) {
-long cnt;
+int cnt;
 
    arg++;
 
@@ -1285,7 +1287,7 @@ CtrDrvrTime t;
 
 int UpdateVersionHistory() {
 
-long m, cnt, vhdlver, filver, found;
+int m, cnt, vhdlver, filver, found;
 CtrDrvrVersion version;
 FILE *verf = NULL;
 char txt[128], fname[64], host[64], *ep, dv[128], df[128];
@@ -1370,7 +1372,7 @@ unsigned int vhdlver;
 char fname[128], vname[128], txt[128], *cp, *ep;
 char host[49];
 CtrDrvrHardwareType ht, cht;
-long m, cnt, update;
+int m, cnt, update;
 
    arg++;
    v = &(vals[arg]);
@@ -2211,7 +2213,7 @@ AtomType  at;
 
 CtrDrvrConnection con;
 CtrDrvrReadBuf rbf;
-long i, cc, qflag, qsize, interrupt, cnt, msk;
+int i, cc, qflag, qsize, interrupt, cnt, msk;
 
    arg++;
    v = &(vals[arg]);
@@ -3287,7 +3289,7 @@ ArgVal   *v;
 AtomType  at;
 
 CtrDrvrCounterMaskBuf cmsb;
-unsigned long cntr, omsk;
+unsigned int cntr, omsk;
 int i;
 
    cntr = channel;
@@ -3351,7 +3353,7 @@ ArgVal   *v;
 AtomType  at;
 
 CtrdrvrRemoteCommandBuf crmb;
-unsigned long cntr, rflg;
+unsigned int cntr, rflg;
 
    cntr = channel;
    crmb.Counter = cntr;
@@ -3410,7 +3412,7 @@ ArgVal   *v;
 AtomType  at;
 
 CtrdrvrRemoteCommandBuf crmb;
-unsigned long cntr, rcmd;
+unsigned int cntr, rcmd;
 int i ,msk;
 
    arg++;
@@ -4267,7 +4269,7 @@ static char *ecnf_help =
 "e<Enable>              Enable or Disable output    1=Enable/0=Disable                          \n"
 "b<Bus>                 Enable businterrupts        1=Interrupt/0=No interrupt                  \n";
 
-void EditConfig(long cntr) {
+void EditConfig(int cntr) {
 
 CtrDrvrCounterConfiguration *cnf;
 CtrDrvrCounterConfigurationBuf cnfb;
@@ -4415,7 +4417,7 @@ unsigned long plw, dly, str, clk, mde, enb, bus;
 /*****************************************************************/
 
 int GetSetConfig(int arg) {
-unsigned long cntr;
+unsigned int cntr;
 
    arg++;
    cntr = 1;
@@ -4426,7 +4428,7 @@ unsigned long cntr;
 /*****************************************************************/
 
 int GetCounterHistory(int arg) {
-unsigned long cntr;
+unsigned int cntr;
 CtrDrvrCounterHistoryBuf chsb;
 
    arg++;
@@ -5627,7 +5629,6 @@ CtrDrvrAction act;
    con.EqpNum   = sctim;
    if (ioctl(ctr,CtrIoctlCONNECT,&con) < 0) {
       IErr("CONNECT",NULL);
-      fclose(lgf);
       return arg;
    }
 

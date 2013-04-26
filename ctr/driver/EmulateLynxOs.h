@@ -33,6 +33,13 @@
 #define cprintf printk
 
 /* ============================================================================ */
+/* Module parameters                                                            */
+/* ============================================================================ */
+extern int debug;
+extern int modules;
+extern int first_module;
+
+/* ============================================================================ */
 /* Debug options are controlled via IOCTL Cmd = 0 argument value                */
 /* ============================================================================ */
 
@@ -44,17 +51,17 @@
 /* LynxOs Memory allocation routines                                            */
 /* ============================================================================ */
 
-char *sysbrk(unsigned long size);
-void sysfree(char *p, unsigned long size);
+extern char *sysbrk(unsigned long size);
+extern void sysfree(char *p, unsigned long size);
 
 /* ============================================================================ */
 /* LynxOs Timeout routines                                                      */
 /* ============================================================================ */
 
-void LynxOsTimersInitialize(void);
+extern void LynxOsTimersInitialize(void);
 
-int timeout(int (*func)(void *), char *arg, int interval);
-int cancel_timeout(int num);
+extern int timeout(int (*func)(void *), char *arg, int interval);
+extern int cancel_timeout(int num);
 
 /* ============================================================================ */
 /* LynxOs interrupt masking routines                                            */
@@ -68,8 +75,8 @@ extern spinlock_t lynxos_cpu_lock;
 /* LynxOs bus error trap mechanism                                              */
 /* ============================================================================ */
 
-int recoset(void);
-void noreco(void);
+extern int recoset(void);
+extern void noreco(void);
 
 /* ============================================================================ */
 /* LynxOs Memory bound checking                                                 */
@@ -95,6 +102,16 @@ long rbounds(unsigned long addr);
 long wbounds(unsigned long addr);
 
 /* ============================================================================ */
+/* Interrupt handler */
+/* ============================================================================ */
+
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,19)
+extern irqreturn_t LynxOsIntrHandler(int irq, void *arg, struct pt_regs *regs);
+#else
+extern irqreturn_t LynxOsIntrHandler(int irq, void *arg);
+#endif
+
+/* ============================================================================ */
 /* LynxOs system kernel errors                                                  */
 /* ============================================================================ */
 
@@ -102,15 +119,15 @@ long wbounds(unsigned long addr);
 #define OK 0
 
 extern int lynxos_error_num;
-int pseterr(int err);
+extern int pseterr(int err);
 
 /* ============================================================================ */
 /* Assorted crap that I have to implement                                       */
 /* ============================================================================ */
 
-int getpid(void);
-void bzero(void *dst, size_t len);
-void bcopy(void *src, void *dst, size_t len);
+extern int getpid(void);
+extern void bzero(void *dst, size_t len);
+extern void bcopy(void *src, void *dst, size_t len);
 
 /* ============================================================================ */
 /* LynxOs DRM Services for PCI                                                  */
@@ -127,43 +144,43 @@ typedef struct drm_node_s  *drm_node_handle;
 #define PCI_RESID_BAR1  0x14
 #define PCI_RESID_BAR0  0x10
 
-void LynxOsIsrsInitialize(void);
+extern void LynxOsIsrsInitialize(void);
 
-int drm_get_handle(int    buslayer_id,
+extern int drm_get_handle(int    buslayer_id,
 		   int    vender_id,
 		   int    device_id,
 		   struct drm_node_s **node_h);
 
-int drm_free_handle(struct drm_node_s *node_h);
+extern int drm_free_handle(struct drm_node_s *node_h);
 
-int drm_device_read (struct drm_node_s *node_h,
+extern int drm_device_read (struct drm_node_s *node_h,
 		     int                resource_id,
 		     unsigned int       offset,
 		     unsigned int       size,
 		     void              *buffer);
 
-int drm_device_write(struct drm_node_s *node_h,
+extern int drm_device_write(struct drm_node_s *node_h,
 		     int                resource_id,
 		     unsigned int       offset,
 		     unsigned int       size,
 		     void              *buffer);
 
-int drm_locate(struct drm_node_s *node);
+extern int drm_locate(struct drm_node_s *node);
 
-int drm_register_isr(struct drm_node_s *node_h,
+extern int drm_register_isr(struct drm_node_s *node_h,
 		     irqreturn_t       (*isr)(void *),
 		     void              *arg);
 
-int drm_map_resource(struct drm_node_s *node_h,
+extern int drm_map_resource(struct drm_node_s *node_h,
 		     int                resource_id,
 		     unsigned long     *vaddr);
 
-int drm_unmap_resource(struct drm_node_s *node_h,
+extern int drm_unmap_resource(struct drm_node_s *node_h,
 		       int                resource_id);
 
-int drm_unregister_isr(struct drm_node_s *node_h);
+extern int drm_unregister_isr(struct drm_node_s *node_h);
 
-int drm_unregister_isr(struct drm_node_s *node_h);
+extern int drm_unregister_isr(struct drm_node_s *node_h);
 
 /* ============================================================================ */
 /* The Unix driver will get hold of the entry points by using the LynxOs dldd   */

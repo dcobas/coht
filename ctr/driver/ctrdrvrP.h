@@ -50,23 +50,23 @@ typedef enum {
 #define CtrDrvrQUEUE_SIZE 64        /* Maximum queue size */
 
 typedef struct {
-   unsigned short QueueOff;
-   unsigned short Missed;
-   unsigned short Size;
-   unsigned int   RdPntr;
-   unsigned int   WrPntr;
+   uint16_t       QueueOff;
+   uint16_t       Missed;
+   uint16_t       Size;
+   uint32_t       RdPntr;
+   uint32_t       WrPntr;
    CtrDrvrReadBuf Entries[CtrDrvrQUEUE_SIZE];
  } CtrDrvrQueue;
 
 typedef struct {
-   unsigned int InUse;
-   unsigned int DebugOn;
-   unsigned int Pid;
-   unsigned int ClientIndex;
-   unsigned int ModuleIndex;
-   unsigned int Timeout;
-	    int Timer;
-	    int Semaphore;
+   uint32_t     InUse;
+   uint32_t     DebugOn;
+   uint32_t     Pid;
+   uint32_t     ClientIndex;
+   uint32_t     ModuleIndex;
+   uint32_t     Timeout;
+   uint32_t     Timer;
+   uint32_t     Semaphore;
    CtrDrvrQueue Queue;
  } CtrDrvrClientContext;
 
@@ -80,47 +80,47 @@ typedef struct {
 
 #ifdef CTR_PCI
    drm_node_handle             Handle;            /* Handle from DRM */
-   int                         LinkId;            /* IointSet Link ID */
-   unsigned int                DeviceId;          /* CTRP or PLX9030 */
-   unsigned int               *Local;             /* Plx9030 local config space */
-   unsigned int                LocalOpen;         /* Plx9030 local conig open */
-   unsigned int                ConfigOpen;        /* Plx9030 configuration open */
-   unsigned int                PciSlot;           /* Module geographic ID PCI Slot */
+   uint32_t                    LinkId;            /* IointSet Link ID */
+   uint32_t                    DeviceId;          /* CTRP or PLX9030 */
+   uint32_t                   *Local;             /* Plx9030 local config space */
+   uint32_t                    LocalOpen;         /* Plx9030 local conig open */
+   uint32_t                    ConfigOpen;        /* Plx9030 configuration open */
+   uint32_t                    PciSlot;           /* Module geographic ID PCI Slot */
 #endif
 
 #ifdef CTR_VME
    CtrDrvrModuleAddress        Address;           /* Vme address */
-   unsigned int                OutputByte;        /* Output byte number 1..64 */
+   uint32_t                    OutputByte;        /* Output byte number 1..64 */
    struct vme_berr_handler     *BerrHandler;       /* Address of VME bus error handler */
 #endif
 
-   unsigned int                IrqBalance;        /* Need to keep track of this */
-   unsigned int                IVector;           /* Resulting interrupt vector */
+   uint32_t                    IrqBalance;        /* Need to keep track of this */
+   uint32_t                    IVector;           /* Resulting interrupt vector */
 
    CtrDrvrMemoryMap            *Map;               /* Pointer to the real hardware */
-   unsigned int                FlashOpen;         /* Flash for CTR VHDL or 93LC56B open */
-   unsigned int                HptdcOpen;         /* Hptdc chip configuration open */
-   unsigned int                ModuleIndex;       /* Which module we are */
-   unsigned int                Command;           /* Command word */
-   unsigned int                InterruptEnable;   /* Enabled interrupts mask */
+   uint32_t                    FlashOpen;         /* Flash for CTR VHDL or 93LC56B open */
+   uint32_t                    HptdcOpen;         /* Hptdc chip configuration open */
+   uint32_t                    ModuleIndex;       /* Which module we are */
+   uint32_t                    Command;           /* Command word */
+   uint32_t                    InterruptEnable;   /* Enabled interrupts mask */
    CtrDrvrPllAsyncPeriodNs     PllAsyncPeriodNs;  /* Pll async period */
-   unsigned int                InputDelay;        /* Specified in 40MHz ticks */
+   uint32_t                    InputDelay;        /* Specified in 40MHz ticks */
    CtrDrvrPll                  Pll;               /* PLL parameters */
-   unsigned int                Status;            /* Module status */
-   unsigned int                InUse;             /* Module context in use */
-   unsigned int                BusErrorCount;     /* Abort fatal loops with this */
-   unsigned int                CableId;           /* Frig a cable ID for module */
+   uint32_t                    Status;            /* Module status */
+   uint32_t                    InUse;             /* Module context in use */
+   uint32_t                    BusErrorCount;     /* Abort fatal loops with this */
+   uint32_t                    CableId;           /* Frig a cable ID for module */
 
    CtrDrvrCounterConfiguration Configs [CtrDrvrRamTableSIZE];
-   unsigned int                Clients [CtrDrvrRamTableSIZE];      /* Clients interrupts PTIM/CTIM */
+   uint32_t                    Clients [CtrDrvrRamTableSIZE];      /* Clients interrupts PTIM/CTIM */
    CtrDrvrTrigger              Trigs   [CtrDrvrRamTableSIZE];
-   unsigned int                EqpNum  [CtrDrvrRamTableSIZE];
+   uint32_t                    EqpNum  [CtrDrvrRamTableSIZE];
    CtrDrvrConnectionClass      EqpClass[CtrDrvrRamTableSIZE];
 
-   unsigned int                HardClients[CtrDrvrInterruptSOURCES];   /* Clients interrupts HARD */
+   uint32_t                    HardClients[CtrDrvrInterruptSOURCES];   /* Clients interrupts HARD */
 
-   int                         Timer;             /* Handel module time delay during reset */
-   int                         Semaphore;
+   uint32_t                    Timer;             /* Handel module time delay during reset */
+   uint32_t                    Semaphore;
 
  } CtrDrvrModuleContext;
 
@@ -136,7 +136,7 @@ typedef struct {
 
    CtrDrvrCtimObjects        Ctim;
    CtrDrvrPtimObjects        Ptim;
-   unsigned int              Modules;
+   uint32_t                  Modules;
    CtrDrvrModuleContext      ModuleContexts[CtrDrvrMODULE_CONTEXTS];
    CtrDrvrClientContext      ClientContexts[CtrDrvrCLIENT_CONTEXTS];
  } CtrDrvrWorkingArea;
@@ -148,11 +148,11 @@ typedef struct {
 typedef struct {
 
 #ifdef CTR_VME
-   unsigned int         Modules;
+   uint32_t             Modules;
    CtrDrvrModuleAddress Addresses[CtrDrvrMODULE_CONTEXTS];
 #endif
 
-   int RecoverMode; /* Needed to recover "lost" modules after FPGA crash */
+   uint32_t RecoverMode; /* Needed to recover "lost" modules after FPGA crash */
 
  } CtrDrvrInfoTable;
 #endif

@@ -28,8 +28,8 @@
 #include <drm.h>
 #endif
 
-#include <ctrhard.h>
 #include <ctrdrvr.h>
+#include <ctrhard.h>
 #include <ctrdrvrP.h>
 
 #ifdef PS_VER

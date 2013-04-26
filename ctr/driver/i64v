@@ -7,9 +7,12 @@ echo "install infoaddr=0 (No xml file will be used)          "
 echo "install This is a light weight installer for tests only"
 echo "======================================================="
 
+CPU=L866
+KVER=3.2.33-rt50.66.el6rt.x86_64
+
 echo 8 > /proc/sys/kernel/printk
 
-/sbin/insmod ../ctrv/ctrv.ko debug=0 recover=0 modules=1 infoaddr=0
+/sbin/insmod ./$CPU/$KVER/ctrv.ko debug=0 recover=0 modules=1 infoaddr=0
 
 MAJOR=`cat /proc/devices | awk '{if ($2 == "ctrv") printf $1}'`
 #echo Making nodes for ${MODULE} major device ctr ${MAJOR}

@@ -39,11 +39,10 @@ extern int LynxOsMemoryGetSize(int cmd, int *dirp);
 extern LynxOsIsr lynxos_isrs[LynxOsMAX_DEVICE_COUNT];
 
 int debug              = 0;
-int recover            = 0;
+static int recover     = 0;
 int modules            = 1;
 int first_module       = 1;
-unsigned long infoaddr = 0;
-static char dname[64]  = { 0 };
+static unsigned long infoaddr = 0;
 
 static int   LynxOs_major      = LynxOsMAJOR;
 static char *LynxOs_major_name = LynxOsMAJOR_NAME;
@@ -62,26 +61,20 @@ module_param(modules,      int,   0644);
 module_param(first_module, int,   0644);
 module_param(infoaddr,     ulong, 0644);
 
-module_param(LynxOs_major,int,0644);
-MODULE_PARM_DESC(LynxOs_major,"Major device number");
+MODULE_VERSION(GIT_REPO ":" GIT_VERSION);
 
-module_param(LynxOs_major_name,charp,0);
-MODULE_PARM_DESC(LynxOs_major_name,"Name of major device");
-
-module_param_string(dname, dname, sizeof(dname), 0);
-MODULE_PARM_DESC(dname, "Driver name");
-
-int         LynxOsOpen(struct inode *inode, struct file *filp);
-int         LynxOsClose(struct inode *inode, struct file *filp);
-ssize_t     LynxOsRead(struct file *filp, char *buf, size_t count, loff_t *f_pos);
-ssize_t     LynxOsWrite(struct file *filp, const char *buf, size_t count, loff_t *f_pos);
-int         LynxOsIoctl(struct inode *inode, struct file *filp, unsigned int cmd, unsigned long arg);
-void        LynxOsUninstall(void);
-int         LynxOsInstall(void);
+static int         LynxOsOpen(struct inode *inode, struct file *filp);
+static int         LynxOsClose(struct inode *inode, struct file *filp);
+static ssize_t     LynxOsRead(struct file *filp, char __user *buf, size_t count, loff_t *f_pos);
+static ssize_t     LynxOsWrite(struct file *filp, const char __user *buf, size_t count, loff_t *f_pos);
+static int         LynxOsIoctl(struct inode *inode, struct file *filp, unsigned int cmd, unsigned long arg);
+static void        LynxOsUninstall(void);
+static int         LynxOsInstall(void);
 
 static DEFINE_MUTEX(ctr_drvr_mutex);
 
-long LynxIoctl64(struct file *filp, unsigned int cmd, unsigned long arg) {
+static long LynxIoctl64(struct file *filp, unsigned int cmd, unsigned long arg) {
+
 int res;
 
    mutex_lock(&ctr_drvr_mutex);
@@ -91,7 +84,8 @@ int res;
    return res;
 }
 
-int LynxIoctl32(struct inode *inode, struct file *filp, unsigned int cmd, unsigned long arg) {
+#ifndef HAVE_UNLOCKED_IOCTL
+static int LynxIoctl32(struct inode *inode, struct file *filp, unsigned int cmd, unsigned long arg) {
 int res;
 
    mutex_lock(&ctr_drvr_mutex);
@@ -100,14 +94,19 @@ int res;
    mutex_unlock(&ctr_drvr_mutex);
    return res;
 }
+#endif
 
-struct file_operations LynxOs_fops = {
-   read:           LynxOsRead,
-   write:          LynxOsWrite,
-   unlocked_ioctl: LynxIoctl64,
-   compat_ioctl:   LynxIoctl64,
-   open:           LynxOsOpen,
-   release:        LynxOsClose
+static struct file_operations LynxOs_fops = {
+   .read         =  LynxOsRead,
+   .write        =  LynxOsWrite,
+#ifndef HAVE_UNLOCKED_IOCTL
+   .ioctl        =  LynxIoctl32,
+#else
+   .unlocked_ioctl = LynxIoctl64,
+#endif
+   .compat_ioctl =  LynxIoctl64,
+   .open         =  LynxOsOpen,
+   .release      =  LynxOsClose,
 };
 
 #include "EmulateLynxOs.h"
@@ -115,13 +114,13 @@ struct file_operations LynxOs_fops = {
 
 extern struct dldd entry_points;
 
-void *LynxOsWorkingArea = NULL;
+static void *LynxOsWorkingArea = NULL;
 
 /* ===================================================== */
 /* Open                                                  */
 /* ===================================================== */
 
-int LynxOsOpen(struct inode *inode, struct file *filp) {
+static int LynxOsOpen(struct inode *inode, struct file *filp) {
 
 long num;
 struct LynxFile lynx_file;
@@ -130,6 +129,11 @@ struct LynxFile lynx_file;
 
    if (debug & LynxOsDEBUG_MODULE)
       printk(KERN_INFO "Debug: LynxOsOpen: Major: %d Minor: %ld\n",MAJOR(inode->i_rdev),num);
+
+   if (LynxOsWorkingArea == NULL) {
+      printk(KERN_INFO "CTRP/V Driver: open: No installed hardware\n");
+      return -ENODEV;
+   }
 
    if (entry_points.dldd_open(LynxOsWorkingArea,num,&lynx_file) == OK) {
       filp->private_data = (void *) num;
@@ -142,7 +146,7 @@ struct LynxFile lynx_file;
 /* Close                                                 */
 /* ===================================================== */
 
-int LynxOsClose(struct inode *inode, struct file *filp) {
+static int LynxOsClose(struct inode *inode, struct file *filp) {
 
 int num;
 struct LynxFile lynx_file;
@@ -162,13 +166,13 @@ struct LynxFile lynx_file;
 /* Read                                                  */
 /* ===================================================== */
 
-ssize_t LynxOsRead(struct file *filp, char *buf, size_t count, loff_t *f_pos) {
+static ssize_t LynxOsRead(struct file *filp, char __user *buf, size_t count, loff_t *f_pos) {
 
 long num;
 struct LynxFile lynx_file;
 char *lynxmem;
 long cc;
-int rc;
+ssize_t rc;
 
    num = lynx_file.dev = (long) filp->private_data;
 
@@ -202,13 +206,13 @@ int rc;
 /* Write                                                 */
 /* ===================================================== */
 
-ssize_t LynxOsWrite(struct file *filp, const char *buf, size_t count, loff_t *f_pos) {
+static ssize_t LynxOsWrite(struct file *filp, const char __user *buf, size_t count, loff_t *f_pos) {
 
 long num;
 struct LynxFile lynx_file;
 char *lynxmem;
 long cc;
-int rc;
+ssize_t rc;
 
    num = lynx_file.dev = (long) filp->private_data;
 
@@ -244,7 +248,7 @@ int rc;
 
 #define CMD_SET_DEBUG 0
 
-int LynxOsIoctl(struct inode *inode, struct file *filp, unsigned int cmd, unsigned long arg) {
+static int LynxOsIoctl(struct inode *inode, struct file *filp, unsigned int cmd, unsigned long arg) {
 
 long num;
 struct LynxFile lynx_file;
@@ -252,6 +256,8 @@ int count, dir;
 long cc;
 int rc, cm;
 char *iobuf;
+void __user *argp = (void __user *)arg;
+
 
    if (cmd >= CtrDrvrLAST_IOCTL) return -25;  /* ENOTTY This is not a typewriter */
 
@@ -266,14 +272,14 @@ char *iobuf;
       return cc;
    }
 
-   if ((iobuf = LynxOsMemoryAllocate(count,dir)) < 0) {
+   if ((iobuf = LynxOsMemoryAllocate(count,dir)) == NULL) {
       printk(KERN_WARNING "LynxOsIoctl: LynxOsMemoryAllocate: No more memory: Minor: %ld Cmd: %d\n",num,cmd);
       return -ENOMEM;
    }
 
    if ((arg) && (dir & LynxOsMemoryREAD_FLAG)) {
-      if (access_ok(VERIFY_READ,(char *) arg,count)) {
-	 cc = __copy_from_user(iobuf,(char *) arg,count);
+      if (access_ok(VERIFY_READ,argp,count)) {
+	 cc = __copy_from_user(iobuf,argp,count);
 	 if (cc) {
 	    LynxOsMemoryFree(iobuf);
 	    printk(KERN_WARNING "LynxOsIoctl __copy_from_user: Returned: %ld\n",cc);
@@ -309,8 +315,8 @@ char *iobuf;
    rc = entry_points.dldd_ioctl(LynxOsWorkingArea,&lynx_file,cmd,iobuf);
    if (rc >= 0) {
       if ((arg) && (dir & LynxOsMemoryWRIT_FLAG)) {
-	 if (access_ok(VERIFY_WRIT,(char *) arg,count)) {
-	    cc = __copy_to_user((char *) arg,iobuf,count);
+	 if (access_ok(VERIFY_WRIT,argp,count)) {
+	    cc = __copy_to_user(argp,iobuf,count);
 	    if (cc) {
 	       LynxOsMemoryFree(iobuf);
 	       printk(KERN_WARNING "LynxOsIoctl __copy_to_user: Returned: %ld\n",cc);
@@ -335,7 +341,7 @@ char *iobuf;
 /* Uninstall the driver                                  */
 /* ===================================================== */
 
-void LynxOsUninstall(void) {
+static void LynxOsUninstall(void) {
 
 int cc;
 
@@ -358,7 +364,7 @@ int cc;
 #define SET_MODULE_OWNER(dev) ((dev)->owner = THIS_MODULE)
 #endif
 
-int LynxOsInstall(void) {
+static int LynxOsInstall(void) {
 
 int cc;
 
