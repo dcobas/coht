@@ -1,8 +1,0 @@
-EXTRA_CFLAGS = -I$(src) -I$(src)/../../include -DHARD_FLOAT -mhard-float -Wno-strict-prototypes -DCOMPILE_TIME=$(shell date +%s)
-
-obj-m := ctrv.o ctrp.o
-ctrv-y := ctrvdrvr.o
-ctrp-y := ctrpdrvr.o
-
-CFLAGS_ctrvdrvr.o := -DCTR_VME
-CFLAGS_ctrpdrvr.o := -DCTR_PCI
