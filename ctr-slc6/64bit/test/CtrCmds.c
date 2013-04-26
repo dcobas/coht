@@ -75,7 +75,7 @@ static char *ioStatae             [CtrDrvrIoSTATAE]          = {"Eng","XIO","V1"
 
 /**************************************************************************/
 
-char *defaultconfigpath = "/usr/local/drivers/ctr/ctrtest.config";
+char *defaultconfigpath = "/usr/local/ctr/ctrtest.config";
 
 char *configpath = NULL;
 char localconfigpath[128];  /* After a CD */
