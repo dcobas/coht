@@ -8,7 +8,7 @@ SRCS =	create_window.c destroy_window.c setflag.c \
 	testvd802.c hsm-dma.c berrtest.c doublemap.c
 
 CFLAGS		= -Wall -DDEBUG -D_GNU_SOURCE -g -I. -I../include
-LIBVMEBUS	= ../object_vmebus/libvmebus.$(CPU).a
+LIBVMEBUS	= ../lib/libvmebus.$(CPU).a
 LIBVD80		= libvd80.$(CPU).a
 LDLIBS		= -lrt
 
