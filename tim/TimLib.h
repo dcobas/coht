@@ -878,6 +878,8 @@ TimLibError TimLibSetPllLocking(unsigned long module,
 
 unsigned long TimLibGetModuleForCtim(unsigned long ctim);
 
+unsigned long TimLibGetModuleForMch(TgmMachine mch);
+
 #if 0
 #ifdef __cplusplus
 }

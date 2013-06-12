@@ -317,6 +317,12 @@ unsigned long cblid;
    return 0;
 }
 
+/* =============================================== */
+
+unsigned long TimLibGetModuleForMch(TgmMachine mch) {
+   return GetModuleForMch(mch);
+}
+
 /* ==================================================================== */
 /* This routine could have been hidden from the user of the Timing lib, */
 /* however, in some circumstances, the initialization can take several  */
