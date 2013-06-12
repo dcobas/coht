@@ -1,0 +1,18 @@
+#!	/bin/sh
+
+ACC=lab
+CPU=L865
+KVER=2.6.24.7-rt27
+
+DRIVER_NAME=cvora
+DRIVER=$DRIVER_NAME.ko 
+INSTALL_SCRIPTS="install_$DRIVER_NAME.sh transfer2insmod.awk"
+
+LIBS=lib$DRIVER_NAME.L865.a
+HEADERS=lib$DRIVER_NAME.h
+
+DRIVER_PATH=/acc/dsc/$ACC/$CPU/$KVER/$DRIVER_NAME
+LIBRARY_PATH=/acc/local/$CPU/drv/$DRIVER_NAME
+
+echo dsc_install $DRIVER $INSTALL_SCRIPTS $DRIVER_PATH
+echo dsc_install $LIBS $HEADERS $LIBRARY_PATH
