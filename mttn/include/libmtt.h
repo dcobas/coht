@@ -168,6 +168,14 @@ MttLibError MttLibContinueTask(char *name);
 uint32_t MttLibGetTaskStatus(char *name);
 
 /* ================================================================ */
+/* Get/Set the current working module                               */
+/* If *modnum is zero, no setting is made                           */
+/* If *modnum is a valid module number [1..n] it sets the module    */
+/* On success *modnum is the current working module number          */
+
+MttLibError MttLibGetSetModule(int *modnum);
+
+/* ================================================================ */
 /* Calling this routine sends out the specified frame imediatley.   */
 
 MttLibError MttLibSendEvent(unsigned long frame);

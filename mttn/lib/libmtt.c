@@ -932,7 +932,7 @@ uint32_t MttLibWait(uint32_t mask, int noqueue, int tmo) {
 		return 0;
 
 	if ((mask & connected) != mask) {
-		con.Module = 1;
+		con.Module = 0;
 		con.ConMask = mask;
 		if (ioctl(mtt, SkelDrvrIoctlCONNECT, &con) < 0)
 			return 0;
@@ -959,6 +959,32 @@ uint32_t MttLibWait(uint32_t mask, int noqueue, int tmo) {
 		if (mask & rbf.Connection.ConMask)
 			return rbf.Connection.ConMask;
 	}
+	return 0;
+}
+
+/* ================================================================ */
+/* Get/Set the current working module                               */
+/* If *modnum is zero, no setting is made                           */
+/* If *modnum is a valid module number [1..n] it sets the module    */
+/* On success *modnum is the current working module number          */
+/* Get/Set the working module                                       */
+
+MttLibError MttLibGetSetModule(int *modnum) {
+
+uint32_t curmod;
+
+	if ((mtt == 0) || (modnum == NULL))
+		return MttLibErrorOPEN;
+
+	curmod = *modnum;
+
+	if ((curmod) && (ioctl(mtt, SkelDrvrIoctlSET_MODULE, &curmod) < 0))
+		return MttLibErrorIO;
+
+	if (ioctl(mtt, SkelDrvrIoctlGET_MODULE, &curmod) < 0)
+		return MttLibErrorIO;
+
+	*modnum = curmod;
 	return 0;
 }
 
