@@ -65,7 +65,7 @@ static int level[SIS33_MAX_DEVICES];
 static unsigned int level_num;
 static int index[SIS33_MAX_DEVICES] = SIS33_DEFAULT_IDX;
 
-module_param_array(base, long, &base_num, 0444);
+module_param_array(base, ulong, &base_num, 0444);
 MODULE_PARM_DESC(base, "Base address of the sis3320 card");
 module_param_array(vector, int, &vector_num, 0444);
 MODULE_PARM_DESC(vector, "IRQ vector");
