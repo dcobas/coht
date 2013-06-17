@@ -47,6 +47,14 @@ ifeq ($(CPU), L865)
 	include ../$(ROOTDIR)/makefiles/Makefile.linux
 endif
 
+# SLC6
+ifeq ($(CPU), L866)
+	ifeq ($(KVER),)
+		KVER = 3.6.11-rt30.25.el6rt.x86_64
+	endif
+	include ../$(ROOTDIR)/makefiles/Makefile.linux
+endif
+
 # Lynx
 ifeq ($(CPU), ppc4)
 	KVER = 4.0.0

@@ -10,8 +10,7 @@
 #include "ModuleLynxOs.c"
 #include "EmulateLynxOs.c"
 #include "DrvrSpec.c"
-
-#include "../driver/acdxdrvr.c"
+#include "acdxdrvr.c"
 
 /* ===================================================== */
 
