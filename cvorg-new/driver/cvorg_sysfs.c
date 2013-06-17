@@ -12,6 +12,7 @@
 #include <linux/device.h>
 #include <linux/ctype.h>
 #include <linux/sysfs.h>
+#include <linux/stat.h>
 #include <asm/uaccess.h>
 
 #include "cvorg.h"
