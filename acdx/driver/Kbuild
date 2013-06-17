@@ -4,8 +4,8 @@ EXTRA_CFLAGS += \
 	-DEMULATE_LYNXOS_ON_LINUX \
 	-DHARD_FLOAT \
 	-mhard-float \
-	-I $(src)/../common \
-	-I $(src)
+	-I/acc/src/dsc/drivers/coht/acdx/driver
+
 
 obj-m := acdx.o
 acdx-objs := acdxdrvr.o DrvrSpec.o EmulateLynxOs.o ModuleLynxOs.o

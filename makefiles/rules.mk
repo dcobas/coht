@@ -16,7 +16,7 @@ DEFAULT_CPU = L865 ppc4
 
 # User can compile for this platforms, if (1) framework compilation is not limited
 # by TARGET_CPU and (2) CPU is provided in the command line
-SUPPORTED_CPU = L865 ppc4 L864 ces
+SUPPORTED_CPU = L866 L865 ppc4 L864 ces
 
 # User can limit framework compilation using this option
 # If user does no limitation -- will compile for default targets
