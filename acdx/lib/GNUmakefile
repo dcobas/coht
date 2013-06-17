@@ -17,6 +17,7 @@ ACCS=
 all:$(INSTFILES)
 
 libacdx.$(CPU).o: libacdx.c
+libamp.$(CPU).o: libamp.c
 
 libacdx.$(CPU).a: libacdx.$(CPU).o
 	-$(RM) $@
