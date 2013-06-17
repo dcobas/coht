@@ -633,9 +633,10 @@ static int cvorg_release(struct inode *inode, struct file *file)
         return 0;
 }
 
-static int cvorg_ioctl(struct inode *inode, struct file *fp, unsigned op, unsigned long arg)
+static long cvorg_ioctl(struct file *fp, unsigned op, unsigned long arg)
 {
-        struct cvorg *cvorg = container_of(inode->i_cdev, struct cvorg, cdev);
+        struct cvorg *cvorg = container_of(fp->f_dentry->d_inode->i_cdev,
+					   struct cvorg, cdev);
 	int ret;
 
 	switch(op) {
@@ -700,7 +701,7 @@ static const struct file_operations cvorg_fops = {
         .owner          = THIS_MODULE,
         .open           = cvorg_open,
         .release        = cvorg_release,
-	.ioctl		= cvorg_ioctl,
+	.unlocked_ioctl = cvorg_ioctl,
 };
 
 
