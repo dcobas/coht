@@ -7,12 +7,14 @@ ifeq ($(CPU),L865)
 	KVER ?= 2.6.24.7-rt27
 endif
 
+include /acc/src/dsc/co/Make.auto
+
 KERNELSRC=/acc/sys/$(CPU)/usr/src/kernels/$(KVER)
-OUTPUTDIR=$(PWD)/$(CPU)/$(KVER)
+OUTPUTDIR=$(shell pwd)/$(CPU)/$(KVER)
 
 CFLAGS=-g -Wall
 
-all: driver 
+all: driver
 driver: modules
 
 modules: 
@@ -23,7 +25,7 @@ modules:
 clean:
 	rm -f *.o *.a *.pyc *.so $(TESTS)
 	rm -f *.mod.c
-	rm -rf L865 L864 ppc 
+	rm -rf L86[4-6] ppc
 	make -C $(KERNELSRC) M=`pwd` clean
 
 
