@@ -1,4 +1,0 @@
-EXTRA_CFLAGS += -DCOMPILE_TIME=$(shell date +%s) -g -Wall
-ccflags-y += -I /acc/local/$(CPU)/include
-
-obj-m:=vd80.o

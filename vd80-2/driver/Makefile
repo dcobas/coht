@@ -9,8 +9,14 @@ KVER=3.6.11-rt30.25.el6rt.x86_64
 endif
 
 KERNELSRC=/acc/sys/$(CPU)/usr/src/kernels/$(KVER)
+GIT_VERSION = $(shell cd $(src); git describe --dirty --long --tags --always)
 
-CFLAGS=-g -Wall
+ccflags-y += -g -Wall
+ccflags-y += -I /acc/local/$(CPU)/include
+ccflags-y += -DGIT_VERSION=\"$(GIT_VERSION)\"
+
+obj-m:=vd80.o
+
 
 all: modules
 
