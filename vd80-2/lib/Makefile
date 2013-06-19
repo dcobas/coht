@@ -1,8 +1,8 @@
-CPU=L866
+CPU ?= L866
 
 include /acc/dsc/src/co/Make.auto
 
-CFLAGS= -g -Wall -I. -I../../driver -fPIC -DCOMPILE_TIME=$(shell date +%s)
+CFLAGS= -g -Wall -I ../driver -fPIC -DCOMPILE_TIME=$(shell date +%s)
 
 SRCS = libvd80.c libvd80.h
 

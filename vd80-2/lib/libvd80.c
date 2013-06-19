@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include <vd80.h>
 #include <vd80hard.h>
-#include <libvd80.h>
+#include "libvd80.h"
 
 /* ==================================================================== */
 
