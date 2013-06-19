@@ -1,4 +1,0 @@
-export LD_LIBRARY_PATH=.:
-rm -f libvd80.so.1.0
-ln -s ../vd80lib.L866.so libvd80.so.1.0
-./vd80Test-stub.L866
