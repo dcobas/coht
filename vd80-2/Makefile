@@ -1,3 +1,4 @@
+CPU ?= L866
 DIRS = driver lib lib/test
 GIT_VERSION = $(git describe --dirty --long --tags --always)
 
