@@ -43,8 +43,8 @@
 #include <linux/delay.h>
 
 #include <vmebus.h>
-#include <vd80.h>
-#include <vd80P.h>
+#include "vd80.h"
+#include "vd80P.h"
 
 #define TSI148_LCSR_DSTA_DON (1<<25) /* DMA done bit */
 

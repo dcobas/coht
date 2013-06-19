@@ -11,8 +11,8 @@
 #ifndef VD80DRVR_P
 #define VD80DRVR_P
 
-#include <vd80.h>
-#include <vd80hard.h>
+#include "vd80.h"
+#include "vd80hard.h"
 
 /* ============================================= */
 /* Declare the structures in the VD80 memory map */

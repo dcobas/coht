@@ -1,3 +1,4 @@
-EXTRA_CFLAGS += -DCOMPILE_TIME=$(shell date +%s) -g -Wall -I/acc/src/dsc/drivers/cohtdrep/lewis/vd80_linux/driver
+EXTRA_CFLAGS += -DCOMPILE_TIME=$(shell date +%s) -g -Wall
+ccflags-y += -I /acc/local/$(CPU)/include
 
 obj-m:=vd80.o

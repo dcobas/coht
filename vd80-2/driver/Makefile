@@ -16,7 +16,7 @@ all: modules
 
 modules: 
 	cp Module.symvers.vmebus Module.symvers
-	make -C $(KERNELSRC) M=`pwd` KVER=$(KVER) CPU=$(CPU) modules
+	make -C $(KERNELSRC) M=`pwd` CPU=$(CPU) modules
 	rm -rf ./$(CPU)
 	mkdir ./$(CPU)
 	mkdir ./$(CPU)/$(KVER)
