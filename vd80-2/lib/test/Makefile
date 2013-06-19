@@ -23,7 +23,7 @@ HDRS = Cmds.h $(VD80LB)/libvd80.h $(DRIVER)/vd80.h
 all: $(ALL)
 
 clean:
-	$(RM) $(ALL) $(BAKS)
+	$(RM) $(ALL) $(BAKS) *.o *.L86[456]
 
 # Run on Workstation only
 

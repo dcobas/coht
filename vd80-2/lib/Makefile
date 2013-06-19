@@ -20,4 +20,4 @@ libvd80.$(CPU).a: libvd80.$(CPU).o
 	$(RANLIB) $@
 
 clean:
-	-$(RM) libvd80.$(CPU).so libvd80.$(CPU).o
+	-$(RM) *.so *.a *.o
