@@ -8,11 +8,11 @@ include /acc/dsc/src/co/Make.auto
 
 COMPILE_TIME:=$(shell date +%s)
 
-DRIVER:=../../../driver
-VD80LB:=..
+VD80LB = ..
+DRIVER = $(VD80LB)/../driver
 
 
-CFLAGS = -g -Wall -I. -I$(VD80LB) -I$(DRIVER) -DCOMPILE_TIME=$(COMPILE_TIME)
+CFLAGS = -g -Wall -I $(VD80LB) -I $(DRIVER) -DCOMPILE_TIME=$(COMPILE_TIME)
 
 LDLIBS = $(VD80LB)/libvd80.$(CPU).a
 
