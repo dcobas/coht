@@ -4,6 +4,9 @@ include /acc/dsc/src/co/Make.auto
 
 CFLAGS= -g -Wall -I ../driver -fPIC -DCOMPILE_TIME=$(shell date +%s)
 
+GIT_VERSION = $(git describe --dirty --long --tags --always)
+CFLAGS += -DGIT_VERSION=\"$(GIT_VERSION)\"
+
 SRCS = libvd80.c libvd80.h
 
 all: libvd80.$(CPU).so libvd80.$(CPU).a
