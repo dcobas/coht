@@ -23,9 +23,7 @@ modules:
 	rm -f *.o
 
 clean:
-	rm -f vd80.ko
-	rm -f ./$(CPU)/$(KVER)/vd80.ko
-	rm -f *.o
+	rm -rf *.ko L86[456] *.o *.mod.c modules.order
 
 install: ./$(CPU)/$(KVER)/vd80.ko
 	@echo "please specify one of {install-lab|install-oper|install-lhc|install-all}"
