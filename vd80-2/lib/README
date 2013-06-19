@@ -1,0 +1,4 @@
+sh_obj: Just contains a static VD80 library and test program.
+	It also has a so object if you prefer.
+	This new library and test is based on a pure Linux driver with a new API.
+	Julian

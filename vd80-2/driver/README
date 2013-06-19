@@ -1,0 +1,3 @@
+This is a pure linux driver.
+It compiles for later kernel versions on both SLC5/6 and for 32/64 bit architectures
+Julian Lewis BE/CO/HT April 16th 2013

@@ -1,0 +1,16 @@
+#!/bin/sh
+echo Installing VD80 driver...
+echo 8 > /proc/sys/kernel/printk
+
+
+insmod L866/3.2.33-rt50.66.el6rt.x86_64/vd80.ko luns=1 slot=3 vmeb=0x180000 vecs=0xB0
+
+MAJOR=`cat /proc/devices | awk '{if ($2 == "vd80") printf $1}'`
+echo Making nodes for ${MODULE} major device vd80 ${MAJOR}
+if [ -z "$MAJOR" ]; then
+     echo "driver VD80 not installed !"
+     exit 2
+fi
+
+rm -f /dev/vd80.*
+/bin/mknod  -m 0666 /dev/vd80.0 c ${MAJOR} 0

@@ -1,0 +1,9 @@
+Tuesday 28th May 2013
+----------------------
+
+This is a completely new test program that calls libvd80.a directly.
+The API of this library is vd80 specific and it calls a new pure Linux driver.
+The new driver is based on the one device per node model and is not compatible
+with the older skel driver.
+
+Julian

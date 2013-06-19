@@ -1,0 +1,2 @@
+To generate html or tex versions of this document, use
+the emacs commands org-export-to-latex or org-export-to-html
