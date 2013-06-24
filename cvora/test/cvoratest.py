@@ -3,9 +3,14 @@
 
 import cmd
 import sys
+import os
+import os.path
 from ctypes import *
+import struct
 
-libcvora = '../libcvora.L865.so'
+testpath = os.path.realpath(sys.argv[0])
+testdir  = os.path.dirname(testpath)
+libcvora = os.path.join(testdir, 'cvora/libcvora.so')
 
 class CvoraCmd(cmd.Cmd):
 
@@ -27,6 +32,7 @@ class CvoraCmd(cmd.Cmd):
         self.lun = lun
 
     def do_lun(self, arg):
+        """lun [lun]: select current module lun to work with"""
         if arg == '':
             print 'lun %d, fd = %d' % (self.lun, self.fd)
             return
@@ -36,6 +42,7 @@ class CvoraCmd(cmd.Cmd):
         self.fd  = self.lib.cvora_init(lun)
 
     def do_mode(self, arg):
+        """mode [mode]: set operation mode for current module"""
         if arg == '':
             mode = c_int()
             self.lib.cvora_get_mode(self.fd, byref(mode))
@@ -44,13 +51,36 @@ class CvoraCmd(cmd.Cmd):
         mode = int(arg)
         print self.lib.cvora_set_mode(self.fd, mode)
 
+    def do_modes(self, arg):
+        """modes: show CVORA modes"""
+        for k, v in self.literal_mode.items():
+            print k, ': ', v
+
+    def do_polarity(self, arg):
+        """polarity [1|positive|0|negative]: set pulse polarity"""
+        if arg == '':
+            polarity = c_int()
+            self.lib.cvora_get_pulse_polarity(self.fd, byref(polarity))
+            print 'polarity %s' % (polarity.value and "positive" or "negative")
+            return
+        if arg in [ "1", "positive" ]:
+            polarity = 1
+        elif arg in [ "0", "negative" ]:
+            polarity = 0
+        else:
+            print "invalid polarity"
+            return
+        print self.lib.cvora_set_pulse_polarity(self.fd, polarity)
+
     def do_version(self, arg):
+        """version: get module firmware version"""
         version = c_uint()
         self.lib.cvora_get_version(self.fd, byref(version))
         version = version.value
-        print '%x' % version
+        print '%x.%x' % ( version >> 8, version & 0xff )
 
     def do_status(self, arg):
+        """status: show and decrypt status register"""
         status = c_uint()
         self.lib.cvora_get_hardware_status(self.fd, byref(status))
         print 'status = 0x%08x' % status.value
@@ -65,15 +95,14 @@ class CvoraCmd(cmd.Cmd):
         irq_vector        = (status & (0xff<<8))    >> 8
         version           = (status & (0xffff<<16)) >> 16
 
-        return '''
+        return '''\
         Module version: %x
         Module status: %s
         IRQ vector: 0x%x
         IRQ status: %s
         Polarity: %s
         Counter overflow: %s
-        Memory overflow: %s
-        ''' % (
+        Memory overflow: %s''' % (
             version,
             module_enable     and  "enabled"    or  "disabled",
             irq_vector,
@@ -83,7 +112,21 @@ class CvoraCmd(cmd.Cmd):
             memory_overflow   and  "Overflown"  or  "OK",
         )
 
+    def print_samples(self, buf, size):
+        format = size/4 * 'I'
+        values = struct.unpack(format, buf[:size])
+        col = 0
+        for v in values:
+            print '%08x' % v,
+            col += 1
+            if col >= 8:
+                print
+                col = 0
+        if 0 < col:
+            print
+
     def do_samples(self, arg):
+        """samples: show current sample buffer"""
         size = c_int()
         self.lib.cvora_get_sample_size(self.fd, byref(size))
         size = size.value
@@ -91,20 +134,89 @@ class CvoraCmd(cmd.Cmd):
         actsize = c_int()
         self.lib.cvora_read_samples(self.fd, size, byref(actsize), byref(buffer))
         actsize = actsize.value
-        print '%d (%d) samples' % (size, actsize)
-        if False:
-            print '%di (%d) samples, buffer = [%x %x %x %x ... ]' % (
-                    size, actsize,
-                    ord(buffer[0]), ord(buffer[1]), ord(buffer[2]), ord(buffer[3]),)
+        print '%d (%d) samples' % (size/4, actsize/4)
+        self.print_samples(buffer, actsize)
+
+    def do_soft_start(self, arg):
+        """soft_start   issue a SOFT START command"""
+        self.lib.cvora_soft_start(self.fd)
+    def do_soft_stop(self, arg):
+        """soft_stop   issue a SOFT STOP command"""
+        self.lib.cvora_soft_stop(self.fd)
+    def do_soft_rearm(self, arg):
+        """soft_rearm   issue a SOFT REARM command"""
+        self.lib.cvora_soft_rearm(self.fd)
+    def do_clock(self, arg):
+        """clock    display observed clock frequency"""
+        freq = c_int()
+        self.lib.cvora_get_clock_frequency(self.fd, byref(freq))
+        print '%d Hz' % freq.value
+
+    def do_channel_mask(self, arg):
+        """channel_mask [mask]: get/set channel mask"""
+        if arg == '':
+            mask = c_uint()
+            self.lib.cvora_get_channels_mask(self.fd, byref(mask))
+            print 'mask: %08x' % mask.value
+            return
+        mask = int(arg, 0)
+        print self.lib.cvora_set_channels_mask(self.fd, mask)
+
+    def do_enable(self, arg):
+        """enable: enable module"""
+        self.lib.cvora_enable_module(self.fd)
+    def do_disable(self, arg):
+        """disable: disable module"""
+        self.lib.cvora_disable_module(self.fd)
+
+    def do_irq_enable(self, arg):
+        """irq_enable: enable interrupts"""
+        self.lib.cvora_enable_interrupts(self.fd)
+    def do_irq_disable(self, arg):
+        """irq_disable: disable interrupts"""
+        self.lib.cvora_disable_interrupts(self.fd)
+    def do_irq_timeout(self, arg):
+        """irq_timeout [timeout]: get/set interrupt wait timeout"""
+        if arg == '':
+            timeout = c_int()
+            self.lib.cvora_get_timeout(self.fd, byref(timeout))
+            print 'timeout %d' % timeout.value
+            return
+        timeout = int(arg, 0)
+        print self.lib.cvora_set_timeout(self.fd, timeout)
+
+    def do_irq_wait(self):
+        """irq_wait: wait for an interrupt"""
+        self.lib.cvora_wait(self.fd)
 
     def do_quit(self, arg):
+        """quit, q: exit from test program"""
         return True
-
-    do_q = do_quit
 
     def do_EOF(self, arg):
+        """EOF: exit from test program"""
         print
         return True
+
+    def do_help(self, arg):
+        """help [cmd|all]: print help for [all] command[s]"""
+        if arg != 'all':
+            cmd.Cmd.do_help(self, arg)
+            return
+        for comm in CvoraCmd.__dict__:
+            if comm[:3] != 'do_':
+                continue
+            h = getattr(CvoraCmd, comm).__doc__
+            if not h:
+                continue
+            idx = h.find(':')
+            cmd = h[:idx]
+            hlp = h[idx:].lstrip()
+            print '%-20s\t%s' % (cmd + ':', hlp)
+
+
+    do_q = do_quit
+    do_h = cmd.Cmd.do_help
 
 if __name__ == '__main__':
 
