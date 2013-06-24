@@ -14,6 +14,8 @@ CFLAGS= -g -Wall -I. -I ../../driver
 CFLAGS += -I /acc/local/$(CPU)/include/
 CFLAGS += -DCOMPILE_TIME=$(COMPILE_TIME) -g -Wall -fPIC
 
+GIT_VERSION = $(shell git describe --tags --dirty --long --always)
+
 MODLIBS = $(LIBNAME).$(CPU).a 
 MODLIBOBJS = $(LIBNAME).$(CPU).o $(DRIVER)_regs.$(CPU).o
 ENCORELIBS = libencore.$(CPU).a
@@ -24,7 +26,7 @@ all: modules libs
 libs: $(MODLIBS) $(ENCORELIBS)
 modules:
 	cp Module.symvers.vmebus Module.symvers
-	make -C $(KERNELSRC) M=`pwd` KVER=$(KVER) 'DRIVER_NAME=$(DRIVER_NAME)' modules
+	make -C $(KERNELSRC) M=`pwd` GIT_VERSION=$(GIT_VERSION) 'DRIVER_NAME=$(DRIVER_NAME)' modules
 clean:
 	rm -f *.o *.a *.so
 	make -C $(KERNELSRC) M=`pwd` clean
