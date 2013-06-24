@@ -783,7 +783,7 @@ ssize_t vmeio_read(struct file * filp, char *buf, size_t count,
 	dev = &devices[minor];
 
 	if (dev->debug) {
-		printk("%s:read:count:%d minor:%d\n", vmeio_major_name,
+		printk("%s:read:count:%zd minor:%d\n", vmeio_major_name,
 		       count, (int) minor);
 		if (dev->debug > 1) {
 			printk("%s:read:timout:%d\n", vmeio_major_name,
@@ -867,7 +867,7 @@ ssize_t vmeio_write(struct file * filp, const char *buf, size_t count,
 	}
 
 	if (dev->debug) {
-		printk("%s:write:count:%d minor:%d mask:0x%X\n",
+		printk("%s:write:count:%zd minor:%d mask:0x%X\n",
 		       vmeio_major_name, count, (int) minor, mask);
 	}
 
@@ -1008,7 +1008,7 @@ static int raw_dma(struct vmeio_device *dev,
 {
 	struct vme_dma dma_desc;
 	struct vmeio_map *map = &dev->maps[riob->winum];
-	unsigned int buf = (unsigned int)riob->buffer;
+	unsigned long buf = (unsigned long)riob->buffer;
 	unsigned int bu, bl;
 	int cc, winum;
 	unsigned int haddr;
