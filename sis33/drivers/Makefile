@@ -4,14 +4,15 @@ KERN_DIR:= "/acc/sys/$(CPU)/usr/src/kernels/$(KVER)"
 VME_DIR := "../../vmebridge/driver"
 VME_OBJDIR := "../../vmebridge/driver/$(CPU)/$(KVER)"
 
+GIT_VERSION = $(shell git describe --dirty --tags --always --long)
 
-all: Module.symvers
-	$(MAKE) -C $(KERN_DIR) M=`pwd`
 .PHONY: all clean help
 
-Module.symvers:
-	$(MAKE) -C $(VME_DIR) CPU=$(CPU) KVER=$(KVER)
-	cp $(VME_OBJDIR)/Module.symvers .
+all: modules
+
+modules:
+	cp Module.symvers.vme Module.symvers
+	$(MAKE) -C $(KERN_DIR) M=`pwd` GIT_VERSION=$(GIT_VERSION) modules
 
 clean:
 	$(MAKE) -C $(KERN_DIR) M=`pwd` clean
