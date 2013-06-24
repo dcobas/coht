@@ -8,6 +8,8 @@ CPU ?= L865
 KVER32 ?= 3.2.33-rt50
 KVER64 ?= 3.2.33-rt50.66.el6rt.x86_64
 
+GIT_VERSION = $(shell git describe --dirty --long --tags)
+
 ifeq ($(CPU), L866)
 	KVER=$(KVER64)
 else
@@ -23,7 +25,7 @@ all: driver
 driver: modules
 
 modules:
-	make -C $(KERNELSRC) M=`pwd` KVER=$(KVER) CPU=$(CPU) modules
+	make -C $(KERNELSRC) M=`pwd` KVER=$(KVER) CPU=$(CPU) GIT_VERSION=$(GIT_VERSION) modules
 	mkdir -p $(OUTPUTDIR)
 	mv *.o *.ko $(OUTPUTDIR)
 clean:
