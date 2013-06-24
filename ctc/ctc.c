@@ -8,6 +8,9 @@
 #include <asm/uaccess.h>
 #include <linux/fs.h>
 #include <linux/interrupt.h>
+#include <linux/sched.h>
+#include <linux/module.h>
+#include <linux/slab.h>
 
 #include "vmebus.h"
 #include "vmeio.h"
@@ -358,7 +361,7 @@ ssize_t vmeio_read(struct file * filp, char *buf, size_t count,
 	dev = filp->private_data;
 
 	if (dev->debug) {
-		printk(PFX "read:count:%d minor:%d\n",
+		printk(PFX "read:count:%zd minor:%d\n",
 		       count, (int) minor);
 		if (dev->debug > 1) {
 			printk(PFX "read:timout:%d\n", dev->timeout);
@@ -430,7 +433,7 @@ ssize_t vmeio_write(struct file * filp, const char *buf, size_t count,
 	}
 
 	if (dev->debug) {
-		printk(PFX "write:count:%d minor:%d mask:0x%X\n",
+		printk(PFX "write:count:%zd minor:%d mask:0x%X\n",
 		       count, (int) minor, mask);
 	}
 
@@ -823,10 +826,11 @@ out:	kfree(arb);
 
 static DEFINE_MUTEX(driver_mutex);
 
-int vmeio_ioctl32(struct inode *inode, struct file *filp, unsigned int cmd,
-		  unsigned long arg)
+long vmeio_ioctl32(struct file *filp, unsigned int cmd, unsigned long arg)
 {
 	int res;
+	struct inode *inode = filp->f_dentry->d_inode;
+
 	mutex_lock(&driver_mutex);
 	res = vmeio_ioctl(inode, filp, cmd, arg);
 	mutex_unlock(&driver_mutex);
@@ -837,7 +841,7 @@ struct file_operations vmeio_fops = {
 	.owner = THIS_MODULE,
 	.read = vmeio_read,
 	.write = vmeio_write,
-	.ioctl = vmeio_ioctl32,
+	.unlocked_ioctl = vmeio_ioctl32,
 	.open = vmeio_open,
 	.release = vmeio_close,
 };

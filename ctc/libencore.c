@@ -226,7 +226,7 @@ int encore_dma_read(encore_handle h, unsigned long address,
 	dma_desc.src.addru = 0;
 	dma_desc.src.addrl = address;
 	dma_desc.dst.addru = 0;
-	dma_desc.dst.addrl = (unsigned int) dst;
+	dma_desc.dst.addrl = (unsigned long) dst;
 	dma_desc.length = size;
 
 	dma_desc.ctrl.pci_block_size = VME_DMA_BSIZE_4096;
@@ -273,7 +273,7 @@ int encore_dma_write(encore_handle h, unsigned long address,
 	dma_desc.dst.addru = 0;
 	dma_desc.dst.addrl = address;
 	dma_desc.src.addru = 0;
-	dma_desc.src.addrl = (unsigned int) src;
+	dma_desc.src.addrl = (unsigned long) src;
 	dma_desc.length = size;
 
 	dma_desc.ctrl.pci_block_size = VME_DMA_BSIZE_4096;
