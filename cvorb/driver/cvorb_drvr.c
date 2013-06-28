@@ -160,7 +160,13 @@ static int __init cvorb_init_module(void)
 		       "Failed initializing sysfs at module installation.(-ENOMEM) \n");
 		goto alloc_chrdev_region_failed;
 	}
-	return vme_register_driver(&cvorb_driver, num_lun);
+	error = vme_register_driver(&cvorb_driver, num_lun);
+	if (error) {
+		printk(KERN_ERR PFX
+		       "Could not register vme cvorb driver \n");
+		goto alloc_chrdev_region_failed;
+	}
+	return 0;
 
 alloc_chrdev_region_failed:
 	class_destroy(cvorb_class);
