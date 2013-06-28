@@ -348,3 +348,4 @@ module_init(modpci_init);
 module_exit(modpci_exit);
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Juan David Gonzalez Cobas <dcobas@cern.ch>");
+MODULE_VERSION(GIT_VERSION);

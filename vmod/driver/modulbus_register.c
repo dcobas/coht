@@ -143,6 +143,7 @@ EXPORT_SYMBOL(modulbus_carrier_isr_entry);
 
 /* usual housekeeping */
 MODULE_LICENSE("GPL");
+MODULE_VERSION(GIT_VERSION);
 module_init(modulbus_init);
 module_exit(modulbus_exit);
 

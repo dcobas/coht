@@ -352,4 +352,4 @@ module_exit(vmodio_exit);
 MODULE_AUTHOR("Juan David Gonzalez Cobas");
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("VMODIO driver");
-
+MODULE_VERSION(GIT_VERSION);
