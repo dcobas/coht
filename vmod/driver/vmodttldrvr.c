@@ -8,7 +8,9 @@
 #include <linux/list.h>
 #include <linux/wait.h>
 #include <asm/uaccess.h>        /* copy_*_user */
-#include <asm/semaphore.h>
+#include <linux/semaphore.h>
+#include <linux/sched.h>
+#include <linux/delay.h>
 #include <asm/atomic.h>
 #include "vmodttl.h"
 #include "cio8536.h"

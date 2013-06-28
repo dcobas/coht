@@ -146,7 +146,7 @@ static int __init vmod12e16_init(void)
 	/* fill in config data and semaphore */
 	for (i = 0; i < config.num_modules; i++) {
 		device_list[i].config = &config.module[i];
-		init_MUTEX(&device_list[i].sem);
+		sema_init(&device_list[i].sem, 1);
 	}
 
 	err = alloc_chrdev_region(&devno, 0, VMOD12E16_MAX_MODULES, DRIVER_NAME);
