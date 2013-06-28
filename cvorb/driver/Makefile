@@ -5,6 +5,7 @@ KVER ?=3.2.33-rt50.66.el6rt.x86_64
 
 KERNELSRC=/acc/sys/$(CPU)/usr/src/kernels/$(KVER)
 OUTPUTDIR=$(CURDIR)/$(CPU)/$(KVER)
+GIT_VERSION=$(shell git describe --always --dirty --tags --all)
 
 CFLAGS=-g -Wall -Wstrict-prototypessss
 all: driver 
@@ -13,7 +14,7 @@ driver: modules
 # compile with V=1 to see compilation details
 modules: 
 	cp Module.symvers.vme Module.symvers
-	make -C $(KERNELSRC) M=`pwd` KVER=$(KVER) CPU=$(CPU) modules 
+	make -C $(KERNELSRC) M=`pwd` GIT_VERSION=$(GIT_VERSION) modules
 	mkdir -p $(OUTPUTDIR)
 	mv *.o *.ko $(OUTPUTDIR)
 clean:

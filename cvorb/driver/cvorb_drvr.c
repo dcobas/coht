@@ -20,7 +20,7 @@
 MODULE_AUTHOR ("Samuel Iglesias Gonsalvez <siglesia@cern.ch>,"
 		"Michel Arruat <michel.arruat@cern.ch>");
 MODULE_DESCRIPTION("Linux Device Driver for the CVORB board at CERN.");
-MODULE_VERSION("1.0");
+MODULE_VERSION(GIT_VERSION);
 MODULE_LICENSE("GPL");
 
 /* module parameters                                                  */

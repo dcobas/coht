@@ -1,4 +1,5 @@
 EXTRA_CFLAGS += \
+	     -DGIT_VERSION=\"$(GIT_VERSION)\" \
 	     -Wstrict-prototypes \
              -I$(M) \
 	     -I $(M)/../include \
