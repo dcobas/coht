@@ -19,13 +19,13 @@ static int			used_entries = 0;
 static DEFINE_MUTEX(register_mutex);
 
 /* module initialization and cleanup */
-static int __init init(void)
+static int __init modulbus_init(void)
 {
 	printk(KERN_INFO PFX "carrier register module init\n");
 	return 0;
 }
 
-static void __exit exit(void)
+static void __exit modulbus_exit(void)
 {
 	printk(KERN_INFO PFX "carrier register module exit\n");
 }
@@ -143,7 +143,7 @@ EXPORT_SYMBOL(modulbus_carrier_isr_entry);
 
 /* usual housekeeping */
 MODULE_LICENSE("GPL");
-module_init(init);
-module_exit(exit);
+module_init(modulbus_init);
+module_exit(modulbus_exit);
 
 

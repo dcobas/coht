@@ -132,7 +132,7 @@ static struct file_operations fops = {
 };
 
 /* module initialization and cleanup */
-static int __init init(void)
+static int __init vmod12e16_init(void)
 {
 	int i, err;
 
@@ -171,15 +171,15 @@ fail_chrdev:
 	return -1;
 }
 
-static void __exit exit(void)
+static void __exit vmod12e16_exit(void)
 {
 	cdev_del(&cdev);
 	unregister_chrdev_region(devno, VMOD12E16_MAX_MODULES);
 }
 
 
-module_init(init);
-module_exit(exit);
+module_init(vmod12e16_init);
+module_exit(vmod12e16_exit);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Juan David Gonzalez Cobas <dcobas@cern.ch>");
