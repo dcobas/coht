@@ -70,8 +70,7 @@ static int do_iocput(struct file *fp, struct vmod12a2_output *argp)
 }
 
 /* @brief file operations for this driver */
-static int vmod12a2_ioctl(struct inode *inode, 
-			struct file *fp, 
+static long vmod12a2_ioctl(struct file *fp,
 			unsigned op, 
 			unsigned long arg)
 {
@@ -93,7 +92,7 @@ static int vmod12a2_ioctl(struct inode *inode,
 
 static struct file_operations vmod12a2_fops = {
 	.owner =    THIS_MODULE,
-	.ioctl =    vmod12a2_ioctl,
+	.unlocked_ioctl =    vmod12a2_ioctl,
 	.open =     vmod12a2_open,
 	.release =  vmod12a2_release,
 };

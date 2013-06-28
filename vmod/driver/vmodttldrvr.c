@@ -672,9 +672,9 @@ static int vmodttl_write_chan(struct vmodttlarg buf, struct vmodttl_dev *pd)
 	return 0;
 }
 
-static int vmodttl_ioctl(struct inode *inode, struct file *fp, unsigned op, unsigned long arg)
+static long vmodttl_ioctl(struct file *fp, unsigned op, unsigned long arg)
 {
-	unsigned int minor = iminor(inode);
+	unsigned int minor = iminor(fp->f_dentry->d_inode);
 	struct vmodttl_dev *pd =  (struct vmodttl_dev *)pvmodttlDv[minor];
 	int ret;
 
@@ -758,7 +758,7 @@ static int vmodttl_ioctl(struct inode *inode, struct file *fp, unsigned op, unsi
 struct file_operations vmodttl_fops = {
         .owner 		= THIS_MODULE,
 	.read 		= vmodttl_read,
-        .ioctl 		= vmodttl_ioctl,
+        .unlocked_ioctl	= vmodttl_ioctl,
         .open 		= vmodttl_open,
         .release 	= vmodttl_release
 };

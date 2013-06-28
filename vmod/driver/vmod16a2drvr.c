@@ -60,8 +60,7 @@ static int do_output(struct vmod_dev *dev,
 	return 0;
 }
 
-static int ioctl(struct inode *inode,
-		struct file *fp,
+static long ioctl(struct file *fp,
 		unsigned op,
 		unsigned long arg)
 {
@@ -85,7 +84,7 @@ static int ioctl(struct inode *inode,
 /* @brief file operations for this driver */
 static struct file_operations vmod16a2_fops = {
 	.owner =    THIS_MODULE,
-	.ioctl =    ioctl,
+	.unlocked_ioctl =    ioctl,
 	.open =     open,
 	.release =  release,
 };

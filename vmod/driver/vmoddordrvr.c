@@ -52,10 +52,10 @@ int vmoddor_release(struct inode *ino, struct file *filp)
         return 0;
 }
 
-static int vmoddor_ioctl(struct inode *inode, struct file *fp, unsigned op,
+static long vmoddor_ioctl(struct file *fp, unsigned op,
                         				unsigned long arg)
 {
-        unsigned int		minor = iminor(inode);
+        unsigned int		minor = iminor(fp->f_dentry->d_inode);
         struct vmoddor_dev	*pd =  &vmoddor[minor];
 
 	if (pd == NULL)
@@ -107,7 +107,7 @@ static int vmoddor_ioctl(struct inode *inode, struct file *fp, unsigned op,
 
 struct file_operations vmoddor_fops = {
         .owner =    THIS_MODULE,
-        .ioctl =    vmoddor_ioctl,
+        .unlocked_ioctl =    vmoddor_ioctl,
         .open =     vmoddor_open,
         .release =  vmoddor_release
 };

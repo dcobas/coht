@@ -96,8 +96,7 @@ static int do_conversion(struct file *filp,
 	return -ETIME;
 }
 
-static int vmod12e16_ioctl(struct inode *ino,
-		    struct file *filp,
+static long vmod12e16_ioctl(struct file *filp,
 		    unsigned int cmd,
 		    unsigned long arg)
 {
@@ -126,7 +125,7 @@ static int vmod12e16_ioctl(struct inode *ino,
 
 static struct file_operations fops = {
 	.owner =    THIS_MODULE,
-	.ioctl =    vmod12e16_ioctl,
+	.unlocked_ioctl =    vmod12e16_ioctl,
 	.open =     vmod12e16_open,
 	.release =  vmod12e16_release,
 };
