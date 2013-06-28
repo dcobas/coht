@@ -31,7 +31,7 @@
 /*!
  *  \mainpage VMOD-TTL Device Driver
  *  \author Samuel Iglesias Gonsalvez BE/CO/HT
- *  \version 20 May 2010
+ *  \version 21 September 2010
  *
  * The VMOD-TTL hardware module is an opto-isolated digital input/output
  * with 20 bit TTL-level. There are three channels: two of 8 bits and one of 4 bits.
@@ -228,7 +228,7 @@ int vmodttl_write(int lun, enum vmodttl_channel chan, int val);
 */
 int vmodttl_read(int lun, enum vmodttl_channel chan, int *val);
 
-//! Configure the pattern in a channel. <b>Not implemented in PPC4.</b>                 
+//! Configure the pattern in a channel. <b>Not implemented</b>
 /*!                                                                                       
   \param lun an integer argument to select the device.
   \param chan an enum vmodttl_channel (only A or B are allowed) to select the desired input channel.
@@ -238,7 +238,7 @@ int vmodttl_read(int lun, enum vmodttl_channel chan, int *val);
 */
 int vmodttl_pattern(int lun, enum vmodttl_channel chan, int pos, enum vmodttl_conf_pattern bit_pattern);
 
-//! Configuration of each channel. <b>Not implemented in PPC4.</b>
+//! Configuration of each channel. <b>Not implemented in PPC4</b>
 /*!
   \param lun an integer argument to select the device.
   \param conf a struct vmodttl_config to copy the I/O configuration of the device.
@@ -246,9 +246,9 @@ int vmodttl_pattern(int lun, enum vmodttl_channel chan, int pos, enum vmodttl_co
 */
 int vmodttl_read_config(int lun, struct vmodttl_config *conf);
 
-//! Read the device (to be notified of interrupts). <b>Not implemented in PPC4.</b>
+//! Read the device (to be notified of interrupts).
 /*!
-  \brief It will be blocked until an IRQ arrives.
+  \brief It will be blocked until an IRQ arrives. <b>Not implemented</b>
   \param lun an integer argument to select the device.
   \param buffer unsigned char array to save the channel in the first position and the value in the second.
   \return returns 0 on success. On error, negative number is returned, and errno is set appropriately.
