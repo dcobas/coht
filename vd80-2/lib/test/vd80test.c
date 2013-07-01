@@ -42,7 +42,7 @@ static char *pname = NULL;
 
 int main(int argc,char *argv[])
 {
-	int rp, pr, dev;
+	int rp, pr, dev = 0;
 	char *cp;
 	char host[49];
 	char tmpb[CMD_BUF_SIZE];
