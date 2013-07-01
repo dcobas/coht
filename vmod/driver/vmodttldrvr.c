@@ -8,7 +8,9 @@
 #include <linux/list.h>
 #include <linux/wait.h>
 #include <asm/uaccess.h>        /* copy_*_user */
-#include <asm/semaphore.h>
+#include <linux/semaphore.h>
+#include <linux/sched.h>
+#include <linux/delay.h>
 #include <asm/atomic.h>
 #include "vmodttl.h"
 #include "cio8536.h"
@@ -672,9 +674,9 @@ static int vmodttl_write_chan(struct vmodttlarg buf, struct vmodttl_dev *pd)
 	return 0;
 }
 
-static int vmodttl_ioctl(struct inode *inode, struct file *fp, unsigned op, unsigned long arg)
+static long vmodttl_ioctl(struct file *fp, unsigned op, unsigned long arg)
 {
-	unsigned int minor = iminor(inode);
+	unsigned int minor = iminor(fp->f_dentry->d_inode);
 	struct vmodttl_dev *pd =  (struct vmodttl_dev *)pvmodttlDv[minor];
 	int ret;
 
@@ -758,7 +760,7 @@ static int vmodttl_ioctl(struct inode *inode, struct file *fp, unsigned op, unsi
 struct file_operations vmodttl_fops = {
         .owner 		= THIS_MODULE,
 	.read 		= vmodttl_read,
-        .ioctl 		= vmodttl_ioctl,
+        .unlocked_ioctl	= vmodttl_ioctl,
         .open 		= vmodttl_open,
         .release 	= vmodttl_release
 };
@@ -892,3 +894,4 @@ MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Samuel Iglesias Gonsalvez");
 MODULE_DESCRIPTION("VMOD-TTL device driver");
 MODULE_VERSION("1.1");
+MODULE_VERSION(GIT_VERSION);

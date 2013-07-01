@@ -61,7 +61,7 @@ OBJS=libvmod12a2.o libvmod16a2.o libvmod12e16.o
 
 HEADERS=../include \
 	-I../driver
-CFLAGS=-g -Wall
+CFLAGS=-g -Wall -fPIC
 
 libvmod12a2.o:
 	$(CC) $(CFLAGS) -c -I$(HEADERS) libvmod12a2.c -o $@

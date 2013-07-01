@@ -9,6 +9,7 @@ KVER=2.6.24.7-rt27
 
 KERNELSRC=/acc/sys/$(CPU)/usr/src/kernels/$(KVER)
 OUTPUTDIR=$(PWD)/$(CPU)/$(KVER)
+GIT_VERSION = $(shell git describe --always --tags --dirty)
 
 CFLAGS=-g -Wall
 
@@ -16,8 +17,8 @@ all: driver
 driver: modules
 
 modules: 
-#	cp Module.symvers.vme Module.symvers
-	make -C $(KERNELSRC) M=`pwd` KVER=$(KVER) CPU=$(CPU) modules
+	cp Module.symvers.vme Module.symvers
+	make -C $(KERNELSRC) M=`pwd` GIT_VERSION=$(GIT_VERSION) modules
 	mkdir -p $(OUTPUTDIR)
 	mv *.o *.ko $(OUTPUTDIR)
 clean:

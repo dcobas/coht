@@ -276,7 +276,7 @@ static int device_init(struct vmodio *dev, int lun, unsigned long base_address, 
 	return 0;
 }
 
-static int __init init(void)
+static int __init vmodio_init(void)
 {
 	int device = 0;
 	int i;
@@ -334,7 +334,7 @@ failed_init:
 	return -1;
 }
 
-static void __exit exit(void)
+static void __exit vmodio_exit(void)
 {
 	int i, j;
 
@@ -346,10 +346,10 @@ static void __exit exit(void)
 	modulbus_carrier_unregister(DRIVER_NAME);
 }
 
-module_init(init);
-module_exit(exit);
+module_init(vmodio_init);
+module_exit(vmodio_exit);
 
 MODULE_AUTHOR("Juan David Gonzalez Cobas");
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("VMODIO driver");
-
+MODULE_VERSION(GIT_VERSION);

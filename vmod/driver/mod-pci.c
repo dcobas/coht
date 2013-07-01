@@ -297,7 +297,7 @@ static struct pci_driver pci_driver = {
 	.remove   = remove,
 };
 
-static int __init init(void)
+static int __init modpci_init(void)
 {
 	int device = 0;
 
@@ -338,13 +338,14 @@ failed_init:
 	return -1;
 }
 
-static void __exit exit(void)
+static void __exit modpci_exit(void)
 {
 	pci_unregister_driver(&pci_driver);
 	modulbus_carrier_unregister(DRIVER_NAME);
 }
 
-module_init(init);
-module_exit(exit);
+module_init(modpci_init);
+module_exit(modpci_exit);
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Juan David Gonzalez Cobas <dcobas@cern.ch>");
+MODULE_VERSION(GIT_VERSION);

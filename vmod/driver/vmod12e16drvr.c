@@ -96,8 +96,7 @@ static int do_conversion(struct file *filp,
 	return -ETIME;
 }
 
-static int vmod12e16_ioctl(struct inode *ino,
-		    struct file *filp,
+static long vmod12e16_ioctl(struct file *filp,
 		    unsigned int cmd,
 		    unsigned long arg)
 {
@@ -126,13 +125,13 @@ static int vmod12e16_ioctl(struct inode *ino,
 
 static struct file_operations fops = {
 	.owner =    THIS_MODULE,
-	.ioctl =    vmod12e16_ioctl,
+	.unlocked_ioctl =    vmod12e16_ioctl,
 	.open =     vmod12e16_open,
 	.release =  vmod12e16_release,
 };
 
 /* module initialization and cleanup */
-static int __init init(void)
+static int __init vmod12e16_init(void)
 {
 	int i, err;
 
@@ -147,7 +146,7 @@ static int __init init(void)
 	/* fill in config data and semaphore */
 	for (i = 0; i < config.num_modules; i++) {
 		device_list[i].config = &config.module[i];
-		init_MUTEX(&device_list[i].sem);
+		sema_init(&device_list[i].sem, 1);
 	}
 
 	err = alloc_chrdev_region(&devno, 0, VMOD12E16_MAX_MODULES, DRIVER_NAME);
@@ -171,15 +170,16 @@ fail_chrdev:
 	return -1;
 }
 
-static void __exit exit(void)
+static void __exit vmod12e16_exit(void)
 {
 	cdev_del(&cdev);
 	unregister_chrdev_region(devno, VMOD12E16_MAX_MODULES);
 }
 
 
-module_init(init);
-module_exit(exit);
+module_init(vmod12e16_init);
+module_exit(vmod12e16_exit);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Juan David Gonzalez Cobas <dcobas@cern.ch>");
+MODULE_VERSION(GIT_VERSION);

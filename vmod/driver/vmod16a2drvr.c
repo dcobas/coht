@@ -60,8 +60,7 @@ static int do_output(struct vmod_dev *dev,
 	return 0;
 }
 
-static int ioctl(struct inode *inode,
-		struct file *fp,
+static long ioctl(struct file *fp,
 		unsigned op,
 		unsigned long arg)
 {
@@ -85,13 +84,13 @@ static int ioctl(struct inode *inode,
 /* @brief file operations for this driver */
 static struct file_operations vmod16a2_fops = {
 	.owner =    THIS_MODULE,
-	.ioctl =    ioctl,
+	.unlocked_ioctl =    ioctl,
 	.open =     open,
 	.release =  release,
 };
 
 /* module initialization and cleanup */
-static int __init init(void)
+static int __init vmod16a2_init(void)
 {
 	int err;
 
@@ -120,14 +119,15 @@ fail_cdev:	unregister_chrdev_region(devno, VMOD16A2_MAX_MODULES);
 fail_chrdev:	return -1;
 }
 
-static void __exit exit(void)
+static void __exit vmod16a2_exit(void)
 {
 	cdev_del(&cdev);
 	unregister_chrdev_region(devno, VMOD16A2_MAX_MODULES);
 }
 
-module_init(init);
-module_exit(exit);
+module_init(vmod16a2_init);
+module_exit(vmod16a2_exit);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Juan David Gonzalez Cobas <dcobas@cern.ch>");
+MODULE_VERSION(GIT_VERSION);
