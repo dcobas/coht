@@ -20,27 +20,28 @@ BEGIN	{
 	base_address1 = ""
 	base_address2 = ""
 	vectors = ""
+	slots= ""
 }
 
 /^#\+#/ && $6 == device_name  && $4 == "VME" {
 	# decode transfer.ref line
-	luns =  luns "," $7 + 1
-	base_address1 =  base_address1 "," "0x" $11
-	base_address2 =  base_address2 "," "0x" $16
+	luns =  luns "," $7
+	base_address =  base_address "," "0x" $16
 	vectors =  vectors "," $23
+	slots = slots "," $20
 }
 
 END {
 
-	insmod_params = " dname=" tolower(device_name) " "
+	insmod_params = " "
 
 	if (luns) insmod_params = insmod_params "luns=" substr(luns, 2)
 
 	if (vectors) insmod_params = insmod_params " vecs=" substr(vectors, 2)
 
-	if (base_address1) insmod_params = insmod_params " vme1=" substr(base_address1, 2)
+	if (base_address) insmod_params = insmod_params " vmeb=" substr(base_address, 2)
 
-	if (base_address2) insmod_params = insmod_params " vme2=" substr(base_address2, 2)
+	if (slots) insmod_params = insmod_params " slot=" substr(slots, 2)
 
 	print insmod_params
 }
