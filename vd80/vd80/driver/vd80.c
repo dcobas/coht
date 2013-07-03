@@ -61,3 +61,5 @@
  */
 
 #include <skeldrvr.c>
+
+MODULE_VERSION(GIT_VERSION);

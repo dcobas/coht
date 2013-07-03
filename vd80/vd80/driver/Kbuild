@@ -1,3 +1,6 @@
-EXTRA_CFLAGS += -DCOMPILE_TIME=$(shell date +%s) -g -Wall -I/acc/src/dsc/drivers/cohtdrep/lewis/vd80/skel -I/acc/src/dsc/drivers/cohtdrep/lewis/vd80/vd80/driver
+EXTRA_CFLAGS += -DCOMPILE_TIME=$(shell date +%s) \
+	-g -Wall \
+	-I $(src)/../../skel -I $(src) \
+	-DGIT_VERSION=\"$(GIT_VERSION)\"
 
 obj-m:=vd80.o

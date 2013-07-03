@@ -9,12 +9,13 @@ KVER=3.2.33-rt50.66.el6rt.x86_64
 endif
 
 KERNELSRC=/acc/sys/$(CPU)/usr/src/kernels/$(KVER)
+GIT_VERSION = $(shell git describe --dirty --always --tags)
 
 CFLAGS=-g -Wall
 
 modules: 
 	cp Module.symvers.vmebus Module.symvers
-	make -C $(KERNELSRC) M=`pwd` KVER=$(KVER) CPU=$(CPU) modules
+	make -C $(KERNELSRC) M=`pwd` GIT_VERSION=$(GIT_VERSION) modules
 	rm -rf ./$(CPU)
 	mkdir ./$(CPU)
 	mkdir ./$(CPU)/$(KVER)
