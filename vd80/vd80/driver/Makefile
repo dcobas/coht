@@ -13,6 +13,8 @@ GIT_VERSION = $(shell git describe --dirty --always --tags)
 
 CFLAGS=-g -Wall
 
+all: modules
+
 modules: 
 	cp Module.symvers.vmebus Module.symvers
 	make -C $(KERNELSRC) M=`pwd` GIT_VERSION=$(GIT_VERSION) modules
