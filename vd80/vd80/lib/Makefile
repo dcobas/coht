@@ -21,6 +21,7 @@ vd80lib.$(CPU).so: vd80lib.$(CPU).o
 
 clean:
 	-$(RM) vd80lib.$(CPU).so vd80lib.$(CPU).a vd80lib.$(CPU).o
+	$(MAKE) -C test CPU=$(CPU) $@
 
 install:
 	dsc_install vd80lib.$(CPU).a /acc/local/$(CPU)/vd80
