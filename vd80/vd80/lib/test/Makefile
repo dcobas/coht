@@ -2,7 +2,7 @@
 # Makefile to produce libvd80 test program
 #================================================================
 
-CPU=L866
+CPU ?= L866
 
 include /acc/dsc/src/co/Make.auto
 
@@ -10,7 +10,7 @@ COMPILE_TIME:=$(shell date +%s)
 
 CFLAGS = -g -Wall -I. -I./extest -I../stub -DCOMPILE_TIME=$(COMPILE_TIME)
 
-LDLIBS= extest/libextest.$(CPU).a ../stub/stublib.$(CPU).a -ldl -lreadline
+LDLIBS= extest/libextest.$(CPU).a ../stub/stublib.$(CPU).a -ldl -lreadline -lcurses
 
 ALL  = vd80Test-stub.$(CPU).o vd80Test-stub.$(CPU)
 
