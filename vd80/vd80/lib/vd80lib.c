@@ -91,7 +91,7 @@ int vd80OpenHandle() {
 char fnm[32];
 int  i, fd;
 
-   for (i = 1; i <=SkelDrvrCLIENT_CONTEXTS; i++) {
+   for (i = 0; i <=SkelDrvrCLIENT_CONTEXTS; i++) {
       sprintf(fnm,"/dev/vd80.%1d",i);
       if ((fd = open(fnm,O_RDWR,0)) > 0) return fd;
    }

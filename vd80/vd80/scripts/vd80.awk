@@ -7,7 +7,7 @@
 #  $ awk -f vd80.awk VD80 /acc/dsc/tst/cfv-864-cdv28/etc/transfer.ref
 #
 #  produces
-#     insmod vd80.ko dname=vd80 luns=1,2,3
+#     insmod vd80.ko dname=vd80 luns=0,1,2
 #                               vme1=0x980000,0xa00000,0xa80000
 #                               vme2=0x980000,0xa00000,0xa80000
 #                               vecs=0xB0,0xB1,0xB2
@@ -24,7 +24,7 @@ BEGIN	{
 
 /^#\+#/ && $6 == device_name  && $4 == "VME" {
 	# decode transfer.ref line
-	luns =  luns "," $7 + 1
+	luns =  luns "," $7
 	base_address1 =  base_address1 "," "0x" $11
 	base_address2 =  base_address2 "," "0x" $16
 	vectors =  vectors "," $23
