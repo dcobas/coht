@@ -1,0 +1,159 @@
+#+TITLE: CVORB arbitrary waveform generator library API.
+##+AUTHOR: Yury GEORGIEVSKIY $<$\href{mailto:ygeorgie@cern.ch}{ygeorgie@cern.ch}$>$ \\ CERN
+#+EMAIL: ygeorgie@cern.ch
+##+OPTIONS: author:t toc:nil num:nil
+#+OPTIONS:   H:3 num:t toc:t \n:f @:t ::t |:t ^:t -:t f:t *:t TeX:t LaTeX:nil skip:t d:nil tags:not-in-toc
+
+#+LATEX_HEADER: \usepackage{ae,aecompl}
+#+LATEX_HEADER: % The following is needed in order to make the code compatible
+#+LATEX_HEADER: % with both latex/dvips and pdflatex.
+#+LATEX_HEADER: \ifx\pdftexversion\undefined
+#+LATEX_HEADER: \usepackage[dvips]{graphicx}
+#+LATEX_HEADER: \else
+#+LATEX_HEADER: \usepackage{graphicx}
+#+LATEX_HEADER: \DeclareGraphicsRule{*}{mps}{*}{}
+#+LATEX_HEADER: \fi
+
+* General info.
+  You can visit [[http://wikis.cern.ch/display/HT/CVORB+V2+-+Arbitrary+waveform+generator][*CVORB homepage*]] for complete board details.
+  Hardware-specific information is not provided here as you can find it in the [[http://wikis.cern.ch/download/attachments/16779455/CVORB+-+technical+guide.pdf][*CVORB techicla guide*]] manual.
+  + Board is made of two identical submodules. Each of them has 8 channels
+    to play functions.
+  + Library operates on the Board as a whole, i.e. it doesn't distinguishing
+    between submodules.
+  + There are situations nevertheless, when a specific submodule register
+    should be adressed.
+    In this case channel numbers are used to distinguish between submodules.
+    [1 - 8]  -- to address first submodule
+    [9 - 16] -- to address second submodule
+  + CVORB Driver bench (including generic module libraries) was generated usind
+    driver-genV2 and therefore complyes with all its rules and limitations.
+    Current library -- is a user-defined (among 3 possible for the module) one.
+  + This Library is using DAL library, so user application should be compiled
+    with =-lcvorb= and =-ldal= libraries.
+    Note, that library order is relevant during compilation.
+
+* Short description of the Libary API.
+  Current API was derived from the old interface for GFAS module, which is an
+  ancestor of CVORB.
+  Extra funcions were added to exploit new features, that were not available
+  in the old HW.
+  Following functions are available and should be used to work with CVORB
+  modules:
+
+  1. Open module \\
+     1 =DaEnableAccess()= \\
+     2 =DaDisableAccess()= \\
+
+  2. r/w Module Configuration Register \\
+     3 =cvorb_rd_mcr(handle, channel[1-16])= \\
+     4 =cvorb_wr_mcr(handle, channel[1-16])= \\
+
+  3. r/w Channel Configuration Register \\
+     5 =cvorb_rd_ccr(handle, channel[1-16])= \\
+     6 =cvorb_wr_ccr(handle, channel[1-16])= \\
+
+  4. Read Module/Channel status \\
+     7 =cvorb_rd_mod_stat(handle, channel[1-16])= \\
+     8 =cvorb_rd_chan_stat(handle, channel[1-16])= \\
+
+  5. Current VHDL version \\
+     9 =cvorb_rd_vhdl_vers(handle)= \\
+
+  6. "Printed Circuit Board" serial number \\
+     10 =cvorb_rd_psb_sn(handle)= \\
+
+  7. Read module temp \\
+     11 =cvorb_rd_temp(handle, channel[1-16])= \\
+
+  8. Reset Module/FPGA \\
+     12 =cvorb_rst_module(handle)= \\
+     13 =cvorb_rst_fpga(handle)= \\
+
+  9. r/w Function Enable Mask \\
+     14 =cvorb_rd_fem(handle, channel[1-16])= \\
+     15 =cvorb_wr_fem(handle, channel[1-16])= \\
+
+  10. Funtion operations \\
+      16 =cvorb_func_load(handle, chan[1-16], function[1-64], data)= \\
+      17 =cvorb_func_read(handle, chan[1-16], function[1-64], data)= \\
+      18 =cvorb_func_en(handle, chan[1-16], function[1-64], mask)= \\
+      19 =cvorb_func_dis(handle, chan[1-16], function[1-64], mask)= \\
+      20 =cvorb_func_sel(handle, chan[1-16], function[1-64])= \\
+      21 =cvorb_func_get(handle, chan[1-16])= \\
+
+  11. Additional functions \\
+      * TODO
+
+* Detailed description of each Library function.
+** /DaEnableAccess/ --  Open driver node and get handle.
+   DAL library call.
+   This function should be called at the beginning in order to open driver node
+   and get a module Handle.
+   It will be refferred to as /handle/
+   Returned Handle will be used in all subsequent calls to the library.
+   I will not give the details of this function as there is a profound
+   *DAL* manual.
+
+** /DaDisableAccess/  -- Close driver node and free resources.
+   DAL library call.
+   This function is called when you done working with the module. The Handle
+   will be released and driver node will be closed.
+   Read *DAL* manual for complete information.
+
+** /cvorb\_rd\_mcr/  -- Read Module Configuration Register.
+   =int cvorb_rd_mcr(HANDLE handle, int chan)=
+
+** /cvorb\_wr\_mcr/  -- Write Module Configuration Register.
+   =int cvorb_wr_mcr(HANDLE handle, int chan, int data)=
+
+** /cvorb\_rd\_ccr/  -- Read Channel Configuration Register.
+   =int cvorb_rd_ccr(HANDLE handle, int chan)=
+
+** /cvorb\_wr\_ccr/  -- Write Channel Configuration Register.
+   =int cvorb_wr_ccr(HANDLE handle, int chan, int data)=
+
+** /cvorb\_rd\_mod\_stat/  -- Read Module Status Register.
+   =int cvorb_rd_mod_stat(HANDLE handle, int chan)=
+
+** /cvorb\_rd\_chan\_stat/  -- Read Channel Status Register.
+   =int cvorb_rd_chan_stat(HANDLE handle, int chan)=
+
+** /cvorb\_rd\_vhdl\_vers/  -- Get current VHDL version of the Board.
+   =int cvorb_rd_vhdl_vers(HANDLE handle)=
+
+** /cvorb\_rd\_psb\_sn/  -- Get "Printed Circuit Board" serial number.
+   =long long cvorb_rd_psb_sn(HANDLE handle)=
+
+** /cvorb\_rd\_temp/  -- Get Board Temperature.
+   =int cvorb_rd_temp(HANDLE handle)=
+
+** /cvorb\_rst\_module/  -- Module Software Reset.
+   =int cvorb_rst_module(HANDLE handle int chan)=
+
+** /cvorb\_rst\_fpga/  -- FPGA reset (Global Reset).
+   =int cvorb_rst_fpga(HANDLE handle, int chan)=
+
+** /cvorb\_rd\_fem/  -- Read Channel Function Enable Mask.
+   =long long cvorb_rd_fem(HANDLE handle, int chan)=
+
+** /cvorb\_wr\_fem/  -- Write Channel Function Enable Mask.
+   =int cvorb_wr_fem(HANDLE handle, int chan, long long mask)=
+
+** /cvorb\_func\_load/  -- Load Channel Function.
+   =int cvorb_func_load(HANDLE handle, int chan, int function, struct function_vector)=
+
+** /cvorb\_func\_read/  -- Read Channel Function.
+   =int cvorb_func_read(HANDLE handle, int chan, int function, struct)=
+
+** /cvorb\_func\_en/  -- Enable Channel Function.
+   =int cvorb_func_en(HANDLE handle, long long function_mask)=
+
+** /cvorb\_func\_dis/  -- Disable Channel Function.
+   =int cvorb_func_dis(HANDLE handle, long long function_mask)=
+
+** /cvorb\_func\_sel/  -- Select Channel Fuction to play.
+   =int cvorb_func_sel(HANDLE handle, int chan, int function)=
+
+** /cvorb\_func\_get/  -- Read Channel Function, currently selected for playing.
+   =int cvorb_func_get(HANDLE handle, int chan)=
