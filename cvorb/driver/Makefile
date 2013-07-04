@@ -12,7 +12,7 @@ endif
 
 KERNELSRC=/acc/sys/$(CPU)/usr/src/kernels/$(KVER)
 OUTPUTDIR=$(CURDIR)/$(CPU)/$(KVER)
-GIT_VERSION=$(shell git describe --always --dirty --tags --all)
+GIT_VERSION=$(shell git describe --always --dirty --tags --long)
 
 CFLAGS=-g -Wall -Wstrict-prototypessss
 all: driver 

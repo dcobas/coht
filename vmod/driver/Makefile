@@ -9,7 +9,7 @@ KVER=2.6.24.7-rt27
 
 KERNELSRC=/acc/sys/$(CPU)/usr/src/kernels/$(KVER)
 OUTPUTDIR=$(PWD)/$(CPU)/$(KVER)
-GIT_VERSION = $(shell git describe --always --tags --dirty)
+GIT_VERSION = $(shell git describe --always --tags --dirty --long)
 
 CFLAGS=-g -Wall
 

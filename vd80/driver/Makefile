@@ -9,7 +9,7 @@ KVER=3.6.11-rt30.25.el6rt.x86_64
 endif
 
 KERNELSRC=/acc/sys/$(CPU)/usr/src/kernels/$(KVER)
-GIT_VERSION = $(shell git describe --dirty --always --tags)
+GIT_VERSION = $(shell git describe --dirty --always --tags --long)
 
 CFLAGS=-g -Wall
 

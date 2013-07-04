@@ -9,7 +9,7 @@ CPU ?= L865
 KVER ?= 2.6.24.7-rt27
 KERNELSRC=/acc/sys/$(CPU)/usr/src/kernels/$(KVER)
 
-GIT_VERSION = $(shell git describe --dirty --long --tags)
+GIT_VERSION = $(shell git describe --dirty --long --tags --always)
 
 include /acc/dsc/src/co/Make.auto
 

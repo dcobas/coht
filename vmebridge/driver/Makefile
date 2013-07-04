@@ -8,7 +8,7 @@ CPU ?= L865
 KVER32 ?= 3.2.33-rt50
 KVER64 ?= 3.2.33-rt50.66.el6rt.x86_64
 
-GIT_VERSION = $(shell git describe --dirty --long --tags)
+GIT_VERSION = $(shell git describe --dirty --long --tags --always)
 
 ifeq ($(CPU), L866)
 	KVER=$(KVER64)
