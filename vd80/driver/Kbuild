@@ -1,6 +1,6 @@
 EXTRA_CFLAGS += -DCOMPILE_TIME=$(shell date +%s) \
 	-g -Wall \
-	-I $(src)/../../skel -I $(src) \
+	-I $(src)/../skel -I $(src) \
 	-DGIT_VERSION=\"$(GIT_VERSION)\"
 
 obj-m:=vd80.o
