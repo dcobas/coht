@@ -1,0 +1,31 @@
+* lib functions prototypes:
+	There is some inconsistencies in the meaning of what a function returns : value or error?
+	One possible convention:
+		- values: passed to the user by means of output arguments
+		- error: passed to the user using the return value: 0:no error, -1: error, enum for erroCode?).
+		Therefore the return type should be uint16_t
+		In case of a function not returning errors the return type should be void.
+
+* headers file name convention:
+	Any CERN driver is made of 2 major software component: the driver itself and on top of it a library.
+	acting as a public API for user. Each components defines a set of headers and we could decide to 
+	homogenize the naming schema. Again the motivation is to make the user life easier.
+	For example, for a driver called xyz we could have: 
+		- xyz.h: library public header defining the API. Should be the only one includes by the user.
+		- xyz_private.h: library private header if necessary
+		- xyz_driver.h: driver public header
+		- xyz_driver_private.h: driver private header file.
+		- xyz_driver_defs: driver public header containing definition (enum, constants)
+		  shared between library and driver. Normally should be include by "xyz.h".
+
+* header includes
+	why local drivers are not included via their package name which is a common practice.
+	For instance instead of doing:
+	#include <vmebus.h>
+	we should write
+	#include <vmedriver/vmebus.h>
+	
+* git:
+	- tag: one possible usage of a tag is to assign the version number to a commit:
+		git tag v1.0.2.
+	-  

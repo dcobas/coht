@@ -1,0 +1,12 @@
+Waveform file format (.vtf)
+===========================
+
+The waveform is given to the test program as an array of points.
+Inside the driver, this array is transfomed in vectors for the hardware.
+
+The points format is:
+
+time[ms]  | amplitude[digital value]
+
+* Digital values for amplitude must be between 0 and 65535 (2^16).
+* Internal stop can be added to a waveform. Put 0 in the time column to insert an internal stop.

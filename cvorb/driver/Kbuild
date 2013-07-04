@@ -1,0 +1,10 @@
+EXTRA_CFLAGS += \
+	     -DGIT_VERSION=\"$(GIT_VERSION)\" \
+	     -Wstrict-prototypes \
+             -I$(M) \
+	     -I $(M)/../include \
+	     -I /acc/src/dsc/drivers/coht/vmebridge/include
+
+obj-m += cvorb.o
+
+cvorb-objs := cvorb_func.o cvorb_sysfs.o cvorb_drvr.o cvorb_dma.o
