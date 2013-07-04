@@ -8,23 +8,31 @@
 #include <skeluser_ioctl.h>
 #include <skeldrvrP.h>
 
-#include <cdcm/cdcm.h>
 #include <vd80drvrP.h>
 #include <vd80hard.h>
-#include <vd80Names.c>
 
-#ifdef __linux__
 #include <vmebus.h>
 #include <asm/page.h>
 #include <linux/mm.h>
 #include <linux/page-flags.h>
 #include <linux/pagemap.h>
-#else
-#include <vme_am.h>
-#define VME_A24_USER_DATA_SCT AM_A24_UDA
-#define VME_CR_CSR            AM_A24_CR_CSR
-#define VME_A24_USER_MBLT     AM_A24_UMBLT
-#endif
+#include <linux/time.h>
+#include <linux/delay.h>
+#include <asm/io.h>
+
+/**
+ * ===========================================================
+ * @brief Given a pointer split it into upr and lwr parts
+ * @param upr address where upper part of arddress will be stored
+ * @param lwr address where lower part of arddress will be stored
+ * @param ptr is the given pointer value to be split
+ */
+
+void split_address(uint32_t *upr, uint32_t *lwr, uintptr_t ptr)
+{
+	*upr = (uint32_t) ((uint64_t) ptr >> 32);
+	*lwr = (uint32_t) (ptr  & 0xFFFFFFFF);
+}
 
 /* =========================================================== */
 /* Client and module asociated error messages                  */
@@ -35,8 +43,8 @@
 /* Given a module context and an address modifier returned the */
 /* corresponding address map pointer.                          */
 
-U32 *GetVmeMappedAddress(SkelDrvrModuleContext *mcon,
-			 int                    am) {
+uint32_t *GetVmeMappedAddress(SkelDrvrModuleContext *mcon,
+			      int                    am) {
 
 InsLibModlDesc         *modld = NULL;   /* Module descriptor linked list */
 InsLibVmeModuleAddress *vmema = NULL;   /* The VD80 VME address space linked list */
@@ -71,8 +79,8 @@ InsLibVmeAddressSpace  *vmeas = NULL;   /* VME address spaces linked list */
 /* =========================================================== */
 /* As above but return the corresponding base address instead  */
 
-U32 *GetVmeBaseAddress(SkelDrvrModuleContext *mcon,
-		       int                    am) {
+uint32_t GetVmeBaseAddress(SkelDrvrModuleContext *mcon,
+			    int                    am) {
 
 InsLibModlDesc         *modld = NULL;
 InsLibVmeModuleAddress *vmema = NULL;
@@ -80,49 +88,49 @@ InsLibVmeAddressSpace  *vmeas = NULL;
 
    if (!mcon) {
       report_module(mcon, SkelDrvrDebugFlagWARNING, "GetVmeBaseAddress:NULL module context");
-      return NULL;
+      return 0;
    }
    modld = mcon->Modld;
    if (!modld) {
       report_module(mcon, SkelDrvrDebugFlagWARNING, "GetVmeBaseAddress:NULL module descriptor");
-      return NULL;
+      return 0;
    }
    vmema = modld->ModuleAddress;
    if (!vmema) {
       report_module(mcon, SkelDrvrDebugFlagWARNING, "GetVmeBaseAddress:NULL module address");
-      return NULL;
+      return 0;
    }
 
    vmeas = vmema->VmeAddressSpace;
    while (vmeas) {
-      if (vmeas->AddressModifier == am) return (U32 *) vmeas->BaseAddress;
+      if (vmeas->AddressModifier == am) return (uint32_t) vmeas->BaseAddress;
       vmeas = vmeas->Next;
    }
    report_module(mcon, SkelDrvrDebugFlagWARNING, "GetVmeBaseAddress:Address modifier 0x%X not found", am);
-   return NULL;
+   return 0;
 }
 
 /* =========================================================== */
 /* Access hardware/software registers with emulation           */
 
-void SetReg(U32 *map, U32 offset, U32 valu, SkelDrvrModuleContext *mcon) {
+void SetReg(uint32_t *map, uint32_t offset, uint32_t valu, SkelDrvrModuleContext *mcon) {
    mcon->Registers[offset/4] = valu;
    if (mcon->StandardStatus & SkelDrvrStandardStatusEMULATION) return;
-   cdcm_iowrite32(cdcm_cpu_to_be32((U32) valu), &(map[offset/4]));
+   iowrite32(cpu_to_be32((uint32_t) valu), &(map[offset/4]));
 }
 
-U32 GetReg(U32 *map, U32 offset, SkelDrvrModuleContext *mcon) {
+uint32_t GetReg(uint32_t *map, uint32_t offset, SkelDrvrModuleContext *mcon) {
    if (mcon->StandardStatus & SkelDrvrStandardStatusEMULATION)
-      return (U32) mcon->Registers[offset/4];
-   return (U32) cdcm_be32_to_cpu(cdcm_ioread32(&(map[offset/4])));
+      return (uint32_t) mcon->Registers[offset/4];
+   return (uint32_t) be32_to_cpu(ioread32(&(map[offset/4])));
 }
 
 /* =========================================================== */
 /* Get operational registers                                   */
 
-U32 *GetRegs(SkelDrvrModuleContext *mcon) {
+uint32_t *GetRegs(SkelDrvrModuleContext *mcon) {
 
-U32 *regs;
+uint32_t *regs;
 
    if (mcon->StandardStatus & SkelDrvrStandardStatusEMULATION)
       return mcon->Registers;
@@ -141,13 +149,12 @@ U32 *regs;
 #define DMA_BLOCK_SIZE        4096
 #define SAMPLES_IN_DMA_BLOCK  2048
 
-#ifdef __linux__
 void BuildDmaReadDesc(SkelDrvrModuleContext *mcon,
-		      void                  *dest,
-		      unsigned int           len,
+		      uintptr_t              dest,
+		      uint32_t               len,
 		      struct vme_dma        *dma_desc) {
 
-   bzero((void *) dma_desc, sizeof(struct vme_dma));
+   memset(dma_desc, 0, sizeof(struct vme_dma));
 
    dma_desc->dir            = VME_DMA_FROM_DEVICE;
    dma_desc->src.data_width = VME_D32;
@@ -159,19 +166,17 @@ void BuildDmaReadDesc(SkelDrvrModuleContext *mcon,
    dma_desc->ctrl.vme_block_size   = VME_DMA_BSIZE_4096;
    dma_desc->ctrl.vme_backoff_time = VME_DMA_BACKOFF_0;
 
-   dma_desc->src.addrl = (unsigned int) GetVmeBaseAddress(mcon,VME_A24_USER_DATA_SCT);
-   dma_desc->dst.addrl = (unsigned int) dest;
+   split_address(&dma_desc->src.addru, &dma_desc->src.addrl, GetVmeBaseAddress(mcon,VME_A24_USER_DATA_SCT));
+   split_address(&dma_desc->dst.addru, &dma_desc->dst.addrl, dest);
    dma_desc->length    = len;
 
    if (mcon->Debug & SkelDrvrDebugFlagMODULE) {
-      report_module(mcon, 0, "DMA:src.addrl:0x%X dst.addrl:0x%X length:0x%X\n",
+      report_module(mcon, SkelDrvrDebugFlagWARNING, "DMA:src.addrl:0x%X dst.addrl:0x%X length:0x%X\n",
 	      dma_desc->src.addrl,
 	      dma_desc->dst.addrl,
 	      dma_desc->length);
    }
 }
-
-#endif
 
 /* =========================================================== */
 /* The module version can be the compilation date for the FPGA */
@@ -196,9 +201,9 @@ UserData *u;
 /* context at location mcon->StandardStatus                    */
 
 SkelUserReturn SkelUserGetHardwareStatus(SkelDrvrModuleContext *mcon,
-					 U32                   *hsts) {
-U32 *regs = NULL;
-U32 reg;
+					 uint32_t              *hsts) {
+uint32_t *regs = NULL;
+uint32_t reg;
 
    *hsts = mcon->StandardStatus;
 
@@ -224,7 +229,11 @@ U32 reg;
 SkelUserReturn SkelUserGetUtc(SkelDrvrModuleContext *mcon,
 			      SkelDrvrTime          *utc) {
 
-   utc->NanoSecond = nanotime((long *) &(utc->Second));
+   struct timespec curtime;
+   curtime = current_kernel_time();
+
+   utc->NanoSecond = curtime.tv_nsec;
+   utc->Second     = curtime.tv_sec;
    return SkelUserReturnOK;
 }
 
@@ -247,8 +256,8 @@ SkelUserReturn SkelUserHardwareReset(SkelDrvrModuleContext *mcon) {
 
 SkelUserReturn SkelUserGetInterruptSource(SkelDrvrModuleContext *mcon,
 					  SkelDrvrTime          *itim,
-					  U32                   *isrc) {
-U32 *regs = NULL;
+					  uint32_t              *isrc) {
+uint32_t *regs = NULL;
 
    if ((regs = GetRegs(mcon)) == NULL)
       return SkelUserReturnFAILED;
@@ -267,14 +276,14 @@ U32 *regs = NULL;
 /* routine to enable them.                                     */
 
 SkelUserReturn SkelUserEnableInterrupts(SkelDrvrModuleContext *mcon,
-					U32                    imsk) {
+					uint32_t               imsk) {
 
-U32 *regs = NULL;
-U32 tval;
+uint32_t *regs = NULL;
+uint32_t tval;
 
    if ((regs = GetRegs(mcon)) == NULL) return SkelUserReturnFAILED;
    if (mcon->Debug & SkelDrvrDebugFlagMODULE) {
-      report_module(mcon, 0, "SkelUserEnableInterrupts:0x%X", imsk);
+      report_module(mcon, SkelDrvrDebugFlagWARNING, "SkelUserEnableInterrupts:0x%X", imsk);
    }
    tval = GetReg(regs,VD80_GCR2,mcon) & ~VD80_INTERRUPT_MASK;
    tval |= (imsk & VD80_INTERRUPT_MASK);
@@ -286,48 +295,28 @@ U32 tval;
 /* Provide a way to enable or disable the hardware module.     */
 
 SkelUserReturn SkelUserHardwareEnable(SkelDrvrModuleContext *mcon,
-				      U32                    flag) {
+				      uint32_t               flag) {
    return SkelUserReturnNOT_IMPLEMENTED;
 }
-
-/* =========================================================== */
-/* Standard CO FPGA JTAG IO, Read a byte                       */
-
-SkelUserReturn SkelUserJtagReadByte(SkelDrvrModuleContext *mcon,
-				    U32                   *byte) {
-   return SkelUserReturnNOT_IMPLEMENTED;
-}
-
-/* =========================================================== */
-/* Standard CO FPGA JTAG IO, Write a byte                      */
-
-SkelUserReturn SkelUserJtagWriteByte(SkelDrvrModuleContext *mcon,
-				     U32                    byte) {
-   return SkelUserReturnNOT_IMPLEMENTED;
-}
-
-/* ===================================================== */
-/* Copy from Vd80 hardware memory to user virtual memory */
-
-#include "vd80CopyToUser.inc"
 
 /* =========================================================== */
 /* Then decide on howmany IOCTL calls you want, and fill their */
 /* debug name strings.                                         */
 
 /* sleep until IDLE is settled or things time out */
-void wait_for_idle(SkelDrvrModuleContext *mcon, int maxdelay)
+
+void wait_for_idle(SkelDrvrModuleContext *mcon, uint32_t maxdelay)
 {
-	int state;
-	int delay;
+	uint32_t state;
+	uint32_t delay;
 
 	for (delay = 0; delay < maxdelay; delay += 10) {
 		state = GetReg(GetRegs(mcon), VD80_GSR, mcon) & VD80_STATE_MASK;
 		if (state == VD80_STATE_IDLE)
 			return;
-		usec_sleep(10);
+		udelay(10);
 	}
-	cprintf("vd80: wait_for_idle timed out after %d us\n", maxdelay);
+	printk("vd80: wait_for_idle timed out after %d us\n", maxdelay);
 }
 
 /**
@@ -344,18 +333,16 @@ void wait_for_idle(SkelDrvrModuleContext *mcon, int maxdelay)
  */
 SkelUserReturn SkelUserIoctls(SkelDrvrClientContext *ccon,
 			      SkelDrvrModuleContext *mcon,
-			      int                    cm,
+			      uint32_t               cm,
 			      char                  *arg)
 {
 
-#ifdef __linux__
 struct vme_dma dma_desc;    /* Vme driver DMA structure */
 int    tcnt, psze;          /* Transfer count and short page size */
-#endif
 
-U32 *regs = NULL;   /* Mapped A24D32 address space for Vd80 module */
-int *lap  = NULL;   /* Long-Value pointer to argument */
-int lval, tval, bms;/* Long-Value from argument, temp-value, bit-mask */
+uint32_t *regs = NULL;   /* Mapped A24D32 address space for Vd80 module */
+int *lap  = NULL;        /* Long-Value pointer to argument */
+int lval, tval, bms;     /* Long-Value from argument, temp-value, bit-mask */
 int i;
 
 int actpostrig = 0; /* The actual number of post trigger samples */
@@ -379,7 +366,7 @@ int lvalue;                 /* For when arg is NULL */
    num = _IOC_NR(cm);       /* Get pure ioctl enumeration number */
 
    if ((mcon == NULL) || (ccon == NULL)) {
-      cprintf("Vd80:Assertion Violation:Null Context\n");
+      printk("Vd80:Assertion Violation:Null Context\n");
       return SkelUserReturnFAILED;
    }
 
@@ -787,7 +774,6 @@ int lvalue;                 /* For when arg is NULL */
 	 remaining = sbuf->Samples; /* Samples remaining to be transfered by dma */
 	 samples = 0;               /* Samples transfered so far */
 
-#ifdef __linux__
 	 psze = remaining;
 
 	 while (remaining > 0) {
@@ -795,7 +781,7 @@ int lvalue;                 /* For when arg is NULL */
 	    if (remaining > psze) tcnt = psze;
 	    else                  tcnt = remaining;
 
-	    BuildDmaReadDesc(mcon,&(sbuf->SampleBuf[samples]),tcnt*sizeof(short),&dma_desc);
+	    BuildDmaReadDesc(mcon,(uintptr_t) &(sbuf->SampleBuf[samples]),tcnt*sizeof(short),&dma_desc);
 	    if (vme_do_dma(&dma_desc)) {
 	       report_module(mcon, SkelDrvrDebugFlagASSERTION, "SkelUserIoctl:Error vme_do_dma");
 	       return SkelUserReturnFAILED;
@@ -804,9 +790,6 @@ int lvalue;                 /* For when arg is NULL */
 	    remaining -= tcnt;
 	    samples   += tcnt;
 	 }
-#else
-	 samples = Vd80CopyToUser(sbuf, mcon);  /* LynxOs ppc4 */
-#endif
 
 	 sbuf->Samples = samples; /* The actual number we successfully transfered */
 	 return SkelUserReturnOK;
@@ -844,10 +827,10 @@ InsLibModlDesc         *modld = NULL;
 InsLibVmeModuleAddress *vmema = NULL;
 InsLibVmeAddressSpace  *vmeas = NULL;
 
-U32 *config = NULL;        /* Always use 32-bit accesses */
+uint32_t *config = NULL;        /* Always use 32-bit accesses */
 
-U32  tval;
-U32  valu[4];
+uint32_t  tval;
+uint32_t  valu[4];
 char *board_id = "VD80"; /* The character board_id in Vd80 configuration ROM */
 
 char revis_id[VD80_CR_REV_ID_LEN +1]; /* The revis_id and terminator byte */
@@ -858,7 +841,6 @@ UserData *u;
    if (!mcon) return SkelUserReturnFAILED;
 
    modld = mcon->Modld;
-
    if (!modld) return SkelUserReturnFAILED;
 
    if (mcon->StandardStatus & SkelDrvrStandardStatusEMULATION) return SkelUserReturnOK;
@@ -875,22 +857,23 @@ UserData *u;
 
 	    /* First check we're accessing a configuration ROM */
 
-	    config = (U32 *) vmeas->Mapped;
+	    config = (uint32_t *) vmeas->Mapped;
 
-	    valu[1] = (U32  ) cdcm_be32_to_cpu(cdcm_ioread32(&config[VD80_CR_SIG1/4]));
-	    valu[2] = (U32  ) cdcm_be32_to_cpu(cdcm_ioread32(&config[VD80_CR_SIG2/4]));
+	    valu[1] = (uint32_t) be32_to_cpu(ioread32(&config[VD80_CR_SIG1/4]));
+	    valu[2] = (uint32_t) be32_to_cpu(ioread32(&config[VD80_CR_SIG2/4]));
+
 	    if ( ((valu[1] & 0xFF) != 'C')
 	    ||   ((valu[2] & 0xFF) != 'R') ) {
-	       report_module(mcon, 0, "Configuration Rom not found");
+	       report_module(mcon, SkelDrvrDebugFlagWARNING, "Configuration Rom not found");
 	       return SkelUserReturnFAILED;
 	    }
 
 	    /* Read the board ID and compare it to "VD80" */
 
 	    for (i=0; i<strlen(board_id); i++) {
-	       tval = cdcm_be32_to_cpu(cdcm_ioread32(&config[(VD80_CR_BOARD_ID/4)+i]));
+	       tval = be32_to_cpu(ioread32(&config[(VD80_CR_BOARD_ID/4)+i]));
 	       if (board_id[i] != (char) (tval & 0xff)) {
-	          report_module(mcon, 0, "Bad Configuration Board ID");
+		  report_module(mcon, SkelDrvrDebugFlagWARNING, "Bad Configuration Board ID");
 		  return SkelUserReturnFAILED;
 	       }
 	    }
@@ -898,46 +881,41 @@ UserData *u;
 	    /* Read the board revision ID  */
 
 	    for (i=0; i<VD80_CR_REV_ID_LEN; i++) {
-	       tval = cdcm_be32_to_cpu(cdcm_ioread32(&config[(VD80_CR_REV_ID/4)+i]));
+	       tval = be32_to_cpu(ioread32(&config[(VD80_CR_REV_ID/4)+i]));
 	       revis_id[i] = (char) (tval & 0xff);
 	    }
 	    revis_id[i] = '\0';
-	    cprintf("VD80: Board Revision ID:%s ",revis_id);
-	    if (strcmp("C1A9",revis_id) == 0)
-	       cprintf("OK - Supported by this driver\n");
-	    else if (strcmp("C2Aa",revis_id) == 0)
-	       cprintf("OK - Supported by this driver\n");
-	    else if (strcmp("C2Ab",revis_id) == 0)
-	       cprintf("OK - Supported by this driver\n");
-	    else if (strcmp("C2Ac",revis_id) == 0)
-	       cprintf("OK - Supported by this driver\n");
-	    else if (strcmp("C2Ad",revis_id) == 0)
-	       cprintf("OK - Supported by this driver\n");
+	    printk("VD80: Board Revision ID:%s ",revis_id);
+	    if (strcmp("C2Ad",revis_id) == 0)
+	       printk("OK - Warning OLD version - Supported by this driver\n");
 	    else if (strcmp("C2Ae",revis_id) == 0)
-	       cprintf("OK - Supported by this driver\n");
+	       printk("OK - Warning OLD version - Supported by this driver\n");
 	    else if (strcmp("C2Af",revis_id) == 0)
-	       cprintf("OK - Supported by this driver\n");
+	       printk("OK - Warning OLD version - Supported by this driver\n");
+	    else if (strcmp("D0Af",revis_id) == 0)
+	       printk("OK - Supported by this driver\n");
 	    else {
-	       cprintf("ERROR - %s NOT SUPPORTED BY THIS DRIVER\n",revis_id);
+	       printk("ERROR - %s NOT SUPPORTED BY THIS DRIVER\n",revis_id);
 	       return SkelUserReturnFAILED;
 	    }
-	    u = (UserData *) sysbrk(sizeof(UserData));  /* TODO: Leaks on uninstall */
+
+	    u = (UserData *) kmalloc(sizeof(UserData),GFP_KERNEL);  /* TODO: Leaks on uninstall */
 	    if (u) strncpy(u->revis_id,revis_id,VD80_CR_REV_ID_LEN);
 	    else
-	       report_module(mcon, 0, "No memory in SkelUserConfig:UserData");
+	       report_module(mcon, SkelDrvrDebugFlagWARNING, "No memory in SkelUserConfig:UserData");
 	    mcon->UserData = u;
 
 	    intrd = mcon->Modld->Isr;
-	    cdcm_iowrite32(cdcm_cpu_to_be32((U32) intrd->Vector), &(config[VD80_CSR_IRQ_VECTOR/4]));
-	    cdcm_iowrite32(cdcm_cpu_to_be32((U32) intrd->Level),  &(config[VD80_CSR_IRQ_LEVEL /4]));
+	    iowrite32(cpu_to_be32((uint32_t) intrd->Vector), &(config[VD80_CSR_IRQ_VECTOR/4]));
+	    iowrite32(cpu_to_be32((uint32_t) intrd->Level),  &(config[VD80_CSR_IRQ_LEVEL /4]));
 
 	    if (Wa->Endian == InsLibEndianLITTLE)
-	       cdcm_iowrite32(cdcm_cpu_to_be32((U32) VD80_CSR_MBLT_LITTLE_ENDIAN), &(config[VD80_CSR_MBLT_ENDIAN /4]));
+	       iowrite32(cpu_to_be32((uint32_t) VD80_CSR_MBLT_LITTLE_ENDIAN), &(config[VD80_CSR_MBLT_ENDIAN /4]));
 	    else
-	       cdcm_iowrite32(cdcm_cpu_to_be32((U32) VD80_CSR_MBLT_BIG_ENDIAN),    &(config[VD80_CSR_MBLT_ENDIAN /4]));
+	       iowrite32(cpu_to_be32((uint32_t) VD80_CSR_MBLT_BIG_ENDIAN),    &(config[VD80_CSR_MBLT_ENDIAN /4]));
 
-	    cdcm_iowrite32(0, &(config[VD80_TCR3 /4])); // Clear trigger delay
-	    cdcm_iowrite32(0, &(config[VD80_PTCR /4])); // Clear min pre trigger samples
+	    iowrite32(0, &(config[VD80_TCR3 /4])); // Clear trigger delay
+	    iowrite32(0, &(config[VD80_PTCR /4])); // Clear min pre trigger samples
 	 break;
 
 	 case VME_A24_USER_DATA_SCT:
@@ -946,24 +924,24 @@ UserData *u;
 
 	    if (config) {
 
-	       cdcm_iowrite32(cdcm_cpu_to_be32((U32) (vmeas->BaseAddress >> 24) & 0xff), &(config[VD80_CSR_ADER0/4   ]));
-	       cdcm_iowrite32(cdcm_cpu_to_be32((U32) (vmeas->BaseAddress >> 16) & 0xff), &(config[VD80_CSR_ADER0/4 +1]));
-	       cdcm_iowrite32(cdcm_cpu_to_be32((U32) (vmeas->BaseAddress >>  8) & 0xff), &(config[VD80_CSR_ADER0/4 +2]));
+	       iowrite32(cpu_to_be32((uint32_t) (vmeas->BaseAddress >> 24) & 0xff), &(config[VD80_CSR_ADER0/4   ]));
+	       iowrite32(cpu_to_be32((uint32_t) (vmeas->BaseAddress >> 16) & 0xff), &(config[VD80_CSR_ADER0/4 +1]));
+	       iowrite32(cpu_to_be32((uint32_t) (vmeas->BaseAddress >>  8) & 0xff), &(config[VD80_CSR_ADER0/4 +2]));
 
-	       cdcm_iowrite32(cdcm_cpu_to_be32((U32) (VME_A24_USER_DATA_SCT * 4)), &(config[VD80_CSR_ADER0/4 +3]));
-	       cdcm_iowrite32(cdcm_cpu_to_be32((U32) (VME_A24_USER_MBLT     * 4)), &(config[VD80_CR_FUNC0_AM_MASK/4 +3]));
-	       cdcm_iowrite32(cdcm_cpu_to_be32((U32) (VME_A24_USER_MBLT     * 4)), &(config[VD80_CR_FUNC1_AM_MASK/4 +3]));
+	       iowrite32(cpu_to_be32((uint32_t) (VME_A24_USER_DATA_SCT * 4)), &(config[VD80_CSR_ADER0/4 +3]));
+	       iowrite32(cpu_to_be32((uint32_t) (VME_A24_USER_MBLT     * 4)), &(config[VD80_CR_FUNC0_AM_MASK/4 +3]));
+	       iowrite32(cpu_to_be32((uint32_t) (VME_A24_USER_MBLT     * 4)), &(config[VD80_CR_FUNC1_AM_MASK/4 +3]));
 
-	       cdcm_iowrite32(cdcm_cpu_to_be32((U32) (vmeas->BaseAddress >> 24) & 0xff), &(config[VD80_CSR_ADER1/4   ]));
-	       cdcm_iowrite32(cdcm_cpu_to_be32((U32) (vmeas->BaseAddress >> 16) & 0xff), &(config[VD80_CSR_ADER1/4 +1]));
-	       cdcm_iowrite32(cdcm_cpu_to_be32((U32) (vmeas->BaseAddress >>  8) & 0xff), &(config[VD80_CSR_ADER1/4 +2]));
-	       cdcm_iowrite32(cdcm_cpu_to_be32((U32) (VME_A24_USER_MBLT * 4)          ), &(config[VD80_CSR_ADER1/4 +3]));
+	       iowrite32(cpu_to_be32((uint32_t) (vmeas->BaseAddress >> 24) & 0xff), &(config[VD80_CSR_ADER1/4   ]));
+	       iowrite32(cpu_to_be32((uint32_t) (vmeas->BaseAddress >> 16) & 0xff), &(config[VD80_CSR_ADER1/4 +1]));
+	       iowrite32(cpu_to_be32((uint32_t) (vmeas->BaseAddress >>  8) & 0xff), &(config[VD80_CSR_ADER1/4 +2]));
+	       iowrite32(cpu_to_be32((uint32_t) (VME_A24_USER_MBLT * 4)          ), &(config[VD80_CSR_ADER1/4 +3]));
 
-	       cdcm_iowrite32(cdcm_cpu_to_be32((U32) (0)                              ), &(config[VD80_CSR_FUNC_ACEN/4]));
-	       cdcm_iowrite32(cdcm_cpu_to_be32((U32) (VD80_CSR_ENABLE_MODULE)         ), &(config[VD80_CSR_BITSET/4   ]));
+	       iowrite32(cpu_to_be32((uint32_t) (0)                              ), &(config[VD80_CSR_FUNC_ACEN/4]));
+	       iowrite32(cpu_to_be32((uint32_t) (VD80_CSR_ENABLE_MODULE)         ), &(config[VD80_CSR_BITSET/4   ]));
 
 	    } else {
-	       report_module(mcon, 0, "Missing AM=2F can't config A24");
+	       report_module(mcon, SkelDrvrDebugFlagWARNING, "Missing AM=2F can't config A24");
 	       return SkelUserReturnFAILED;
 	    }
 
@@ -986,7 +964,7 @@ UserData *u;
 
    /* Enable the module */
 
-   cdcm_iowrite32(cdcm_cpu_to_be32((U32) VD80_CSR_ENABLE_MODULE),
+   iowrite32(cpu_to_be32((uint32_t) VD80_CSR_ENABLE_MODULE),
 		  &(config[VD80_CSR_BITSET/4]) );
 
    return SkelUserReturnOK;

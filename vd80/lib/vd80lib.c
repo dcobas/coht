@@ -91,7 +91,7 @@ int vd80OpenHandle() {
 char fnm[32];
 int  i, fd;
 
-   for (i = 1; i <=SkelDrvrCLIENT_CONTEXTS; i++) {
+   for (i = 0; i <=SkelDrvrCLIENT_CONTEXTS; i++) {
       sprintf(fnm,"/dev/vd80.%1d",i);
       if ((fd = open(fnm,O_RDWR,0)) > 0) return fd;
    }
@@ -112,10 +112,11 @@ void vd80CloseHandle(int fd) {
 Vd80Err vd80ResetMod(int fd, int mod) {
 
 Vd80Err err;
+int reset = 1;
 
    err = SetModule(fd,mod);
    if (err != Vd80ErrSUCCESS) return err;
-   if (ioctl(fd,SkelDrvrIoctlRESET,NULL) < 0) return Vd80ErrIO;
+   if (ioctl(fd,SkelDrvrIoctlRESET,&reset) < 0) return Vd80ErrIO;
    return Vd80ErrSUCCESS;
 }
 
@@ -586,7 +587,7 @@ Vd80Err err;
 
    err = SetModule(fd,mod);
    if (err != Vd80ErrSUCCESS) return err;
-   if (ioctl(fd,Vd80IoctlGET_POSTSAMPLES,&post) < 0) return Vd80ErrIO;
+   if (ioctl(fd,Vd80IoctlGET_POSTSAMPLES,post) < 0) return Vd80ErrIO;
    return Vd80ErrSUCCESS;
 }
 

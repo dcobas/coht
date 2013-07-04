@@ -2,9 +2,9 @@
 
 typedef struct {   /* mcon->Registers */
 
-   U32 GCR1;
-   U32 GCR2;
-   U32 GSR;
+   uint32_t GCR1;
+   uint32_t GCR2;
+   uint32_t GSR;
 
 
  } GeneralRegs;

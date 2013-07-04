@@ -1,0 +1,89 @@
+#****************************************************************************
+# $Id: transfer.ref,v 1.125 2012/01/09 13:00:29 aradeva Exp $
+#****************************************************************************
+# WARNING: File generated from database. Can be overwritten at any time !
+#
+
+# ***** IOCONFIG Information *****
+
+#   ln mln bus mtno module-type      lu W AM DPsz basaddr1   range1 W AM DPsz basaddr2   range2 testoff  sz sl ss L Vect
+#+#  1   0 VME   90 CTRV              0 N ST DP32   c00000    10000 N SH DP16      100      100        0  0  3 -1 2 0xb8
+#+#  2   0 VME   90 CTRV              1 N ST DP32   c10000    10000 N SH DP16      200      100        0  0  4 -1 2 0xb9
+#+#  3   0 VME  167 CONV-DIST         0 N -- DP16        0        0 N -- ----        0        0        0  0 14 -1 0 0x00
+#+#  4   0 VME 2279 MEN-A20           0 N -- DP16        0        0 N -- ----        0        0        0  0  1  0 0 0x00
+#+#  5   0 VME    0 CTC-TMP           0 N ST DP32    20000      200 N -- ----        0        0        0  4  8 -1 0 0x00
+#+#  6   0 VME    0 CTC-TMP           1 N ST DP32    30000      200 N -- ----        0        0        0  4  9 -1 0 0x00
+#+#  7   0 VME    0 CVORA-TMP         0 N ST DP32   300000    80000 N -- ----        0        0        0  4 11 -1 2 0x86
+#+#  8   0 VME    0 CVORA-TMP         1 N ST DP32   400000    80000 N -- ----        0        0        0  4 12 -1 2 0x87
+#+#  9   0 VME   75 SIS3300           1 N EX DP32 10000000   400000 N -- ----        0        0        4  0 16 -1 2 0xc9
+#+# 10   0 VME   97 SIS3320           0 N EX DP32  8000000   800000 N -- ----        0        0        4  4 15 -1 2 0xc8
+#+# 11   0 VME   97 SIS3320           2 N EX DP32 18000000   800000 N -- ----        0        0        4  4 17 -1 2 0xca
+#+# 12   0 VME   92 VD80              0 N CR DP32   980000    80000 N ST DP32   980000    80000        0  0 19 -1 2 0xb0
+#+# 13   0 VME   92 VD80              1 N CR DP32   a00000    80000 N ST DP32   a00000    80000        0  0 20 -1 2 0xb1
+#+# 14   0 VME   92 VD80              2 N CR DP32   a80000    80000 N ST DP32   a80000    80000        0  0 21 -1 2 0xb2
+
+#   ln sln bus mtno module-type      lu evno  subaddr    A1 F1     D1    A2 F2     D2
+#
+# ***** Program Startup before drivers *****
+#
+#
+#% cd /usr/local/drivers/sacvme; sacvmeinstall -R0 -M0 -V254 -L2
+#% cd /usr/local/drivers/ctr; ctrvinstall  -object ctrvdrvr.o  -M0xc00000 -X0x100 -V184 -L2   -M0xc10000 -X0x200 -V185 -L2
+#% cd /usr/local/drivers/ctc; install_ctc.sh  CTC  -U0  -O20000 -,  -U1  -O30000
+#% cd /usr/local/drivers/cvora; install_cvora.sh   
+#% cd /usr/local/drivers/sis33; sis3300inst.sh  -l1  -V201 -L2
+#% cd /usr/local/drivers/sis33; sis3320inst.sh  -l0  -V200 -L2   -l2  -V202 -L2
+#% cd /usr/local/drivers/vd80; instprog  /etc/drivers.xml VD80     
+#
+#% upfiles -all
+#% wreboot -all
+#% end
+#
+# ***** Program Startup after drivers *****
+#
+#
+# Load the CTIMs into the CTRx
+/usr/local/tim timload /usr/local/tim timload root root  555 command 20 % /usr/local/tim/timload   >/dev/con 2>&1 %
+#
+# Tgm RT using TIM or DTM
+# Use -edtm option to allow DTM telegram reception if no hardware available
+/usr/local/tgm get_tgm_tim /usr/local/tgm get_tgm_tim root root  755 server -100 % /usr/local/tgm/get_tgm_tim %
+#
+/usr/bin chrt /usr/bin chrt root root  555 command - % echo Adjust threaded IRQs prio to 87 >/dev/console;/bin/sh -c "/bin/ps -eLo cmd,tid,class,rtprio | /bin/awk '/^\[.*FF      50/{print $2}' | /usr/bin/xargs -n1 chrt -f -p 87|| echo done";[ -z "" ] || /bin/sh -c "/bin/ps -eLo cmd,tid,class,rtprio | /bin/awk '/^\[.*FF      49/{print $2}' | /usr/bin/xargs -n1 chrt -f -p || echo done" %
+#
+# Start real-time and CMW server for FESA class LTIM
+/dsc/local/bin LTIM_M /dsc/local/bin LTIM_M root root  555 server -25 % ./LTIM_M %
+#
+# wait for 5 seconds (repeat with negative value for priority)
+/bin sleep /bin sleep root root  555 command 5 % sleep 5 %
+#
+# Start real-time for FESA class CTCMux_RT
+/dsc/local/bin CTCMux_RT_R /dsc/local/bin CTCMux_RT_R root root  555 server -50 % ./CTCMux_RT_R %
+#
+# Start CMW server for FESA class CTCMux
+/dsc/local/bin CTCMux_S /dsc/local/bin CTCMux_S root root  555 server -25 % ./CTCMux_S %
+#
+# Start CMW server for FESA class CTCCount
+/dsc/local/bin CTCCount_S /dsc/local/bin CTCCount_S root root  555 server -25 % ./CTCCount_S %
+#
+/dsc/local/data FesaShared_M /dsc/local/data FesaShared_M root root  555 server -50 % ./FesaShared_M %
+#
+# wait for 5 seconds (repeat with negative value for priority)
+/bin sleep /bin sleep root root  555 command 5 % sleep 5 %
+#
+# Start real-time and CMW server for FESA class OasisRdaClient
+/dsc/local/bin OasisRdaClient_M /dsc/local/bin OasisRdaClient_M root root  555 server -25 % ./OasisRdaClient_M %
+#
+# Start real-time and CMW server for FESA class OasisDataSource
+/dsc/local/bin OasisDataSource_M /dsc/local/bin OasisDataSource_M root root  555 server -25 % ./OasisDataSource_M %
+#
+# Start real-time and CMW server for FESA class OasisCursor
+/dsc/local/bin OasisCursor_M /dsc/local/bin OasisCursor_M root root  555 server -25 % ./OasisCursor_M %
+#
+# Start real-time and CMW server for FESA class TriggerSignal
+/dsc/local/bin TriggerSignal_M /dsc/local/bin TriggerSignal_M root root  555 server -25 % ./TriggerSignal_M %
+#
+# Start real-time and CMW server for FESA class AnalogueSignal
+/dsc/local/bin AnalogueSignal_M /dsc/local/bin AnalogueSignal_M root root  555 server -25 % ./AnalogueSignal_M %
+
+# End of file transfer.ref : all OK.
