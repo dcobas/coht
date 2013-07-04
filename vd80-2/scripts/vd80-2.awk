@@ -1,5 +1,5 @@
 #
-# vd80-64.awk - extract insmod parameters from transfer.ref
+# vd80-2.awk - extract insmod parameters from transfer.ref
 #
 # usage: vd80.awk DEVICE_NAME [transfer_file]
 #

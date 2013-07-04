@@ -62,7 +62,7 @@
  */
 
 static int vd80_major = 0;
-static char *vd80_major_name = "vd80-64";
+static char *vd80_major_name = "vd80-2";
 
 MODULE_AUTHOR("Julian Lewis BE/CO/HT CERN");
 MODULE_LICENSE("GPL");

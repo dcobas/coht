@@ -3,18 +3,16 @@
 DEVICE_NAME=VD80
 TRANSFER=/etc/transfer.ref
 DRIVER_NAME=vd80
-PARSER=vd80.awk
 
 # Install the vd80 driver specific script
 
 OUTPUT=":"
 RUN=""
-while getopts hvn36D:d:t: o
+while getopts hvn2D:d:t: o
 do	case $o in
 	v)	OUTPUT="echo" ;;		# verbose
 	n)	RUN=":" ;;			# dry run
-	3)	DRIVER_NAME=vd80 PARSER=vd80.awk ;;
-	6)	DRIVER_NAME=vd80-64 PARSER=vd80-64.awk ;;
+	2)	DRIVER_NAME=vd80-2 ;;
 	D)	DEVICE_NAME="$OPTARG" ;;
 	d)	DRIVER_NAME="$OPTARG" ;;
 	t)	TRANSFER="$OPTARG" ;;
@@ -24,6 +22,7 @@ do	case $o in
 done
 
 $OUTPUT "Installing $DEVICE_NAME driver..."
+PARSER=$DRIVER_NAME.awk
 INSMOD_ARGS=`awk -f $PARSER $DEVICE_NAME $TRANSFER`
 if [ x"$INSMOD_ARGS" == x"" ] ; then
     echo "No $DEVICE_NAME declared in $TRANSFER, exiting"

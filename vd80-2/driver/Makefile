@@ -8,7 +8,7 @@ ifeq ($(CPU),L866)
 KVER=3.6.11-rt30.25.el6rt.x86_64
 endif
 
-TARGET = vd80-64
+TARGET = vd80-2
 
 KERNELSRC=/acc/sys/$(CPU)/usr/src/kernels/$(KVER)
 GIT_VERSION = $(shell cd $(src); git describe --dirty --long --tags --always)
