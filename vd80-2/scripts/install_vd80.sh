@@ -3,6 +3,7 @@
 DEVICE_NAME=VD80
 TRANSFER=/etc/transfer.ref
 DRIVER_NAME=vd80
+DEVNODE_NAME=$DRIVER_NAME
 
 # Install the vd80 driver specific script
 
@@ -42,6 +43,6 @@ fi
 MINORS=`awk '/^#\+#/ && $6 == "'"$DEVICE_NAME"'" { printf("%s ", $7) }' $TRANSFER`
 $OUTPUT "creating device nodes for driver $DRIVER_NAME, major $MAJOR, minors $MINORS"
 for MINOR in $MINORS; do
-    sh -c "$RUN rm -f /dev/$DRIVER_NAME.$MINOR"
-    sh -c "$RUN mknod -m 777 /dev/$DRIVER_NAME.$MINOR c $MAJOR $MINOR"
+    sh -c "$RUN rm -f /dev/$DEVNODE_NAME.$MINOR"
+    sh -c "$RUN mknod -m 777 /dev/$DEVNODE_NAME.$MINOR c $MAJOR $MINOR"
 done
