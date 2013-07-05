@@ -1,14 +1,19 @@
 /*!
- *  \class Vd80Device Driver
+ *  \class Vd80 Linux only Library
  *  \author Julian Lewis BE/CO/HT Julian Lewis
- *  \version 25 Mar 2009
+ *  \version 5th July 2013
  *
- * The VD80 hardware module is a sampling 16-channel 16-Bit Transient Recorder
- * with a sampling rate up to 200 KHz.
- * This driver exposes a minimum functionality of the boards capabilities.
+ * This is the documentation for libvd80
+ */
+
+/** This include is needed to get the libvd80 API */ #include <libvd80.h>
+
+/**
+ *
+ * The vd80 driver exposes a minimum functionality of the boards capabilities.
  * More functions can be added later if needed.
  *
- * In this version of the driver the following capabilities are provided.
+ * In the current driver the following capabilities are provided.
  * 1) Setting up of the trigger
  * 2) Setting up of the clock
  * 3) Setting up the post trigger sample size
@@ -16,151 +21,543 @@
  * 5) Reading the sample buffer for a given channel via DMA
  * 6) Connecting to and waiting for module interrupts
  *
- * The VD80 is based on the standard SKEL driver and hence provides all
- * the standard SKEL features for debugging getting the status etc
- *
- * A standard test program encorporating all the SKEL features and the
- * VD80 specific features is provided
- * As usual to see a complete list of available test program commands type h
+ * A library test program using the dynamic library is available, the
+ * executable is named "vd80test".
  */
 
 /**
- *  Vd80NumGET_POSTSAMPLES, Get the number of post samples you set
- *  Vd80NumSET_POSTSAMPLES, Set the number of post samples you want
- *
- * The VD80 once started begins filling sample memory in the PRE-TRIGGER state.
- * Once triggered it will start counting post trigger samples and compare them
- * with the POSTSAMPLES value you have set. Once the count reaches this set value
- * the state then switches to IDLE and sampling is stopped.
- *
- * V80IoctlREAD_SAMPLE has an argument pointer of type Vd80SampleBuf
- *
- * Once the module has returned to the IDLE state, the sample data can be read from the
- * fifo buffer using DMA transfers. In order to avoid unnessary Scatter Gather lists the
- * target buffer should be aligned on a 4096 page boundary. The DMA transfer from the
- * Vd80 occur in 32 sample blocks using 64-Bit MBLT block transfers, so an arbitary
- * specification of a sample count and trigger position will be adjusted by the driver.
- *
- * The driver will try to supply the requested data, in any case it will adjust the values
- * of TrigPosition and Samples as best it can. Don't forget you should have set up the number
- * of post-samples prior to calling READ_SAMPLE.
+ * This API relies on definitions made in the driver API header file vd80.h
+ * The relavent doccumentation is here as required for using the library
+ * So this doccument is complete and contains what you need to know for
+ * accessing the vd80 library
  */
 
-typedef struct {
-/** WO Channel to read from                   */ int Channel;
-/** WO The number of samples you want to read */ int BufSizeSamples;
-/** RW Position of trigger in buf             */ int TrigPosition;
-/** RO The number of samples actually read    */ int Samples;
-/** RO Buffer where samples will be stored    */ short *SampleBuf;
- } Vd80SampleBuf;
+/** The driver API is included by libvd80.h */ #include <vd80.h>
 
 /**
- *  Vd80NumREAD_ADC,
- *
- * At any time the instantaneous ADC value on a given channel can be read.
- * This IOCTL call takes a channel number [1..16] at the argument pointer and
- * returns the ADC value for that channel to the same address.
+ * There are 16 vd80 analogue input channels, defined here
  */
 
+#define VD80_LIB_CHANNELS 16
+
 /**
- * Vd80IoctlSET_CLOCK has an argument pointer of type Vd80Clock
- * Vd80IoctlGET_CLOCK has an argument pointer of type Vd80Clock
- *
- * A Lemo plug on the front pannel provides the external clock input
- * A 200KHz internal clock is available
+ * When an IO direction is required in RAW IO for example, these
+ * constants can be used for clarity
+ */
+
+#define VD80_IO_DIR_READ  0x1
+#define VD80_IO_DIR_WRITE 0x2
+
+/**
+ * Only 3 error codes are used, more details are in errno as standard.
+ * Error codes can be converted to strings which contain also the errno information
  */
 
 typedef enum {
-/** Indicates the internal clock            */ Vd80ClockINTERNAL,
-/** Indicates the external clock            */ Vd80ClockEXTERNAL,
-/** The number of clock selections possible */ Vd80CLOCKS
- } Vd80Clock;
+/** All went OK, No error */ VD80_LIB_ERR_SUCCESS,
+/** Timeout in wait       */ VD80_LIB_ERR_TIMEOUT,
+/** IO or BUS error       */ VD80_LIB_ERR_IO,
+
+/** Total error codes     */ VD80_LIB_ERR_ERRORS
+} vd80_err_t;
 
 /**
- * Vd80NumSET_CLOCK_DIVIDE_MODE has an argument pointer of type Vd80DivideMode
- * Vd80NumGET_CLOCK_DIVIDE_MODE has an argument pointer of type Vd80DivideMode
- *
- * When the divide mode is set DIVIDE, the internal clock is divided by the
- * value set in the CLOCK_DIVISOR.
- * When the divide mode is set SUBSAMPLE the external clock is divided by the
- * value set in the CLOCK_DIVISOR.
+ * A signal input requires the edge, termination, and source to be specified
+ * These are defined in the driver vd80 include
+ */
+
+struct vd80_input_s {
+	vd80_edge_t        edge;
+	vd80_termination_t termination;
+	vd80_source_t      source;
+};
+
+/**
+ * From vd80.h the edge definition
  */
 
 typedef enum {
-/** Indicates divide internal 200KHz clock */ Vd80DivideModeDIVIDE,
-/** Indicates divide external clock        */ Vd80DivideModeSUBSAMPLE,
-/** The number of clock modes possible     */ Vd80DivideMODES
- } Vd80DivideMode;
+	VD80_EDGE_RISING,
+	VD80_EDGE_FALLING,
+	VD80_EDGES
+} vd80_edge_t;
 
 /**
- * Vd80NumSET_CLOCK_EDGE,   Set the edge used on the external clock input
- * Vd80NumGET_CLOCK_EDGE,   Get the edge used on the external clock input
- * Vd80NumSET_TRIGGER_EDGE, Set the edge used on the external trigger input
- * Vd80NumGET_TRIGGER_EDGE, Get the edge used on the external trigger input
- *
- * The external clock and trigger inputs can use rising or falling edges
+ * From vd80.h the termination definition
  */
 
 typedef enum {
-/** Use the rising edge          */ Vd80EdgeRISING,
-/** Use the falling edge         */ Vd80EdgeFALLING,
-/** The number of possible edges */ Vd80EDGES
- } Vd80Edge;
+	VD80_TERMINATION_NONE,
+	VD80_TERMINATION_50OHM,
+	VD80_TERMINATIONS
+} vd80_termination_t;
 
 /**
- *  Vd80NumSET_CLOCK_TERMINATION    Set the external clock input termination
- *  Vd80NumGET_CLOCK_TERMINATION,   Get the external clock input termination
- *  Vd80NumSET_TRIGGER_TERMINATION, Set the external trigger input termination
- *  Vd80NumGET_TRIGGER_TERMINATION, Get the external trigger input termination
- *
- * The external clock and trigger inputs can have 50 Ohm or no termination
+ * From vd80.h the source definition
  */
 
 typedef enum {
-/** No termination used                */ Vd80TerminationNONE,
-/** 50 Ohm termination                 */ Vd80Termination50OHM,
-/* The number of possible terminations */ Vd80TERMINATIONS
- } Vd80Termination;
+	VD80_SOURCE_INTERNAL,
+	VD80_SOURCE_EXTERNAL,
+	VD80_SOURCES
+} vd80_source_t;
+
 
 /**
- *  Vd80NumSET_TRIGGER, Set the trigger source
- *  Vd80NumGET_TRIGGER, Get the trigger source
- *
- * The trigger source can be internally generated from a command or it
- * can be supplied via the external trigger input
+  * Number of interrupts and the corresponding bit mask
+  */
+
+#define VD80_LIB_INTR_MASKS 3
+#define VD80_LIB_INTR_MASK  0x7
+
+/**
+ * ====================================================================
+ * Now the API library routine function prototypes follow
+ * N.B In this linux implementation file handles are bound to devices.
+ *     The same device can be opened as many times as you like.
+ *     Each opened file number talks to only one device.
+ */
+
+/**
+ * ====================================================================
+ * @brief Open driver handle
+ * @param dev The device number or logical unit number to be opened
+ * @return A file number for the device, or zero/negative on error
+ */
+
+int vd80OpenHandle(int dev);
+
+/**
+ * @brief Close driver handle
+ * @param fd The posative open file descriptor/number returned by OpenHandle
+ */
+
+void vd80CloseHandle(int fd);
+
+/**
+ * ====================================================================
+ * Getting information about modules.
+ * N.B We use the terms device, logical unit and module interchangably
+ */
+
+/**
+ * The vd80 VME module implements full CSR geographic addressing.
+ * In this scheme the "slot" is first found and using the CSR address
+ * modifier, the vd80 at that slot is then configured with the given
+ * VME base address and interrupt vector. The lun is the device number
+ * used in the open call and identifies the module with that address
+ */
+
+struct vd80_mod_addr_s {
+/** Logical unit number   */ uint32_t lun;
+/** Interrupt vector      */ uint32_t vec;
+/** VD80 VME base address */ uint32_t vmeb;
+/** VME Slot number       */ uint32_t slot;
+};
+
+/**
+ * @brief Get the modula address corresponding to the given open file
+ * @param fd The posative open file descriptor/number returned by OpenHandle
+ * @param moad The address of the descriptor where the result will be stored
+ * @return The library error code and errno
+ */
+
+vd80_err_t vd80GetModuleAddress(int fd, struct vd80_mod_addr_s *moad);
+
+/**
+ * @brief Discover how many modules are installed.
+ * @param fd The posative open file descriptor/number returned by OpenHandle
+ * @param count The place where the module count will be stored
+ * @return The library error code and errno
+ */
+
+vd80_err_t vd80GetModuleCount(int fd, uint32_t *count);
+
+/**
+ * From vd80.h the version structure
+ */
+
+struct vd80_version_s {
+/** Driver  version (UTC compilation time) */ uint32_t drvrver;
+/** VD80 firmware revision ID              */ uint32_t vhdlver;
+};
+
+/**
+ * @brief This returns the hardware, driver and library versions
+ * @param fd The posative open file descriptor/number returned by OpenHandle
+ * @param version The structure where the version data will be stored
+ * @return The library error code and errno
+ */
+
+vd80_err_t vd80GetVersion(int fd, struct vd80_version_s *version);
+
+/**
+ * ====================================================================
+ * Set/Get the driver debug behaviour
+ * Setting driver debugging causes messages to be logged, they can
+ * be later examined by using the "dmseg" bash command.
+ * This type of debugging is useful to see what calls the library makes
  */
 
 typedef enum {
-/** The trigger source is internally generated */ Vd80TriggerINTERNAL,
-/** The trigger source is external             */ Vd80TriggerEXTERNAL,
-/* The number of possible trigger sources      */ Vd80TRIGGERS
- } Vd80Trigger;
+/** No debug information logged */ VD80_DEBUG_OFF,
+/** Each ioctl call is logged   */ VD80_DEBUG_IOCTL,
+/** The call stack is logged    */ VD80_DEBUG_BUF
+} vd80_debug_level_t;
 
 /**
- *  Vd80NumGET_STATE,                              /* Returns a Vd80 state */
+ * @brief Set the driver debug level
+ * @param fd The posative open file descriptor/number returned by OpenHandle
+ * @param debug The debug level
+ * @return The library error code and errno
+ */
+
+vd80_err_t vd80SetDebug(int fd, vd80_debug_level_t  debug);
+
+/**
+ * @brief Get the driver debug level
+ * @param fd The posative open file descriptor/number returned by OpenHandle
+ * @param debug Address where the debug level will be stored
+ * @return The library error code and errno
+ */
+
+vd80_err_t vd80GetDebug(int fd, vd80_debug_level_t *debug);
+
+/**
+ * ====================================================================
+ * Reset is the equivalent to a VME bus reset. All settings and data on
+ * the module will be lost.
+ */
+
+/**
+ * @brief Reset the vd80 hardware to the power on state
+ * @param fd The posative open file descriptor/number returned by OpenHandle
+ * @return The library error code and errno
+ */
+
+vd80_err_t vd80ResetMod(int fd);
+
+/**
+ * @brief Get the instant signed ADC value for a given channel
+ * @param fd The posative open file descriptor/number returned by OpenHandle
+ * @param channel The channel number 1..16
+ * @param adc The place where the adc value will be stored
+ * @return The library error code and errno
+ */
+
+vd80_err_t vd80GetAdcValue(int fd, uint32_t channel, int *adc);
+
+/**
+ * From vd80.h this is the module state
+ * There is only one state for the entire module
+ * Channels do not have individual states
  */
 
 typedef enum {
-/** In this state, sample data can be read from the module */ Vd80StateIDLE        = 0x1,
-/** The device is sampling and storing pre-trigger data    */ Vd80StatePRETRIGGER  = 0x2,
-/** The device is sampling and storing post-trigger data   */ Vd80StatePOSTTRIGGER = 0x4,
-/** The number of possible states                          */ Vd80STATES           = 3
- } Vd80State;
+/** Base state          */ VD80_STATE_IDLE        = 0x1,
+/** Waiting for trigger */ VD80_STATE_PRETRIGGER  = 0x2,
+/** Acquiring the data  */ VD80_STATE_POSTTRIGGER = 0x4,
+/** Number of states    */ VD80_STATES            = 3
+} vd80_state_t;
 
 /**
- *  Vd80NumSET_COMMAND, Set to a Vd80 command
- *
- * Commands can be sent to the VD80 to start, stop and trigger it
+ * @brief Read the module state
+ * @param fd The posative open file descriptor/number returned by OpenHandle
+ * @param state The place where the module state will be stored
+ * @return The library error code and errno
+ */
+
+vd80_err_t vd80GetState(int fd, vd80_state_t *state);
+
+/**
+ * @brief configure the module trigger input
+ * @param fd The posative open file descriptor/number returned by OpenHandle
+ * @param trigger The place from which the trigger configuration is read
+ * @return The library error code and errno
+ */
+
+vd80_err_t vd80SetTrigger(int fd, struct vd80_input_s *trigger);
+
+/**
+ * @brief Get the configure of the module trigger input
+ * @param fd The posative open file descriptor/number returned by OpenHandle
+ * @param trigger The place where the trigger configuration will be stored
+ * @return The library error code and errno
+ */
+
+vd80_err_t vd80GetTrigger(int fd, struct vd80_input_s *trigger);
+
+/**
+ * @brief configure the module clock input
+ * @param fd The posative open file descriptor/number returned by OpenHandle
+ * @param clock The place from which the clock configuration is read
+ * @return The library error code and errno
+ */
+
+vd80_err_t vd80SetClock(int fd, struct vd80_input_s *clock);
+
+/**
+ * @brief Get the configure of the module clock input
+ * @param fd The posative open file descriptor/number returned by OpenHandle
+ * @param clock The place where the clock configuration will be stored
+ * @return The library error code and errno
+ */
+
+vd80_err_t vd80GetClock(int fd, struct vd80_input_s *clock);
+
+/**
+ * @brief Set the clock frequency divider
+ * @param fd The posative open file descriptor/number returned by OpenHandle
+ * @param divisor The divsor, N.B a value of zero means no division
+ * @return The library error code and errno
+ */
+
+vd80_err_t vd80SetClockDivide(int fd, uint32_t  divisor);
+
+/**
+ * @brief Get the clock frequency divider
+ * @param fd The posative open file descriptor/number returned by OpenHandle
+ * @param divisor The place where the divsor will be stored
+ * @return The library error code and errno
+ */
+
+vd80_err_t vd80GetClockDivide(int fd, uint32_t *divisor);
+
+/**
+ * @brief Set the number of post trigger samples you want
+ * @param fd The posative open file descriptor/number returned by OpenHandle
+ * @param post The number of post samples
+ * @return The library error code and errno
+ */
+
+vd80_err_t vd80SetPostSamples(int fd, uint32_t post);
+
+/**
+ * @brief Get the number of post trigger samples
+ * @param fd The posative open file descriptor/number returned by OpenHandle
+ * @param post The place where the number of post samples will be stored
+ * @return The library error code and errno
+ */
+
+vd80_err_t vd80GetPostSamples(int fd, uint32_t *post);
+
+/**
+ * @brief Start the acquisition = go to pre-trigger state
+ * @param fd The posative open file descriptor/number returned by OpenHandle
+ * @return The library error code and errno
+ */
+
+vd80_err_t vd80StrtAcquisition(int fd);
+
+/**
+ * @brief Trigger the acquisition = go to post-trigger state
+ * @param fd The posative open file descriptor/number returned by OpenHandle
+ * @return The library error code and errno
+ */
+
+vd80_err_t vd80TrigAcquisition(int fd);
+
+/**
+ * @brief Stop the acquisition = go to idle state
+ * @param fd The posative open file descriptor/number returned by OpenHandle
+ * @return The library error code and errno
+ */
+
+vd80_err_t vd80StopAcquisition(int fd);
+
+/**
+ * ====================================================================
+ * Interrupt source connection mask.
+ * You can get interrupted by the trigger, acquisition ready,
+ * or a hardware error
  */
 
 typedef enum {
-/** Stop the module and go straight to the IDLE state  */ Vd80CommandSTOP    = 0xE,
-/** Start sampling and go to the PRETRIGGER state      */ Vd80CommandSTART   = 0xB,
-/** If internal trigger is set go to POSTTRIGGER state */ Vd80CommandTRIGGER = 0x2,
-/** The number of possible commands                    */ Vd80COMMANDS       = 3
- } Vd80Command;
+/** Trigger interrupt        */ VD80_LIB_INTR_MASK_TRIGGER      = 0x1,
+/** Data ready interrupt     */ VD80_LIB_INTR_MASK_ACQUISITION  = 0x2,
+/** Hardware error interrupt */ VD80_LIB_INTR_MASK_ERR          = 0x4,
+} vd80_intr_mask_t;
 
 /**
- *  Vd80NumSET_CLOCK_DIVISOR, A 16 bit integer so the lowest frequency is
- *  Vd80NumGET_CLOCK_DIVISOR,
+ * @brief Connect to an interrupt
+ * @param fd The posative open file descriptor/number returned by OpenHandle
+ * @param imask The interrupt you want to connect to, 0=>disconnect all
+ * @return The library error code and errno
  */
+
+vd80_err_t vd80Connect(int fd, vd80_intr_mask_t imask);
+
+/**
+ * @brief Get the connected interrupt mask
+ * @param fd The posative open file descriptor/number returned by OpenHandle
+ * @param imask The place where the mask will be stored
+ * @return The library error code and errno
+ */
+
+vd80_err_t vd80GetConnect(int fd, vd80_intr_mask_t *imask);
+
+/**
+ * @brief Set the wait for interrupt timeout value
+ * @param fd The posative open file descriptor/number returned by OpenHandle
+ * @param tmout The timeout value, 0=>no timeout
+ * @return The library error code and errno
+ */
+
+vd80_err_t vd80SetTimeout(int fd, uint32_t tmout);
+
+/**
+ * @brief Get the wait for interrupt timeout value
+ * @param fd The posative open file descriptor/number returned by OpenHandle
+ * @param tmout The place where the timeout value will be stored
+ * @return The library error code and errno
+ */
+
+vd80_err_t vd80GetTimeout(int fd, uint32_t *tmout);
+
+/**
+ * From vd80.h the interrupt buffer structure
+ * N.B All connected interrupts from all modules are delivered
+ *     to all file descriptors. If you only want for your open
+ *     device, check the lun number.
+ * N.B Calls to vd80Wait are blocking and will return only when
+ *     an interrupt happens, a timeout occurs, or a signal is received
+ */
+
+struct vd80_int_buf_s {
+/** Interrupt mask                */ uint32_t src;
+/** Interrupt count               */ uint32_t cnt;
+/** Interrupt logical unit number */ uint32_t lun;
+};
+
+/**
+ * @brief Wait for any connected interrupt on any device
+ * @param fd The posative open file descriptor/number returned by OpenHandle
+ * @param intr The place where the next interrupt will be stored
+ * @return The library error code and errno
+ */
+
+vd80_err_t vd80Wait(int fd, struct vd80_int_buf_s *intr);
+
+/**
+ * Sample buffers are read back from a sampler and contain the acquired
+ * data for a channel.
+ */
+
+struct vd80_buffer_s {
+/** Address of alloocated sample memory */ int16_t  *addr;
+/** Buffer size in shorts/uint16_t      */ uint32_t  bsze;
+/** Requested number of post samples    */ uint32_t  post;
+/** Actual position of trigger          */ uint32_t  tpos;
+/** Actual number of samples in buffer  */ uint32_t  asze;
+/** Number of 100K ticks since start    */ uint32_t  ptsr;
+};
+
+/**
+ * @brief Get information about a buffer
+ * @param fd The posative open file descriptor/number returned by OpenHandle
+ * @param chn The channel number 1..16
+ * @param buffer The place where the buffer will be stored
+ * @return The library error code and errno
+ */
+
+vd80_err_t vd80GetBuffer(int fd, uint32_t chn, struct vd80_buffer_s *buffer);
+
+/**
+ * From vd80.h The vd80 can have an analogue trigger configuration
+ */
+
+typedef enum {
+/** No analogue triggering                       */ VD80_ANALOGUE_TRIG_DISABLED   = 0x0,
+/** Trigger when passing below the trigger level */ VD80_ANALOGUE_TRIG_BELOW      = 0x3,
+/** Trigger when passing above the trigger level */ VD80_ANALOGUE_TRIG_ABOVE      = 0x4,
+} vd80_analogue_trig_t;
+
+/**
+ * From vd80.h Here is the analogue trigger level structure
+ */
+
+struct vd80_analogue_trig_s {
+/** Channel to define the trigger on */ uint32_t             channel;
+/** Control options for trigger      */ vd80_analogue_trig_t control;
+/** Trigger level                    */ int16_t              level;
+};
+
+/**
+ * @brief Set the trigger analogue level for a channel
+ * @param fd The posative open file descriptor/number returned by OpenHandle
+ * @param atrg The trigger level you want to set
+ * @return The library error code and errno
+ */
+
+vd80_err_t vd80SetTriggerLevel(int fd, struct vd80_analogue_trig_s *atrg);
+
+/**
+ * @brief Get the trigger analogue level for a channel
+ * @param fd The posative open file descriptor/number returned by OpenHandle
+ * @param atrg The place where the trigger level will be stored
+ * @return The library error code and errno
+ */
+
+vd80_err_t vd80GetTriggerLevel(int fd, struct vd80_analogue_trig_s *atrg);
+
+/**
+ * From vd80.h This structure allows you to control pre trigger behaviour
+ */
+
+struct vd80_trig_config_s {
+/** Time to wait after trig in sample intervals */ uint32_t trig_delay;
+/** Mininimum number of pretrig samples         */ uint32_t min_pre_trig;
+};
+
+/**
+ * @brief Set the pre-trigger configuration behaviour
+ * @param fd The posative open file descriptor/number returned by OpenHandle
+ * @param ctrg The address of the pretrigger configuration you want to set
+ * @return The library error code and errno
+ */
+
+vd80_err_t vd80SetTriggerConfig(int fd, struct vd80_trig_config_s *ctrg);
+
+/**
+ * @brief Get the pre-trigger configuration behaviour
+ * @param fd The posative open file descriptor/number returned by OpenHandle
+ * @param ctrg The address where the pretrigger configuration will be stored
+ * @return The library error code and errno
+ */
+
+vd80_err_t vd80GetTriggerConfig(int fd, struct vd80_trig_config_s *ctrg);
+
+/**
+ * @brief Convert the error code and current errno to a printable string
+ * @param error The error number to convert
+ * @return Pointer to a printable string in static memory
+ */
+
+char *vd80ErrToStr(vd80_err_t error);
+
+/**
+ * When an IO direction is required in RAW IO for example, these
+ * constants can be used for clarity
+ */
+
+#define VD80_IO_DIR_READ  0x1
+#define VD80_IO_DIR_WRITE 0x2
+
+/**
+ * From vd80.h This is the RAW IO buffer
+ */
+
+struct vd80_riob_s {
+/** Byte offset in map          */ uint32_t boffs;
+/** The number of bytes to read */ uint32_t bsize;
+/** Pointer to user data area   */ void *buffer;
+};
+
+/**
+ * @brief Specialists RAW IO to vd80 memory map
+ * @param fd The address of the raw IO operation you want to perform
+ * @param rio The IO buffer
+ * @param io_dir The IO direction of the operation
+ * @return Pointer to a printable string in static memory
+ */
+vd80_err_t vd80RawIo(int fd, struct vd80_riob_s *rio, int io_dir);

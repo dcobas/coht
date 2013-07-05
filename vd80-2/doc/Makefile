@@ -1,11 +1,11 @@
-DOXY_INSTPATH = /acc/doc/html/private/coht/doxy/vd80/driver
+DOXY_INSTPATH = /acc/doc/html/private/coht/doxy/vd80-2.0
 
 all:
-	echo Make documentation for VD80 driver
+	echo Make documentation for linux VD80 library
 	rm -f ,*.h
 	rm -rf doc
-	../../doxy/doxy.sh -n"VD80 Device Driver" -o "doc" vd80.doxygen
+	doxygen Doxyfile
 
 doxy_install: all
 	mkdir -p $(DOXY_INSTPATH)
-	cp -r doc/html/* $(DOXY_INSTPATH)
+	cp -r doc/html/* $(DOXY_INSTPATH)/
