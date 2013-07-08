@@ -632,14 +632,14 @@ static DEFINE_PCI_DEVICE_TABLE(tpci200_idtable) = {
 
 MODULE_DEVICE_TABLE(pci, tpci200_idtable);
 
-static struct pci_driver __refdata tpci200_pci_drv = {
+static struct pci_driver tpci200_pci_driver = {
 	.name = "tpci200",
 	.id_table = tpci200_idtable,
 	.probe = tpci200_pci_probe,
 	.remove = tpci200_pci_remove,
 };
 
-module_pci_driver(tpci200_pci_drv);
+module_pci_driver(tpci200_pci_driver);
 
 MODULE_DESCRIPTION("TEWS TPCI-200 device driver");
 MODULE_LICENSE("GPL");
