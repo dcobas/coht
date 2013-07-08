@@ -1,6 +1,0 @@
-0x00000000	ipack_device_register	/acc/dsc/src/drivers/cohtdrep/lfruiz/ipoctal/ipack/ipack	EXPORT_SYMBOL_GPL
-0x00000000	ipack_bus_register	/acc/dsc/src/drivers/cohtdrep/lfruiz/ipoctal/ipack/ipack	EXPORT_SYMBOL_GPL
-0x00000000	ipack_bus_unregister	/acc/dsc/src/drivers/cohtdrep/lfruiz/ipoctal/ipack/ipack	EXPORT_SYMBOL_GPL
-0x00000000	ipack_device_unregister	/acc/dsc/src/drivers/cohtdrep/lfruiz/ipoctal/ipack/ipack	EXPORT_SYMBOL_GPL
-0x00000000	ipack_driver_register	/acc/dsc/src/drivers/cohtdrep/lfruiz/ipoctal/ipack/ipack	EXPORT_SYMBOL_GPL
-0x00000000	ipack_driver_unregister	/acc/dsc/src/drivers/cohtdrep/lfruiz/ipoctal/ipack/ipack	EXPORT_SYMBOL_GPL
