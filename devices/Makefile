@@ -1,13 +1,12 @@
 # Assign sensible defaults, but allow overriding with environment variables.
 #
-LINUX=/acc/sys/L865/usr/src/kernels/2.6.24.7-rt27
 
 CPU	?= L865
-KVER	?= 2.6.24.7-rt27
-KVER	?= 3.2.33-rt50
-LINUX ?= "/acc/sys/$(CPU)/usr/src/kernels/$(KVER)"
+KVER	?= 3.2.43-rt63
+LINUX ?= /acc/sys/$(CPU)/usr/src/kernels/$(KVER)
 
 GIT_VERSION = $(shell git describe --dirty --long --tags)
+KBUILD_EXTRA_SYMBOLS = $(src)/../ipack/Module.symvers
 
 ccflags-y += -DDEBUG
 ccflags-y += -DGIT_VERSION=\"$(GIT_VERSION)\"

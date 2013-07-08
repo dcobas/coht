@@ -1,14 +1,12 @@
 # Assign sensible defaults, but allow overriding with environment variables.
 #
-LINUX=/acc/sys/L865/usr/src/kernels/2.6.24.7-rt27
-IPACK_DIR=../ipack
 
 CPU	?= L865
-KVER	?= 2.6.24.7-rt27
 KVER	?= 3.2.33-rt50
-LINUX ?= "/acc/sys/$(CPU)/usr/src/kernels/$(KVER)"
+LINUX	?= /acc/sys/$(CPU)/usr/src/kernels/$(KVER)
 
 GIT_VERSION = $(shell git describe --dirty --long --tags)
+KBUILD_EXTRA_SYMBOLS = $(src)/../ipack
 
 ccflags-y += -DDEBUG
 ccflags-y += -DGIT_VERSION=\"$(GIT_VERSION)\"
@@ -20,7 +18,6 @@ all: modules
 .PHONY: all modules clean help install modules_install
 
 modules help install modules_install:
-	cp ../ipack/Module.symvers .
 	$(MAKE) -C $(LINUX) M=$(shell pwd) CPU=$(CPU) \
 		KVER=$(KVER) GIT_VERSION=$(GIT_VERSION) \
 		$@
