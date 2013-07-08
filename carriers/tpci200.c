@@ -632,7 +632,7 @@ static DEFINE_PCI_DEVICE_TABLE(tpci200_idtable) = {
 
 MODULE_DEVICE_TABLE(pci, tpci200_idtable);
 
-static struct pci_driver tpci200_pci_drv = {
+static struct pci_driver __refdata tpci200_pci_drv = {
 	.name = "tpci200",
 	.id_table = tpci200_idtable,
 	.probe = tpci200_pci_probe,
