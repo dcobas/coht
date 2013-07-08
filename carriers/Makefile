@@ -2,7 +2,7 @@
 #
 
 CPU	?= L865
-KVER	?= 3.2.33-rt50
+KVER	?= 3.2.43-rt63
 LINUX	?= /acc/sys/$(CPU)/usr/src/kernels/$(KVER)
 
 GIT_VERSION = $(shell git describe --dirty --long --tags)
