@@ -6,7 +6,7 @@ KVER	?= 3.2.33-rt50
 LINUX	?= /acc/sys/$(CPU)/usr/src/kernels/$(KVER)
 
 GIT_VERSION = $(shell git describe --dirty --long --tags)
-KBUILD_EXTRA_SYMBOLS = $(src)/../ipack
+KBUILD_EXTRA_SYMBOLS = $(src)/../ipack/Module.symvers
 
 ccflags-y += -DDEBUG
 ccflags-y += -DGIT_VERSION=\"$(GIT_VERSION)\"
