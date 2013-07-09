@@ -11,8 +11,8 @@
  * any later version.
  */
 
+#include <linux/version.h>
 #include <linux/module.h>
-#include <linux/moduleparam.h>
 #include <linux/interrupt.h>
 #include <linux/fs.h>
 #include <linux/delay.h>
@@ -20,6 +20,7 @@
 #include <linux/tty.h>
 #include <linux/serial.h>
 #include <linux/tty_flip.h>
+#include <linux/slab.h>
 #include <asm/uaccess.h>
 #include "ipoctal_drvr.h"
 #include "carrier.h"
@@ -114,7 +115,8 @@ static int __init ipoctal_init(void);
 static void __exit ipoctal_exit(void);
 int ipoctal_open(struct tty_struct *tty, struct file *filp);
 void ipoctal_close(struct tty_struct *tty, struct file *filp);
-int ipoctal_ioctl(struct tty_struct *tty, struct file *file, unsigned int cmd, unsigned long arg);
+int ipoctal_ioctl_compat(struct tty_struct *tty, struct file *file, unsigned int cmd, unsigned long arg);
+int ipoctal_ioctl(struct tty_struct *tty, unsigned int cmd, unsigned long arg);
 static int ipoctal_write_tty(struct tty_struct *tty, const unsigned char *buf, int count);
 static int ipoctal_inst_slot(struct ipoctal *ipoctal, unsigned int carrier_number, unsigned int slot_position, unsigned int vector, char *carrier);
 static void ipoctal_uninst_slot(struct ipoctal *ipoctal);
@@ -140,9 +142,14 @@ MODULE_VERSION(IPOCTAL_DRIVER_VERSION);
 module_init(ipoctal_init);
 module_exit(ipoctal_exit);
 
+
 struct tty_operations ipoctalFops =
 {
-	.ioctl = 		ipoctal_ioctl,
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,38)
+	.ioctl = 		ipoctal_ioctl_compat,
+#else
+	.ioctl =		ipoctal_ioctl,
+#endif
 	.open = 		ipoctal_open,
 	.close = 		ipoctal_close,
 	.write =		ipoctal_write_tty,
@@ -250,7 +257,12 @@ void ipoctal_close(struct tty_struct *tty, struct file *filp)
 	}
 }
 
-int ipoctal_ioctl(struct tty_struct *tty, struct file *file, unsigned int cmd, unsigned long arg)
+inline int ipoctal_ioctl(struct tty_struct *tty, unsigned int cmd, unsigned long arg)
+{
+	return ipoctal_ioctl_compat(tty, NULL, cmd, arg);
+}
+
+int ipoctal_ioctl_compat(struct tty_struct *tty, struct file *file, unsigned int cmd, unsigned long arg)
 {
 	void __user *user_arg = (void __user *)arg;
 	int index = *(int *)tty->driver_data;
