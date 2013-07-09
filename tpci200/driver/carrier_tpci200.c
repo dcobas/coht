@@ -128,8 +128,8 @@ static int carrier_register(struct carrier_board *carrier, void *dev_specific)
 	int res = 0;
 	struct params_pci *pci_params = (struct params_pci *) dev_specific;
 	struct carrier_infos *pci_carrier = NULL;
-	unsigned int ioidint_base = 0;
-	unsigned int mem_base = 0;
+	unsigned long ioidint_base = 0;
+	unsigned long mem_base = 0;
 	unsigned short slot_ctrl;
 
 	/* Check if carrier is already registered */
@@ -559,7 +559,7 @@ struct slot_id* ip_slot_register(char* board_name, unsigned int carrier_number,
 	}
 
 	if (strlen(board_name) > SLOT_BOARD_NAME_SIZE) {
-		printk(KERN_WARNING PFX "Slot [%s %d:%d] name (%s) too long (%d char > %d char MAX). Will be truncated!\n",
+		printk(KERN_WARNING PFX "Slot [%s %d:%d] name (%s) too long (%zd char > %d char MAX). Will be truncated!\n",
 				TPCI200_SHORTNAME,
 				carrier_number, slot_position,
 				board_name, strlen(board_name), SLOT_BOARD_NAME_SIZE);
@@ -870,7 +870,7 @@ int ip_slot_request_irq(struct slot_id *slot_id, int vector, int (*handler)(void
 	slot_irq->arg = arg;
 	if (name){
 		if (strlen(name) > SLOT_IRQ_NAME_SIZE) {
-			printk(KERN_WARNING PFX "Slot [%s %d:%d] IRQ name (%s) too long (%d char > %d char MAX). Will be truncated!\n",
+			printk(KERN_WARNING PFX "Slot [%s %d:%d] IRQ name (%s) too long (%zd char > %d char MAX). Will be truncated!\n",
 					TPCI200_SHORTNAME,
 					slot_id->carrier_number, slot_id->slot_position,
 					name, strlen(name), SLOT_IRQ_NAME_SIZE);
