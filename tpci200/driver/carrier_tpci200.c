@@ -17,6 +17,15 @@
 #include <linux/interrupt.h>
 #include <linux/module.h>
 #include <linux/fs.h>
+#include <linux/version.h>
+
+#if LINUX_VERSION_CODE <= KERNEL_VERSION(2,6,24)
+#include <linux/byteorder/swabb.h>
+#else
+#include <linux/swab.h>
+#endif
+
+
 
 #include "carrier.h"
 #include "carrier_common.h"
