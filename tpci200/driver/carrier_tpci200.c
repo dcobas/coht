@@ -15,9 +15,8 @@
 #include <linux/pci.h>
 #include <linux/spinlock.h>
 #include <linux/interrupt.h>
-#include <linux/moduleparam.h>
+#include <linux/module.h>
 #include <linux/fs.h>
-#include <linux/byteorder/swabb.h>
 
 #include "carrier.h"
 #include "carrier_common.h"
