@@ -9,12 +9,12 @@
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
  */
-#ifdef __cplusplus__
+#ifdef __cplusplus
 extern "C" {
 #endif
 
 int ipoctal_get_device_name(int lun, int mezz, int line, char *name);
 
-#ifdef __cplusplus__
+#ifdef __cplusplus
 }
 #endif
