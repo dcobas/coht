@@ -1,4 +1,5 @@
 EXTRA_CFLAGS += -DCOMPILE_TIME=$(shell date +%s) -g -Wall \
 		-I/acc/src/dsc/drivers/cohtdrep/lewis/icv196/linux/driver
+EXTRA_CFLAGS += -DGIT_VERSION=\"$(GIT_VERSION)\"
 
 obj-m:=icv196.o

@@ -65,6 +65,7 @@ MODULE_AUTHOR("Julian Lewis BE/CO/HT CERN");
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("ICV196 Digital IO Driver");
 MODULE_SUPPORTED_DEVICE("ICV196 VME Module");
+MODULE_VERSION(GIT_VERSION);
 
 /*
  * ==============================

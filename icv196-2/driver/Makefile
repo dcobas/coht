@@ -8,6 +8,7 @@ ifeq ($(CPU),L866)
 KVER=3.6.11-rt30.25.el6rt.x86_64
 endif
 
+GIT_VERSION = $(shell git describe --dirty --tags --always --long)
 KERNELSRC=/acc/sys/$(CPU)/usr/src/kernels/$(KVER)
 
 CFLAGS=-g -Wall
@@ -15,7 +16,7 @@ CFLAGS=-g -Wall
 all: modules
 modules: 
 	cp Module.symvers.vmebus Module.symvers
-	make -C $(KERNELSRC) M=`pwd` KVER=$(KVER) CPU=$(CPU) modules
+	make -C $(KERNELSRC) M=`pwd` GIT_VERSION=$(GIT_VERSION) modules
 	rm -rf ./$(CPU)
 	mkdir ./$(CPU)
 	mkdir ./$(CPU)/$(KVER)
