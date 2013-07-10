@@ -2,11 +2,11 @@ CPU ?= L866
 #KVER=2.6.24.7-rt27
 #KVER=3.2.33-rt50
 
-ifeq($(CPU),L866)
+ifeq ($(CPU),L866)
 KVER ?= 3.6.11-rt30.25.el6rt.x86_64
 endif
 
-ifeq($(CPU),L865)
+ifeq ($(CPU),L865)
 KVER ?= 3.2.43-rt63
 endif
 
