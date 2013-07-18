@@ -343,7 +343,7 @@ int dg_cdv_install(char *name, struct file_operations *fops, char *dnm)
 			      "%s.l%02d.c%02d", dnm, abs(info->mlun), i);
 #else
 		device_create(cdcm_class, NULL, MKDEV(maj, i+1), NULL,
-			      "%s.l%02d.c%02d", dnm, abs(info->mlun), i);
+			      "%s.l%02d.c%02d", dnm, (int) abs(info->mlun), i);
 #endif	/* 2.6.28 */
 	}
 

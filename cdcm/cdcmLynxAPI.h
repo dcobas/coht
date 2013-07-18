@@ -77,7 +77,11 @@ struct cdcm_file {
 
 /* select implementation */
 #define SREAD		0
-//#define SWRITE 1 /* already defined in Linux (fs.h as 3) So let it be. */
+
+#ifndef SWRITE
+#define SWRITE 1 /* already defined in Linux (fs.h as 3) So let it be. */
+#endif
+
 #define SEXCEPT		2
 struct cdcm_sel {
   int *iosem;

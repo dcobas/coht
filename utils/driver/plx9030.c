@@ -346,9 +346,11 @@ int plx9030_init(struct pci_dev *pdev, plx_info_t *card)
 
 #ifdef YGEORGIE_VERS
   unsigned short plx_command_reg; /* ygeorgie version */
-#elif LEWIS_VERS
-  unsigned int dword;		/* Julian's version */
 #endif /* YGEORGIE_VERS */
+
+#ifdef LEWIS_VERS
+  unsigned int dword;		/* Julian's version */
+#endif
 
   /* Ensure using memory mapped I/O */
 #ifdef YGEORGIE_VERS
@@ -358,12 +360,13 @@ int plx9030_init(struct pci_dev *pdev, plx_info_t *card)
   pci_write_config_word(pdev, PLX_PCI_CMD, plx_command_reg);
   //pci_read_config_word(pdev, PLX_PCI_CMD, &plx_command_reg);
   //printk("-------> COMMAND2 is %#x (%s)\n", plx_command_reg, bitprint(plx_command_reg));
-#elif LEWIS_VERS
+#endif /* YGEORGIE_VERS */
+
+#ifdef LEWIS_VERS
   pci_read_config_dword(pdev, 1, &dword);
   dword |= 2;
   pci_write_config_dword(pdev, 1, dword);
-#endif /* YGEORGIE_VERS */
-
+#endif
 
   if (map_bars(&card->plx_bar_list, pdev, (1<<0)/*we need to map only BAR0*/, "PLX9030") != 1) {
     PRNT_ABS_ERR("Can't map plx9030 (BAR0) local configuration");

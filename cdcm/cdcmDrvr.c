@@ -61,7 +61,7 @@ cdcmStatics_t cdcmStatT = {
    Should be set _ONLY_ by 'pseterr' function */
 int cdcm_err = 0;
 
-spinlock_t lynxos_cpu_lock = SPIN_LOCK_UNLOCKED;
+DEFINE_SPINLOCK(lynxos_cpu_lock);
 
 struct file_operations cdcm_fops;
 
