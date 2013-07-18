@@ -951,6 +951,7 @@ uint32_t MttLibWait(uint32_t mask, int noqueue, int tmo) {
 	}
 
 	while (1) {
+		bzero(&rbf,sizeof(SkelDrvrReadBuf));
 		cc = read(mtt, &rbf, sizeof(SkelDrvrReadBuf));
 		if (cc <= 0)
 			return 0;
