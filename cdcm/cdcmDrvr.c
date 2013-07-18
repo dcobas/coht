@@ -103,8 +103,10 @@ static ssize_t cdcm_fop_read(struct file *filp, char __user *buf,
 			     size_t size, loff_t *off)
 {
 	void *iobuf  = NULL;
+	int res = 0;
 
 	struct cdcm_file *lynx_file = filp->private_data;
+
 	if (lynx_file == NULL) {
 	   cdcm_err = -ENODEV;
 	   return cdcm_err; /* failure */
@@ -113,7 +115,6 @@ static ssize_t cdcm_fop_read(struct file *filp, char __user *buf,
 
 	PRNT_DBG(cdcmStatT.cdcm_ipl, "Read device with minor = %d",
 		 MINOR(lynx_file->dev));
-	cdcm_err = 0;	/* reset */
 
 	if (!access_ok(VERIFY_WRITE, buf, size)) {
 		PRNT_ABS_ERR("Can't verify user buffer for writing.");
@@ -125,16 +126,21 @@ static ssize_t cdcm_fop_read(struct file *filp, char __user *buf,
 		return -ENOMEM;
 
 	/* call user */
+
 	if (cdcmStatT.cdcm_isdg)
-		cdcm_err = dg_fop_read(filp, iobuf, size, off);
-	else
-		cdcm_err = entry_points.dldd_read(cdcmStatT.cdcm_st, lynx_file,
-						  iobuf, size);
-	if (cdcm_err == SYSERR)
-		cdcm_err = -EAGAIN;
+		res = dg_fop_read(filp, iobuf, size, off);
+	else {
+		res = entry_points.dldd_read(cdcmStatT.cdcm_st,lynx_file,iobuf,size);
+		if (res <= 0)
+			printk("cdcm:error from read:%d\n",res);
+	}
+
+	if (res == SYSERR)
+		res = -EAGAIN;
 	else {
 		if (__copy_to_user(buf,  iobuf, size)) {
 			cdcm_mem_free(iobuf);
+			printk("cdcm:error from copy_to_user\n");
 			return -EFAULT;
 		}
 		*off = lynx_file->position;
@@ -142,7 +148,10 @@ static ssize_t cdcm_fop_read(struct file *filp, char __user *buf,
 
 	cdcm_mem_free(iobuf);
 
-	return cdcm_err;
+	if (res < 0)
+		cdcm_err = res;
+
+	return res;
 }
 
 /**
