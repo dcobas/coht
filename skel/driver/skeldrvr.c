@@ -1510,9 +1510,17 @@ int SkelDrvrUninstall(void *wa)
 /* Note: call with the queue's lock held */
 static void __q_get(SkelDrvrReadBuf *rb, SkelDrvrQueue *q)
 {
+
+	static SkelDrvrReadBuf rbt = { { 0, 0 }, { 0, 0} };
+
 	*rb = q->Entries[q->RdPntr];
-	q->RdPntr = (q->RdPntr + 1) % SkelDrvrQUEUE_SIZE;
-	q->Size--;
+	if (q->Size > 0) {
+		q->RdPntr = (q->RdPntr + 1) % SkelDrvrQUEUE_SIZE;
+		q->Size--;
+	} else {
+		printk("mttn:q_get:underflow\n");
+		*rb = rbt;
+	}
 }
 
 /**
@@ -1537,10 +1545,11 @@ static int SkelDrvrRead(void *wa, struct cdcm_file *flp, char *u_buf, int len)
 	SkelDrvrQueue         *q;
 	SkelDrvrReadBuf       *rb;
 	unsigned long          flags;
+	int                    cc;
 
 	ccon = skel_get_ccon(flp);
 	if (ccon == NULL) {
-		cprintf("Skel:Read:Bad File Descriptor\n");
+		cprintf("skel:read:bad file descriptor\n");
 		pseterr(EBADF);
 		return SYSERR;
 	}
@@ -1552,16 +1561,34 @@ static int SkelDrvrRead(void *wa, struct cdcm_file *flp, char *u_buf, int len)
 	cdcm_spin_unlock_irqrestore(&q->lock, flags);
 
 	/* wait for something new in the queue */
-	if (tswait(&ccon->Semaphore, SEM_SIGABORT, ccon->Timeout)) {
-		client_timeout(ccon);
-		pseterr(EINTR);
-		return 0;
+
+	if (ccon->Timeout) {
+		cc = tswait(&ccon->Semaphore, SEM_SIGABORT, ccon->Timeout);
+		if (cc) {
+			printk("skel:read:error in tswait:%d\n",cc);
+			client_timeout(ccon);
+			pseterr(EINTR);
+			return SYSERR;
+		}
+	} else {
+		cc = swait(&ccon->Semaphore, SEM_SIGABORT);
+		if (cc) {
+			printk("skel:read:error in swait:%d\n",cc);
+			pseterr(EINTR);
+			return SYSERR;
+		}
 	}
 
 	/* read from the queue */
-	rb = (SkelDrvrReadBuf *)u_buf;
-	q_get(rb, ccon);
 
+	rb = (SkelDrvrReadBuf *) u_buf;
+
+	q_get(rb, ccon);
+	if (rb->Connection.ConMask == 0) {
+		pseterr(ETIME);
+		printk("mttn:read:zero mask\n");
+		return 0;
+	}
 	return sizeof(SkelDrvrReadBuf);
 }
 
