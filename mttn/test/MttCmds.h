@@ -988,7 +988,7 @@ unsigned int ms;
 
     if (t->Second) {
 
-	ctime_r (&t->Second, tmp); /* Day Mon DD HH:MM:SS YYYY\n\0 */
+	ctime_r((time_t *) &t->Second, tmp); /* Day Mon DD HH:MM:SS YYYY\n\0 */
 
         tmp[3] = 0;
         dy = &(tmp[0]);
@@ -1033,7 +1033,7 @@ double fms;
 
     if (t->Second) {
 
-	ctime_r (&t->Second, tmp); /* Day Mon DD HH:MM:SS YYYY\n\0 */
+	ctime_r((time_t *) &t->Second, tmp); /* Day Mon DD HH:MM:SS YYYY\n\0 */
 
         tmp[3] = 0;
         dy = &(tmp[0]);
@@ -1785,9 +1785,11 @@ int i, cc, qflag, qsize, interrupt, cnt;
 
    cnt = 0;
    do {
+      bzero(&rbf,sizeof(SkelDrvrReadBuf));
       cc = read(mtt,&rbf,sizeof(SkelDrvrReadBuf));
       if (cc <= 0) {
-	 printf("Time out or Interrupted call\n");
+	 printf("Time out or Interrupted call:%d\n",cc);
+	 perror("read");
 	 return arg;
       }
       if ((interrupt == 0) || (rbf.Connection.ConMask & interrupt)) break;
@@ -1925,7 +1927,7 @@ int i, j, k, pid, mypid;
 int GetSetEnable(int arg) {
 ArgVal   *v;
 AtomType  at;
-unsigned long enb, stat;
+unsigned int enb, stat;
 
    arg++;
    v = &(vals[arg]);
