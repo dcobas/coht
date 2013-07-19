@@ -1785,8 +1785,8 @@ int i, cc, qflag, qsize, interrupt, cnt;
 
    cnt = 0;
    do {
-      bzero(&rbf,sizeof(SkelDrvrReadBuf));
-      cc = read(mtt,&rbf,sizeof(SkelDrvrReadBuf));
+      bzero((void *) &rbf, sizeof(SkelDrvrReadBuf));
+      cc = read(mtt, &rbf, sizeof(SkelDrvrReadBuf));
       if (cc <= 0) {
 	 printf("Time out or Interrupted call:%d\n",cc);
 	 perror("read");
