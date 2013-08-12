@@ -597,6 +597,11 @@ int h_chanstat(struct cmd_desc *cmdd, struct atom *atoms)
 	if (status & CVORG_CHANSTAT_READY)
 		printf("\tReady\n");
 
+	ret = cvorgdev_get_chan_attr_uint(device->index, device->channelnr, "config", &config_reg);
+	if (ret < 0) {
+		__cvorg_libc_error(__func__);
+		return -1;
+	}
 	show_mode(status_reg, config_reg);
 
 	if (status & CVORG_CHANSTAT_BUSY)

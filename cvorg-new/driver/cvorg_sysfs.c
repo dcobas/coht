@@ -9,9 +9,11 @@
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
  */
+#include <linux/version.h>
 #include <linux/device.h>
 #include <linux/ctype.h>
 #include <linux/sysfs.h>
+#include <linux/stat.h>
 #include <asm/uaccess.h>
 
 #include "cvorg.h"
@@ -280,7 +282,8 @@ cvorg_show_sampling_freq(struct cvorg_channel *channel, char *buf)
 }
 
 static ssize_t
-cvorg_show_pll(struct kobject *kobj,
+cvorg_show_pll(struct file *filp,
+		struct kobject *kobj,
 		struct bin_attribute *bin_attr,
 		char *buf, loff_t off, size_t count)
 {
@@ -298,7 +301,8 @@ cvorg_show_pll(struct kobject *kobj,
 }
 
 static ssize_t
-cvorg_store_pll(struct kobject *kobj,
+cvorg_store_pll(struct file *filp,
+		struct kobject *kobj,
 		struct bin_attribute *bin_attr,
 		char *buf, loff_t off, size_t count)
 {
@@ -316,8 +320,25 @@ cvorg_store_pll(struct kobject *kobj,
 	return count;
 }
 
+static inline ssize_t
+cvorg_show_pll_compat(struct kobject *kobj,
+		struct bin_attribute *bin_attr,
+		char *buf, loff_t off, size_t count)
+{
+	return cvorg_show_pll(NULL, kobj, bin_attr, buf, off, count);
+}
+
+static inline ssize_t
+cvorg_store_pll_compat(struct kobject *kobj,
+		struct bin_attribute *bin_attr,
+		char *buf, loff_t off, size_t count)
+{
+	return cvorg_store_pll(NULL, kobj, bin_attr, buf, off, count);
+}
+
 static ssize_t
-cvorg_store_set_sequence(struct kobject *kobj,
+cvorg_store_set_sequence(struct file *filp,
+		struct kobject *kobj,
 		struct bin_attribute *bin_attr,
 		char *buf, loff_t off, size_t count)
 {
@@ -333,6 +354,20 @@ cvorg_store_set_sequence(struct kobject *kobj,
 
 	return count;
 }
+
+static inline ssize_t
+cvorg_store_set_sequence_compat(struct kobject *kobj,
+		struct bin_attribute *bin_attr,
+		char *buf, loff_t off, size_t count)
+{
+	return cvorg_store_set_sequence(NULL, kobj, bin_attr, buf, off, count);
+}
+
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,35)
+#define	cvorg_show_pll			cvorg_show_pll_compat
+#define	cvorg_store_pll			cvorg_store_pll_compat
+#define	cvorg_store_set_sequence	cvorg_store_set_sequence_compat
+#endif
 
 static ssize_t
 cvorg_show_dac_gain(struct cvorg_channel *channel, char *buf)
@@ -536,6 +571,46 @@ static struct bin_attribute cvorg_chan_set_sequence_attr = {
 };
 
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,25)
+/*
+ * kobject_init_and_add (and its helper kobject_set_name_vargs) are
+ * lifted here from 2.6.25, for the case of 2.6.24 compilation
+ */
+static int kobject_set_name_vargs(struct kobject *kobj, const char *fmt,
+                                  va_list vargs)
+{
+        va_list aq;
+        char *name;
+
+        va_copy(aq, vargs);
+        name = kvasprintf(GFP_KERNEL, fmt, vargs);
+        va_end(aq);
+
+        if (!name)
+                return -ENOMEM;
+
+        /* Free the old name, if necessary. */
+        kfree(kobj->k_name);
+
+        /* Now, set the new name */
+        kobj->k_name = name;
+
+        return 0;
+}
+
+int kobject_init_and_add(struct kobject *kobj, struct kobj_type *ktype,
+		         struct kobject *parent, const char *fmt, ...)
+{
+	va_list args;
+
+	va_start(args, fmt);
+	kobject_set_name_vargs(kobj, fmt, args);
+	va_end(args);
+	kobj->parent = parent;
+	kobj->ktype = ktype;
+	return kobject_register(kobj);
+}
+#endif
 
 /* the kobj_type instance for a CSROW */
 static struct kobj_type ktype_cvorg_chan = {
@@ -552,13 +627,10 @@ static int cvorg_dev_add_attributes(struct cvorg *card)
 
 	for (i = 0; i < card->n_channels; i++) {
 		channel = &card->channels[i];
-		memset(&channel->kobj, 0, sizeof(struct kobject));
-		kobject_init(&channel->kobj);
-		kobject_set_name(&channel->kobj, "channel.%d", i);
-		channel->kobj.parent	= &card->dev->kobj;
-		channel->kobj.ktype	= &ktype_cvorg_chan;
 
-		ret = kobject_register(&channel->kobj);
+		memset(&channel->kobj, 0, sizeof(struct kobject));
+		ret = kobject_init_and_add(&channel->kobj, &ktype_cvorg_chan,
+			&card->dev->kobj, "channel.%d", i);
 		if (ret)
 			goto error_channel;
 
@@ -568,7 +640,6 @@ static int cvorg_dev_add_attributes(struct cvorg *card)
 		ret = sysfs_create_bin_file(&channel->kobj, &cvorg_chan_set_sequence_attr);
 		if(ret)
 			goto error_set_sequence;
-		
 	}
 	return 0;
 
@@ -576,12 +647,12 @@ static int cvorg_dev_add_attributes(struct cvorg *card)
 	sysfs_remove_bin_file(&channel->kobj, &cvorg_chan_pll_attr);
 
  error_pll:
-	kobject_unregister(&channel->kobj);	
+	kobject_put(&channel->kobj);
 
  error_channel:
 	for (i--; i >= 0; i--) {
 		channel = &card->channels[i];
-		kobject_unregister(&channel->kobj);
+		kobject_put(&channel->kobj);
 	}
 	return ret;
 }
@@ -593,7 +664,7 @@ static void cvorg_dev_del_attributes(struct cvorg *card)
 
 	for (i = 0; i < card->n_channels; i++) {
 		channel = &card->channels[i];
-		kobject_unregister(&channel->kobj);
+		kobject_put(&channel->kobj);
 	}
 }
 

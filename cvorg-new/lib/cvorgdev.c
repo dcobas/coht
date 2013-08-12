@@ -362,7 +362,7 @@ static int cvorgdev_set_attr_dev(char *path, size_t pathlen, const char *attr, c
 	return size;
 }
 
-static int cvorgdev_get_attr_bin(char *path, size_t pathlen, const char *attr, const void *value, size_t count)
+static int cvorgdev_get_attr_bin(char *path, size_t pathlen, const char *attr, void *value, size_t count)
 {
 	struct stat statbuf;
 	size_t size;
@@ -510,7 +510,7 @@ int cvorgdev_set_chan_attr_bin(int index, int channel, const char *name, void *v
 	return __cvorgdev_set_chan_attr_bin(index, channel, name, value, count);
 }
 
-static int __cvorgdev_get_chan_attr_bin(int index, int channel, const char *name, const void *value, size_t count)
+static int __cvorgdev_get_chan_attr_bin(int index, int channel, const char *name, void *value, size_t count)
 {
 	char path[CVORG_PATH_MAX];
 	int ret;

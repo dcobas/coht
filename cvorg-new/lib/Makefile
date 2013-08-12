@@ -1,10 +1,12 @@
 CPU ?= L865
 
+include /acc/src/dsc/co/Make.auto
+
 CFLAGS := -Wall -g -I. -I../include -I../../include -I../ad9516
 LIBCVORG := libcvorg.$(CPU).a 
 HLIBCVORG := ../include/libcvorg.h
 HCVORG := ../include/cvorg.h
-OBJAD9516 := ../ad9516/ad9516.o
+OBJAD9516 := ../ad9516/ad9516.$(CPU).o
 EXAMPLES_DIR := examples
 DOXY_DIR := doxygen_output
 DOXY_FILES := cvorg.c error.c $(HLIBCVORG) $(HCVORG)

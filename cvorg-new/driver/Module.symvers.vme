@@ -17,3 +17,5 @@
 0x00000000	vme_intset	/acc/src/dsc/drivers/cohtdrep/dcobas/vmebridge/driver/vmebus	EXPORT_SYMBOL_GPL
 0x00000000	vme_intclr	/acc/src/dsc/drivers/cohtdrep/dcobas/vmebridge/driver/vmebus	EXPORT_SYMBOL_GPL
 0x00000000	vme_get_window_attr	/acc/src/dsc/drivers/cohtdrep/dcobas/vmebridge/driver/vmebus	EXPORT_SYMBOL_GPL
+0x00000000	vme_unregister_driver	/nfs/cs-ccr-nfs1/vol30/src/dsc/drivers/coht/vmebridge/driver/vmebus	EXPORT_SYMBOL_GPL
+0x00000000	vme_register_driver	/nfs/cs-ccr-nfs1/vol30/src/dsc/drivers/coht/vmebridge/driver/vmebus	EXPORT_SYMBOL_GPL

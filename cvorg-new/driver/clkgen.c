@@ -6,6 +6,7 @@
  *
  * Released under the GPL v2. (and only v2, not any later version)
  */
+#include <linux/delay.h>
 #include <cvorg_priv.h>
 #include <cvorg_hw.h>
 
