@@ -229,7 +229,7 @@ static int ipack_unregister_bus_member(struct device *dev, void *data)
 	if (idev->bus == bus)
 		ipack_device_unregister(idev);
 
-	return 1;
+	return 0;
 }
 
 int ipack_bus_unregister(struct ipack_bus_device *bus)
