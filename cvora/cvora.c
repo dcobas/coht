@@ -814,11 +814,8 @@ ssize_t vmeio_read(struct file * filp, char *buf, size_t count,
 		       cc);
 	}
 
-	if (cc == -ERESTARTSYS) {
-		printk("%s:vmeio_read:interrupted by signal\n",
-		       vmeio_major_name);
+	if (cc == -ERESTARTSYS)
 		return cc;
-	}
 	if (cc == 0 && dev->timeout)
 		return -ETIME;	/* Timer expired */
 	if (cc < 0)
