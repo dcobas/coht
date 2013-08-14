@@ -1041,6 +1041,8 @@ unsigned int modn, modcnt;
 			   atom = atom->Next;
 			   atom = GetPtimBinding(atom);
 			   equips++; rows = 0;
+			   modn = ptim.ModuleIndex + 1;
+			   row = rowm[modn -1];
 			break;
 
 			case CTIM:
