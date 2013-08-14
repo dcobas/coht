@@ -233,9 +233,26 @@ static irqreturn_t ipoctal_irq_handler(void *arg)
 	return IRQ_HANDLED;
 }
 
+static void ipoctal_port_shutdown(struct tty_port *port)
+{
+	struct ipoctal_channel *channel = port->tty->driver_data;
+
+	if (channel == NULL)
+		return;
+
+	iowrite8(CR_DISABLE_RX | CR_DISABLE_TX, &channel->regs->w.cr);
+	channel->rx_enable = 0;
+	iowrite8(CR_CMD_RESET_RX, &channel->regs->w.cr);
+	iowrite8(CR_CMD_RESET_TX, &channel->regs->w.cr);
+	iowrite8(CR_CMD_RESET_ERR_STATUS, &channel->regs->w.cr);
+	iowrite8(CR_CMD_RESET_MR, &channel->regs->w.cr);
+	clear_bit(ASYNCB_INITIALIZED, &channel->tty_port.flags);
+}
+
 static const struct tty_port_operations ipoctal_tty_port_ops = {
 	.dtr_rts = NULL,
 	.activate = ipoctal_port_activate,
+	.shutdown = ipoctal_port_shutdown,
 };
 
 static int ipoctal_inst_slot(struct ipoctal *ipoctal, unsigned int bus_nr,
@@ -620,22 +637,6 @@ static void ipoctal_hangup(struct tty_struct *tty)
 	wake_up_interruptible(&channel->tty_port.open_wait);
 }
 
-static void ipoctal_shutdown(struct tty_struct *tty)
-{
-	struct ipoctal_channel *channel = tty->driver_data;
-
-	if (channel == NULL)
-		return;
-
-	iowrite8(CR_DISABLE_RX | CR_DISABLE_TX, &channel->regs->w.cr);
-	channel->rx_enable = 0;
-	iowrite8(CR_CMD_RESET_RX, &channel->regs->w.cr);
-	iowrite8(CR_CMD_RESET_TX, &channel->regs->w.cr);
-	iowrite8(CR_CMD_RESET_ERR_STATUS, &channel->regs->w.cr);
-	iowrite8(CR_CMD_RESET_MR, &channel->regs->w.cr);
-	clear_bit(ASYNCB_INITIALIZED, &channel->tty_port.flags);
-}
-
 static const struct tty_operations ipoctal_fops = {
 	.ioctl =		NULL,
 	.open =			ipoctal_open,
@@ -646,7 +647,6 @@ static const struct tty_operations ipoctal_fops = {
 	.chars_in_buffer =	ipoctal_chars_in_buffer,
 	.get_icount =		ipoctal_get_icount,
 	.hangup =		ipoctal_hangup,
-	.shutdown =		ipoctal_shutdown,
 };
 
 static int ipoctal_probe(struct ipack_device *dev)
