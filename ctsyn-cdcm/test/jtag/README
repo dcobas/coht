@@ -1,0 +1,29 @@
+
+We can change the VHDL program in the xilinx FPGA remotely from the test
+program. See the jtag command. This code was downloaded from the xilinx
+web site, and it understands the xilinx xsvf binary file format, and it
+implements the jtag state machine engine.
+
+I provide the backend in ports.c, I was obliged to change some of this code
+to make it work, I would stay away from this stuff unless you know what you
+are doing.
+
+ports.c     :   Implementation of jtag backend based on the bstdriver ioctl
+ports.h     :   Types use in ports.c
+
+So called system/platform independent stuff, which needed none the less to
+be modified, so it is not the orriginal. BEWARE.
+
+lenval.c    :   Changed by me !!!
+lenval.h    :
+micro.c     :   Changed by me !!!
+micro.h     :
+RCS         :   Directory: Versions of this code
+
+
+N.B. The code I down loaded was of very poor quaility, and targeted a windows
+system using PC centric C compiler using bit fields that worked in an other
+way with gcc. Hence it took me some time to get it to work, change it at your
+own risk.
+
+Julian.Lewis@cern.ch
