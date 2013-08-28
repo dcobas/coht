@@ -55,6 +55,11 @@ static int wind_size_mem[MAX_CARRIER];
 static int num_wind_size_mem;
 module_param_array(wind_size_mem, int, &num_wind_size_mem, S_IRUGO);
 
+static int irq[MAX_CARRIER * 4];
+static unsigned int num_irq;
+module_param_array(irq, int, &num_irq, S_IRUGO);
+MODULE_PARM_DESC(irq, "IRQ vectors for mezzanines, 4 for each board. Expected -1 if slot empty.");
+
 static const size_t tvme200_space_size[IPACK_SPACE_COUNT] = {
         [IPACK_IO_SPACE]    = TVME200_IO_SPACE_SIZE,
         [IPACK_ID_SPACE]    = TVME200_ID_SPACE_SIZE,
@@ -324,6 +329,7 @@ static int tvme200_request_irq(struct ipack_device *dev, irqreturn_t (*handler)(
 	int res = 0;
 	struct slot_irq *slot_irq;
 	struct tvme200_board *tvme200;
+	void *irq_reg;
 	
 	tvme200 = check_slot(dev);
 	if (tvme200 == NULL)
@@ -356,8 +362,7 @@ static int tvme200_request_irq(struct ipack_device *dev, irqreturn_t (*handler)(
 	 * Read the User Manual of your IndustryPack device to know
 	 * where to write the vector in memory.
 	 */
-	/* FIXME: UGLY thing, just for testing */
-	slot_irq->vector = 0xd9 + dev->slot;
+	slot_irq->vector = irq[(4 * tvme200->number) + dev->slot];
 	slot_irq->handler = (int (*)(void *))(handler); /* FIXME: ugly casting, its ok? */
 	slot_irq->arg = arg;
 	slot_irq->holder = dev;
@@ -365,10 +370,10 @@ static int tvme200_request_irq(struct ipack_device *dev, irqreturn_t (*handler)(
 
 	rcu_assign_pointer(tvme200->slots[dev->slot].irq, slot_irq);
 
+	irq_reg = ioremap_nocache(tvme200->mod_mem[IPACK_INT_SPACE] + 
+			TVME200_INT_SPACE_INTERVAL * dev->slot, TVME200_ID_SPACE_SIZE);
 
-	iowrite8(slot_irq->vector, ioremap_nocache(dev->region[IPACK_ID_SPACE].start + 0x41, TVME200_ID_SPACE_SIZE));
-
-
+	iowrite8(slot_irq->vector, irq_reg);
 	res = vme_request_irq(slot_irq->vector, slot_irq->handler, slot_irq->arg, slot_irq->name);
 
 out_unlock:
@@ -395,9 +400,9 @@ static int tvme200_free_irq_slot(struct tvme200_board *tvme200, int slot)
         slot_irq = tvme200->slots[slot].irq;
 	err = vme_free_irq(slot_irq->vector);
 	if (!err)
-		dev_info(tvme200->info->dev, "slot %d irq vector 0x%x free\n)", slot, slot_irq->vector);
+		dev_info(tvme200->info->dev, "slot %d irq vector 0x%x freed\n", slot, slot_irq->vector);
 	else
-		dev_info(tvme200->info->dev, "error: slot %d irq vector 0x%x can not be free\n)", slot, slot_irq->vector);
+		dev_info(tvme200->info->dev, "error: slot %d irq vector 0x%x can not be freed\n", slot, slot_irq->vector);
         kfree(slot_irq);
         mutex_unlock(&tvme200->mutex);
         return 0;
@@ -592,12 +597,44 @@ out_err :
         },
 };
 
+static int tvme200_check_params(void) 
+{
+	int res = 0;
+
+	if (	(num_lun != num_address_ioid) ||
+		(num_lun != num_data_width_ioid) ||
+		(num_lun != num_wind_size_mem) ||
+		(num_lun != num_base_address_ioid) ||
+		(num_lun != num_address_mem) ||
+		(num_lun != num_data_width_mem) ||
+		(num_lun != num_wind_size_mem) ||
+		(num_lun != num_base_address_mem) ) {
+
+			pr_err("%s: The number of parameters doesn't match\n",
+				__func__);
+			res = -EINVAL;
+	}
+
+	if (4 * num_lun  != num_irq) {
+			pr_err("%s: The number of IRQ parameters doesn't match\n",
+				__func__);
+			pr_err("%s: You must specify 4 irq vectors for each carrier." 
+				" -1 if slot is empty\n", __func__);
+			res = -EINVAL;
+	}
+
+	return res;
+}
 
 static int __init tvme200_init(void)
 {
 	int error = 0;
 
 	printk(KERN_INFO PFX "Carrier driver loading...\n");
+
+	error = tvme200_check_params();
+	if (error)
+		return -EINVAL;
 
 	carrier_boards = (struct tvme200_board*) kzalloc(num_lun * sizeof(struct tvme200_board), GFP_KERNEL);
 	if (carrier_boards == NULL) {
