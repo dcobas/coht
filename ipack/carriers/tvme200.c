@@ -93,7 +93,7 @@ static int set_ioid_params(struct tvme200_board *tvme200, struct vme_addr_space 
 
 	dev_info(dev, "Carrier [%s %d] IO space size is ignored and fixed to 0x%X.\n",
 			TVME200_SHORTNAME,
-			tvme200->number, TVME200_IOIDINT_SIZE);
+			tvme200->lun, TVME200_IOIDINT_SIZE);
 
 	i = 0;
 	while (a16_modifiers[i] != ioid_space->address_modifier) {
@@ -101,7 +101,7 @@ static int set_ioid_params(struct tvme200_board *tvme200, struct vme_addr_space 
 			dev_err(dev, "Carrier [%s %d] address modifier (0x%X) \
 					of ID and IO space is not supported !\n",
 					TVME200_SHORTNAME,
-					tvme200->number, ioid_space->address_modifier);
+					tvme200->lun, ioid_space->address_modifier);
 			return -EINVAL;
 		}
 		i++;
@@ -113,7 +113,7 @@ static int set_ioid_params(struct tvme200_board *tvme200, struct vme_addr_space 
 			dev_err(dev, "Carrier [%s %d] data width (%d) \
 					of ID and IO space is not supported !\n",
 					TVME200_SHORTNAME,
-					tvme200->number, ioid_space->data_width);
+					tvme200->lun, ioid_space->data_width);
 			return -EINVAL;
 		}
 		i++;
@@ -123,7 +123,7 @@ static int set_ioid_params(struct tvme200_board *tvme200, struct vme_addr_space 
 		dev_err(dev, "Carrier [%s %d] base address of ID and IO \
 				space must be a boundary equal of the space size (0x%X) !\n",
 				TVME200_SHORTNAME,
-				tvme200->number, TVME200_IOIDINT_SIZE);
+				tvme200->lun, TVME200_IOIDINT_SIZE);
 		return -EINVAL;
 	}
 
@@ -150,7 +150,7 @@ static int set_mem_params(struct tvme200_board *tvme200, struct vme_addr_space *
 		if (carrier_mem_size[index] == ENDLIST){
 			dev_err(dev, "Carrier [%s %d] memory size (0x%X) is not supported !\n",
 					TVME200_SHORTNAME,
-					tvme200->number, mem_space->window_size);
+					tvme200->lun, mem_space->window_size);
 			return -EINVAL;
 		}
 		index++;
@@ -168,7 +168,7 @@ static int set_mem_params(struct tvme200_board *tvme200, struct vme_addr_space *
 		if (addr_modifier[i] == ENDLIST){
 			dev_err(dev, "Carrier [%s %d] address modifier (0x%X) of MEM space is not supported !\n",
 					TVME200_SHORTNAME,
-					tvme200->number, mem_space->address_modifier);
+					tvme200->lun, mem_space->address_modifier);
 			return -EINVAL;
 		}
 		i++;
@@ -179,7 +179,7 @@ static int set_mem_params(struct tvme200_board *tvme200, struct vme_addr_space *
 		if (data_width[i] == ENDLIST){
 			dev_err(dev, "Carrier [%s %d] The data width (%d) of MEM space is not supported !\n",
 					TVME200_SHORTNAME,
-					tvme200->number, mem_space->data_width);
+					tvme200->lun, mem_space->data_width);
 			return -EINVAL;
 		}
 		i++;
@@ -189,7 +189,7 @@ static int set_mem_params(struct tvme200_board *tvme200, struct vme_addr_space *
 		dev_err(dev, "Carrier [%s %d] base address of MEM space must be \
 				a boundary equal of the space size (0x%X) !\n",
 				TVME200_SHORTNAME,
-				tvme200->number, carrier_mem_size[index]);
+				tvme200->lun, carrier_mem_size[index]);
 		return -EINVAL;
 	}
 
@@ -206,13 +206,13 @@ static int set_mem_params(struct tvme200_board *tvme200, struct vme_addr_space *
 
 
 /**
- * tvme200_register - Initialisation of the TVME200 board.
+ * tvme200_init_mem - Initialisation of the TVME200 board.
  *
  * @carrier		Base structure of the carrier.
  * @dev_specific	Specific device informations.
  *
  */
-static int tvme200_register(struct tvme200_board *tvme200)
+static int tvme200_init_mem(struct tvme200_board *tvme200)
 {
 	int res = 0;
 	struct tvme200_infos *info = tvme200->info;
@@ -249,7 +249,7 @@ static int tvme200_register(struct tvme200_board *tvme200)
 	if (res) {
 		dev_err(dev, "Carrier [%s %d] unable to find window mapping for IO space !\n",
 				TVME200_SHORTNAME,
-				tvme200->number);
+				tvme200->lun);
 		goto out_err;
 	}
 
@@ -257,7 +257,7 @@ static int tvme200_register(struct tvme200_board *tvme200)
 	if (res) {
 		dev_err(dev, "Carrier [%s %d] unable to find window mapping for MEM space !\n",
 				TVME200_SHORTNAME,
-				tvme200->number);
+				tvme200->lun);
 		goto out_release_ioid;
 	}
 
@@ -285,14 +285,16 @@ out_err :
  */
 static void tvme200_unregister(struct tvme200_board *tvme200)
 {
-	int i;
-
+	int error = 0;
 	
-	vme_release_mapping(&tvme200->info->ioid_mapping, 1);
-	vme_release_mapping(&tvme200->info->mem_mapping, 1);
+	error = vme_release_mapping(&tvme200->info->ioid_mapping, 1);
+	error |= vme_release_mapping(&tvme200->info->mem_mapping, 1);
 
-	for (i=0; i<TVME200_NB_SLOT; i++)
-		tvme200_free_irq_slot(tvme200, i);
+	if (!error)
+		dev_info(tvme200->info->dev,"%s: vme mappings released\n", __func__);
+	else
+		dev_info(tvme200->info->dev,"%s: can't release vme mappings [err %d]\n",
+			 __func__,error);
 
 	kfree(tvme200->slots);
 }
@@ -366,7 +368,7 @@ static int tvme200_request_irq(struct ipack_device *dev, irqreturn_t (*handler)(
 	slot_irq->handler = (int (*)(void *))(handler); /* FIXME: ugly casting, its ok? */
 	slot_irq->arg = arg;
 	slot_irq->holder = dev;
-	sprintf(slot_irq->name, "ipackdev_%d_%d", tvme200->number, dev->slot);
+	sprintf(slot_irq->name, "ipackdev_%d_%d", tvme200->lun, dev->slot);
 
 	rcu_assign_pointer(tvme200->slots[dev->slot].irq, slot_irq);
 
@@ -457,9 +459,10 @@ static int tvme200_install(struct tvme200_board *tvme200, unsigned int n)
 	int res = 0;
 	struct device *dev = tvme200->info->dev;
 
-	dev_info(dev, "Carrier TVME200 number %d installing...\n", n);
+	dev_info(dev, "Carrier TVME200 lun %d installing...\n", lun[n]);
 
 	tvme200->number = n;
+	tvme200->lun	= lun[n];
 	tvme200->slots = (struct tvme200_slot*) kzalloc(TVME200_NB_SLOT 
 				* sizeof(struct tvme200_slot), GFP_KERNEL);
 				
@@ -469,14 +472,14 @@ static int tvme200_install(struct tvme200_board *tvme200, unsigned int n)
 		goto out_err;
 	}
 
-	res = tvme200_register(tvme200);
+	res = tvme200_init_mem(tvme200);
 	if (res){
 		dev_err(dev, "Carrier %d, unable to init board !\n", n);
 		goto out_free;
 	}
 
 	mutex_init(&tvme200->mutex);
-	dev_info(dev, "Carrier %s number %d installed.\n", TVME200_SHORTNAME, n);
+	dev_info(dev, "Carrier %s lun %d installed.\n", TVME200_SHORTNAME, lun[n]);
 	return 0;
 
 out_free :
@@ -491,7 +494,7 @@ static void tvme200_release_device (struct ipack_device *dev)
 	kfree(dev);
 }
 
-static int tvme200_create_device(struct tvme200_board *tvme200, int i)
+static int tvme200_create_mezz_device(struct tvme200_board *tvme200, int i)
 {
 	enum ipack_space space;
 	struct ipack_device *dev =
@@ -573,12 +576,10 @@ static int tvme200_probe(struct device *dev, unsigned int ndev)
 	        goto out_free;
 	}
 
-	/* save the bus number given by ipack to logging purpose */
-	tvme200->number = tvme200->info->ipack_bus->bus_nr;
 	dev_set_drvdata(dev, tvme200);
 
 	for (i = 0; i < TVME200_NB_SLOT; i++)
-        	tvme200_create_device(tvme200, i);
+        	tvme200_create_mezz_device(tvme200, i);
 
 	return 0;
 
