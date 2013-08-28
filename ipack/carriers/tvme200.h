@@ -23,7 +23,7 @@
 #define TVME200_ID_SPACE_OFF          0x0080
 #define TVME200_ID_SPACE_INTERVAL     0x0100
 #define TVME200_ID_SPACE_SIZE         0x0080
-#define TVME200_INT_SPACE_OFF         0x00C0
+#define TVME200_INT_SPACE_OFF         0x00C1
 #define TVME200_INT_SPACE_INTERVAL    0x0100
 #define TVME200_INT_SPACE_SIZE        0x0040
 #define TVME200_IOIDINT_SIZE          0x0400
@@ -177,13 +177,14 @@ struct tvme200_infos {
 
 /**
  * struct tvme200_board - all configuration information about a board.
- * @_number	Logical board position
+* @index	Logical board position
  * @mutex	Carrier mutex to prevent concurrent access
  * @slots 		Array os slots
  *
  */
 struct tvme200_board {
 	unsigned int          	number;
+	unsigned int		lun;
 	struct mutex          	mutex;
 	spinlock_t		regs_lock;
 	struct tvme200_slot   	*slots;
