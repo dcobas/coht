@@ -245,5 +245,10 @@ int cvora_get_channels_mask(int fd, unsigned int *chans)
 
 int cvora_set_channels_mask(int fd, unsigned int chans)
 {
+	int status;
+
+	cvora_get_hardware_status(fd, &status);
+	if (status & (1<<CVORA_MODULE_ENABLE_BIT))
+		return -1;
 	return write_reg(fd, CVORA_CHANNEL, chans);
 }
