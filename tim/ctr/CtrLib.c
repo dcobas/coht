@@ -73,7 +73,7 @@ unsigned long ins;
 
 unsigned long CtrLibGetInstalledModuleCount() {
 
-unsigned long cnt;
+uint32_t cnt;
 
    if (ctr == 0) return 0;
    if (ioctl(ctr,CtrIoctlGET_MODULE_COUNT,&cnt) < 0) return 0;
@@ -94,8 +94,9 @@ unsigned long cnt;
 
 TimLibError CtrLibInitialize(TimLibDevice device) { /* Initialize hardware/software */
 char cmd[64];
-int m, mods;
+int mods;
 unsigned long p2c, oby; /* VME P2Connector output byte */
+uint32_t m, debug, delay, enable;
 
    if ((device == TimLibDevice_ANY)
    ||  (device == TimLibDevice_CTR)) {
@@ -114,9 +115,13 @@ unsigned long p2c, oby; /* VME P2Connector output byte */
       mods = CtrLibGetInstalledModuleCount();
       for (m=1; m<=mods; m++) {
 	 ioctl(ctr,CtrIoctlSET_MODULE,&m);
-	 if (timlib_debug)  ioctl(ctr,CtrIoctlSET_SW_DEBUG,   &timlib_debug);
-	 if (timlib_delay)  ioctl(ctr,CtrIoctlSET_INPUT_DELAY,&timlib_delay);
-	 if (timlib_enable) ioctl(ctr,CtrIoctlENABLE,         &timlib_enable);
+	 if (timlib_debug)  ioctl(ctr,CtrIoctlSET_SW_DEBUG,   &debug);
+	 if (timlib_delay)  ioctl(ctr,CtrIoctlSET_INPUT_DELAY,&delay);
+	 if (timlib_enable) ioctl(ctr,CtrIoctlENABLE,         &enable);
+
+	 timlib_debug =  debug;
+         timlib_delay =  delay;
+         timlib_enable = enable;
 
 	 if (m == 1) p2c = timlib_oby1_8;
 	 if (m == 9) p2c = timlib_oby9_16;
@@ -226,7 +231,8 @@ int i ,j;
    trg = &(act.Trigger);
 
    if (module) {
-      if (ioctl(ctr,CtrIoctlSET_MODULE,&module) < 0)
+      uint32_t m = module;
+      if (ioctl(ctr,CtrIoctlSET_MODULE,&m) < 0)
 	 return TimLibErrorMODULE;
    }
    if (ioctl(ctr,CtrIoctlLIST_CTIM_OBJECTS,&ctimo) < 0) return TimLibErrorIO;
@@ -288,10 +294,13 @@ CtrDrvrConnection con;
 TimLibError CtrLibQueue(unsigned long qflag,    /* 0=>Queue, 1=>NoQueue  */
 			unsigned long tmout) {  /* 0=>No time outs       */
 
+   uint32_t qf = qflag;
+   uint32_t tm = tmout;
+
    if (ctr == 0) return TimLibErrorINIT;
 
-   if (ioctl(ctr,CtrIoctlSET_TIMEOUT,&tmout)    < 0) return TimLibErrorIO;
-   if (ioctl(ctr,CtrIoctlSET_QUEUE_FLAG,&qflag) < 0) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlSET_TIMEOUT, &tm)    < 0) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlSET_QUEUE_FLAG, &qf) < 0) return TimLibErrorIO;
 
    return TimLibErrorSUCCESS;
 }
@@ -302,10 +311,13 @@ TimLibError CtrLibFdQueue(int           fd,      /* File descriptor       */
 			  unsigned long qflag,   /* 0=>Queue, 1=>NoQueue  */
 			  unsigned long tmout) { /* 0=>No time outs       */
 
+   uint32_t tm = tmout;
+   uint32_t qf = qflag;
+
    if (fd == 0) return TimLibErrorINIT;
 
-   if (ioctl(fd,CtrDrvrSET_TIMEOUT,&tmout)    < 0) return TimLibErrorIO;
-   if (ioctl(fd,CtrDrvrSET_QUEUE_FLAG,&qflag) < 0) return TimLibErrorIO;
+   if (ioctl(fd,CtrDrvrSET_TIMEOUT,&tm)    < 0) return TimLibErrorIO;
+   if (ioctl(fd,CtrDrvrSET_QUEUE_FLAG,&qf) < 0) return TimLibErrorIO;
 
    return TimLibErrorSUCCESS;
 }
@@ -318,8 +330,8 @@ TimLibError CtrLibFdQueue(int           fd,      /* File descriptor       */
 
 unsigned long CtrLibGetQueueSize() {
 
-unsigned long qflag;
-unsigned long qsize;
+   uint32_t qflag;
+   uint32_t qsize;
 
    if (ioctl(ctr,CtrIoctlGET_QUEUE_FLAG,&qflag) < 0) return 0;
    if (qflag) return 0;
@@ -367,11 +379,13 @@ TimLibError CtrLibWait(TimLibClass    *iclss,      /* Class of interrupt */
 		       unsigned long  *qsize,      /* Remaining interrupts on queue */
 		       TgmMachine     *machine) {  /* Corresponding TgmMachine */
 
-static int         cbl = 0;
+static uint32_t    cbl = 0;	/* FIXME: this is not reentrant! */
 CtrDrvrReadBuf     rbf;
 CtrDrvrPtimBinding ob;
 CtrDrvrAction      act;
 TgmMachine         mch;
+
+   uint32_t miss, qs;
 
    if (ctr == 0) return TimLibErrorINIT;
    if (ctr_connected == 0) return TimLibErrorWAIT;
@@ -379,7 +393,8 @@ TgmMachine         mch;
    while (1) {
       if (read(ctr,&rbf,sizeof(CtrDrvrReadBuf)) <= 0) return TimLibErrorTIMEOUT;
       if (rbf.Connection.EqpClass == CtrDrvrConnectionClassPTIM) {
-	 ioctl(ctr,CtrIoctlSET_MODULE,&rbf.Connection.Module);
+         uint32_t m = rbf.Connection.Module;
+	 ioctl(ctr,CtrIoctlSET_MODULE,&m);
 	 act.TriggerNumber = rbf.TriggerNumber;
 	 if (ioctl(ctr,CtrIoctlGET_ACTION,&act) < 0) return TimLibErrorIO;
 	 if ((act.Config.OnZero & CtrDrvrCounterOnZeroOUT) == 0) continue;
@@ -409,8 +424,8 @@ TgmMachine         mch;
 	 *plnum  = rbf.TriggerNumber - ob.StartIndex;
       } else *plnum = 0;
    }
-   if (missed) ioctl(ctr,CtrIoctlGET_QUEUE_OVERFLOW,missed);
-   if (qsize)  ioctl(ctr,CtrIoctlGET_QUEUE_SIZE,qsize);
+   if (missed) ioctl(ctr,CtrIoctlGET_QUEUE_OVERFLOW,&miss); *missed = miss;
+   if (qsize)  ioctl(ctr,CtrIoctlGET_QUEUE_SIZE,&qs); *qsize = qs;
 
    if (onzero) {
       onzero->Machine = mch;
@@ -451,18 +466,21 @@ TimLibError CtrLibFdWait(int            fd,          /* File descriptor */
 			 unsigned long  *qsize,      /* Remaining interrupts on queue */
 			 TgmMachine     *machine) {  /* Corresponding TgmMachine */
 
-static int         cbl = 0;
+static uint32_t    cbl = 0;	/* FIXME: this is not reentrant */
 CtrDrvrReadBuf     rbf;
 CtrDrvrPtimBinding ob;
 CtrDrvrAction      act;
 TgmMachine         mch;
+
+   uint32_t miss, qs;
 
    if (fd == 0) return TimLibErrorINIT;
 
    while (1) {
       if (read(fd,&rbf,sizeof(CtrDrvrReadBuf)) <= 0) return TimLibErrorTIMEOUT;
       if (rbf.Connection.EqpClass == CtrDrvrConnectionClassPTIM) {
-	 ioctl(fd,CtrDrvrSET_MODULE,&rbf.Connection.Module);
+         uint32_t m = rbf.Connection.Module;
+	 ioctl(fd,CtrDrvrSET_MODULE,&m);
 	 act.TriggerNumber = rbf.TriggerNumber;
 	 if (ioctl(fd,CtrDrvrGET_ACTION,&act) < 0) return TimLibErrorIO;
 	 if ((act.Config.OnZero & CtrDrvrCounterOnZeroOUT) == 0) continue;
@@ -492,8 +510,8 @@ TgmMachine         mch;
 	 *plnum  = rbf.TriggerNumber - ob.StartIndex;
       } else *plnum = 0;
    }
-   if (missed) ioctl(fd,CtrDrvrGET_QUEUE_OVERFLOW,missed);
-   if (qsize)  ioctl(fd,CtrDrvrGET_QUEUE_SIZE,qsize);
+   if (missed) ioctl(fd,CtrDrvrGET_QUEUE_OVERFLOW,&miss); *missed = miss;
+   if (qsize)  ioctl(fd,CtrDrvrGET_QUEUE_SIZE,&qs); *qsize = qs;
 
    if (onzero) {
       onzero->Machine = mch;
@@ -528,7 +546,8 @@ TimLibError CtrLibSet(unsigned long ptim,    /* PTIM to write to */
 		      TimLibCcvMask ccvm,    /* Which values to write */
 		      TimLibCcv     *ccv) {  /* Current control value */
 
-int                          anum, msk, i, found, module;
+int                          anum, msk, i, found;
+uint32_t		     module;
 CtrDrvrAction                act;
 CtrDrvrTrigger              *trg;
 CtrDrvrCounterConfiguration *cnf;
@@ -695,7 +714,8 @@ TimLibError CtrLibGet(unsigned long ptim,
 		      TimLibCcvMask *ccvm,  /* Valid fields in ccv */
 		      TimLibCcv     *ccv) {
 
-int                          anum, module;
+int                          anum;
+uint32_t		     module;
 CtrDrvrAction                act;
 CtrDrvrTrigger              *trg;
 CtrDrvrCounterConfiguration *cnf;
@@ -863,9 +883,11 @@ CtrDrvrCounterConfigurationBuf cnfb;
 CtrdrvrRemoteCommandBuf        crmb;
 CtrDrvrCounterMaskBuf          cmbf;
 
+   uint32_t m = module;
+
    if (ctr == 0) return TimLibErrorINIT;
 
-   ioctl(ctr,CtrIoctlSET_MODULE,&module);
+   ioctl(ctr,CtrIoctlSET_MODULE,&m);
 
    crmb.Remote = remflg;
    crmb.Counter = cntr;
@@ -920,9 +942,11 @@ CtrDrvrCounterConfigurationBuf cnfb;
 CtrdrvrRemoteCommandBuf        crmb;
 CtrDrvrCounterMaskBuf          cmbf;
 
+   uint32_t m = module;
+
    if (ctr == 0) return TimLibErrorINIT;
 
-   ioctl(ctr,CtrIoctlSET_MODULE,&module);
+   ioctl(ctr,CtrIoctlSET_MODULE,&m);
 
    crmb.Counter = cntr;
 
@@ -968,16 +992,18 @@ TimLibError CtrLibGetTime(unsigned long module, /* Module number to read from */
 			   TimLibTime    *utc) { /* Returned time value */
 
 
-unsigned long cbl;
+uint32_t cbl;
 CtrDrvrCTime  ct;
 CtrDrvrTime   *t;
+
+   uint32_t m = module;
 
    if (ctr == 0) return TimLibErrorINIT;
 
    t = &ct.Time;
 
    if (module) {
-      if (ioctl(ctr,CtrIoctlSET_MODULE,&module)) return TimLibErrorMODULE;
+      if (ioctl(ctr,CtrIoctlSET_MODULE,&m)) return TimLibErrorMODULE;
    }
    if (ioctl(ctr,CtrIoctlGET_UTC,&ct) < 0) return TimLibErrorIO;
 
@@ -1021,7 +1047,8 @@ CtrDrvrTgmBuf  tgmb;
    if (ctr == 0) return TimLibErrorINIT;
 
    if (module) {
-      if (ioctl(ctr,CtrIoctlSET_MODULE,&module)) return TimLibErrorMODULE;
+      uint32_t m = module;
+      if (ioctl(ctr,CtrIoctlSET_MODULE,&m)) return TimLibErrorMODULE;
    }
    tgmb.Machine = TgvTgmToTgvMachine(machine);
    if (ioctl(ctr,CtrIoctlREAD_TELEGRAM,&tgmb) < 0) return TimLibErrorIO;
@@ -1086,7 +1113,7 @@ CtrDrvrCtimObjects ctimo;
 
 TimLibError CtrLibGetHandle(int *fd) {
 
-unsigned long qflag;
+uint32_t qflag;
 
    if (ctr == 0) return TimLibErrorINIT;
    if (ioctl(ctr,CtrIoctlGET_QUEUE_FLAG,&qflag) < 0) return TimLibErrorIO;
@@ -1154,9 +1181,13 @@ CtrDrvrCtimBinding ctim;
 TimLibError CtrLibGetCableId(unsigned long module,   /* The given module */
 			     unsigned long *cable) { /* The cable ID */
 
+   uint32_t cbl;
+   uint32_t m = module;
+
    if (ctr == 0) return TimLibErrorINIT;
-   if (ioctl(ctr,CtrIoctlSET_MODULE,&module)) return TimLibErrorMODULE;
-   if (ioctl(ctr,CtrIoctlGET_CABLE_ID,cable)) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlSET_MODULE,&m)) return TimLibErrorMODULE;
+   if (ioctl(ctr,CtrIoctlGET_CABLE_ID,&cbl)) return TimLibErrorIO;
+   *cable = cbl;
    return TimLibErrorSUCCESS;
 }
 
@@ -1172,9 +1203,12 @@ TimLibError CtrLibGetCableId(unsigned long module,   /* The given module */
 TimLibError CtrLibSetCableId(unsigned long module,  /* The given module */
 			     unsigned long cable) { /* The given CablID */
 
+   uint32_t m = module;
+   uint32_t cbl = cable;
+
    if (ctr == 0) return TimLibErrorINIT;
-   if (ioctl(ctr,CtrIoctlSET_MODULE,&module))  return TimLibErrorMODULE;
-   if (ioctl(ctr,CtrIoctlSET_CABLE_ID,&cable)) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlSET_MODULE,&m))  return TimLibErrorMODULE;
+   if (ioctl(ctr,CtrIoctlSET_CABLE_ID,&cbl)) return TimLibErrorIO;
    return TimLibErrorSUCCESS;
 }
 
@@ -1186,9 +1220,11 @@ TimLibStatus CtrLibGetStatus(unsigned long module, TimLibDevice *dev) {
 TimLibStatus  tstat;
 CtrDrvrStatus cstat;
 
+   uint32_t m = module;
+
    if (dev) *dev = TimLibDevice_CTR;
 
-   if (ioctl(ctr,CtrIoctlSET_MODULE,&module)) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlSET_MODULE,&m)) return TimLibErrorIO;
    if (ioctl(ctr,CtrIoctlGET_STATUS,&cstat))  return TimLibErrorIO;
 
    tstat = 0;
@@ -1263,12 +1299,13 @@ CtrDrvrCtimObjects ctimo;
 TimLibError CtrLibGetIoStatus(unsigned long module,
 			      TimLibLemo *input) {
 
-unsigned long iostat;
+uint32_t m = module;
+uint32_t iostat;
 
    if (ctr == 0) return TimLibErrorINIT;
    if (input == NULL) return TimLibErrorNOMEM;
 
-   if (ioctl(ctr,CtrIoctlSET_MODULE,&module)) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlSET_MODULE,&m)) return TimLibErrorIO;
 
    if (ioctl(ctr,CtrIoctlGET_IO_STATUS,&iostat) < 0) return TimLibErrorIO;
 
@@ -1304,9 +1341,11 @@ TimLibError err;
 CtrDrvrCounterMaskBuf cmsb;
 unsigned long msk, cntr;
 
+   uint32_t m = module;
+
    if (ctr == 0) return TimLibErrorINIT;
 
-   if (ioctl(ctr,CtrIoctlSET_MODULE,&module)) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlSET_MODULE,&m)) return TimLibErrorIO;
 
    err = CtrLibGetIoStatus(module,&input);
    if (err != TimLibErrorSUCCESS) return err;
@@ -1338,7 +1377,7 @@ TimLibError CtrLibGetModuleVersion(TimLibModuleVersion *tver) {
 CtrDrvrVersion cver;
 CtrDrvrHardwareType ht;
 char *cp, *ep, txt[128];
-unsigned long cnt, m;
+uint32_t cnt, m;
 FILE *fver;
 
    if (ctr == 0)     return TimLibErrorINIT;
@@ -1454,19 +1493,21 @@ CtrDrvrPll plb;
 float aspn, tempr;
 double ph, er;
 char tmp[TMPLN], txd[32];
-unsigned long stat;
+uint32_t stat;
 CtrDrvrModuleStats mstat;
+
+   uint32_t m = module;
 
    if (ctr == 0) return NULL;
 
-   if (ioctl(ctr,CtrIoctlSET_MODULE, &module) < 0) return NULL;
+   if (ioctl(ctr,CtrIoctlSET_MODULE, &m) < 0) return NULL;
 
    bzero((void *) tmp, TMPLN);
    bzero((void *) res, RESLN);
 
    if (ioctl(ctr,CtrIoctlGET_PLL,&plb) >= 0) {
+      /* FIXME: aspn is float??? Guess its size */
       if (ioctl(ctr,CtrIoctlGET_PLL_ASYNC_PERIOD,&aspn) >= 0) {
-
 
 	 ph = aspn * ((double) (int) plb.Phase / (double) (int) plb.NumAverage);
 	 er = aspn * ((double) (int) plb.Error / (double) (int) plb.NumAverage);
@@ -1644,9 +1685,11 @@ unsigned long stat;
 CtrDrvrModuleStats mstat;
 TimLibTime tlt;
 
+   uint32_t m = module;
+
    if (ctr == 0)      return TimLibErrorINIT;
    if (stats == NULL) return TimLibErrorNOMEM;
-   if (ioctl(ctr,CtrIoctlSET_MODULE, &module) < 0) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlSET_MODULE, &m) < 0) return TimLibErrorIO;
 
    bzero((void *) stats, sizeof(TimLibModuleStats));
    CtrLibGetTime(module, &tlt);
@@ -1664,6 +1707,7 @@ TimLibTime tlt;
       stats->Pll.NumAverage = plb.NumAverage;
       stats->Pll.Phase      = plb.Phase;
 
+      /* FIXME: aspn is float??? */
       if (ioctl(ctr,CtrIoctlGET_PLL_ASYNC_PERIOD,&aspn) >= 0) {
 	 stats->Pll.AsPrdNs    = aspn;
       }
@@ -1736,8 +1780,10 @@ TimLibTime tlt;
 TimLibError CtrLibSetPllLocking(unsigned long module,
 				unsigned long lockflag) { /* 1=> Brutal, else Slow */
 
+   uint32_t m = module;
+
    if (ctr == 0) return TimLibErrorINIT;
-   if (ioctl(ctr,CtrIoctlSET_MODULE, &module) < 0) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlSET_MODULE, &m) < 0) return TimLibErrorIO;
 
    if (ioctl(ctr,CtrIoctlSET_BRUTAL_PLL,&lockflag) < 0) return TimLibErrorIO;
 
