@@ -728,6 +728,7 @@ static void __exit ipoctal_exit(void)
 
 MODULE_DESCRIPTION("IP-Octal 232, 422 and 485 device driver");
 MODULE_LICENSE("GPL");
+MODULE_VERSION(GIT_VERSION);
 
 module_init(ipoctal_init);
 module_exit(ipoctal_exit);

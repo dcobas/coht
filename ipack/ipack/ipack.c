@@ -479,3 +479,4 @@ module_exit(ipack_exit);
 MODULE_AUTHOR("Samuel Iglesias Gonsalvez <siglesias@igalia.com>");
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Industry-pack bus core");
+MODULE_VERSION(GIT_VERSION);

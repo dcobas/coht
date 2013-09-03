@@ -643,3 +643,4 @@ module_pci_driver(tpci200_pci_driver);
 
 MODULE_DESCRIPTION("TEWS TPCI-200 device driver");
 MODULE_LICENSE("GPL");
+MODULE_VERSION(GIT_VERSION);
