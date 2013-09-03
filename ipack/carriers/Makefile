@@ -4,14 +4,19 @@
 CPU	?= L865
 KVER	?= 3.2.43-rt63
 LINUX	?= /acc/sys/$(CPU)/usr/src/kernels/$(KVER)
+VMEBRIDGE	?= /acc/dsc/src/drivers/coht/vmebridge
+IPACK	?=  $(src)/../ipack
 
 GIT_VERSION = $(shell git describe --dirty --long --tags)
-KBUILD_EXTRA_SYMBOLS = $(src)/../ipack/Module.symvers
+KBUILD_EXTRA_SYMBOLS = $(IPACK)/Module.symvers
+KBUILD_EXTRA_SYMBOLS += $(VMEBRIDGE)/driver/Module.symvers
 
 ccflags-y += -DDEBUG
 ccflags-y += -DGIT_VERSION=\"$(GIT_VERSION)\"
+ccflags-y += -I$(VMEBRIDGE)/include/
+ccflags-y += -I$(IPACK)
 
-obj-m := tpci200.o
+obj-m := tpci200.o tvme200.o
 
 all: modules
 
