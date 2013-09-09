@@ -9,6 +9,8 @@ endif
 
 include /acc/src/dsc/co/Make.auto
 
+GIT_VERSION = $(shell git describe --dirty --tags --always --long)
+
 KERNELSRC=/acc/sys/$(CPU)/usr/src/kernels/$(KVER)
 OUTPUTDIR=$(shell pwd)/$(CPU)/$(KVER)
 
@@ -19,7 +21,7 @@ driver: modules
 
 modules: 
 	cp Module.symvers.vme Module.symvers
-	make -C $(KERNELSRC) M=`pwd` KVER=$(KVER) CPU=$(CPU) modules
+	make -C $(KERNELSRC) M=`pwd` GIT_VERSION=$(GIT_VERSION) KVER=$(KVER) CPU=$(CPU) modules
 	mkdir -p $(OUTPUTDIR)
 	mv *.o *.ko $(OUTPUTDIR)
 clean:

@@ -2,6 +2,7 @@ EXTRA_CFLAGS += \
              -I$(M) \
              -I$(M)/../include \
              -I$(M)/../../include 
+EXTRA_CFLAGS += -DGIT_VERSION=\"$(GIT_VERSION)\"
 
 obj-m += cvorg.o
 
