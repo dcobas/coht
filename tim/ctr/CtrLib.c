@@ -424,8 +424,14 @@ TgmMachine         mch;
 	 *plnum  = rbf.TriggerNumber - ob.StartIndex;
       } else *plnum = 0;
    }
-   if (missed) ioctl(ctr,CtrIoctlGET_QUEUE_OVERFLOW,&miss); *missed = miss;
-   if (qsize)  ioctl(ctr,CtrIoctlGET_QUEUE_SIZE,&qs); *qsize = qs;
+   if (missed) {
+	ioctl(ctr,CtrIoctlGET_QUEUE_OVERFLOW,&miss);
+	*missed = miss;
+   }
+   if (qsize) {
+	ioctl(ctr,CtrIoctlGET_QUEUE_SIZE,&qs);
+	*qsize = qs;
+   }
 
    if (onzero) {
       onzero->Machine = mch;
@@ -510,8 +516,14 @@ TgmMachine         mch;
 	 *plnum  = rbf.TriggerNumber - ob.StartIndex;
       } else *plnum = 0;
    }
-   if (missed) ioctl(fd,CtrDrvrGET_QUEUE_OVERFLOW,&miss); *missed = miss;
-   if (qsize)  ioctl(fd,CtrDrvrGET_QUEUE_SIZE,&qs); *qsize = qs;
+   if (missed) {
+	ioctl(fd,CtrDrvrGET_QUEUE_OVERFLOW,&miss);
+	*missed = miss;
+   }
+   if (qsize) {
+	ioctl(fd,CtrDrvrGET_QUEUE_SIZE,&qs);
+	*qsize = qs;
+   }
 
    if (onzero) {
       onzero->Machine = mch;
