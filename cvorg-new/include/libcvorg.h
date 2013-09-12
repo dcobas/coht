@@ -5,7 +5,7 @@
 #ifndef _CVORG_LIB_H_
 #define _CVORG_LIB_H_
 
-#include <cvorg.h>
+#include "cvorg.h"
 
 #ifdef __cplusplus
 extern "C" {

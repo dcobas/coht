@@ -1,7 +1,7 @@
 #ifndef _CVORGDEV_H_
 #define _CVORGDEV_H_
 
-#include <cvorg.h>
+#include "cvorg.h"
 
 #define CVORG_PATH_MAX	256
 

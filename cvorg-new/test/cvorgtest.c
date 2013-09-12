@@ -18,10 +18,10 @@
 #include <general_usr.h>
 
 #include <extest.h>
-#include <cvorgdev.h>
+#include "cvorgdev.h"
 #include "cvorgtest.h"
-#include <libinternal.h>
-#include <libad9516.h>
+#include "libinternal.h"
+#include "libad9516.h"
 
 /* this compilation flag enables printing the test waveform before it's sent */
 /* #define DEBUG_CVORG_WVSHAPES */

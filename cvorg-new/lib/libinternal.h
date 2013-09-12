@@ -1,7 +1,7 @@
 #ifndef _CVORG_LIBINTERNAL_H_
 #define _CVORG_LIBINTERNAL_H_
 
-#include <libcvorg.h>
+#include "libcvorg.h"
 #include "cvorg_errno.h"
 
 extern int __cvorg_loglevel;

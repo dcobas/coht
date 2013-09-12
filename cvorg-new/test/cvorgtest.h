@@ -11,9 +11,9 @@
 
 #include <sys/ioctl.h>
 
-#include <cvorg.h>
-#include <libcvorg.h>
-#include <ad9516.h>
+#include "cvorg.h"
+#include "libcvorg.h"
+#include "ad9516.h"
 
 #define CVORG_STATUS_REG	0x40
 #define CVORG_CONFIG_REG	0x44

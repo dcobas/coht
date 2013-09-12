@@ -16,7 +16,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 
-#include <cvorg.h>
+#include "cvorg.h"
 
 #include "cvorgdev.h"
 

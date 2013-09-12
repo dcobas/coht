@@ -19,12 +19,12 @@
 #include <fcntl.h>
 #include <stdio.h>
 
-#include <libcvorg.h>
-#include <cvorgdev.h>
-#include <error.h>
-#include <ad9516.h>
-#include <libad9516.h>
-#include <cvorg.h>
+#include "libcvorg.h"
+#include "cvorgdev.h"
+#include "error.h"
+#include "ad9516.h"
+#include "libad9516.h"
+#include "cvorg.h"
 #include "libinternal.h"
 
 #define LIBCVORG_VERSION	"1.0"
