@@ -10,7 +10,7 @@
 #include <unistd.h>
 #include <math.h>
 #include <time.h>
-
+#include <stdio.h>
 #include <sys/ioctl.h>
 #include <curses.h>
 #include <readline/readline.h>
@@ -470,6 +470,7 @@ int h_outoff(struct cmd_desc *cmdd, struct atom *atoms)
 	if (atoms->type == Numeric) {
 		offset = !!atoms->val;
 		if (cvorg_channel_set_outoff(device, offset) < 0) {
+			cvorg_perror(__func__);
 			mperr("set analog output offset");
 			return -TST_ERR_IOCTL;
 		}
@@ -1355,6 +1356,7 @@ int h_outgain(struct cmd_desc *cmdd, struct atom *atoms)
 	if (atoms->type == Numeric) {
 		gain = atoms->val;
 		if (cvorg_channel_set_outgain(device, &gain) < 0) {
+			cvorg_perror(__func__);
 			mperr("set analog output gain");
 			return -TST_ERR_IOCTL;
 		}

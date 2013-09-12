@@ -82,6 +82,7 @@ int select_module(int modnr)
 	close(dev.fd);
 	dev.fd = device->fd;
 	dev.index = modnr;
+	dev.dac_calib = device->dac_calib;
 	printf("Controlling module #%d\n", dev.index);
 	return 0;
 }

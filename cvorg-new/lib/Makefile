@@ -2,7 +2,7 @@ CPU ?= L865
 
 include /acc/src/dsc/co/Make.auto
 
-CFLAGS := -Wall -g -I. -I../include -I../../include -I../ad9516
+CFLAGS := -Wall -g -D_GNU_SOURCE -I. -I../include -I../../include -I../ad9516
 LIBCVORG := libcvorg.$(CPU).a 
 HLIBCVORG := ../include/libcvorg.h
 HCVORG := ../include/cvorg.h

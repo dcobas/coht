@@ -10,11 +10,14 @@
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
-
+#define CVORG_NR_CALIB_VALUES 18
 struct cvorglib {
 	int fd;
 	int index;
 	int channelnr;
+	uint32_t *dac_calib; /* dac offset/gain calibration values */
+	void *reserved1;
+	void *reserved2;
 };
 
 typedef struct cvorglib cvorg_t;
