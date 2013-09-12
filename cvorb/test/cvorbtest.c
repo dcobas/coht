@@ -20,8 +20,7 @@
 
 #include <extest/general_usr.h>  /* for handy definitions (mperr etc..) and macros coming from general_both.h */
 #include <extest/extest.h>
-#include <cvorb.h>
-#include <libcvorb.h>
+#include <cvorb/libcvorb.h>
 #include <cvorbdev.h>
 
 #include "cvorbtest.h"

@@ -3,9 +3,6 @@
 
 #include <stdint.h>
 
-#include <cvorb.h>
-#include "libcvorb.h"
-
 /**
  * @brief defines the cvorb attribute's scope
  */

@@ -20,8 +20,8 @@
 #include <unistd.h>
 #include <byteswap.h>
 
-#include <libcvorb.h>
-#include <cvorbdev.h>
+#include "libcvorb.h"
+#include "cvorbdev.h"
 #include "libinternal.h"
 
 #define LIBCVORB_VERSION        "1.0"

@@ -16,8 +16,8 @@
 #include <stdio.h>
 #include <errno.h>
 
-#include <cvorb.h>
-
+#include "cvorb.h"
+#include "libcvorb.h"
 #include "cvorbdev.h"
 
 static void remove_trailing_chars(char *path, char c)
