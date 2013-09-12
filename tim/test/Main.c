@@ -109,7 +109,8 @@ char *text; {
 int main(int argc,char *argv[]) {
 
 int i, j, found_device;
-unsigned int cnt, mod, cbl, dbg, ind, enb, jtg, oby;
+unsigned int cnt, mod, dbg, ind, enb, jtg, oby;
+unsigned long cbl;
 char *cp, *ep;
 char host[49];
 char tmpb[CMD_BUF_SIZE];
