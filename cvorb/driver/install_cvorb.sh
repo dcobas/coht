@@ -1,6 +1,6 @@
 #!/bin/sh
 
-DEVICE_NAME=CVORBN
+DEVICE_NAME=CVORB
 DRIVER_NAME=cvorb
 TRANSFER=/etc/transfer.ref
 
