@@ -164,16 +164,8 @@ vd80_err_t vd80GetModuleCount(int fd, uint32_t *cnt)
 
 vd80_err_t vd80GetVersion(int fd, struct vd80_version_s *ver)
 {
-	char ver_str[9], *cp;
-
-
 	if (ioctl(fd,VD80_GET_VERSION,ver) < 0)
 		return VD80_LIB_ERR_IO;
-
-	cp = (char *) &ver->vhdlver;
-
-	sprintf(ver_str,"%4s", cp);
-	ver->vhdlver = strtoul(ver_str, &cp, 16);
 
 	return VD80_LIB_ERR_SUCCESS;
 }
