@@ -1,0 +1,1027 @@
+
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+
+CERN - SL DIVISION
+
+
+
+SL-Note 97-31 CO
+
+The TG8 Hardware Description
+
+PUCCIO, B.
+
+Abstract:  This  document  describes  the hardware  features of the CERN Timing
+ module for the VMEbus.  It also exposes the  properties  of the receiver  part
+ and the  characteristics  of its  generation  part.  In addition, it shows the
+ various jumper options to customise the board.
+
+Geneva, Switzerland
+
+
+Table of contents :
+
+1) OVERVIEW 1-1) Introduction 1-2) Features 1-3) Module addressing
+
+2) THE DUAL-PORT MEMORY 2-1) Description 2-2) Arbitration 2-3) DP-Ram Interrupt
+capability
+
+3) THE RECEIVER PART 3-1)  Introduction  3-2) Line Frame Reception 3-3) The 1ms
+machine Clock 3-4) The Start  Super-Cycle  Signal 3-5) Receiver Error  register
+3-6) Timing input connections
+
+4) THE PROCESS PART 4-1)  Introduction  4-2) The User table 4-3) Others  tables
+4-4) The Interrupt Generation 4-5) The Status register 4-6) Reset and Auto Test
+4-7) Module Enable / Disable
+
+5) THE  DESIGN  DESCRIPTION  5-1) The  internal  processor  5-2) The  Processor
+Memories 5-3) The Dual-Port Memory 5-4) The Content Addressable Memory 5-4) The
+Receiver Chips 5-5) The Counter Part 5-6) The TPU part
+
+6) JUMPER  IDENTIFICATION  6.1)  Description  6.2) Base Address  selection 6.3)
+Address Modifier selection 6.4) Interrupt selection 6.5) Timing Input Selection
+6.6) Third Clock Selection
+
+7)  CONNECTIONS  ON THE "P2"  CONNECTOR  8)  FIGURES  Fig.1:  Simplified  Block
+Diagram Fig.2:  Component Layout Fig.3:  Front Panel Labelling
+
+
+1) Overview
+
+1-1) Introduction
+
+       The TG8 is a  multipurpose  VMEbus Timing  receiver and pulse  generator
+module.  It receives all the messages  distributed over the G.M.T.1  multi-drop
+line.  These messages  include Timing  information,  event, clock, telegram and
+calendar,  are compared  with a set of  pre-loaded  parameters  contained  in a
+portion of the on-board memory.  If a comparison is valid the requested action,
+relevant to that particular  condition, is initiated.  Normally the action will
+be to interrupt the VMEbus and/or to transmit a trigger  pulse to some external
+equipment.  This action can be delayed from the trigger occurrence using one of
+the  eight  on-board  counters  and  one of  the  four  different  clocks.  The
+simplified block diagram for the TG8 is shown in Fig.1.
+
+1-2) Features
+
+The module  incorporates the following features :
+* Slave module in the VMEbus with 16-bit data  transfer.  
+* Interrupts  the VMEbus  with a user  selectable level.  
+* 4K contiguous  addresses  required in the VMEbus  memory.  
+* 1 output for 1ms machine  clock, via Lemo00  connector.  
+* 8 outputs with programmable delay (0->65535  clock  periods) via Lemo00.  
+* 8 counters with chaining facility (7 are down counters and 1 is an up/down).  
+* 4 clock sources are software  selectable:
+  	1kHz machine clock, internal 10MHz, or 2 external.
+* 3 different  starts for the beginning of a counting:
+  	Synchronous, Chained or  External. 
+* All output  signals are  standard  TTL active low, 2us wide.  
+* Up to 256 different trigger  conditions can be pre-loaded.  
+* Internal Contents Address Memory for wild cards adjunction in trigg. conditions.
+* Internal auto-test feature and RS232 debugging port. 
+* Module enable/disable facility. 
+* 18 front panel LED's. 
+*  Only +5V supply required with a consummation of 1.1 Amp.
+
+
+1-3) Module addressing
+
+The module requires 4K bytes of contiguous addresses in the VMEbus memory range.
+The base address is used to assign the location of this address space.
+The base  address  is  selected  by means of  jumpers  on address  lines and on
+address  modifier  lines (see  section 6 for the jumper  selection).  In the 4K
+bytes range  (0x0000 to 0x0FFE) 2, the first half (0x0000 to 0x07FE) is used by
+a Dual-Port memory as shown below:
+
+Base Address WRITE  Function  (write* =0 ) /   READ Function  (write* =1 )
++ 0x0000                Dual-Port  memory:  1st location 
++ 0x0002                Dual-Port  memory:  2nd location ...
+                          ...                  ...  
++ 0x07FE                Dual-Port  memory:  last  location  
++ 0x0800  Reset  Module                    / Status register 
++ 0x0802  Enable/Disable command           / Vector register 
++ 0x0804 Clear Individual Interrupt bit    /    reserved 
++ 0x0806     reserved                      /    reserved 
+   ...       reserved                      /    reserved 
++ 0x0FFE     reserved                      /    reserved
+
+The second half of the 4K range is used for various purposes:
+  - Reading Status and   Vector   registers.
+  - Sending   commands   for  Reset  or  for
+  _ Enable/Disable  functions.  
+  _ Clearing  individual  interrupt sources.
+  (These accesses are detailed in section 4 )
+
+Note: The remaining addresses (i.e. 0x0806 to 0x0FFE) are reserved for future
+extensions.
+
+
+2) The Dual-Port memory
+
+2-1) Description
+
+	A Dual-Port  memory ( called DP-Ram ) is employed to  communicate  with
+the TG8's  microprocessor.  This  feature  allows to  transfer  information  by
+passing data through this common  memory.  This 2K bytes RAM device is used for
+many  purposes:  ( Write  and read  the  "User  table" ( Read the date and time
+information.  ( Read the S-Cycle length, the S-Cycle  number, and other various
+Timing  parameters.  ( Read the  Reception  "History  table".  ( Download a new
+firmware program.
+
+2-2) Arbitration
+
+The DP-Ram  enables the VMEbus master and the internal CPU to have  independent
+access to this shared  memory.  The  hardware  arbitration  implemented  on the
+board will insure that both sides will not access the same location at the same
+time.  It means that one port will wait for the end of an  operation  initiated
+by the other port.  In addition, to avoid a writing/reading mismatch, the TG8's
+driver  will use a  semaphore  technique  with  the  mail box and an  interrupt
+generation.  It means that only the VMEbus  master can initiate an operation by
+writing in a the mail box ( location 0x004 of the DP-Ram ).  In the other side,
+the  internal  CPU polls this  location  and  executes  further  the  requested
+procedure.  When the  operation is finished, it indicates  the  termination  by
+placing an interrupt on the VMEbus.
+
+2-3) DP-Ram Interrupt capability
+
+The  interrupt  capability  is provided by the on board  DP-Ram  chip.  In this
+device, the two top addresses ( 0x07FC and 0x07FE ) of the memory also serve as
+interrupt  generators  for each of the ports.  To provoke an  interrupt  to the
+VMEbus master, the internal CPU writes into the last address, then an interrupt
+latch is set and the interrupt is activated on the bus.  This  interrupt  latch
+is cleared  when the VMEbus  master reads from this  address.  A similar set of
+logic is  provided  to allow  the  VMEbus  master  to  interrupt  the  internal
+processor,  but  this  feature  is not  used by the  existing  driver.  For the
+interrupt acknowledge process, bit 8 of the Status register ( see section 4-5 )
+indicates that an interrupt has been activated by the DP-Ram's logic.
+
+
+3) The Receiver part
+
+3-1) Introduction
+
+The basic purpose of the Receiver  part is to decode the Timing  messages  from
+the  multi-drop  Timing line and to pass on the  treated  data to the  internal
+processor.  The  treatment  consists  of first  checking  that each  Manchester
+encoded  frame  received is error free and then  converting  and stripping  the
+frame down to a four byte binary coded messages.
+
+3-2) Line Frame Reception
+
+A differential  bus transceiver is used to receive the line frames  conforms to
+EIA  standard  RS-422A  and to  convert  the  differential  signal to TTL logic
+levels.    This    device    is    specially     designed    for    multi-point
+transmission/reception  on long bus  lines in noisy  environments.  Afterwards,
+the  Manchester  encoded line frame is converted to a useful 32-bit  message by
+means of a  dedicated  Xilinx Gate  array.  This  device  works as a high speed
+serial  receiver/decoder  chip,  checks the  transmission  error, and  provides
+parallel data outputs for the internal processor.
+
+3-3) The 1ms machine Clock
+
+The  receiver  part of the TG8 decodes the 1ms clock from the Timing  messages.
+For each  decoding,  it  generates a TTL pulse via a Lemo ((  connector  on the
+front panel3 .  In addition, a check of this clock is provided  internally by a
+watch-dog  logic.  In case of a  missing  clock  decoded  from  the  line,  the
+receiver  supplies a 1ms clock pulse backup.  This feature  guarantees that the
+1ms clock train is always generated by the module.
+
+3-4) The Start Super-Cycle Signal
+
+The receiver part of the TG8 decodes also the Start Super-Cycle  frame from the
+SPS ( or LEP) Timing messages.  For each decoding, it generates a TTL pulse via
+a Lemo (( connector on the front panel3.
+
+3-5) Receiver Error register
+
+The eight bit Error  register  is only  accessed  by the  internal  CPU but the
+contents can be read via the mail-box protocol.  The bit signification is shown
+below :
+
+Bit Definition +0 Data overflow +1 Parity error, odd parity detected +2 Invalid
+ending sequence +3 Loss of mid-bit  transmission +4 Start sequence  overflow +5
+Receiver disabled +6 1ms clock missing +7 Watch-dog elapsed
+
+Bits  0  to  5  indicate   reception  errors  and  are  used  for  transmission
+diagnostics.  The bit 6 ("1ms clock missing") indicates that the real 1ms clock
+is no  longer  present  and is  replaced  by the 1ms  clock  backup.  The bit 7
+("Watch-dog  elapsed")  indicates  that one or more 1ms clock  pulses have been
+missed  since the Error  register  was last reset.  Note:  The  Receiver  Error
+register can be only cleared by the internal CPU via a command  transmitted via
+the  mail-box  protocol.  3 LED's  indicates  the status of the receiver  part:
+Reception error, 1ms missing, 1ms clock.
+
+3-6) Timing input connections
+
+       The connection to the multi-drop line is made either at the front of the
+card with a 9pin Cannon D type female connector, or by 2 wire-wrap pins via the
+P2  connector.  The selection for the Timing input is done by means of a jumper
+(see section 6.5).  The pin allocation for the 9pin connector is a follows:
+
+pin 2 :  Frame IN+ pin 5 :  Ground pin 7 :  Frame IN-
+
+
+
+4) The Process part
+
+4-1) Introduction
+
+The internal CPU receives  only valid  messages  via the receiver  part.  These
+messages including Timing  information, event, clock, telegram and calendar are
+compared with up to 256 programmed actions.  An action consists of two parts, a
+trigger which matches an incoming message and what to do when the match occurs.
+The  latter  part may  optionally  create an output  pulse on one of the  eight
+output  channels  and/or a bus interrupt.  This  generation can be delayed from
+the trigger  occurrence  using one of the eight  on-board  counters and one the
+four different clocks.
+
+4-2) The User table
+
+	The User table  contains  256  entries of rows and each row of 16 bytes
+represents an action.  A row or an action  contains many bit fields:  ( one for
+the  trigger  information.  ( one  field for the  Telegram  condition  ( for PS
+purpose  only).  ( one field for the action  requested  (i.e.  a bus  interrupt
+and/or  an  output  pulse)  ( one  for the  output  selected  ( if a  delay  is
+requested:  _ a bit field for the Clock  selection  ( Four  available)  _ a bit
+field for the Start  choice ( Normal with the next  millisecond,  External,  or
+chained on the previous counter) Note:  These fields are explained in detail in
+the Firmware documentation.  ( SL-Note 97-32 (CO) )
+
+4-3) Others tables
+
+	In  addition  to the  User  table,  a part of the  internal  memory  is
+assigned to some others  tables:  * The  Recording  table  contains the arrival
+time of each selected  event ( in  millisecond  units  referenced  to the Start
+Super-Cycle  ), the time when each counter has fired, the  Super-Cycle  number,
+plus  numerous  operational  parameters.  * The  Interrupt  Buffer  is a  table
+concerning  the source of a TG8  interrupt.  It consists of the contents of the
+trigger, the occurrence  time, the  Super-Cycle  number and various useful data
+for the interrupt acknowledge.  * The History Table holds information about all
+the frames  received by the TG8 ( Contents of the  received  frame,  Occurrence
+Time since the last Super-Cycle  signal, Calendar Time, S-Cycle number, etc.  )
+Note:  These  fields are  explained in detail in the Firmware  documentation  (
+SL-Note 97-32 (CO) ).
+
+4-4) The Interrupt Generation
+
+	The TG8  generates  a bus  interrupt  request  as a result  of its nine
+internal requests.  These nine interrupt sources are either the DP-Ram logic or
+one of the eight  counters.  The origin of these internal  sources can be known
+for the VMEbus  interrupt  handler by reading the Status register.  If multiple
+internal  requests arrive in the same time, an individual  clear can be made by
+means of a write command at the address 0x0804.  A individual  clearing  action
+is made by associating one single bit to one interrupt source.  The table below
+indicates the bit signification for this write command:
+
+Bit If bit=1 15 not used 14 not used 13 not used 12 not used 11 not used 10 not
+     used 9 not used 8 Clear  DP-Ram  Interrupt  activated  7 Clear  Counter #8
+     Interrupt activated 6 Clear Counter #7 Interrupt activated 5 Clear Counter
+     #6  Interrupt  activated 4 Clear  Counter #5  Interrupt  activated 3 Clear
+     Counter #4 Interrupt  activated 2 Clear  Counter #3 Interrupt  activated 1
+     Clear  Counter  #2  Interrupt  activated  0  Clear  Counter  #1  Interrupt
+     activated
+
+The TG8 can  activate  a VMEbus  interrupt  on only one  level  over the  seven
+possible.  A jumper and a rotary switch on the module  determine this level and
+the associated  vector is fixed by two other rotary switches on the module (see
+section  6-4).  The value of this  interrupt  vector can be read at the address
+0x0802 in the TG8 memory  area.  The TG8  handles  the VMEbus  interrupts  by a
+dedicated  chip ( PLX  VME-3000  ).  This chip  meets the  Revision  C.1 VMEbus
+specification.  It performs all the protocols required for the VMEbus interrupt
+process.  Using  this chip, the TG8  responds  to an  interrupt  cycle  when it
+receives an  acknowledge  input  signal  from the daisy  chain.  It  arbitrates
+between  this  signal  and its  internal  interrupt  request  signal,  compares
+priority  levels and generates an appropriate  acknowledge  output  signal.  In
+addition, it supplies the selected  vector and handles all bus Timing during an
+interrupt acknowledge cycle.
+
+4-5) The Status register
+
+The contents of the Status register ( Base Address + 0x0800 ) is shown below:
+
+Bit Signal name If bit=1 If bit=0 15 Auto-test Auto-Test is not OK Auto-Test is
+OK 14 Clock Select  Ext.Clock#1  selected  Internal Clock selected 13 X1 Xilinx
+(Counters  #1to#4) is loaded Xilinx  (Counters  #1to#4) not loaded 12 X2 Xilinx
+(Counters  #5to#8) is loaded Xilinx  (Counters  #5to#8) not loaded 11 XR Xilinx
+(Receiver part) is loaded Xilinx  (Receiver  part) not loaded 10 Pending Module
+in a Pending  state Module NOT in a Pending  state 9 Enabled  Module is Enabled
+Module is Disabled 8 DPR INT DP-Ram  Interrupt  activated  DP-Ram is NOT an INT
+source interrupt 7 C#8 INT Counter #8 Interrupt activated  acactsourceactivated
+Counter  #8 NOT  an  INT  source  6 C#7  INT  Counter  #7  Interrupt  activated
+sourceactivated  Counter #7 NOT an INT  source 5 C#6 INT  Counter #6  Interrupt
+activated  sourceactivated  Counter #6 NOT an INT source 4 C#5 INT  Counter  #5
+Interrupt  activated  sourceactivated  Counter  #5 NOT an INT  source 3 C#4 INT
+Counter #4 Interrupt activated  sourceactivated  Counter #4 NOT an INT source 2
+C#3 INT Counter #3 Interrupt  activated  sourceactivated  Counter #3 NOT an INT
+source 1 C#2 INT Counter #2 Interrupt activated  sourceactivated Counter #2 NOT
+an INT source 0 C#1 INT Counter #1 Interrupt activated  sourceactivated Counter
+#1 NOT an INT source
+
+
+4-6) Reset and Auto Test
+
+The Reset of the module and the  auto-test  always occur  consecutively.  There
+are four  different  ways of activating  them:  1) Applying +5 volts to the TG8
+card.  2) Writing a Reset  command  (BA+ 0x0800) to the module.  3) Pushing the
+front panel reset button.  4) Activating the VMEbus reset line.
+
+A Reset will have the following  consequences:  - The module is disabled, - The
+8 counters  are reset and any  running  delayed  action is aborted, - A pending
+interrupt is removed, - The  Receiver  Error  register  value is cleared, - The
+TG8's microprocessor executes an auto-test by checking out the on-board memory,
+all the DP-Ram, and the internal  registers and counters :  _ If the  auto-test
+is OK, bit 15 of the Status  register is set to a zero.  _ If a fault  occurred
+during  the  auto-test,  then bit 15 of the  Status  register  is set to a one.
+After a reset, the contents of the status register are shown below:
+
+Bit level  Signification  15 = 0 Auto-Test  should be OK 14 ?  depending of the
+Jumper  J2 13 = 1  Xilinx  (Counters  #1to#4)  correctly  loaded  12 = 1 Xilinx
+(Counters  #5to#8)  correctly  loaded 11 = 1 Xilinx  (Receiver  part) correctly
+loaded  10 =0  Module is NOT in a Pending  state 9 =0 always  Disabled  after a
+Reset 8 =0 DP-Ram's  interrupt  NOT activated 7 =0  Counter#8's  interrupt  NOT
+activated 6 =0 Counter#7's  interrupt NOT activated 5 =0 Counter#6's  interrupt
+NOT  activated  4 =0  Counter#5's  interrupt  NOT  activated  3 =0  Counter#4's
+interrupt  NOT  activated  2  =0  Counter#3's  interrupt  NOT  activated  1  =0
+Counter#2's interrupt NOT activated 0 =0 Counter#1's interrupt NOT activated
+
+
+4-7) Module Enable / Disable
+
+Two different types of Enable/Disable  facilities are provided, synchronous and
+asynchronous.  In the  asynchronous  mode the  requested  action  is  performed
+immediately  upon  receiving the command.  In the  synchronous  mode the action
+awaits  the   reception   of  the  next  Start   Super-Cycle   frame  to  allow
+synchronisation with the machine cycle.
+
+Note:  For the  Enable/Disable  command,  only the two least  significant  data
+bits, D1 and D0 are used.  Any of the others bits  D16,D15,..D2  transmitted by
+the write command are ignored by the TG8's logic.
+
+D1  D0  Command  :  0  0  Asynchronous  Enable  0  1  Synchronous  Enable  1  0
+Asynchronous Disable 1 1 Synchronous Disable
+
+
+The TG8 card is disabled by means of the "Asynchronous  disable" command (Write
+with D1=1 & D0=0 at BA+ 0x0802).  Whilst in this disabled  state all the Timing
+frames  received  from the receiver  part are ignored by the internal CPU, i.e.
+the frame  interrupt  source is masked.  Thus, any new action must be initiated
+by the internal CPU during this state.  However, the 1ms clock pulse  output is
+still  available.  Bit nine of the Status  register is maintained at logic zero
+throughout the disabled state.
+
+The TG8 card can also be disabled by means of the "Synchronous disable" command
+(Write with D1=1 & D0=1 at  BA+0x0802).  In this case, the module stays enabled
+until  the end of the  current  Super-Cycle.  This  feature  allows  the TG8 to
+finish a complete cycle, and to store all the  Super-Cycle's  parameters in its
+memory.  Bit 10 of the Status  register is  maintained at logic one  throughout
+the "pending" state.
+
+The "Asynchronous enable" command (Write with D1=0 & D0=0 at BA+0x0802) is used
+to re-enable the module at any time during the Super-Cycle.
+
+After the "Synchronous  disable"  command (Write with D1=0 & D0=1 at BA+0x0802)
+the module stays disabled until the start of the next Start  Super-Cycle.  This
+feature synchronises the TG8 with the machine cycle.
+
+Note :  The TG8 is always in a disabled state after a reset.
+
+
+
+
+
+
+
+
+
+5) The Design description
+
+
+Note:  This chapter is dedicated to the detailed  description of the design and
+canbe  evenly  ignored by readers who are not  interested  in all the  hardware
+aspects.
+
+5-1) The internal processor
+
+5-1-1) Introduction
+
+The main element of the TG8 module is a Motorola MC68332  processor.  This chip
+is a 32-bit micro-controller which combines  high-performance data manipulation
+capabilities  with  powerful  peripheral  subsystems:  the  System  Integration
+Module  (SIM), the Queued  Serial  Module  (QSM), and the Time  Processor  Unit
+(TPU).  The  MC68332  is a member  of the  Motorola  M68300  family of  modular
+embedded  controllers  featuring  the CMOS  technology.  Based on the  familiar
+MC68020, the CPU32  instruction  processing  module  provides  enhanced  system
+performance and offers a compliant solution for our real-time process.
+
+5-1-2) Main Features
+
+* Modular  architecture in a single chip * CPU:  32-bit MC68020 family _ Upward
+Object  code  compatible  from the  MC68010 _ New  instruction  for  controller
+applications.  *  Low-power  operation:  600mW  maximum *  Frequency,  software
+programmable:  _ On-chip  PLL, 131 kHz to 16.78 MHz or External  oscillator.  *
+Technology:  1-micron HCMOS * Package:  132-pin PQFP * Intelligent  16-bit Time
+Processor Unit ( TPU ):  _ Dedicated  micro-engine  operating  independently of
+CPU32.  _ 16  independent,  programmable  channels and pins.  _ Any channel can
+perform  any  time  function  ( Input  capture,  Output  compare,  Pulse  Width
+Modulation,  Stepper motor, etc.)  _ Selectable channel priority levels.  * Two
+serial Input /Output  subsystems:  _ Serial  communications  interface ( SCI ),
+Universal   Asynchronous   Receiver   Transmitter   (  UART)  with  parity  and
+programmable baud rate modulus counter.  _ Enhanced serial peripheral  Motorola
+interface  with I/O queue ( QSPI ).  * On-Chip  memory:  2K bytes standby RAM *
+On-Chip,  programmable  chip-select  logic:  _ Up to 12 signals  for memory and
+peripheral  I/O *  System  failure  protection:  _  Software  watchdog  timer _
+Periodic  interrupt  timer _ M68000 family  spurious  interrupt,  Halt, and Bus
+time-out monitors * Up to 32 discrete I/O pins.
+
+
+
+5-1-3) Processor Clock
+
+The  MC68332  clock can be  generated  by either an on-chip  phase-locked  loop
+	 circuit  (from  a low  cost  32.768  kHz  crystal)  or by an  external
+	 oscillator.  This  second  solution  has been  preferred  by using the
+	 Receiver  part's  oscillator ( 16.384 MHz ).  This feature  allows the
+	 MC68332  processes to be  synchronous  with the Frame  receiver chip (
+	 Xilinx  XC4004 ).  The  selection  between the two clocks mode is done
+	 via the pin MODCK.  If the MODCK  signal is low during  the  RESET, an
+	 external  frequency  appearing at the EXTAL pin  furnishes  the system
+	 clock ( ~ 60 nanoseconds ).
+
+5-1-4) Chips Selects
+
+The MC68332 provides 12 independent  programmable  chip selects that can be set
+ up as output  enables, read or write  strobes, or IACK signals.  Block size is
+ programmable  from a minimum of 2K bytes to 1M bytes in length.  Accesses  can
+ be pre-selected  for either 8- or 16-bit  transfers.  Up to 13 wait states can
+ be programmed for insertion during the access.  All bus interface  signals are
+ handled automatically by the chip select logic.  The following table shows the
+ different chip selects used and theirs utilisation:
+
+Signal  Function  CS-boot R/W enable for EPROM Memory CS0 Write  enable for one
+RAM ( Even Byte ) CS1 Write enable for one RAM ( Odd Byte ) CS2 Read enable for
+both RAM Memories CS3 R/W enable for Xilinx Chips ( 1 Receiver and 2 Counters )
+CS4 Interrupt Auto-vector for ABORT button CS5 Interrupt  Auto-vector for Frame
+Receiver  chip CS6 Write  enable for the CAM chip.  CS7 Read enable for the CAM
+chip.  CS8 R/W enable for the DP-Ram.  CS9 not used CS10 not used
+
+
+Note:  The  chip  selects  CS4 and  CS5 are  used  as IACK  signals  to  reduce
+interrupt acknowledge logic on the board.
+
+
+5-1-5) Internal Interrupts Levels:
+
+The following  table shows the assignation of the seven  prioritised  interrupt
+ request  lines ( IRQ7 is the highest  priority and  IRQ6-IRQ1  are  internally
+ "maskable" ):
+
+Level  Function  IRQ7 Abort Switch IRQ6 Timing frame from the  Receiver  chip (
+i.e.  Xilinx ) IRQ5  DP-Ram  Interrupt  from the VMEbus  Master.  IRQ4 not used
+IRQ3 ( pin  used as an I/O ) IRQ2 ( pin used as an I/O ) IRQ1 ( pin  used as an
+I/O )
+
+Note:.  IRQ5 is not used by the  existing  Firmware  and is masked  during  the
+Reset routine.
+
+
+5-2) The Processor Memories
+
+The MC 68332 contains 2K bytes of fast Static RAM used as system stack space or
+variable  storage.  In addition to this  on-chip  memory, two RAM chips of 256K
+bits are  provided.  These  two  integrated  circuits  ( type  Intel  51256  or
+equivalent  )  offers  32,768-word  by 8-bit  each in a 28-pin  DIP ( 300 mil )
+package.  The typical access time of 35 nanoseconds allows for the processor an
+access in only one cycle.  The memory used to contain  the Boot  loader and the
+Firmware is 1 Megabit  EPROM ( type  AM27C1024 ).  It is organised as 64K words
+of 16 bits and  features a quite  fast  access  time  (=150  nanoseconds).  The
+package  used is for this  application  is a  standard  44-pin  PLCC chip.  The
+Motorola  Monitor  332Bug is also  included in this EPROM and can be invoked by
+pressing the ABORT button.
+
+5-3) The Dual-Port Memory
+
+The  Dual-Port  memory is used for  communication  between  the MC68332 and the
+VMEbus Master.  The Dual-Port allows these two processors to have  simultaneous
+read and write  access to this shared  memory.  Two devices ( type IDT 7130 for
+the Odd  byte  and type  IDT7140  for the Even  byte ) are  used  here to get a
+capacity  of 1 K x 16-bit of Static  RAM.  The  IDT7130  is used as a  "Master"
+Dual-Port Ram together  with the IDT7140  "Slave" in 16-bit width access.  Both
+devices are packaged in 48-pin  plastic DIP and provide two  independent  ports
+with   separate   control,   access  and  I/O  pins  that  permit   independent
+asynchronously  access  for reads or writes  to any  location  in  memory.  The
+device speed ( 35 nanoseconds max.  ) allows an access time in one CPU cycle.
+
+5-4) The Content Addressable Memory
+
+The Content  Addressable  Memory ( CAM ) is used to get a very fast  comparison
+between  the  received  frame and the  contents of the User  Table.  The chosen
+device has a capacity of 256 words, each consisting of a 48-bit  comparator and
+a 48-bit  register.  Any or all bits of the value stored in the  comparator can
+be  selectively  masked.  The masked  bits do not  participate  in the  compare
+decisions.  This feature  allows a comparison on a portion of the 48-bit word (
+for the TG8  application,  only 32 bits are  used).  When a word ( the image of
+the  received  frame ) is presented  to the CAM array, a  simultaneous  compare
+operation is  performed  between  this word and all data ( image of the Trigger
+part of the User Table ) in a single cycle.  When the compared  word and a word
+in the CAM are matched,  the on-chip  priority  encoder  generates a match word
+address identifying the location of the data in the CAM.  If a multiple matches
+occur, the encoder  generates  the lowest  matched  address and  activates  the
+output signal MUL.  For the internal  processor, this signal indicates that two
+or more  words in the CAM array  match  the  input  masked  data.  The CAM chip
+selected ( type AMD Am99C10 ) is assembled in a 28 pin, 300 mil plastic package
+and  allows  a 48-bit  comparison  against  all 256  words of the  array in 100
+nanoseconds.
+
+5-4) The Receiver Chips
+
+The Receiver part consists of two devices:  a  differential  bus  transceiver (
+type Texas 75176 ) and a serial  Receiver/Decoder  implanted in a single chip (
+type Xilinx XC4004 ).  The differential  bus transceiver is used to receive the
+line frames conforms to EIA standard RS-422A and CCITT recommendations V.11 and
+X.27.   Although   this   device   is   already    designed   for   multi-point
+transmission/reception on long bus lines in noisy environments, the common mode
+rejection has been substantially  increased by the adoption of AC.  coupling on
+the card.  The chip easily meets the maximum line transmission  requirements of
+512K bits per second.  The serial Receiver/Decoder provides a complete decoding
+of the Manchester  encoded line frame.  The internal  process consists of first
+checking  that each frame is error  free, then  converting  the frame into four
+byte of parallel  data and finally  interrupting  the on-board  processor for a
+double 16-bit access to get the received  frame.  The error treatment is mainly
+made by a parity  check for each  received  byte.  In addition the  transmitted
+frame  contains  a  transmission  start/termination  sequence  and each byte is
+preceded by a synchronising bit.  These additional bits, which are necessary in
+order to achieve a secure  transmission  system, are  removed by the  dedicated
+circuitry  upon  reception  of a valid  frame.  For every valid  message ( i.e.
+error free ), the  receiver  part  interrupts  ( /IRQ6 ) the  internal  CPU and
+transmits  only  the  useful  part  of  the  frame.  In  addition,  the  serial
+Receiver/Decoder  chip decodes the 1ms clock and the Start Super-Cycle from the
+received frames.  For each decoding, it generates an output signal on the front
+panel.  Furthermore,  a check of the 1ms  clock  is  provided  internally  by a
+watch-dog  logic.  In case of a missing  clock, the chip  supplies  a 1ms clock
+pulse backup.  This  characteristic  ensures that the 1ms clock train is always
+supplied to the counters and generated to the user via the front panel  output.
+
+5-5) The Counter Part
+
+Eight 16-bit  channels are available on the board and are implanted in two gate
+array  devices ( type Xilinx  XC4005-6 ).  Each chip ensures the  functionality
+for four  channels ( counter#1 to #4 for the first one, and counter#5 to #8 for
+the second one ).  Using these two  devices,  the  processor  MC68332  controls
+eight  independent  and orthogonal  channels, each  associated  with an output:
+counter#1  with  output#1,  counter#2  with  output#2,  etc.  A channel  is the
+summation   of  a   standard   counter   and  a   "direct-action"   logic.  The
+"direct-action"  logic is implanted in parallel with the associated counter and
+is used for an  action  with  delay  equal to zero.  In fact, for a  no-delayed
+action, it is not  necessary  to imply a counter.  In this  case, the  internal
+processor  involves the  "direct-action"  logic to supplied a pulse ( and/or an
+interrupt) without disturbing the associated  counter.  Each channel contains a
+dedicated  configuration  register ( Clock select and Start Mode ) and a 16-bit
+delay  register.  All the channels  are  identical  and are  performing  a down
+counting   function  except  the  counter#8  which  has  an  up/down   counting
+capability.  Each  counter  can be  synchronised  to any of the four  available
+clocks:  * 1 ms machine  clock * Internal  on-board  clock ( 10 MHz) * External
+Clock#1 * External Clock#2 ( External  Clock#3 is only used by counter#8 for Up
+counting )
+
+Note :  The  internal  gate array design and the device speed  allows a maximum
+frequency up to 30 MHz on the external clock inputs.
+
+Counters may also be linked together, allowing the user to reference operations
+on one channel to the  occurrence of a specified  action on another  channel to
+provide  inter-task  control.  Each  channel can be started on any of the three
+different  modes:  * Normal mode ( i.e.  on the next 1ms clock ) * Chained mode
+( by the output of the previous  one ) * External  Start ( on the front panel )
+For  a  "direct-action",  it  is  like  the  Normal  mode  and  the  action  is
+synchronised with the next 1ms clock pulse.
+
+In  addition,  the two gate  array  chip fill the half of the  Status  Register
+corresponding  to the interrupt  source bits ( see Chapter 4.5 ).  If a channel
+is the source of a bus interrupt, the corresponding bit is set to a one.  These
+bits can be reset individually by a VMEbus command ( see Chapter 4.4 )
+
+5-6) The TPU part
+
+The Time  Processor  Unit ( i.e.  TPU ) is an integral  module of the  on-board
+processor  MC68332.  The T.P.U.  works  independently,  as a  coprocessor,  and
+reduces the CPU  intervention  with its dedicated  execution unit,  prioritised
+scheduler,  and  micro-code   ROM.  The  TPU  controls   sixteen   independent,
+orthogonal channels, each with associated I/O pin and capable of performing any
+time function.  Each channel also contains a dedicated event register, allowing
+both match and input  capture  functions.  On the TG8  board,  only nine of the
+sixteen  channels  are used:  eight for the control of the counters and one for
+the  monitoring  of  the  1ms  clock  train.  For  each  pulse  detection,  the
+appropriate  TPU channel  provokes an internal  interrupt to the MC68332.  This
+feature allows the firmware to know the occurrence time of a counter output and
+also to discriminate the 1ms clock train.
+
+
+
+6) Jumper Identification
+
+6.1) Description
+
+The  physical  location  of the  jumpers  are shown in Fig.2.  When a jumper is
+inserted the input circuit is connected to 0v (i.e.  logic level 0) and when it
+is off, the input  circuit is  "pulled-up"  to +5v via a resistor  (i.e.  logic
+level 1).
+
+6.2) Base Address selection
+
+	The base  address of the module  must be  located in the VMEbus  memory
+area.  For the TG8 this is  achieved  by the 12 jumpers on the  Address  lines:
+Address Jumper
+
+
+
+A23
+
+
+
+
+A22
+
+
+
+
+A21
+
+
+
+
+A20
+
+
+ Address Jumper A19
+
+
+A15
+
+A18
+
+
+A14
+
+A17
+
+
+A13
+
+A16
+
+
+A12
+
+
+Example:  If the requested Base Address is equal to 0x841000.  Because the size
+of the TG8  memory  space is equal  to 4K the  module  will  respond  from  the
+addresses  0x841000 to  0x841FFE.  0x841XXX is  equivalent  to [ 1000 0100 0001
+xxxx xxxx xxxx ] in a binary format.  The jumpers must be placed as follows:
+
+Jumpers
+
+
+
+
+A23=1 OFF
+
+
+
+
+A22=0 ON
+
+
+
+
+A21=0 ON
+
+
+
+
+A20=0 ON
+
+
+Jumpers
+
+A19=0 ON
+
+A15=0 ON
+
+A18=1 OFF
+
+A14=0 ON
+
+A17=0 ON
+
+A13=0 ON
+
+A16=0 ON
+
+A12=1 OFF
+
+
+6.3) Address Modifier selection
+
+The  selection  for the module is achieved  by five  jumpers on the six Address
+Modifier lines:  ( the line AM2 is not encoded to enable an access to either in
+Supervisor mode or in Non-privileged mode)
+
+Address Modifier field Jumpers
+
+
+
+Example
+
+AM5
+
+
+
+AM5=1 OFF
+
+AM4
+
+
+
+AM4=1 OFF
+
+AM3
+
+
+
+AM3=0 OFF
+
+AM1
+
+
+
+AM1=1 ON
+
+AM0
+
+
+
+AM0=0 OFF
+
+
+Example:  If AM code is equal  to 0x39 (= [11  1001] in a binary  format ) That
+means  AM5=1,  AM4=1,  AM3=1,  AM2=0 (but not  encoded),  AM1=0 and AM0=1.  The
+jumpers must be placed as above.
+
+6.4) Interrupt selection
+
+A unique interrupt level must be assigned to the TG8.  The selection is made by
+an unique  jumper placed in the "IRQ" field and by a dedicated  rotary  switch.
+The value set in a decimal  format on the rotary switch must be the  equivalent
+of the jumper placed in one the seven IRQ field.
+
+Example:  If the level is equal to IRQ2,  the  jumper  must be  placed  and the
+rotary switch must be set as follows:
+
+IRQx
+
+
+Jumpers
+
+IRQ7
+
+
+IRQ6
+
+
+IRQ5
+
+
+IRQ4
+
+
+IRQ3
+
+
+IRQ2 ON
+
+IRQ1
+
+
+
+
+IRQ Value = 2
+
+
+       The  eight  bit  vector   supplied  on  the  bus  during  the  interrupt
+acknowledge  is selected  by means of two rotary  switches  in hex format.  The
+left rotary  switch  indicates  the Most  Significant  nibble and the right one
+indicates  Lowest  Significant  nibble.  The  following  example is shown for a
+value equal to 0xB8:
+
+
+
+
+
+
+6.5) Timing Input Selection
+
+
+The input selection with  the  multi-drop  line can be made by the  front-panel
+		    connector or by the private 'P2'  connector.  The choice is
+		    done by means of the  jumper J1:  J1 J1 FP ON OFF P2 FP OFF
+		    ON P2
+
+
+If the Timing input is made by the front-panel connector
+
+
+If the Timing input is made via the P2 connector
+
+
+
+
+
+6.6) Third Clock Selection
+
+A  choice  must be made  for the  third  source  clock  required  by the  eight
+counters.  The  selection  is between the Internal  10Mhz clock and an External
+clock connected on the "Ext.#1" clock input.  The selection is done by means of
+the jumper J2:
+
+		    J2 J2 INT ON OFF EXT INT OFF ON EXT
+
+
+The Internal clock is connected to all counters
+
+
+The External Clock#1 is connected to all counters
+
+
+
+7) Connections on the "P2" connector
+
+	To enable private patching on the lowest connector of the VMEbus crate,
+all the inputs and outputs signals available on the Lemo (( connectors are also
+connected to wire-wrap  pins.  In addition, the Start  Super-Cycle  output (TTL
+active low and 2(s wide) is also  available.  In the same  manner,  the  Timing
+input connection  could be wired via the 2 wire-wrap pins.  All these wire-wrap
+pins are placed near the P2 connector:
+
+START
+
+c1 b1 a1 EXT#1
+
+c2 b2 a2 EXT#2
+
+
+EXT#3
+
+
+OUT#1
+
+
+OUT#2
+
+
+OUT#3
+
+
+OUT#4
+
+
+OUT#5
+
+
+OUT#6
+
+
+OUT#7
+
+
+OUT#8
+
+
+ms
+
+
+IN+
+
+
+IN-
+
+
+SSC
+
+
+GND
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+c32 b32 a32 8) FIGURES
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fig.1:  Simplified Block Diagram
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fig.2:  Component Layout
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fig.3:  Front  Panel  Labelling 1 G.M.T.  :  General  Machine  Timing at CERN 2
+0x...  means that the number is in the hexadecimal  format 3 The signal is also
+available  on a wire-wrap  pin for a  connection  with the P2  connector  ( see
+Chapter 7 ) TG8 Hardware Description
+
+2
+
+

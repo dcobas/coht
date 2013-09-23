@@ -1,0 +1,41 @@
+.TH "ctr_module_address_s" 3 "14 May 2012" "libctr Timing Library" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+ctr_module_address_s \- 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "CtrDrvrDevice \fBdevice_type\fP"
+.br
+.ti -1c
+.RI "void * \fBmemory_map\fP"
+.br
+.ti -1c
+.RI "void * \fBjtag_address\fP"
+.br
+.ti -1c
+.RI "unsigned int \fBspecific\fP [4]"
+.br
+.in -1c
+.SH "Field Documentation"
+.PP 
+.SS "CtrDrvrDevice \fBctr_module_address_s::device_type\fP"
+.PP
+.SS "void* \fBctr_module_address_s::jtag_address\fP"
+.PP
+Main FPGA address (VME A24/BAR2) 
+.SS "void* \fBctr_module_address_s::memory_map\fP"
+.PP
+Which kind of device PCI/VME 
+.SS "unsigned int \fBctr_module_address_s::specific\fP[4]"
+.PP
+JTAG IO address (VME D16/BAR0) 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libctr Timing Library from the source code.
