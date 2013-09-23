@@ -6,9 +6,9 @@ CPU=L866
 
 include /acc/dsc/src/co/Make.auto
 
-CTRBACKEND = ctr
+CTRDRVR = ../../ctr/driver
 
-CFLAGS= -g -Wall -I $(CTRBACKEND) -I/acc/local/$(CPU)/include
+CFLAGS= -g -Wall -I $(CTRDRVR) -I/acc/local/$(CPU)/include
 
 SRCS=TimLib.c TimLib.h ctr/CtrLib.c tg8cps/Tg8CpsLib.c tg8sps/Tg8SpsLib.c netwrk/NetWrkLib.c
 

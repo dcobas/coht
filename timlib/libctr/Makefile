@@ -49,9 +49,9 @@ AH_TARGET=/acc/local/$(CPU)/tim
 
 include /acc/dsc/src/co/Make.auto
 
-DRVR = ../../driver
+CTRDRVR = ../../ctr/driver
 
-CFLAGS= -g -Wall -I. -I$(DRVR) -fPIC -DLDVER=$(LDVER) -DSOVER=$(SOVER) -DSUBVER=$(SUBVER)
+CFLAGS= -g -Wall -I $(CTRDRVR) -fPIC -DLDVER=$(LDVER) -DSOVER=$(SOVER) -DSUBVER=$(SUBVER)
 
 SRCS=libctr.c libctr.h libctrP.h libctrp.c libctrv.c
 

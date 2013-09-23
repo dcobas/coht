@@ -12,7 +12,7 @@
 #ifndef LIBCTRP
 #define LIBCTRP
 
-#include <libctr.h>
+#include "libctr.h"
 
 #define CTR_PATH_SIZE 64
 

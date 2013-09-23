@@ -24,8 +24,8 @@
 #include <unistd.h>
 #include <dlfcn.h>
 
-#include <libctr.h>
-#include <libctrP.h>
+#include "libctr.h"
+#include "libctrP.h"
 
 #define SO_PATH_DEFAULT "/usr/local/ctr"
 
