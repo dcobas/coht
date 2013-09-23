@@ -20,7 +20,7 @@
 #include <tgm/tgm.h>
 #include <tgm/TgmDefP.h>
 #include <tgv/tgv.h>
-#include <TimLib.h>
+#include "TimLib.h"
 
 /**
  * When sending messages to the TGM daemon timlib has
