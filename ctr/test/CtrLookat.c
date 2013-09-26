@@ -140,7 +140,7 @@ double fms;
 
 int GetCableId() {
 
-int cbid = -1;
+int32_t cbid = -1;
 
    if (ioctl(ctr,CtrIoctlGET_CABLE_ID,&cbid) < 0) {
       IErr("GET_CABLE_ID",NULL);

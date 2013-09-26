@@ -172,11 +172,13 @@ XColor         exact_color;
 /* General purpose crap */
 
 struct sigaction action, old;
-int i, j, module;
+int i, j;
+uint32_t  module;
 char ymd[81], *cp, *ep;
 int xo, yo, xh, yh, xm, ym, xs, ys;
 double d30, hl, ml, sl, tl;
-int Hour, Minute, Second, secs;
+int Hour, Minute, Second;
+time_t secs;
 struct tm *tod;
 CtrDrvrTime t;
 

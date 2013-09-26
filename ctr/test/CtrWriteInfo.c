@@ -89,11 +89,12 @@ TgmMachine *mch;
 TgmNetworkId nid;
 #endif
 
-int i, j, tm, rows, en, modnum, rcnt, cnt, ch;
+int i, j, tm, rows, en, rcnt, ch;
+int32_t cnt, modnum;
 char *p = "%";
 
 #ifdef CTR_VME
-unsigned int oby = 0;
+uint32_t oby = 0;
 #endif
 
 #ifdef PS_VER

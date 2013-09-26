@@ -50,7 +50,7 @@ static CtrDrvrCounterConfiguration    conf[CtrDrvrPtimOBJECTS][CtrDrvrMODULE_CON
 
 static int                            rowm[CtrDrvrMODULE_CONTEXTS];
 
-static int                            modn = 1;
+static int32_t                        modn = 1;
 static CtrDrvrCounterConfigurationBuf cbuf;
 static CtrdrvrRemoteCommandBuf        crmb;
 static CtrDrvrCounterMaskBuf          cmsb;
@@ -810,7 +810,7 @@ int i, ok;
 
 Atom *GetOByte(Atom *atom) {
 
-unsigned int oby;
+uint32_t oby;
 
    if (atom->Type == Numeric) {
       modn = atom->Value;
@@ -917,7 +917,7 @@ TgmNetworkId nid;
 #endif
 
 CtrDrvrAction tact;
-unsigned int modn, modcnt;
+uint32_t modn, modcnt;
 
    printf("%s: Compiled %s %s\n",pname,__DATE__,__TIME__);
 

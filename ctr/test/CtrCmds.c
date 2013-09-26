@@ -55,8 +55,8 @@ int xsvf_iDebugLevel = 0;
 static Plx9030Eprom eeprom;
 #endif
 
-static long module = 1;
-static long channel = CtrDrvrCounter1;
+static uint32_t module = 1;
+static uint32_t channel = CtrDrvrCounter1;
 
 static char *editor = "e";
 
@@ -600,7 +600,7 @@ int PrevChannel(int arg) {
 int GetSetChannel(int arg) {
 ArgVal   *v;
 AtomType  at;
-long ch;
+uint32_t ch;
 
    arg++;
    v = &(vals[arg]);
@@ -623,7 +623,7 @@ long ch;
 int SwDeb(int arg) { /* Arg!=0 => On, else Off */
 ArgVal   *v;
 AtomType  at;
-long debug;
+uint32_t debug;
 
    arg++;
    v = &(vals[arg]);
@@ -656,7 +656,7 @@ long debug;
 int GetSetOByte(int arg) { /* Output Byte on P2 0..8 */
 ArgVal   *v;
 AtomType  at;
-long obyte;
+uint32_t obyte;
 
    arg++;
    v = &(vals[arg]);
@@ -688,7 +688,7 @@ long obyte;
 int GetSetTmo(int arg) { /* Arg=0 => Timeouts disabled, else Arg = Timeout */
 ArgVal   *v;
 AtomType  at;
-long timeout;
+int32_t timeout;
 
    arg++;
    v = &(vals[arg]);
@@ -1731,7 +1731,7 @@ CtrDrvrVersion version;
 int GetSetQue(int arg) { /* Arg=Flag */
 ArgVal   *v;
 AtomType  at;
-long qflag, qsize, qover;
+uint32_t qflag, qsize, qover;
 
    arg++;
 
@@ -1774,7 +1774,7 @@ int GetSetCableId(int arg) {
 ArgVal   *v;
 AtomType  at;
 
-long cid;
+uint32_t cid;
 
    arg++;
 
@@ -1998,9 +1998,9 @@ int GetStatus(int arg) {
 CtrDrvrRawIoBlock iob;
 
 CtrDrvrBoardId bird;
-unsigned long stat, iostat;
+uint32_t stat, iostat;
 int i;
-long svn;
+uint32_t svn;
 int array[32];
 CtrDrvrMemoryMap *mp=NULL;
 
@@ -2025,7 +2025,7 @@ CtrDrvrMemoryMap *mp=NULL;
    }
 
    bzero((void *) array, 32*sizeof(int));
-   svn = (long) (&mp->SvnId) / sizeof(int);
+   svn = (unsigned long)(&mp->SvnId) / sizeof(int);
    for (i=0; i<32; i++) {
       iob.Size = 1;
       iob.Offset = svn + i;
@@ -2046,7 +2046,7 @@ CtrDrvrMemoryMap *mp=NULL;
 
 /*****************************************************************/
 
-unsigned long GetHptdcVersion() {
+uint32_t GetHptdcVersion() {
 
 CtrDrvrHptdcIoBuf hpio;
 HptdcRegisterVlaue hpver, hpverbk;
@@ -2082,7 +2082,7 @@ CtrDrvrVersion version;
 
 int hptdc;
 CtrDrvrTime t;
-unsigned long hpver, vhdlver;
+uint32_t hpver, vhdlver;
 char fname[128], txt[128], *cp, *ep;
 CtrDrvrHardwareType ht;
 
@@ -2406,7 +2406,7 @@ double lat, avr, sum, maxt, mint;
    con.EqpNum = CtrDrvrInterruptMaskPPS;
    con.EqpClass = CtrDrvrConnectionClassHARD;
    if (ioctl(ctr,CtrIoctlCONNECT,&con) < 0) {
-      IErr("CONNECT", (long *) &con.EqpNum);
+      IErr("CONNECT", (uint32_t *) &con.EqpNum);
       return arg;
    }
 
@@ -2468,7 +2468,7 @@ char *cp = act_str;
    grp = &(trg->Group);
 
    if (ioctl(ctr,CtrIoctlGET_ACTION,&act) < 0) {
-      IErr("GET_ACTION",(long *) &anum);
+      IErr("GET_ACTION",(uint32_t *) &anum);
       return NULL;
    }
 
@@ -2551,7 +2551,7 @@ AtomType  at;
 CtrDrvrConnection con;
 CtrDrvrWriteBuf wbf;
 CtrDrvrPtimBinding ob;
-long i, cc, trignum;
+uint32_t i, cc, trignum;
 
    arg++;
    v = &(vals[arg]);
@@ -2675,8 +2675,8 @@ CtrDrvrTgmGroup             *grp;
 
 char c, *cp, *ep, txt[128];
 int i, n, wbk, ok;
-unsigned long nadr, anum;
-unsigned long eqp, frm, grn, grv, plw, dly, trc, mch, str, clk, mde, enb;
+uint32_t nadr, anum;
+uint32_t eqp, frm, grn, grv, plw, dly, trc, mch, str, clk, mde, enb;
 
    if (mod) ioctl(ctr,CtrIoctlSET_MODULE,&mod);
 
@@ -2708,7 +2708,7 @@ unsigned long eqp, frm, grn, grv, plw, dly, trc, mch, str, clk, mde, enb;
 		  if (wbk || err_in_act) {
 		     wbk = 0; err_in_act = 0;
 		     if (ioctl(ctr,CtrIoctlSET_ACTION,&act) < 0) {
-			IErr("SET_ACTION",(long *) &anum);
+			IErr("SET_ACTION",(uint32_t *) &anum);
 			if (mod) ioctl(ctr,CtrIoctlSET_MODULE,&module);
 			return;
 		     }
@@ -3091,7 +3091,7 @@ CtrDrvrTrigger *trg;
 CtrDrvrCounterConfiguration *cnf;
 
 char c, *cp, *ep, str[128];
-long n, i, j, ix, nadr;
+uint32_t n, i, j, ix, nadr;
 
    if (id) {
       ix = -1;
@@ -3390,7 +3390,7 @@ unsigned int cntr, rflg;
 
 /*****************************************************************/
 
-char *RemoteToString(unsigned long rem) {
+char *RemoteToString(uint32_t rem) {
 
 static char res[32];
 
@@ -3477,7 +3477,7 @@ int SetDebHis(int arg) {
 ArgVal   *v;
 AtomType  at;
 
-unsigned long stat;
+uint32_t stat;
 int debh;
 
    arg++;
@@ -3508,7 +3508,7 @@ int SetBrutalPll(int arg) {
 ArgVal   *v;
 AtomType  at;
 
-unsigned long stat;
+uint32_t stat;
 int brtpll;
 
    arg++;
@@ -4196,7 +4196,7 @@ HptdcRegisterVlaue *hrv;
 int GetSetEnable(int arg) {
 ArgVal   *v;
 AtomType  at;
-unsigned long enb, stat;
+uint32_t enb, stat;
 
    arg++;
    v = &(vals[arg]);
@@ -4227,7 +4227,7 @@ unsigned long enb, stat;
 int GetSetInputDelay(int arg) {
 ArgVal   *v;
 AtomType  at;
-unsigned long dly;
+uint32_t dly;
 float us;
 
    arg++;
@@ -4277,7 +4277,7 @@ CtrdrvrRemoteCommandBuf crmb;
 
 char c, *cp, *ep, txt[128];
 int n, wbk;
-unsigned long plw, dly, str, clk, mde, enb, bus;
+uint32_t plw, dly, str, clk, mde, enb, bus;
 
    cnf = &cnfb.Config;
 
@@ -4543,7 +4543,7 @@ int array[2];
       v = &(vals[arg]);
       at = v->Type;
 
-      iob.Offset = (long) &mp->ModStats.PllErrorThreshold / sizeof(int);
+      iob.Offset = (uint32_t) ((unsigned long) &mp->ModStats.PllErrorThreshold / sizeof(int));
       if (ioctl(ctr,CtrIoctlRAW_WRITE,&iob) < 0) {
 	 IErr("RAW_WRITE",NULL);
 	 return arg;
@@ -4561,7 +4561,7 @@ int array[2];
 	 v = &(vals[arg]);
 	 at = v->Type;
 
-	 iob.Offset = (long) &mp->ModStats.PllDacCICConstant / sizeof(int);
+	 iob.Offset = (uint32_t) ((unsigned long) &mp->ModStats.PllDacCICConstant / sizeof(int));
 	 if (ioctl(ctr,CtrIoctlRAW_WRITE,&iob) < 0) {
 	    IErr("RAW_WRITE",NULL);
 	    return arg;
@@ -4579,7 +4579,7 @@ int array[2];
 	    v = &(vals[arg]);
 	    at = v->Type;
 
-	    iob.Offset = (long) &mp->ModStats.PllMonitorCICConstant / sizeof(int);
+	    iob.Offset = (unsigned long) &mp->ModStats.PllMonitorCICConstant / sizeof(int);
 	    if (ioctl(ctr,CtrIoctlRAW_WRITE,&iob) < 0) {
 	       IErr("RAW_WRITE",NULL);
 	       return arg;
@@ -4732,7 +4732,7 @@ TgmLineNameTable   ltab;
 int GetEventHistory(int arg) {
 ArgVal   *v;
 AtomType  at;
-unsigned long size;
+uint32_t size;
 int i, j, hi;
 CtrDrvrEventHistory ehsb;
 
@@ -4805,8 +4805,8 @@ char comment[128];
 typedef struct {
    char           Name[OB_NAME_LENGTH];
    char           Comment[OB_COMMENT_LENGTH];
-   unsigned long  EqpNum;
-   unsigned long  Frame;
+   uint32_t  EqpNum;
+   uint32_t  Frame;
    CtrDrvrMachine Machine;
  } CtimMtgBinding;
 
@@ -4816,7 +4816,7 @@ int CtimRead(int arg) {
 
 #ifdef PS_VER
 int cnt, fal;
-unsigned long equip, frame;
+uint32_t equip, frame;
 CtrDrvrCtimBinding ob;
 TgvName eqname;
 #endif
@@ -5131,7 +5131,7 @@ AtomType  at;
 
 char txt[128], fname[64];
 int i, cnt, enb;
-unsigned long stat, option;
+uint32_t stat, option;
 
    arg++;
    v = &(vals[arg]);
@@ -5287,7 +5287,7 @@ CtrDrvrRawIoBlock iob;
 
 int MemoryTest(int arg) {
 
-unsigned long stat;
+uint32_t stat;
 
    arg++;
 
@@ -5349,7 +5349,7 @@ int PlotPll(int arg) { /* Plot PLL curves */
 ArgVal   *v;
 AtomType  at;
 
-long nav, kp, ki, points, phase, qflag, qsize, qsave, to, tn;
+uint32_t nav, kp, ki, points, phase, qflag, qsize, qsave, to, tn;
 CtrDrvrConnection con;
 CtrDrvrReadBuf rbf, ibf;
 CtrDrvrPll *pll, plb;
@@ -5572,7 +5572,7 @@ FILE *lgf;
 CtrDrvrConnection con;
 char fname[64], *cp;
 int i, cc, cnt, msd;
-unsigned long sctim, ectim, cbl, usr, qsz;
+uint32_t sctim, ectim, cbl, usr, qsz;
 TgmMachine mch;
 TgmLineNameTable ltab;
 CtrDrvrCTime stim;
@@ -5681,9 +5681,9 @@ CtrDrvrAction act;
 		   (int)    sctim,
 			    TimeToStr(&stim.Time,1));
 
-	    stim.Time.TicksHPTDC = (unsigned long)
+	    stim.Time.TicksHPTDC = (uint32_t)
 				   ((double) (2.56 *
-				   (unsigned long)
+				   (uint32_t)
 				   (((HptdcToNano(stim.Time.TicksHPTDC)/1000000) + 1)*1000000)));
 	    break;
 	 }
@@ -5779,7 +5779,7 @@ CtrDrvrTime t;
 
 int IoStatus(int arg) {
 
-unsigned long iostat;
+uint32_t iostat;
 
    arg++;
    if (ioctl(ctr,CtrIoctlGET_IO_STATUS,&iostat) < 0) {
