@@ -50,7 +50,7 @@ int ctr_get_module_address(void *handle, struct ctr_module_address_s *module_add
 int ctr_set_p2_output_byte(void *handle, int p2byte)
 {
 	struct ctr_handle_s *h = handle;
-	unsigned long obyte;
+	uint32_t obyte;
 
 	obyte = p2byte;
 	if (ioctl(h->fd,CtrIoctlSET_OUTPUT_BYTE,&obyte) < 0)
@@ -68,7 +68,7 @@ int ctr_set_p2_output_byte(void *handle, int p2byte)
 int ctr_get_p2_output_byte(void *handle)
 {
 	struct ctr_handle_s *h = handle;
-	unsigned long obyte;
+	uint32_t obyte;
 
 	if (ioctl(h->fd,CtrIoctlGET_OUTPUT_BYTE,&obyte) < 0)
 		return -1;

@@ -34,7 +34,7 @@
 int ctr_get_module_count(void *handle)
 {
 	struct ctr_handle_s *h = handle;
-	unsigned long arg = 0;
+	uint32_t arg = 0;
 
 	if (ioctl(h->fd,CtrIoctlGET_MODULE_COUNT,&arg) < 0)
 		return -1;
@@ -55,7 +55,7 @@ int ctr_get_module_count(void *handle)
 int ctr_set_module(void *handle, int modnum)
 {
 	struct ctr_handle_s *h = handle;
-	unsigned long arg = modnum;
+	uint32_t arg = modnum;
 
 	if (ioctl(h->fd,CtrIoctlSET_MODULE,&arg) < 0)
 		return -1;
@@ -70,7 +70,7 @@ int ctr_set_module(void *handle, int modnum)
 int ctr_get_module(void *handle)
 {
 	struct ctr_handle_s *h = handle;
-	unsigned long arg = 0;
+	uint32_t arg = 0;
 
 	if (ioctl(h->fd,CtrIoctlGET_MODULE,&arg) < 0)
 		return -1;
@@ -288,7 +288,7 @@ int ctr_set_ccv(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv, ct
 	CtrDrvrCounterMaskBuf        cmsb;
 	CtrDrvrCtimObjects           ctimo;
 
-	unsigned long mod;
+	uint32_t mod;
 	int anm, i, ok;
 
 	trg = &(act.Trigger);
@@ -419,7 +419,7 @@ int ctr_get_ccv(void *handle, int ltim, int index, struct ctr_ccv_s *ctr_ccv)
 	CtrDrvrTgmGroup             *grp;
 	CtrDrvrCounterMaskBuf        cmsb;
 
-	unsigned long mod;
+	uint32_t mod;
 	int anm;
 
 	trg = &(act.Trigger);
@@ -591,7 +591,7 @@ int ctr_set_time(void *handle, CtrDrvrTime ctr_time)
 int ctr_get_cable_id(void *handle, int *cable_id)
 {
 	struct ctr_handle_s *h = handle;
-	unsigned long cid;
+	uint32_t cid;
 
 	if (ioctl(h->fd,CtrIoctlGET_CABLE_ID,&cid) < 0)
 		return -1;
@@ -612,7 +612,7 @@ int ctr_get_cable_id(void *handle, int *cable_id)
 int ctr_set_cable_id(void *handle, int cable_id)
 {
 	struct ctr_handle_s *h = handle;
-	unsigned long cid = cable_id;
+	uint32_t cid = cable_id;
 
 	if (ioctl(h->fd,CtrIoctlSET_CABLE_ID,&cid) < 0)
 		return -1;
@@ -719,7 +719,7 @@ int ctr_destroy_ctim(void *handle, int ctim)
 int ctr_get_queue_size(void *handle)
 {
 	struct ctr_handle_s *h = handle;
-	unsigned long qs;
+	uint32_t qs;
 
 	if (ioctl(h->fd,CtrIoctlGET_QUEUE_SIZE,&qs) < 0)
 		return -1;
@@ -735,7 +735,7 @@ int ctr_get_queue_size(void *handle)
 int ctr_set_queue_flag(void *handle, int flag)
 {
 	struct ctr_handle_s *h = handle;
-	unsigned long qf;
+	uint32_t qf;
 
 	if (flag) qf = 0;
 	else      qf = 1;
@@ -752,7 +752,7 @@ int ctr_set_queue_flag(void *handle, int flag)
 int ctr_get_queue_flag(void *handle)
 {
 	struct ctr_handle_s *h = handle;
-	unsigned long qf;
+	uint32_t qf;
 
 	if (ioctl(h->fd,CtrIoctlGET_QUEUE_FLAG,&qf) < 0)
 		return -1;
@@ -770,7 +770,7 @@ int ctr_get_queue_flag(void *handle)
 int ctr_set_enable(void *handle, int flag)
 {
 	struct ctr_handle_s *h = handle;
-	unsigned long en = flag;
+	uint32_t en = flag;
 
 	if (ioctl(h->fd,CtrIoctlENABLE,&en) < 0)
 		return -1;
@@ -785,7 +785,7 @@ int ctr_set_enable(void *handle, int flag)
 int ctr_get_enable(void *handle)
 {
 	struct ctr_handle_s *h = handle;
-	unsigned long st;
+	uint32_t st;
 
 	if (ioctl(h->fd,CtrIoctlGET_STATUS,&st) < 0)
 		return -1;
@@ -804,7 +804,7 @@ int ctr_get_enable(void *handle)
 int ctr_set_input_delay(void *handle, int delay)
 {
 	struct ctr_handle_s *h = handle;
-	unsigned long dly = delay;
+	uint32_t dly = delay;
 
 	if (ioctl(h->fd,CtrIoctlSET_INPUT_DELAY,&dly) < 0)
 		return -1;
@@ -819,7 +819,7 @@ int ctr_set_input_delay(void *handle, int delay)
 int ctr_get_input_delay(void *handle)
 {
 	struct ctr_handle_s *h = handle;
-	unsigned long dly;
+	uint32_t dly;
 
 	if (ioctl(h->fd,CtrIoctlGET_INPUT_DELAY,&dly) < 0)
 		return -1;
@@ -835,7 +835,7 @@ int ctr_get_input_delay(void *handle)
 int ctr_set_debug_level(void *handle, int level)
 {
 	struct ctr_handle_s *h = handle;
-	unsigned long deb = level;
+	uint32_t deb = level;
 
 	if (ioctl(h->fd,CtrIoctlSET_SW_DEBUG,&deb) < 0)
 		return -1;
@@ -850,7 +850,7 @@ int ctr_set_debug_level(void *handle, int level)
 int ctr_get_debug_level(void *handle)
 {
 	struct ctr_handle_s *h = handle;
-	unsigned long deb;
+	uint32_t deb;
 
 	if (ioctl(h->fd,CtrIoctlGET_SW_DEBUG,&deb) < 0)
 		return -1;
@@ -866,7 +866,7 @@ int ctr_get_debug_level(void *handle)
 int ctr_set_timeout(void *handle, int timeout)
 {
 	struct ctr_handle_s *h = handle;
-	unsigned long tmo = timeout;
+	uint32_t tmo = timeout;
 
 	if (ioctl(h->fd,CtrIoctlSET_TIMEOUT,&tmo) < 0)
 		return -1;
@@ -881,7 +881,7 @@ int ctr_set_timeout(void *handle, int timeout)
 int ctr_get_timeout(void *handle)
 {
 	struct ctr_handle_s *h = handle;
-	unsigned long tmo;
+	uint32_t tmo;
 
 	if (ioctl(h->fd,CtrIoctlGET_TIMEOUT,&tmo) < 0)
 		return -1;
@@ -1074,7 +1074,7 @@ int ctr_get_remote(void *handle, CtrDrvrCounter ch, struct ctr_ccv_s *ctr_ccv)
 int ctr_set_pll_lock_method(void *handle, int lock_method)
 {
 	struct ctr_handle_s *h = handle;
-	unsigned long lkf = lock_method;
+	uint32_t lkf = lock_method;
 
 	if (ioctl(h->fd,CtrIoctlSET_BRUTAL_PLL,&lkf) < 0)
 		return -1;
@@ -1089,7 +1089,7 @@ int ctr_set_pll_lock_method(void *handle, int lock_method)
 int ctr_get_pll_lock_method(void *handle)
 {
 	struct ctr_handle_s *h = handle;
-	unsigned long stat;
+	uint32_t stat;
 
 	if (ioctl(h->fd,CtrIoctlGET_IO_STATUS,&stat) < 0)
 		return -1;
@@ -1109,7 +1109,7 @@ int ctr_get_pll_lock_method(void *handle)
 int ctr_get_io_status(void *handle, CtrDrvrIoStatus *io_stat)
 {
 	struct ctr_handle_s *h = handle;
-	unsigned long stat;
+	uint32_t stat;
 
 	if (ioctl(h->fd,CtrIoctlGET_IO_STATUS,&stat) < 0)
 		return -1;
@@ -1127,7 +1127,7 @@ int ctr_get_io_status(void *handle, CtrDrvrIoStatus *io_stat)
 int ctr_get_stats(void *handle, CtrDrvrModuleStats *stats)
 {
 	struct ctr_handle_s *h = handle;
-	unsigned long stat;
+	uint32_t stat;
 	CtrDrvrModuleStats mstat;
 
 	if (ioctl(h->fd,CtrIoctlGET_IO_STATUS,&stat) < 0)
@@ -1164,7 +1164,7 @@ int ctr_memory_test(void *handle, int *address, int *wpat, int *rpat)
 #define RAMSZ 12288
 
 	struct ctr_handle_s *h = handle;
-	unsigned long stat;
+	uint32_t stat;
 	unsigned int i, data, addr;
 	CtrDrvrRawIoBlock iob;
 
