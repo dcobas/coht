@@ -10,9 +10,9 @@
 
 #define CTR_VME
 
-#include <libctr.h>
+#include "libctr.h"
 
-#include <libctr_common.c>
+#include "libctr_common.c"
 
 /**
  * @brief Get the addresses of a module
