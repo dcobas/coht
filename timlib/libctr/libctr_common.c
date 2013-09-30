@@ -1095,9 +1095,9 @@ int ctr_get_pll_lock_method(void *handle)
 		return -1;
 
 	if (CtrDrvrIOStatusUtcPllEnabled & stat)   /* Slow lock */
-		return 1;
+		return 0;
 
-	return 0;                                  /* Brutal lock */
+	return 1;                                  /* Brutal lock */
 }
 
 /**
