@@ -99,7 +99,7 @@ install-lib: $(INSTFILES)
 	@echo "Installing libctr.a and libctr.h in " $(AH_TARGET) "/libctr." $(LDVER)
 	dsc_install libctr.$(CPU).a $(AH_TARGET)/libctr.$(LDVER)
 	dsc_install libctr.h $(AH_TARGET)/libctr.$(LDVER)
-	dsc_install $(DRVR)/*.h $(AH_TARGET)/libctr.$(LDVER)
+	dsc_install $(CTRDRVR)/*.h $(AH_TARGET)/libctr.$(LDVER)
 	@echo -e "Done install-lib\n"
 
 install-lab: $(INSTFILES)
