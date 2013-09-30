@@ -23,8 +23,8 @@
 #include <a.out.h>
 #include <ctype.h>
 
-#include "libctr.h"
-#include "libctrP.h"
+#include <libctr.h>
+#include <libctrP.h>
 
 /**
  * @brief Get the number of installed CTR modules
