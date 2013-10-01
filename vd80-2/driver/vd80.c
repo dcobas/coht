@@ -719,10 +719,11 @@ long __vd80_ioctl(struct file *filp, uint32_t cmd, uintptr_t arg)
 		break;
 
 	case VD80_CONNECT:                 /** Connect/Disconnect interrupts */
-		tval = *ival & VD80_INTERRUPT_MASK;
-		if (tval)
-			tval |= (getreg(dev,VD80_GCR2) & ~VD80_INTERRUPT_MASK);
-
+		tval = getreg(dev,VD80_GCR2);
+		if (*ival & VD80_INTERRUPT_MASK)
+			tval |= (*ival & VD80_INTERRUPT_MASK);
+		else
+			tval &= ~VD80_INTERRUPT_MASK;
 		setreg(dev,VD80_GCR2,tval);
 		break;
 
@@ -1172,10 +1173,10 @@ static irqreturn_t vd80_irq(void *arg)
 
 	IHWr32(VD80_INTCLR,&vad[VD80_GCR1/4]);
 
-	wa.ibuf.src = isrc;
-	wa.ibuf.cnt++;
-	wa.ibuf.lun = luns[dev->dev_idx];
-	wake_up(&wa.queue);
+	dev->ibuf.src = isrc;
+	dev->ibuf.cnt++;
+	dev->ibuf.lun = luns[dev->dev_idx];
+	wake_up(&dev->queue);
 
 	return IRQ_HANDLED;
 }
@@ -1213,8 +1214,6 @@ int vd80_install(void)
 		return -EACCES;
 	}
 
-	init_waitqueue_head(&wa.queue);
-
 	for (i=0; i<luns_num; i++) {
 
 		struct vd80_device_s   *dev = &wa.devs[i];
@@ -1227,6 +1226,7 @@ int vd80_install(void)
 		mad->slot = slot[i];
 
 		mutex_init(&dev->mutex);
+		init_waitqueue_head(&dev->queue);
 
 		if (init_device(dev) < 0) {
 			printk("VD80:lun:%d Not installed\n",mad->lun);
@@ -1326,16 +1326,16 @@ ssize_t vd80_read(struct file * filp, char *buf, size_t count, loff_t * f_pos)
 
 	dev = filp->private_data;
 
-	icnt = wa.ibuf.cnt;
+	icnt = dev->ibuf.cnt;
 	if (dev->timeout) {
-		cc = wait_event_interruptible_timeout(wa.queue,
-						      icnt != wa.ibuf.cnt,
+		cc = wait_event_interruptible_timeout(dev->queue,
+						      icnt != dev->ibuf.cnt,
 						      dev->timeout);
 		if (cc == 0)
 			return -ETIME;
 	} else
-		cc = wait_event_interruptible(wa.queue,
-					      icnt != wa.ibuf.cnt);
+		cc = wait_event_interruptible(dev->queue,
+					      icnt != dev->ibuf.cnt);
 	if (cc < 0)
 		return cc;
 
@@ -1343,7 +1343,7 @@ ssize_t vd80_read(struct file * filp, char *buf, size_t count, loff_t * f_pos)
 	if (wcnt > sizeof(struct vd80_int_buf_s))
 		wcnt = sizeof(struct vd80_int_buf_s);
 
-	cc = copy_to_user(buf, &wa.ibuf, wcnt);
+	cc = copy_to_user(buf, &dev->ibuf, wcnt);
 	if (cc)
 		return -EACCES;
 

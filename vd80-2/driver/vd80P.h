@@ -42,6 +42,10 @@ struct vd80_map_s {
 struct vd80_device_s {
 	struct vd80_map_s map;
 	struct mutex mutex;
+
+	wait_queue_head_t queue;
+	struct vd80_int_buf_s ibuf;
+
 	uint32_t timeout;
 	uint32_t revid;         /** VD80 Firmware revision ID */
 	uint32_t dev_idx;       /** Device index 0..devices */
@@ -53,8 +57,6 @@ struct vd80_device_s {
 struct working_area_s {
 	uint32_t devcnt;                        /** Number of intstalled devices */
 	struct vd80_device_s devs[MAX_DEVICES]; /** Devices */
-	wait_queue_head_t queue;
-	struct vd80_int_buf_s ibuf;
 };
 
 #endif
