@@ -376,7 +376,7 @@ vd80_err_t vd80Wait(int fd, struct vd80_int_buf_s *intr)
 	int ret;
 
 	ret = read(fd,intr,sizeof(struct vd80_int_buf_s));
-	if (ret == 0)
+	if (ret <= 0)
 		return VD80_LIB_ERR_TIMEOUT;
 
 	return VD80_LIB_ERR_SUCCESS;
