@@ -115,13 +115,14 @@ uint32_t m, debug, delay, enable;
       mods = CtrLibGetInstalledModuleCount();
       for (m=1; m<=mods; m++) {
 	 ioctl(ctr,CtrIoctlSET_MODULE,&m);
+
+	 debug  = timlib_debug;
+	 delay  = timlib_delay;
+	 enable = timlib_enable;
+
 	 if (timlib_debug)  ioctl(ctr,CtrIoctlSET_SW_DEBUG,   &debug);
 	 if (timlib_delay)  ioctl(ctr,CtrIoctlSET_INPUT_DELAY,&delay);
 	 if (timlib_enable) ioctl(ctr,CtrIoctlENABLE,         &enable);
-
-	 timlib_debug =  debug;
-         timlib_delay =  delay;
-         timlib_enable = enable;
 
 	 if (m == 1) p2c = timlib_oby1_8;
 	 if (m == 9) p2c = timlib_oby9_16;
@@ -1793,11 +1794,12 @@ TimLibError CtrLibSetPllLocking(unsigned long module,
 				unsigned long lockflag) { /* 1=> Brutal, else Slow */
 
    uint32_t m = module;
+   uint32_t lf = lockflag;
 
    if (ctr == 0) return TimLibErrorINIT;
    if (ioctl(ctr,CtrIoctlSET_MODULE, &m) < 0) return TimLibErrorIO;
 
-   if (ioctl(ctr,CtrIoctlSET_BRUTAL_PLL,&lockflag) < 0) return TimLibErrorIO;
+   if (ioctl(ctr,CtrIoctlSET_BRUTAL_PLL,&lf) < 0) return TimLibErrorIO;
 
    return TimLibErrorSUCCESS;
 }
