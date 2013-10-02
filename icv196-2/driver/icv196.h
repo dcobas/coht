@@ -8,8 +8,8 @@
  * =========================================================================================
  */
 
-#ifndef ICV196
-#define ICV196
+#ifndef _ICV196_H
+#define _ICV196_H
 
 #define DEBUG 0
 #define TIMEOUT 1000
@@ -148,4 +148,4 @@ typedef enum {
 #define ICV196_BYTE_SET_OUTPUT    VIOWR(icv196BYTE_SET_OUTPUT    ,uint32_t)                 /** Set 12 bit (0xFFF) output bytes mask */
 #define ICV196_BYTE_WRITE         VIOWR(icv196BYTE_WRITE         ,struct icv196_digiob_s)   /** Byte write to module  */
 
-#endif
+#endif /* _ICV196_H */

@@ -4,8 +4,8 @@
  * Julian Lewis Tue 2nd July 2013
  */
 
-#ifndef ICV196_LIB_LIB
-#define ICV196_LIB_LIB
+#ifndef _LIBICV196_H
+#define _LIBICV196_H
 
 #ifdef __cplusplus
 extern "C"
@@ -241,4 +241,4 @@ char *icv196ErrToStr(icv196_err_t error);
 }
 #endif
 
-#endif
+#endif /* _LIBICV196_H */
