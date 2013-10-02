@@ -4,13 +4,13 @@
 
 CPU=L866
 
-DRVR = ../../../driver
+DRVR = ../../../ctr/driver
 
 include /acc/dsc/src/co/Make.auto
 
 ACCS=tst mcr
 
-CFLAGS = -g -Wall -I. -I.. -I/ps/local/$(CPU)/include -I$(DRVR)
+CFLAGS = -g -Wall -I. -I.. -I/acc/local/$(CPU)/include -I$(DRVR)
 
 LDLIBS = ../libtim.$(CPU).a -ltgm -lerr -lerr_dummy -ltgv -lm -lX11 -ldtm -lnc
 
