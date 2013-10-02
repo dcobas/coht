@@ -917,7 +917,7 @@ TgmNetworkId nid;
 #endif
 
 CtrDrvrAction tact;
-uint32_t modn, modcnt;
+uint32_t modn = 1, modcnt = 1;
 
    printf("%s: Compiled %s %s\n",pname,__DATE__,__TIME__);
 
@@ -1012,6 +1012,7 @@ uint32_t modn, modcnt;
       }
    }
    row = rowm[0]; modn = 1;
+   ioctl(ctr,CtrIoctlSET_MODULE,&modn);
 
    equips = 0; rows = 0; level = 0; atom = head;
    while (atom) {
