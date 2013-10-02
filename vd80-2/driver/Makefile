@@ -44,8 +44,8 @@ install-all: install-lab install-oper install-oplhc
 install-lab: ./$(CPU)/$(KVER)/$(TARGET).ko
 	dsc_install ./$(CPU)/$(KVER)/$(TARGET).ko /acc/dsc/lab/$(CPU)/$(KVER)/vd80;
 
-install-oper: ./$(CPU)/$(KVER)/vd80.ko
+install-oper: ./$(CPU)/$(KVER)/$(TARGET).ko
 	dsc_install ./$(CPU)/$(KVER)/$(TARGET).ko /acc/dsc/oper/$(CPU)/$(KVER)/vd80;
 
-install-oplhc: ./$(CPU)/$(KVER)/vd80.ko
+install-oplhc: ./$(CPU)/$(KVER)/$(TARGET).ko
 	dsc_install ./$(CPU)/$(KVER)/$(TARGET).ko /acc/dsc/oplhc/$(CPU)/$(KVER)/vd80;
