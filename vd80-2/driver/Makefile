@@ -13,6 +13,7 @@ TARGET = vd80-2
 KERNELSRC=/acc/sys/$(CPU)/usr/src/kernels/$(KVER)
 GIT_VERSION = $(shell cd $(src); git describe --dirty --long --tags --always)
 
+ccflags-y += -DCOMPILE_TIME=$(shell date +%s)
 ccflags-y += -g -Wall
 ccflags-y += -I /acc/local/$(CPU)/include
 ccflags-y += -DGIT_VERSION=\"$(GIT_VERSION)\"
