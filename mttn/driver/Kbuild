@@ -13,7 +13,11 @@
 # Use ccflags-y to pass extra driver compilation flags (if any)
 # To compile for 2.6.9 -- EXTRA_CFLAGS should be used instead.
 # ccflags-y =
-# EXTRA_CFLAGS =
+# GIT_VERSION = $(shell git describe --dirty --tags --long)
+#
+# add git version to the kernel module
+GIT_VERSION := $(shell cd $(PWD) ;  git describe --dirty --tags --long)
+ccflags-y += -DGIT_VERSION=\"$(GIT_VERSION)\"
 
 #  Use XTRA_DRSC to add driver files to compile from other
 #+ then ./driver directories

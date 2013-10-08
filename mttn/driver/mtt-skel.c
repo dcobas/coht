@@ -20,6 +20,11 @@
 #include <skeldrvrP.h>
 #include <skeluser_ioctl.h>
 
+#ifdef __linux__
+#include <linux/module.h>
+MODULE_VERSION(GIT_VERSION);
+#endif
+
 static char *mtt_ioctl_names[] = {
 	[_IOC_NR(SkelUserIoctlFIRST)]	= "MTT First IOCTL",
 	[_IOC_NR(MTT_IOCSCABLEID)]	= "Set module cable id",
