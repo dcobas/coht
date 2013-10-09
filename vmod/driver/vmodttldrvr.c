@@ -575,19 +575,19 @@ static int vmodttl_read_chan(struct vmodttlarg buf, struct vmodttl_dev *pd)
 
 	switch(buf.dev){
 		case VMOD_TTL_CHANNEL_A:
-			val = (int) vmodttl_read_word(pd, VMODTTL_PORTA);
+			val = vmodttl_read_word(pd, VMODTTL_PORTA) & 0xff;
 			strobe_value = 0x04;
 			break;
 
 		case VMOD_TTL_CHANNEL_B:
-			val = (int) vmodttl_read_word(pd, VMODTTL_PORTB);		
+			val = vmodttl_read_word(pd, VMODTTL_PORTB) & 0xff;
 			strobe_value = 0x08;
 			break;
 
 		case VMOD_TTL_CHANNELS_AB:
-			val = (int) vmodttl_read_word(pd, VMODTTL_PORTA);
-			val += ((int) vmodttl_read_word(pd, VMODTTL_PORTB)) << 8;
-
+			val  = vmodttl_read_word(pd, VMODTTL_PORTA) & 0xff;
+			val |= (vmodttl_read_word(pd, VMODTTL_PORTB) & 0xff) << 8;
+			break;
 		default:
 			break;
 	}
