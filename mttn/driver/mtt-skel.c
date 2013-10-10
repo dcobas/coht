@@ -303,6 +303,8 @@ static void mtt_reset(SkelDrvrModuleContext *mcon)
 
 	/* reset the module */
 	__mtt_cmd(mcon, MttDrvrCommandRESET, 1);
+	__mtt_cmd(mcon, MttDrvrCommandENABLE, 1);
+	udata->EnabledOutput = 1;
 	cdcm_spin_unlock_irqrestore(&udata->iolock, flags);
 
 	usec_sleep(100);
