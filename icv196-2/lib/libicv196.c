@@ -239,6 +239,7 @@ icv196_err_t icv196GetGroups(int fd, struct icv196_digiob_s *giob)
 		giob->msk = msk;
 		return ICV196_LIB_ERR_IO;
 	}
+	swab(giob->val,giob->val,MAX_BYTES);
 	giob->msk = msk;
 	return ICV196_LIB_ERR_SUCCESS;
 }
