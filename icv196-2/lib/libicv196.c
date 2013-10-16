@@ -219,13 +219,11 @@ void swap_digiob(struct icv196_digiob_s *giob)
 	giob->msk = c;
 }
 
-icv196_err_t icv196SetGroups(int fd, const struct icv196_digiob_s *giob)
+icv196_err_t icv196SetGroups(int fd, struct icv196_digiob_s giob)
 {
-	struct icv196_digiob_s s = *giob;
+	swap_digiob(&giob);
 
-	swap_digiob(&s);
-
-	if (ioctl(fd,ICV196_BYTE_WRITE,&s) < 0)
+	if (ioctl(fd,ICV196_BYTE_WRITE,&giob) < 0)
 		return ICV196_LIB_ERR_IO;
 
 	return ICV196_LIB_ERR_SUCCESS;
@@ -233,11 +231,15 @@ icv196_err_t icv196SetGroups(int fd, const struct icv196_digiob_s *giob)
 
 icv196_err_t icv196GetGroups(int fd, struct icv196_digiob_s *giob)
 {
-	if (ioctl(fd,ICV196_BYTE_READ,giob) < 0)
-		return ICV196_LIB_ERR_IO;
+	uint16_t msk = giob->msk;
 
 	swap_digiob(giob);
 
+	if (ioctl(fd,ICV196_BYTE_READ,giob) < 0) {
+		giob->msk = msk;
+		return ICV196_LIB_ERR_IO;
+	}
+	giob->msk = msk;
 	return ICV196_LIB_ERR_SUCCESS;
 }
 
