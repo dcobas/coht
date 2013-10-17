@@ -186,9 +186,21 @@ icv196_err_t icv196Wait(int fd, struct icv196_int_buf_s *intr)
 /* ==================================================================== */
 /* Get set output groups                                                */
 
+static uint16_t swap_bits(uint16_t val)
+{
+	uint16_t a, b, c;
+
+	a = 0x55555 & val;
+	b = 0xAAAAA & val;
+	c = (a << 1) | (b >> 1);
+	return c;
+}
+
 icv196_err_t icv196SetGroupsAsOutput(int fd, uint32_t omsk)
 {
-	if (ioctl(fd,ICV196_BYTE_SET_OUTPUT,&omsk) < 0)
+	uint32_t msk = swap_bits(omsk);
+
+	if (ioctl(fd,ICV196_BYTE_SET_OUTPUT,&msk) < 0)
 		return ICV196_LIB_ERR_IO;
 
 	return ICV196_LIB_ERR_SUCCESS;
@@ -196,9 +208,12 @@ icv196_err_t icv196SetGroupsAsOutput(int fd, uint32_t omsk)
 
 icv196_err_t icv196GetGroupsAsOutput(int fd, uint32_t *omsk)
 {
+	uint32_t msk = 0;
 
-	if (ioctl(fd,ICV196_BYTE_GET_OUTPUT,omsk) < 0)
+	if (ioctl(fd,ICV196_BYTE_GET_OUTPUT,&msk) < 0)
 	       return ICV196_LIB_ERR_IO;
+
+	*omsk = swap_bits(msk);
 
 	return ICV196_LIB_ERR_SUCCESS;
 }
@@ -206,17 +221,11 @@ icv196_err_t icv196GetGroupsAsOutput(int fd, uint32_t *omsk)
 /* ==================================================================== */
 /* Read/Write groups of bits (bytes)                                    */
 
-void swap_digiob(struct icv196_digiob_s *giob)
+static void swap_digiob(struct icv196_digiob_s *giob)
 {
-	uint16_t a, b, c;
 
 	swab(giob->val,giob->val,MAX_BYTES);
-
-	a = 0x55555 & giob->msk;
-	b = 0xAAAAA & giob->msk;
-	c = (a << 1) | (b >> 1);
-
-	giob->msk = c;
+	giob->msk = swap_bits(giob->msk);
 }
 
 icv196_err_t icv196SetGroups(int fd, struct icv196_digiob_s giob)
