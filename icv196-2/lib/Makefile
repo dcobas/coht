@@ -31,3 +31,6 @@ docs:
 docs-update: docs
 	rsync -av html/ /acc/doc/html/private/coht/doxy/icv196
 
+
+install:
+	dsc_install libicv196.$(CPU).a /acc/local/$(CPU)/drv/icv196vme/
