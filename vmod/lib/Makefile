@@ -57,14 +57,16 @@ else
 
 LIBS=libvmod.a libvmod.so libvmodttl.a libvmoddor.a 
 lib: $(LIBS)
-OBJS=libvmod12a2.o libvmod16a2.o libvmod12e16.o
+OBJS=libvmod12a2.o libvmod12a4.o libvmod16a2.o libvmod12e16.o
 
 HEADERS=../include \
 	-I../driver
-CFLAGS=-g -Wall -fPIC
+CFLAGS=-g -Wall
 
 libvmod12a2.o:
 	$(CC) $(CFLAGS) -c -I$(HEADERS) libvmod12a2.c -o $@
+libvmod12a4.o:
+	$(CC) $(CFLAGS) -c -I$(HEADERS) libvmod12a4.c -o $@
 libvmod16a2.o:
 	$(CC) $(CFLAGS) -c -I$(HEADERS) libvmod16a2.c -o $@
 libvmod12e16.o:
@@ -80,6 +82,8 @@ libvmod.a: $(OBJS)
 	ar r $@ $^
 
 libvmod12a2.a: libvmod12a2.o
+	ar r $@ $^
+libvmod12a4.a: libvmod12a4.o
 	ar r $@ $^
 libvmod16a2.a: libvmod16a2.o
 	ar r $@ $^

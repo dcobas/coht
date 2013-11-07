@@ -50,7 +50,7 @@ HEADERS := ../include/ \
 LOADLIBES := -L../lib/
 LDLIBS=-lvmodttl 
 all: tstlibttl.$(CPU) tstlibdor.$(CPU) load_test.$(CPU) tstlibttl_quick_write.$(CPU) tstlibttl_quick_read.$(CPU) \
-	tstlib12a2.$(CPU) tstlib16a2.$(CPU) tstlib12e16.$(CPU)
+	tstlib12a2.$(CPU) tstlib12a4.$(CPU) tstlib16a2.$(CPU) tstlib12e16.$(CPU)
 
 tstlibttl.$(CPU): 
 	mkdir -p obj
@@ -81,6 +81,10 @@ tstlib12a2.$(CPU):
 	mkdir -p obj
 	$(CC) $(CFLAGS) -c -D$(CPU) -I$(HEADERS) tstlib12a2.c -o ./obj/tstlib12a2.o
 	$(CC) $(CFLAGS) -o ./obj/$@ ./obj/tstlib12a2.o $(LOADLIBES) -lvmod
+tstlib12a4.$(CPU):
+	mkdir -p obj
+	$(CC) $(CFLAGS) -c -D$(CPU) -I$(HEADERS) tstlib12a4.c -o ./obj/tstlib12a4.o
+	$(CC) $(CFLAGS) -o ./obj/$@ ./obj/tstlib12a4.o $(LOADLIBES) -lvmod
 tstlib16a2.$(CPU): 
 	mkdir -p obj
 	$(CC) $(CFLAGS) -c -D$(CPU) -I$(HEADERS) tstlib16a2.c -o ./obj/tstlib16a2.o
