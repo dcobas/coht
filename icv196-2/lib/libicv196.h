@@ -12,7 +12,7 @@ extern "C"
 #endif
 
 #include <stdint.h>
-#include <icv196.h>  /* Driver API */
+#include "icv196.h"  /* Driver API */
 
 /* ==================================================================== */
 /* Some standard error codes                                            */
