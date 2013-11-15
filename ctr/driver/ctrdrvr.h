@@ -14,6 +14,10 @@
 #include <stdint.h>
 #endif
 
+#ifndef uintptr_t
+#define uintptr_t unsigned long
+#endif
+
 #include "ctrhard.h"   /* Hardware interface for expert and diagnostic clients */
 #include "hptdc.h"     /* HPTDC (Time to Digital Convertor) definitions */
 
