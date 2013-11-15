@@ -176,7 +176,7 @@ static int get_unused_lun(void)
 
 	int i, lun, bit;
 
-	if (!used_luns) {
+	if ((iluns) && (!used_luns)) {
 		for (i=0; i<luns_num; i++) {
 			lun = luns[i];
 			bit = 1 << lun;

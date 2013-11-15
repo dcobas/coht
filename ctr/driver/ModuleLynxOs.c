@@ -120,7 +120,7 @@ static void *LynxOsWorkingArea = NULL;
 /* Open                                                  */
 /* ===================================================== */
 
-static int LynxOsOpen(struct inode *inode, struct file *filp) {
+static int __LynxOsOpen(struct inode *inode, struct file *filp) {
 
 long num;
 struct LynxFile lynx_file;
@@ -142,11 +142,19 @@ struct LynxFile lynx_file;
    return -lynxos_error_num;
 }
 
+static int LynxOsOpen(struct inode *inode, struct file *filp) {
+int cc;
+   mutex_lock(&ctr_drvr_mutex);
+   cc = __LynxOsOpen(inode, filp);
+   mutex_unlock(&ctr_drvr_mutex);
+   return cc;
+}
+
 /* ===================================================== */
 /* Close                                                 */
 /* ===================================================== */
 
-static int LynxOsClose(struct inode *inode, struct file *filp) {
+static int __LynxOsClose(struct inode *inode, struct file *filp) {
 
 int num;
 struct LynxFile lynx_file;
@@ -157,9 +165,18 @@ struct LynxFile lynx_file;
       printk(KERN_INFO "Debug: LynxOsClose: Major: %d Minor: %d\n",MAJOR(inode->i_rdev),num);
 
    if (entry_points.dldd_close(LynxOsWorkingArea,&lynx_file) == OK) {
+      filp->private_data = NULL;
       return 0;
    }
    return -lynxos_error_num;
+}
+
+static int LynxOsClose(struct inode *inode, struct file *filp) {
+int cc;
+   mutex_lock(&ctr_drvr_mutex);
+   cc = __LynxOsClose(inode, filp);
+   mutex_unlock(&ctr_drvr_mutex);
+   return cc;
 }
 
 /* ===================================================== */
