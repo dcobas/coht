@@ -26,6 +26,8 @@
 
 #include <sys/ipc.h>
 #include <sys/sem.h>
+#include <ctrdrvr.h>
+#include "libctrP.h"
 
 #define SO_PATH_DEFAULT "/usr/local/ctr"
 
