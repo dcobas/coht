@@ -6,10 +6,9 @@
 /* ****************************************************************************** */
 
 #ifdef PS_VER
-#include <tgm/tgm.h>
-#include <tgv/tgv.h>
-extern int _TgmSemIsBlocked(const char *sname);
-extern CfgGetTgmXXX *_TgmCfgGetTgmXXX(void);
+#include <timTgm-lib/tgmspec.h>
+//extern int _TgmSemIsBlocked(const char *sname);
+//extern CfgGetTgmXXX *_TgmCfgGetTgmXXX(void);
 #endif
 
 #include <time.h>   /* ctime */

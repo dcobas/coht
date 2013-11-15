@@ -34,8 +34,8 @@ SIZV = SizeVme.c
 SIZP = SizePci.c
 
 all: $(ALL)
-all: CFLAGS += -DPS_VER -I/acc/local/$(CPU)/include/tgm 
-all: LDLIBS += -ltgm -ltgv -lerr -lerr_dummy -lX11
+all: CFLAGS += -DPS_VER -I/acc/local/$(CPU)/include/
+all: LDLIBS += -ltgm -lerr -lerr_dummy -lX11
 nops: $(NOPSALL)
 
 # Run on Workstation only

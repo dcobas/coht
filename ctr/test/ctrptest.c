@@ -22,7 +22,7 @@
 #include <ctrdrvrP.h>
 
 #if PS_VER
-#include <tgm/tgm.h>
+#include <timTgm-lib/tgmspec.h>
 #endif
 
 /**************************************************************************/
