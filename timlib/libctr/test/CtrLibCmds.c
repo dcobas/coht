@@ -5,6 +5,9 @@
 
 #include <libctr.h>
 
+#include <sys/ipc.h>
+#include <sys/sem.h>
+
 /**************************************************************************/
 
 static CtrDrvrCounter counter = CtrDrvrCounter1;
@@ -2098,3 +2101,126 @@ int ctim;
 
    return arg;
 }
+
+/*****************************************************************/
+
+int OpenClose(int arg) {
+
+   int cc;
+
+   arg++;
+
+   cc = ctr_close(h);
+   if (cc < 0) {
+      perror("ctr_close");
+      return arg;
+   }
+   h = ctr_open(NULL);
+   if ((long) h == CTR_ERROR)
+      perror("ctr_open");
+
+   return arg;
+}
+
+/*****************************************************************/
+
+#define LOCK_TEST_KEY 134579983
+
+int lock_test()
+{
+	key_t key;
+	int semid;
+
+	struct sembuf sops[2];
+	int nsops, cc;
+
+	key = LOCK_TEST_KEY;
+
+	semid = semget(key, 1, 0666);
+	if (semid < 0) {
+
+		semid = semget(key, 1, 0666 | IPC_CREAT);
+		if (semid < 0)
+			return -1;
+
+		sops[0].sem_num = 0;
+		sops[0].sem_op = 0;
+		sops[0].sem_flg = SEM_UNDO;
+
+		cc = semop(semid, sops, 1);
+		if (cc < 0)
+			return -1;
+	}
+
+	nsops = 2;
+
+	sops[0].sem_num = 0;
+	sops[0].sem_op = 0;
+	sops[0].sem_flg = SEM_UNDO;
+
+	sops[1].sem_num = 0;
+	sops[1].sem_op = 1;
+	sops[1].sem_flg = SEM_UNDO | IPC_NOWAIT;
+
+	cc = semop(semid, sops, nsops);
+	if (cc < 0)
+		return cc;
+
+	return 0;
+}
+
+int unlock_test()
+{
+	key_t key;
+	int semid;
+
+	struct sembuf sops[2];
+	int nsops, cc;
+
+	key = LOCK_TEST_KEY;
+
+	semid = semget(key, 1, 0666);
+	if (semid <= 0)
+		return -1;
+
+	nsops = 1;
+
+	sops[0].sem_num = 0;
+	sops[0].sem_op = -1;
+	sops[0].sem_flg = SEM_UNDO | IPC_NOWAIT;
+
+	cc = semop(semid, sops, nsops);
+	if (cc < 0)
+		return cc;
+
+	return 0;
+}
+
+int LockLib(int arg) {
+
+   int cc;
+
+   arg++;
+
+   cc = lock_test();
+   if (cc < 0) {
+      perror("lock_test");
+      return arg;
+   }
+   return arg;
+}
+
+int UnlockLib(int arg) {
+
+   int cc;
+
+   arg++;
+
+   cc = unlock_test();
+   if (cc < 0) {
+      perror("unlock_test");
+      return arg;
+   }
+   return arg;
+}
+

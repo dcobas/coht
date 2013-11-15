@@ -24,8 +24,8 @@
 #include <unistd.h>
 #include <dlfcn.h>
 
-#include "libctr.h"
-#include "libctrP.h"
+#include <sys/ipc.h>
+#include <sys/sem.h>
 
 #define SO_PATH_DEFAULT "/usr/local/ctr"
 
@@ -85,6 +85,84 @@ char *ctr_get_ldver()
 }
 
 /**
+ * Local routines needed to protect open/close
+ */
+
+#define LOCK_LIB_KEY 13426587
+
+int lock_lib()
+{
+	key_t key;
+	int semid;
+
+	struct sembuf sops[2];
+	int nsops, cc;
+
+	key = LOCK_LIB_KEY;
+
+	semid = semget(key, 1, 0666);
+	if (semid < 0) {
+
+		semid = semget(key, 1, 0666 | IPC_CREAT);
+		if (semid < 0)
+			return -1;
+
+		sops[0].sem_num = 0;
+		sops[0].sem_op = 0;
+		sops[0].sem_flg = SEM_UNDO;
+
+		cc = semop(semid, sops, 1);
+		if (cc < 0) {
+			semctl(semid,0,IPC_RMID);
+			return -1;
+		}
+	}
+
+	nsops = 2;
+
+	sops[0].sem_num = 0;
+	sops[0].sem_op = 0;
+	sops[0].sem_flg = SEM_UNDO;
+
+	sops[1].sem_num = 0;
+	sops[1].sem_op = 1;
+	sops[1].sem_flg = SEM_UNDO | IPC_NOWAIT;
+
+	cc = semop(semid, sops, nsops);
+	if (cc < 0)
+		return cc;
+
+	return 0;
+}
+
+int unlock_lib()
+{
+	key_t key;
+	int semid;
+
+	struct sembuf sops[2];
+	int nsops, cc;
+
+	key = LOCK_LIB_KEY;
+
+	semid = semget(key, 1, 0666);
+	if (semid <= 0)
+		return -1;
+
+	nsops = 1;
+
+	sops[0].sem_num = 0;
+	sops[0].sem_op = -1;
+	sops[0].sem_flg = SEM_UNDO | IPC_NOWAIT;
+
+	cc = semop(semid, sops, nsops);
+	if (cc < 0)
+		return cc;
+
+	return 0;
+}
+
+/**
  * @brief Get a handle to be used in subsequent library calls
  * @param Version string or NULL for the latest
  * @return The handle to be used in subsequent calls or -1
@@ -118,7 +196,7 @@ char *ctr_get_ldver()
  *
  * This function does the following things ...
  * Allocated a libctr handle structure
- * Open the ctr driver at /dev/ctr.[0..15]
+ * Open the ctr driver at /dev/ctr.[1..16]
  * Call the GET_VERSION ioctl to find out if a ctrv or ctrp is installed
  * Load the corresponding shared object at /usr/local/ctr[v|p]/ctr[v|p].so.<version>
  *    N.B. If version is either Null or an empty string its not used
@@ -138,11 +216,14 @@ void *ctr_open(char *version)
 	if (!h)
 		return (void *) -1;
 
+	lock_lib();
 	for (i=1; i<=CtrDrvrCLIENT_CONTEXTS; i++) {
 		sprintf(path,"/dev/ctr.%1d",i);
 		if ((fd = open(path,O_RDWR,0)) > 0)
 			break;
 	}
+	unlock_lib();
+
 	if (fd <= 0) {
 		errsv = errno;
 		free(h);
@@ -226,9 +307,12 @@ int ctr_close(void *handle)
 			return -1;
 		}
 
-		if (close(h->fd))
+		lock_lib();
+		if (close(h->fd)) {
+			unlock_lib();
 			return -1;
-
+		}
+		unlock_lib();
 		free(h);
 		return 0;
 	}

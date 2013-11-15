@@ -43,6 +43,9 @@ int GetSetPllLockMethod();
 int GetSetP2Byte();
 int MemTest();
 int ListClients();
+int OpenClose();
+int LockLib();
+int UnlockLib();
 
 /* Commands */
 
@@ -88,6 +91,9 @@ typedef enum {
    CmdENB,   /* Get/Set enable */
    CmdCTM,   /* Edit CTIM objects */
    CmdDEB,   /* Get set debug level */
+   CmdCRO,   /* Close and reopen lib */
+   CmdLCK,   /* Lock test program */
+   CmdULCK,  /* Unlock test program */
 
    CmdCMDS } CmdId;
 
@@ -141,6 +147,10 @@ static Cmd cmds[CmdCMDS] = {
 
    { CmdCTM,     "ctm",   "Edit CTIM objects"        ,"?|CtimId"           ,GetSetCtim        },
    { CmdDEB,     "deb",   "Get set debug level"      ,"Level"              ,SwDeb             },
+   { CmdCRO,     "cro",   "Close and reopen lib"     ,""                   ,OpenClose         },
+
+   { CmdLCK,     "lck",   "Lock test program"        ,""                   ,LockLib   },
+   { CmdULCK,    "ulk",   "Unlock test program"      ,""                   ,UnlockLib },
 };
 
 typedef enum {
