@@ -84,29 +84,12 @@ int res;
    return res;
 }
 
-#ifndef HAVE_UNLOCKED_IOCTL
-static int LynxIoctl32(struct inode *inode, struct file *filp, unsigned int cmd, unsigned long arg) {
-int res;
-
-   mutex_lock(&ctr_drvr_mutex);
-   if (_IOC_TYPE(cmd) == 'C') cmd = _IOC_NR(cmd);
-   res = LynxOsIoctl(inode, filp, cmd, arg);
-   mutex_unlock(&ctr_drvr_mutex);
-   return res;
-}
-#endif
-
 static struct file_operations LynxOs_fops = {
-   .read         =  LynxOsRead,
-   .write        =  LynxOsWrite,
-#ifndef HAVE_UNLOCKED_IOCTL
-   .ioctl        =  LynxIoctl32,
-#else
+   .read           = LynxOsRead,
+   .write          = LynxOsWrite,
    .unlocked_ioctl = LynxIoctl64,
-#endif
-   .compat_ioctl =  LynxIoctl64,
-   .open         =  LynxOsOpen,
-   .release      =  LynxOsClose,
+   .open           = LynxOsOpen,
+   .release        = LynxOsClose,
 };
 
 #include "EmulateLynxOs.h"
