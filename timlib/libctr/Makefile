@@ -40,8 +40,8 @@
 CPU=L866
 ACC=lab
 
-SOVER=1.1
-LDVER=1.1
+SOVER=1.2
+LDVER=1.2
 SUBVER=1
 
 SO_TARGET=/acc/dsc/$(ACC)/$(CPU)/ctr
