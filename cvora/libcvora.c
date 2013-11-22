@@ -177,7 +177,7 @@ int cvora_get_sample_size(int fd, int *memsz)
 	return 0;
 }
 
-static inline swab32(uint32_t x)
+static inline uint32_t swab32(uint32_t x)
 {
 	return (((x & 0x000000ff) << 24) |
 		((x & 0x0000ff00) <<  8) |
@@ -248,7 +248,7 @@ int cvora_get_channels_mask(int fd, unsigned int *chans)
 
 int cvora_set_channels_mask(int fd, unsigned int chans)
 {
-	int status;
+	unsigned int status;
 
 	cvora_get_hardware_status(fd, &status);
 	if (status & (1<<CVORA_MODULE_ENABLE_BIT))
