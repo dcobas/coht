@@ -200,6 +200,7 @@ class CvoraCmd(cmd.Cmd):
 
     def do_help(self, arg):
         """help [cmd|all]: print help for [all] command[s]"""
+        global cmd
         if arg != 'all':
             cmd.Cmd.do_help(self, arg)
             return
