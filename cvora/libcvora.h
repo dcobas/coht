@@ -39,7 +39,7 @@ extern "C"
 
 /** positions and masks withing mode register */
 #define CVORA_MODE_BIT		0
-#define CVORA_MODE_MASK		0x7
+#define CVORA_MODE_MASK		0xff
 
 /** memory boundaries */
 #define CVORA_MEM_MIN  0x20
@@ -53,14 +53,23 @@ extern "C"
 
 /** cvora modes of operation */
 enum cvora_mode {
-	cvora_reserved,		/**< reserved but parallel input for the moment */
-	cvora_optical_16,       /**< one optical input 16 bits - Input 2 is ignored */
-	cvora_copper_16,        /**< one copper Input 16 bits */
-	cvora_btrain_counter,   /**< Btrain counters */
-	cvora_parallel_input,   /**< parallel input */
-	cvora_optical_2_16,     /**< two optical inputs 16 bits */
-	cvora_copper_2_16,      /**< two copper Inputs 16 bits */
-	cvora_serial_32,        /**< 32 Serial Inputs on rear panel (P2 connector). */
+	cvora_reserved = 0,		/**< reserved */
+	cvora_reserved1 = 0,		/**< reserved */
+	cvora_optical_16,		/**< front panel optical input 1 only (16-bit serial, SCI protocol) */
+	cvora_copper_16,		/**< front panel copper input 1 only (16-bit serial, SCI protocol) */
+	cvora_btrain_counter,		/**< 32-bit up/down counter (btrain) */
+	cvora_parallel_input,		/**< parallel rtm input (32-bit) */
+	cvora_optical_2_16,		/**< front panel optical input 1 and 2 (2x 16-bit serial, SCI protocol) */
+	cvora_copper_2_16,		/**< front panel copper input 1 and 2 (2x 16-bit serial, SCI protocol) */
+	cvora_serial_32,		/**< rtm copper inputs (32x 16-bit serial, SCI protocol) */
+	cvora_reserved2,		/**< reserved */
+	cvora_optical_16_cvorb,		/**< front panel optical input 1 only (16-bit serial, CVORB protocol) */
+	cvora_copper_16_cvorb,		/**< front panel copper input 1 only (16-bit serial, CVORB protocol) */
+	cvora_2_16_up,			/**< 2x 16-bit up counter */
+	cvora_reserved3,		/**< reserved */
+	cvora_optical_2_16_cvorb,	/**< front optical input 1 and 2 (2x 16-bit serial, CVORB protocol) */
+	cvora_copper_2_16_cvorb,	/**< front copper input 1 and 2 (2x 16-bit serial, CVORB protocol) */
+	cvora_serial_32_cvorb,		/**< rtm copper inputs (32x 16-bit serial, CVORB protocol) */
 };
 
 /**

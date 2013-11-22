@@ -15,14 +15,22 @@ libcvora = os.path.join(testdir, 'cvora/libcvora.so')
 class CvoraCmd(cmd.Cmd):
 
     literal_mode = {
-        0 : 'reserved but parallel input for the moment',
-        1 : 'one optical input 16 bits - Input 2 is ignored',
-        2 : 'one copper Input 16 bits',
-        3 : 'Btrain counters',
-        4 : 'parallel input',
-        5 : 'two optical inputs 16 bits',
-        6 : 'two copper Inputs 16 bits',
-        7 : '32 Serial Inputs on rear panel (P2 connector).',
+         0 : 'cvora_reserved1: reserved',
+         1 : 'cvora_optical_16: front panel optical input 1 only (16-bit serial, SCI protocol)',
+         2 : 'cvora_copper_16: front panel copper input 1 only (16-bit serial, SCI protocol)',
+         3 : 'cvora_btrain_counter: 32-bit up/down counter (btrain)',
+         4 : 'cvora_parallel_input: parallel rtm input (32-bit)',
+         5 : 'cvora_optical_2_16: front panel optical input 1 and 2 (2x 16-bit serial, SCI protocol)',
+         6 : 'cvora_copper_2_16: front panel copper input 1 and 2 (2x 16-bit serial, SCI protocol)',
+         7 : 'cvora_serial_32: rtm copper inputs (32x 16-bit serial, SCI protocol)',
+         8 : 'cvora_reserved2: reserved',
+         9 : 'cvora_optical_16_cvorb: front panel optical input 1 only (16-bit serial, CVORB protocol)',
+        10 : 'cvora_copper_16_cvorb: front panel copper input 1 only (16-bit serial, CVORB protocol)',
+        11 : 'cvora_2_16_up: 2x 16-bit up counter',
+        12 : 'cvora_reserved3: reserved',
+        13 : 'cvora_optical_2_16_cvorb: front optical input 1 and 2 (2x 16-bit serial, CVORB protocol)',
+        14 : 'cvora_copper_2_16_cvorb: front copper input 1 and 2 (2x 16-bit serial, CVORB protocol)',
+        15 : 'cvora_serial_32_cvorb: rtm copper inputs (32x 16-bit serial, CVORB protocol)',
     }
 
     def __init__(self, libcvora=libcvora, lun=0):
@@ -54,7 +62,7 @@ class CvoraCmd(cmd.Cmd):
     def do_modes(self, arg):
         """modes: show CVORA modes"""
         for k, v in self.literal_mode.items():
-            print k, ': ', v
+            print '%2d: %s' % (k, v)
 
     def do_polarity(self, arg):
         """polarity [1|positive|0|negative]: set pulse polarity"""
