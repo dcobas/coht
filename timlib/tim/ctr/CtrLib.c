@@ -5,6 +5,10 @@
 /* ==================================================================== */
 
 #define CTR_VME
+
+#include <sys/ipc.h>
+#include <sys/sem.h>
+
 #include <ctrdrvr.h>
 #include <errno.h>
 
@@ -21,6 +25,84 @@ extern int timlib_oby1_8;
 extern int timlib_oby9_16;
 extern int timlib_real_utc;
 
+/**
+ * Local routines needed to protect open/close
+ */
+
+#define LOCK_LIB_KEY 13426587
+
+int lock_lib()
+{
+	key_t key;
+	int semid;
+
+	struct sembuf sops[2];
+	int nsops, cc;
+
+	key = LOCK_LIB_KEY;
+
+	semid = semget(key, 1, 0666);
+	if (semid < 0) {
+
+		semid = semget(key, 1, 0666 | IPC_CREAT);
+		if (semid < 0)
+			return -1;
+
+		sops[0].sem_num = 0;
+		sops[0].sem_op = 0;
+		sops[0].sem_flg = SEM_UNDO;
+
+		cc = semop(semid, sops, 1);
+		if (cc < 0) {
+			semctl(semid,0,IPC_RMID);
+			return -1;
+		}
+	}
+
+	nsops = 2;
+
+	sops[0].sem_num = 0;
+	sops[0].sem_op = 0;
+	sops[0].sem_flg = SEM_UNDO;
+
+	sops[1].sem_num = 0;
+	sops[1].sem_op = 1;
+	sops[1].sem_flg = SEM_UNDO | IPC_NOWAIT;
+
+	cc = semop(semid, sops, nsops);
+	if (cc < 0)
+		return cc;
+
+	return 0;
+}
+
+int unlock_lib()
+{
+	key_t key;
+	int semid;
+
+	struct sembuf sops[2];
+	int nsops, cc;
+
+	key = LOCK_LIB_KEY;
+
+	semid = semget(key, 1, 0666);
+	if (semid <= 0)
+		return -1;
+
+	nsops = 1;
+
+	sops[0].sem_num = 0;
+	sops[0].sem_op = -1;
+	sops[0].sem_flg = SEM_UNDO | IPC_NOWAIT;
+
+	cc = semop(semid, sops, nsops);
+	if (cc < 0)
+		return cc;
+
+	return 0;
+}
+
 /* ==================================================================== */
 /* Open a Ctr Driver file handel.                                       */
 
@@ -35,11 +117,14 @@ char fnm[32];
 int  i;
 
    if (ctr) return ctr;
+   lock_lib();
    for (i = 1; i <= CtrDrvrCLIENT_CONTEXTS; i++) {
       sprintf(fnm,"/dev/%s.%1d",devnames[ctr_device],i);
-      if ((ctr = open(fnm,O_RDWR,0)) > 0) return ctr;
+      if ((ctr = open(fnm,O_RDWR,0)) > 0) break;
    }
-   return 0;
+   unlock_lib();
+   if (ctr < 0) ctr = 0;
+   return ctr;
 }
 
 /* ========= */
@@ -49,11 +134,14 @@ static int CtrFdOpen() {
 char fnm[32];
 int  i, fd;
 
+   lock_lib();
    for (i = 1; i <= CtrDrvrCLIENT_CONTEXTS; i++) {
       sprintf(fnm,"/dev/%s.%1d",devnames[ctr_device],i);
       if ((fd = open(fnm,O_RDWR,0)) > 0) return fd;
    }
-   return 0;
+   unlock_lib();
+   if (ctr < 0) ctr = 0;
+   return ctr;
 }
 
 /* ==================================================================== */
