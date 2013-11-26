@@ -27,7 +27,7 @@ class CvoraCmd(cmd.Cmd):
          9 : 'cvora_optical_16_cvorb: front panel optical input 1 only (16-bit serial, CVORB protocol)',
         10 : 'cvora_copper_16_cvorb: front panel copper input 1 only (16-bit serial, CVORB protocol)',
         11 : 'cvora_2_16_up: 2x 16-bit up counter',
-        12 : 'cvora_reserved3: reserved',
+        12 : 'cvora_rtm_parallel_strobe: rtm parallel strobe',
         13 : 'cvora_optical_2_16_cvorb: front optical input 1 and 2 (2x 16-bit serial, CVORB protocol)',
         14 : 'cvora_copper_2_16_cvorb: front copper input 1 and 2 (2x 16-bit serial, CVORB protocol)',
         15 : 'cvora_serial_32_cvorb: rtm copper inputs (32x 16-bit serial, CVORB protocol)',
