@@ -18,6 +18,8 @@ all: modules libs test
 modules: 
 	cp Module.symvers.vmebus Module.symvers
 	make -C $(KERNELSRC) M=`pwd` KVER=$(KVER) GIT_VERSION=$(GIT_VERSION) modules
+	mkdir -p $(CPU)/$(KVER)
+	cp cvora.ko $(CPU)/$(KVER)
 clean:
 	rm -f *.so
 	make -C $(KERNELSRC) M=`pwd` KVER=$(KVER) clean
@@ -25,8 +27,6 @@ clean:
 	make -C doc clean
 docs:
 	make -C doc
-
-COMPILE_TIME:=$(shell date +%s)
 
 CFLAGS= -g -Wall -fPIC
 CFLAGS += -DGIT_VERSION=\"$(GIT_VERSION)\"
@@ -41,3 +41,20 @@ libcvora.$(CPU).a: libcvora.$(CPU).o
 	$(AR) $(ARFLAGS) $@ $^
 	$(RANLIB) $@
 
+DRVRPATH = /acc/dsc/$(ACC)/$(CPU)/$(KVER)/cvora
+LIBPATH = /acc/local/$(CPU)/drv/cvora
+
+install-lab:
+	$(MAKE) install-driver ACC=lab
+install-oper:
+	$(MAKE) install-driver ACC=oper
+install-all: install-lab install-oper install-oplhc install-opctf
+
+install-driver:
+	dsc_install $(CPU)/$(KVER)/cvora.ko $(DRVRPATH)
+
+install-lib:
+	dsc_install libcvora.h libcvora.$(CPU).a $(LIBPATH)
+install-test:
+	dsc_install test/cvoratest.py $(LIBPATH)
+	dsc_install libcvora.$(CPU).so $(LIBPATH)/cvora
