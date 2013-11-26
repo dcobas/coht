@@ -1,4 +1,4 @@
-GIT_VERSION = $(shell cd $(src); git describe --dirty --long)
+GIT_VERSION = $(shell cd $(src); git describe --dirty --long --tags)
 GIT_REPO = $(src)
 
 EXTRA_CFLAGS = -I$(src) -I$(src)/../../include -DHARD_FLOAT -mhard-float -Wno-strict-prototypes -DCOMPILE_TIME=$(shell date +%s)
