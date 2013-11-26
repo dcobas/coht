@@ -31,7 +31,7 @@ extern int timlib_real_utc;
 
 #define LOCK_LIB_KEY 13426587
 
-int lock_lib()
+static int lock_lib()
 {
 	key_t key;
 	int semid;
@@ -76,7 +76,7 @@ int lock_lib()
 	return 0;
 }
 
-int unlock_lib()
+static int unlock_lib()
 {
 	key_t key;
 	int semid;
