@@ -6,7 +6,7 @@
 # KVER=2.6.24.7-rt27
 
 CPU ?= L865
-KVER ?= 2.6.24.7-rt27
+KVER ?= 3.2.43-rt63
 KERNELSRC=/acc/sys/$(CPU)/usr/src/kernels/$(KVER)
 
 GIT_VERSION = $(shell git describe --dirty --long --tags --always)
