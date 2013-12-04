@@ -684,6 +684,7 @@ int vmeio_install(void)
 				register_int_source(dev, map0->vaddr, dev->isrc);
 			/* set cvora interrupt vector */
 			cr = ioread32be(map0->vaddr);
+			cr &= 0xffff00ff;
 			cr |= ((dev->vec & 0xff) << 8);
 			iowrite32be(cr, map0->vaddr);
 		}
