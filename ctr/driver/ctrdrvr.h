@@ -507,6 +507,10 @@ typedef enum {
 #define CtrIoctlSET_BRUTAL_PLL                 CIOWR(CtrDrvrSET_BRUTAL_PLL         ,uint32_t)
 #define CtrIoctlGET_MODULE_STATS               CIOWR(CtrDrvrGET_MODULE_STATS       ,CtrDrvrModuleStats)
 #define CtrIoctlSET_CABLE_ID                   CIOWR(CtrDrvrSET_CABLE_ID           ,uint32_t)
+
+#define CtrIoctlLOCK                           CIOWR(CtrDrvrLOCK                   ,uint32_t)
+#define CtrIoctlUNLOCK                         CIOWR(CtrDrvrUNLOCK                 ,uint32_t)
+
 #define CtrIoctlIOCTL_64                       CIOWR(CtrDrvrIOCTL_64               ,uint32_t)
 #define CtrIoctlIOCTL_65                       CIOWR(CtrDrvrIOCTL_65               ,uint32_t)
 #define CtrIoctlIOCTL_66                       CIOWR(CtrDrvrIOCTL_66               ,uint32_t)

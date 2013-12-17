@@ -5803,3 +5803,30 @@ CtrDrvrBoardId bird;
    printf("BoardIdentity: 0x%08x%08X\n",(int) bird.IdMSL,(int) bird.IdLSL);
    return arg;
 }
+
+int LockUp(int arg) {
+
+	uint32_t pw;
+
+	arg++;
+	ioctl(ctr,CtrIoctlLOCK,&pw);
+	return arg;
+}
+
+int LockDown(int arg) {
+
+	ArgVal   *v;
+	AtomType at;
+
+	uint32_t pw;
+
+	arg++;
+	v = &(vals[arg]);
+	at = v->Type;
+	if (at == Numeric) {
+		arg++;
+		pw = v->Number;
+		ioctl(ctr,CtrIoctlUNLOCK,&pw);
+	}
+	return arg;
+}

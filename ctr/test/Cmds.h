@@ -95,6 +95,8 @@ int AqLog();
 int RecpErrs();
 int IoStatus();
 int GetBoardId();
+int LockUp();
+int LockDown();
 
 static void IErr();
 
@@ -215,6 +217,9 @@ typedef enum {
    CmdGIOS,    /* Get IO input values */
    CmdGBID,    /* Get 64-bit board ID */
 
+   CmdLCKUP,   /* Lock driver updates */
+   CmdLCKDN,   /* UnLock driver updates */
+
    CmdCMDS } CmdId;
 
 typedef struct {
@@ -330,7 +335,9 @@ static Cmd cmds[CmdCMDS] = {
    { CmdAQLOG,   "aqlog", "Log aqns over interval"   ,"[StCtm,[EnCtm]]"    ,AqLog },
    { CmdGRERS,   "grel",  "Get reception error log"  ,""                   ,RecpErrs},
    { CmdGIOS,    "gio",   "Get IO input values"      ,""                   ,IoStatus},
-   { CmdGBID,    "bid",   "Get 64-bit board ID"      ,""                   ,GetBoardId}
+   { CmdGBID,    "bid",   "Get 64-bit board ID"      ,""                   ,GetBoardId},
+   { CmdLCKUP,   "lkup",  "Lock driver updates"      ,""                   ,LockUp},
+   { CmdLCKDN,   "lkdn",  "UnLock driver updates"    ,"pw"                 ,LockDown},
    };
 
 typedef enum {
