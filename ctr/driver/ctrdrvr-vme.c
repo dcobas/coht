@@ -353,6 +353,23 @@ uint32_t     lft, rgt;
    }
 }
 
+/**
+ * Unlock the driver.
+ */
+
+static void clr_uplock(CtrDrvrModuleContext *mcon, uint32_t pw)
+{
+	uint32_t ck = 0;
+	int i;
+
+	for (i=0; i<8; i++) {
+		ck += (pw & 0xF);
+		pw = pw >> 4;
+	}
+	if (ck == 0x0024)
+		mcon->UpLock = 0;
+}
+
 /*========================================================================*/
 /* Cancel a timeout in a safe way                                         */
 /*========================================================================*/
@@ -409,7 +426,7 @@ static char *ioctl_names[CtrDrvrLAST_IOCTL] = {
 "JTAG_WRITE_BYTE", "JTAG_CLOSE", "HPTDC_OPEN", "HPTDC_IO", "HPTDC_CLOSE", "RAW_READ", "RAW_WRITE",
 "GET_RECEPTION_ERRORS", "GET_IO_STATUS", "GET_IDENTITY",
 "SET_DEBUG_HISTORY","SET_BRUTAL_PLL","GET_MODULE_STATS","SET_CABLE_ID",
-"IOCTL64","IOCTL65","IOCTL66","IOCTL67","IOCTL68","IOCTL69",
+"LOCK","UNLOCK", "IOCTL67","IOCTL68","IOCTL69","IOCTL70",
 
 "GET_OUTPUT_BYTE",
 "SET_OUTPUT_BYTE",
@@ -2270,7 +2287,18 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
 	 }
       break;
 
+      case CtrDrvrLOCK:
+	 mcon->UpLock = 1;
+	 return OK;
+      break;
+
+      case CtrDrvrUNLOCK:
+	 clr_uplock(mcon,lav);
+	 return OK;
+      break;
+
       case CtrDrvrRESET:                  /* Reset the module, re-establish connections */
+	 if (mcon->UpLock) break;
 	 return Reset(mcon);
 
       case CtrDrvrGET_STATUS:             /* Read module status */
@@ -2294,11 +2322,13 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
       break;
 
       case CtrDrvrCONNECT:                /* Connect to an object interrupt */
+	 if (mcon->UpLock) break;
 	 conx = (CtrDrvrConnection *) arg;
 	 if (rcnt >= sizeof(CtrDrvrConnection)) return Connect(conx,ccon);
       break;
 
       case CtrDrvrDISCONNECT:             /* Disconnect from an object interrupt */
+	 if (mcon->UpLock) break;
 	 conx = (CtrDrvrConnection *) arg;
 	 if (rcnt >= sizeof(CtrDrvrConnection)) {
 	    if (conx->EqpNum) return DisConnect(conx,ccon);
@@ -2353,6 +2383,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
       break;
 
       case CtrDrvrSET_UTC:                /* Set Universal Coordinated Time for next PPS tick */
+	 if (mcon->UpLock) break;
 	 if (lap) return SetTime(mcon,(uint32_t    ) lav);
       break;
 
@@ -2373,6 +2404,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
       break;
 
       case CtrDrvrSET_CABLE_ID:           /* If not sent by the hardware */
+	 if (mcon->UpLock) break;
 	 if (lap) {
 	    mcon->CableId = lav;
 	    return OK;
@@ -2380,6 +2412,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
       break;
 
       case CtrDrvrJTAG_OPEN:              /* Open JTAG interface */
+	 if (mcon->UpLock) break;
 	 if (mcon->IrqBalance == 1) {
 	    disable_irq(mcon->IVector);
 	    mcon->IrqBalance = 0;
@@ -2394,6 +2427,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
       break;
 
       case CtrDrvrJTAG_READ_BYTE:         /* Read back uploaded VHDL bit stream */
+	 if (mcon->UpLock) break;
 	 if (mcon->FlashOpen) {
 	    sav = HRdJtag(mcon->Address.JTGAddress);
 	    if (ccon->DebugOn == 2)
@@ -2405,6 +2439,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
 	 return SYSERR;
 
       case CtrDrvrJTAG_WRITE_BYTE:        /* Upload a new compiled VHDL bit stream */
+	 if (mcon->UpLock) break;
 	 if (mcon->FlashOpen) {
 	    sav = (short) lav;
 	    HWrJtag(sav,mcon->Address.JTGAddress);
@@ -2416,6 +2451,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
 	 return SYSERR;
 
       case CtrDrvrJTAG_CLOSE:             /* Close JTAG interface */
+	 if (mcon->UpLock) break;
 
 	 /* Wait 1S for the module to settle */
 
@@ -2434,10 +2470,12 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
 	 return OK;
 
       case CtrDrvrHPTDC_OPEN:             /* Open HPTDC JTAG interface */
+	 if (mcon->UpLock) break;
 	 mcon->HptdcOpen = 1;
 	 return OK;
 
       case CtrDrvrHPTDC_IO:               /* Do HPTDC IO */
+	 if (mcon->UpLock) break;
 	 if (rcnt >= sizeof(CtrDrvrHptdcIoBuf)) {
 	    if (mcon->HptdcOpen) {
 	       hpio = (CtrDrvrHptdcIoBuf *) arg;
@@ -2447,10 +2485,12 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
       break;
 
       case CtrDrvrHPTDC_CLOSE:            /* Close HPTDC JTAG interface */
+	 if (mcon->UpLock) break;
 	 mcon->HptdcOpen = 0;
 	 return OK;
 
       case CtrDrvrRAW_READ:               /* Raw read  access to card for debug */
+	 if (mcon->UpLock) break;
 	 if (wcnt >= sizeof(CtrDrvrRawIoBlock)) {
 	    riob = (CtrDrvrRawIoBlock *) arg;
 	    if ((riob->UserArray != NULL)
@@ -2461,6 +2501,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
       break;
 
       case CtrDrvrRAW_WRITE:              /* Raw write access to card for debug */
+	 if (mcon->UpLock) break;
 	 if (rcnt >= sizeof(CtrDrvrRawIoBlock)) {
 	    riob = (CtrDrvrRawIoBlock *) arg;
 	    if ((riob->UserArray != NULL)
@@ -2490,6 +2531,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
       break;
 
       case CtrDrvrSET_ACTION:             /* Set should not modify the bus interrupt settings */
+	 if (mcon->UpLock) break;
 	 if (rcnt >= sizeof(CtrDrvrAction)) {
 	    act = (CtrDrvrAction *) arg;
 	    if ((act->TriggerNumber > 0) && (act->TriggerNumber <= CtrDrvrRamTableSIZE)) {
@@ -2546,6 +2588,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
       break;
 
       case CtrDrvrCREATE_CTIM_OBJECT:     /* Create a new CTIM timing object */
+	 if (mcon->UpLock) break;
 	 if (rcnt >= sizeof(CtrDrvrCtimBinding)) {
 	    ctim = (CtrDrvrCtimBinding *) arg;
 	    for (i=0; i<Wa->Ctim.Size; i++) {
@@ -2566,6 +2609,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
       break;
 
       case CtrDrvrDESTROY_CTIM_OBJECT:    /* Destroy a CTIM timing object */
+	 if (mcon->UpLock) break;
 	 if (rcnt >= sizeof(CtrDrvrCtimBinding)) {
 	    ctim = (CtrDrvrCtimBinding *) arg;
 	    for (i=0; i<Wa->Ctim.Size; i++) {
@@ -2586,6 +2630,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
       break;
 
       case CtrDrvrCHANGE_CTIM_FRAME:      /* Change the frame of an existing CTIM object */
+	 if (mcon->UpLock) break;
 	 if (rcnt >= sizeof(CtrDrvrCtimBinding)) {
 	    ctim = (CtrDrvrCtimBinding *) arg;
 	    for (i=0; i<Wa->Ctim.Size; i++) {
@@ -2613,6 +2658,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
       break;
 
       case CtrDrvrCREATE_PTIM_OBJECT:     /* Create a new PTIM timing object */
+	 if (mcon->UpLock) break;
 	 if (rcnt >= sizeof(CtrDrvrPtimBinding)) {
 	    ptim = (CtrDrvrPtimBinding *) arg;
 	    for (i=0; i<Wa->Ptim.Size; i++) {
@@ -2671,6 +2717,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
       break;
 
       case CtrDrvrDESTROY_PTIM_OBJECT:    /* Destroy a PTIM timing object */
+	 if (mcon->UpLock) break;
 	 if (rcnt >= sizeof(CtrDrvrPtimBinding)) {
 	    ptim = (CtrDrvrPtimBinding *) arg;
 
@@ -2740,6 +2787,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
       break;
 
       case CtrDrvrSET_OUTPUT_BYTE:        /* VME P2 output byte number */
+	 if (mcon->UpLock) break;
 	 if (lap) {
 	    if ((lav >= 0) && (lav <= 8)) { /* 64 Bits on the P2 connector */
 
@@ -2757,6 +2805,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
       break;
 
       case CtrDrvrENABLE:                               /* Enable CTR module event reception */
+	 if (mcon->UpLock) break;
 	 if        (lav   == CtrDrvrCommandSET_HPTDC) { /* Enable HPTDC chip */
 	    mcon->Command |=  CtrDrvrCommandSET_HPTDC;
 	    HWr(mcon->Command,&mmap->Command);
@@ -2775,6 +2824,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
 	 return OK;
 
       case CtrDrvrSET_DEBUG_HISTORY:
+	 if (mcon->UpLock) break;
 	 if (lav) {
 	    mcon->Command |=  CtrDrvrCommandDebugHisOn;
 	    mcon->Command &= ~CtrDrvrCommandDebugHisOff;
@@ -2786,6 +2836,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
 	 return OK;
 
       case CtrDrvrSET_BRUTAL_PLL:
+	 if (mcon->UpLock) break;
 	 if (lav) {
 	    mcon->Command |=  CtrDrvrCommandUtcPllOff;
 	    mcon->Command &= ~CtrDrvrCommandUtcPllOn;
@@ -2804,6 +2855,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
       break;
 
       case CtrDrvrSET_INPUT_DELAY:        /* Set input delay in 25ns ticks */
+	 if (mcon->UpLock) break;
 	 HWr(lav,&mmap->InputDelay);
 	 mcon->InputDelay = lav;
 	 return OK;
@@ -2819,6 +2871,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
       break;
 
       case CtrDrvrSET_REMOTE:             /* Counter Remote/Local status */
+	 if (mcon->UpLock) break;
 	 if (rcnt >= sizeof(CtrdrvrRemoteCommandBuf)) {
 	    remc = (CtrdrvrRemoteCommandBuf *) arg;
 	    if ((remc->Counter >= CtrDrvrCounter1) && (remc->Counter <= CtrDrvrCounter8)) {
@@ -2830,6 +2883,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
       break;
 
       case CtrDrvrREMOTE:                 /* Remote control counter */
+	 if (mcon->UpLock) break;
 	 if (rcnt >= sizeof(CtrdrvrRemoteCommandBuf)) {
 	    remc = (CtrdrvrRemoteCommandBuf *) arg;
 	    if ((remc->Counter >= CtrDrvrCounter1) && (remc->Counter <= CtrDrvrCounter8)) {
@@ -2868,6 +2922,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
       break;
 
       case CtrDrvrSET_OUT_MASK:           /* Counter output routing mask */
+	 if (mcon->UpLock) break;
 	 if (rcnt >= sizeof(CtrDrvrCounterMaskBuf)) {
 	    cmsb = (CtrDrvrCounterMaskBuf *) arg;
 	    if ((cmsb->Counter >= CtrDrvrCounter1) && (cmsb->Counter <= CtrDrvrCounter8)) {
@@ -2902,6 +2957,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
       break;
 
       case CtrDrvrSET_CONFIG:             /* Set a counter configuration */
+	 if (mcon->UpLock) break;
 	 if (rcnt >= sizeof(CtrDrvrCounterConfigurationBuf)) {
 	    conf = (CtrDrvrCounterConfigurationBuf *) arg;
 	    if (mmap->Counters[conf->Counter].Control.LockConfig) {
@@ -2938,6 +2994,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
       break;
 
       case CtrDrvrSET_PLL:                /* Set phase locked loop parameters */
+	 if (mcon->UpLock) break;
 	 if (rcnt >= sizeof(CtrDrvrPll)) {
 	    pll = (CtrDrvrPll *) arg;
 	    Io32Write((uint32_t     *) &(mmap->Pll),
@@ -2962,6 +3019,7 @@ int rcnt, wcnt;           /* Readable, Writable byte counts at arg address */
       break;
 
       case CtrDrvrSET_PLL_ASYNC_PERIOD:   /* Set PLL asynchronous period */
+	 if (mcon->UpLock) break;
 	 if (rcnt >= sizeof(CtrDrvrPllAsyncPeriodNs)) {
 	    asyp = (CtrDrvrPllAsyncPeriodNs *) arg;
 	    *asyp = mcon->PllAsyncPeriodNs;

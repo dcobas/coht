@@ -110,6 +110,7 @@ typedef struct {
    uint32_t                    InUse;             /* Module context in use */
    uint32_t                    BusErrorCount;     /* Abort fatal loops with this */
    uint32_t                    CableId;           /* Frig a cable ID for module */
+   uint32_t                    UpLock;            /* Update lock */
 
    CtrDrvrCounterConfiguration Configs [CtrDrvrRamTableSIZE];
    uint32_t                    Clients [CtrDrvrRamTableSIZE];      /* Clients interrupts PTIM/CTIM */

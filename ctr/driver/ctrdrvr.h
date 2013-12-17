@@ -383,12 +383,13 @@ typedef enum {
 
    CtrDrvrSET_CABLE_ID,           /* 63 Needed when no ID events sent */
 
-   CtrDrvrIOCTL_64,               /* 64 Spare */
-   CtrDrvrIOCTL_65,               /* 65 Spare */
-   CtrDrvrIOCTL_66,               /* 66 Spare */
+   CtrDrvrLOCK,                   /* Lock all write access to the current CTR module configuration */
+   CtrDrvrUNLOCK,                 /* Unlock all write access to the current CTR module configuration */
+
    CtrDrvrIOCTL_67,               /* 67 Spare */
    CtrDrvrIOCTL_68,               /* 68 Spare */
    CtrDrvrIOCTL_69,               /* 69 Spare */
+   CtrDrvrIOCTL_70,               /* 70 Spare */
 
    /* ============================================================ */
    /* Module specific IOCTL commands, Can't be used in a library!! */
@@ -606,12 +607,14 @@ typedef enum {
 #define CtrIoctlSET_BRUTAL_PLL                 CtrDrvrSET_BRUTAL_PLL
 #define CtrIoctlGET_MODULE_STATS               CtrDrvrGET_MODULE_STATS
 #define CtrIoctlSET_CABLE_ID                   CtrDrvrSET_CABLE_ID
-#define CtrIoctlIOCTL_64                       CtrDrvrIOCTL_64
-#define CtrIoctlIOCTL_65                       CtrDrvrIOCTL_65
-#define CtrIoctlIOCTL_66                       CtrDrvrIOCTL_66
+
+#define CtrIoctlLOCK                           CtrDrvrLOCK
+#define CtrIoctlUNLOCK                         CtrDrvrUNLOCK
+
 #define CtrIoctlIOCTL_67                       CtrDrvrIOCTL_67
 #define CtrIoctlIOCTL_68                       CtrDrvrIOCTL_68
 #define CtrIoctlIOCTL_69                       CtrDrvrIOCTL_69
+#define CtrIoctlIOCTL_70                       CtrDrvrIOCTL_70
 
 #ifdef CTR_VME
 #define CtrIoctlGET_OUTPUT_BYTE                CtrDrvrGET_OUTPUT_BYTE

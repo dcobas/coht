@@ -498,6 +498,23 @@ unsigned int lft, rgt;
    }
 }
 
+/**
+ * Unlock the driver.
+ */
+
+static void clr_uplock(CtrDrvrModuleContext *mcon, uint32_t pw)
+{
+	uint32_t ck = 0;
+	int i;
+
+	for (i=0; i<8; i++) {
+		ck += (pw & 0xF);
+		pw = pw >> 4;
+	}
+	if (ck == 0x0024)
+		mcon->UpLock = 0;
+}
+
 /*========================================================================*/
 /* Cancel a timeout in a safe way                                         */
 /*========================================================================*/
@@ -554,7 +571,7 @@ static char *ioctl_names[CtrDrvrLAST_IOCTL] = {
 "JTAG_WRITE_BYTE", "JTAG_CLOSE", "HPTDC_OPEN", "HPTDC_IO", "HPTDC_CLOSE", "RAW_READ", "RAW_WRITE",
 "GET_RECEPTION_ERRORS", "GET_IO_STATUS", "GET_IDENTITY",
 "SET_DEBUG_HISTORY","SET_BRUTAL_PLL","GET_MODULE_STATS","SET_CABLE_ID",
-"IOCTL64","IOCTL65","IOCTL66","IOCTL67","IOCTL68","IOCTL69",
+"LOCK","UNLOCK", "IOCTL67","IOCTL68","IOCTL69","IOCTL70",
 
 "SET_MODULE_BY_SLOT", "GET_MODULE_SLOT",
 "REMAP", "93LC56B_EEPROM_OPEN", "93LC56B_EEPROM_READ", "93LC56B_EEPROM_WRITE",
@@ -2565,7 +2582,18 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
 	 }
       break;
 
+      case CtrDrvrLOCK:
+	 mcon->UpLock = 1;
+	 return OK;
+      break;
+
+      case CtrDrvrUNLOCK:
+	 clr_uplock(mcon,lav);
+	 return OK;
+      break;
+
       case CtrDrvrRESET:                  /* Reset the module, re-establish connections */
+	 if (mcon->UpLock) break;
 	 return Reset(mcon);
 
       case CtrDrvrGET_STATUS:             /* Read module status */
@@ -2590,11 +2618,13 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrCONNECT:                /* Connect to an object interrupt */
+	 if (mcon->UpLock) break;
 	 conx = (CtrDrvrConnection *) arg;
 	 if (rcnt >= sizeof(CtrDrvrConnection)) return Connect(conx,ccon);
       break;
 
       case CtrDrvrDISCONNECT:             /* Disconnect from an object interrupt */
+	 if (mcon->UpLock) break;
 	 conx = (CtrDrvrConnection *) arg;
 	 if (rcnt >= sizeof(CtrDrvrConnection)) {
 	    if (conx->EqpNum) return DisConnect(conx,ccon);
@@ -2650,6 +2680,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrSET_UTC:                /* Set Universal Coordinated Time for next PPS tick */
+	 if (mcon->UpLock) break;
 	 if (lap) return SetTime(mcon,(unsigned int) lav);
       break;
 
@@ -2671,6 +2702,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrSET_CABLE_ID:           /* If not sent by the hardware */
+	 if (mcon->UpLock) break;
 	 if (lap) {
 	    mcon->CableId = lav;
 	    return OK;
@@ -2679,6 +2711,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
 
       case CtrDrvrJTAG_OPEN:              /* Open JTAG interface */
 
+	 if (mcon->UpLock) break;
 	 if (mcon->IrqBalance == 1) {
 	    disable_irq(mcon->IVector);
 	    mcon->IrqBalance = 0;
@@ -2700,6 +2733,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
 
       case CtrDrvrJTAG_READ_BYTE:         /* Read back uploaded VHDL bit stream */
 
+	 if (mcon->UpLock) break;
 	 if (lap) {
 	    if (mcon->FlashOpen) {
 	       DrmLocalReadWrite(mcon,PLX9030_GPIOC,&lval,4,0);
@@ -2714,6 +2748,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
 
       case CtrDrvrJTAG_WRITE_BYTE:        /* Upload a new compiled VHDL bit stream */
 
+	 if (mcon->UpLock) break;
 	 if (lap) {
 	    if (mcon->FlashOpen) {
 
@@ -2735,6 +2770,8 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
 
       case CtrDrvrJTAG_CLOSE:             /* Close JTAG interface */
 
+	 if (mcon->UpLock) break;
+
 	 /* Wait 1S for the module to settle */
 
 	 sreset(&(mcon->Semaphore));
@@ -2754,10 +2791,12 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
 	 return OK;
 
       case CtrDrvrHPTDC_OPEN:             /* Open HPTDC JTAG interface */
+	 if (mcon->UpLock) break;
 	 mcon->HptdcOpen = 1;
 	 return OK;
 
       case CtrDrvrHPTDC_IO:               /* Do HPTDC IO */
+	 if (mcon->UpLock) break;
 	 if (rcnt >= sizeof(CtrDrvrHptdcIoBuf)) {
 	    if (mcon->HptdcOpen) {
 	       hpio = (CtrDrvrHptdcIoBuf *) arg;
@@ -2767,10 +2806,12 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrHPTDC_CLOSE:            /* Close HPTDC JTAG interface */
+	 if (mcon->UpLock) break;
 	 mcon->HptdcOpen = 0;
 	 return OK;
 
       case CtrDrvrRAW_READ:               /* Raw read  access to card for debug */
+	 if (mcon->UpLock) break;
          wcnt = wbounds((long) arg);       /* Number of writable bytes without error */
 	 if (wcnt >= sizeof(CtrDrvrRawIoBlock)) {
 	    riob = (CtrDrvrRawIoBlock *) arg;
@@ -2782,6 +2823,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrRAW_WRITE:              /* Raw write access to card for debug */
+	 if (mcon->UpLock) break;
 	 if (rcnt >= sizeof(CtrDrvrRawIoBlock)) {
 	    riob = (CtrDrvrRawIoBlock *) arg;
 	    if ((riob->UserArray != NULL)
@@ -2792,9 +2834,11 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrREMAP:                  /* Remap BAR2 after a config change */
+	 if (mcon->UpLock) break;
 	 return Remap(mcon);
 
       case CtrDrvr93LC56B_EEPROM_OPEN:    /* Open the PLX9030 configuration EEPROM 93LC56B for Write */
+	 if (mcon->UpLock) break;
 	 if (mcon->FlashOpen == 0) {
 
 	    /* Assert the chip select for the EEPROM and the target retry delay clocks */
@@ -2810,6 +2854,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
 	 return OK;
 
       case CtrDrvr93LC56B_EEPROM_READ:    /* Read from the EEPROM 93LC56B the PLX9030 configuration */
+	 if (mcon->UpLock) break;
 	 if (mcon->FlashOpen) {
             wcnt = wbounds((long) arg);       /* Number of writable bytes without error */
 	    if (wcnt >= sizeof(CtrDrvrRawIoBlock)) {
@@ -2824,6 +2869,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvr93LC56B_EEPROM_WRITE:   /* Write to the EEPROM 93LC56B a new PLX9030 configuration */
+	 if (mcon->UpLock) break;
 	 if (mcon->FlashOpen) {
 	    if (rcnt >= sizeof(CtrDrvrRawIoBlock)) {
 	       riob = (CtrDrvrRawIoBlock *) arg;
@@ -2837,6 +2883,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvr93LC56B_EEPROM_ERASE:   /* Erase the EEPROM 93LC56B, deletes PLX9030 configuration */
+	 if (mcon->UpLock) break;
 	 if (mcon->FlashOpen) {
 	    SendEpromCommand(mcon,EpCmdERAL,0);
 	    return OK;
@@ -2844,6 +2891,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvr93LC56B_EEPROM_CLOSE:   /* Close EEPROM 93LC56B and load new PLX9030 configuration */
+	 if (mcon->UpLock) break;
 	 SendEpromCommand(mcon,EpCmdEWDS,0);
 	 cntrl = Plx9030CntrlCHIP_UNSELECT; /* Chip un-select 93lc56b EEPROM */
 	 DrmLocalReadWrite(mcon,PLX9030_CNTRL,&cntrl,4,1);
@@ -2851,6 +2899,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
 	 return OK;
 
       case CtrDrvrPLX9030_RECONFIGURE:    /* Load EEPROM configuration into the PLX9030 */
+	 if (mcon->UpLock) break;
 	 if (mcon->FlashOpen == 0) {
 	    cntrl  = Plx9030CntrlRECONFIGURE;   /* Reload PLX9030 from 93lc56b EEPROM */
 	    DrmLocalReadWrite(mcon,PLX9030_CNTRL,&cntrl,4,1);
@@ -2859,10 +2908,12 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;                              /* EEPROM must be closed */
 
       case CtrDrvrPLX9030_CONFIG_OPEN:    /* Open the PLX9030 configuration for read */
+	 if (mcon->UpLock) break;
 	 mcon->ConfigOpen = 1;
 	 return OK;
 
       case CtrDrvrPLX9030_CONFIG_READ:    /* Read the PLX9030 configuration registers */
+	 if (mcon->UpLock) break;
 	 if (mcon->ConfigOpen) {
             wcnt = wbounds((long) arg);       /* Number of writable bytes without error */
 	    if (wcnt >= sizeof(CtrDrvrRawIoBlock)) {
@@ -2875,6 +2926,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrPLX9030_CONFIG_WRITE:   /* Write to PLX9030 configuration registers (Experts only) */
+	 if (mcon->UpLock) break;
 	 if (mcon->ConfigOpen) {
 	    if (rcnt >= sizeof(CtrDrvrRawIoBlock)) {
 	       riob = (CtrDrvrRawIoBlock *) arg;
@@ -2886,14 +2938,17 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrPLX9030_CONFIG_CLOSE:   /* Close the PLX9030 configuration */
+	 if (mcon->UpLock) break;
 	 mcon->ConfigOpen = 0;
 	 return OK;
 
       case CtrDrvrPLX9030_LOCAL_OPEN:     /* Open the PLX9030 local configuration for read */
+	 if (mcon->UpLock) break;
 	 mcon->LocalOpen = 1;
 	 return OK;
 
       case CtrDrvrPLX9030_LOCAL_READ:     /* Read the PLX9030 local configuration registers */
+	 if (mcon->UpLock) break;
 	 if (mcon->LocalOpen) {
             wcnt = wbounds((long) arg);       /* Number of writable bytes without error */
 	    if (wcnt >= sizeof(CtrDrvrRawIoBlock)) {
@@ -2906,6 +2961,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrPLX9030_LOCAL_WRITE:    /* Write the PLX9030 local configuration registers (Experts only) */
+	 if (mcon->UpLock) break;
 	 if (mcon->LocalOpen) {
 	   if (rcnt >= sizeof(CtrDrvrRawIoBlock)) {
 	       riob = (CtrDrvrRawIoBlock *) arg;
@@ -2917,6 +2973,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrPLX9030_LOCAL_CLOSE:    /* Close the PLX9030 local configuration */
+	 if (mcon->UpLock) break;
 	 mcon->LocalOpen = 0;
 	 return OK;
 
@@ -2941,6 +2998,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrSET_ACTION:             /* Set should not modify the bus interrupt settings */
+	 if (mcon->UpLock) break;
 	 if (rcnt >= sizeof(CtrDrvrAction)) {
 	    act = (CtrDrvrAction *) arg;
 	    if ((act->TriggerNumber > 0) && (act->TriggerNumber <= CtrDrvrRamTableSIZE)) {
@@ -2997,6 +3055,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrCREATE_CTIM_OBJECT:     /* Create a new CTIM timing object */
+	 if (mcon->UpLock) break;
 	 if (rcnt >= sizeof(CtrDrvrCtimBinding)) {
 	    ctim = (CtrDrvrCtimBinding *) arg;
 	    for (i=0; i<Wa->Ctim.Size; i++) {
@@ -3017,6 +3076,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrDESTROY_CTIM_OBJECT:    /* Destroy a CTIM timing object */
+	 if (mcon->UpLock) break;
 	 if (rcnt >= sizeof(CtrDrvrCtimBinding)) {
 	    ctim = (CtrDrvrCtimBinding *) arg;
 	    for (i=0; i<Wa->Ctim.Size; i++) {
@@ -3037,6 +3097,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrCHANGE_CTIM_FRAME:      /* Change the frame of an existing CTIM object */
+	 if (mcon->UpLock) break;
 	 if (rcnt >= sizeof(CtrDrvrCtimBinding)) {
 	    ctim = (CtrDrvrCtimBinding *) arg;
 	    for (i=0; i<Wa->Ctim.Size; i++) {
@@ -3065,6 +3126,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrCREATE_PTIM_OBJECT:     /* Create a new PTIM timing object */
+	 if (mcon->UpLock) break;
 	 if (rcnt >= sizeof(CtrDrvrPtimBinding)) {
 	    ptim = (CtrDrvrPtimBinding *) arg;
 	    for (i=0; i<Wa->Ptim.Size; i++) {
@@ -3123,6 +3185,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrDESTROY_PTIM_OBJECT:    /* Destroy a PTIM timing object */
+	 if (mcon->UpLock) break;
 	 if (rcnt >= sizeof(CtrDrvrPtimBinding)) {
 	    ptim = (CtrDrvrPtimBinding *) arg;
 
@@ -3185,6 +3248,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrENABLE:                               /* Enable CTR module event reception */
+	 if (mcon->UpLock) break;
 	 if        (lav   == CtrDrvrCommandSET_HPTDC) { /* Enable HPTDC chip */
 	    mcon->Command |=  CtrDrvrCommandSET_HPTDC;
 	    mmap->Command  =  mcon->Command;
@@ -3203,6 +3267,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
 	 return OK;
 
       case CtrDrvrSET_DEBUG_HISTORY:
+	 if (mcon->UpLock) break;
 	 if (lav) {
 	    mcon->Command |=  CtrDrvrCommandDebugHisOn;
 	    mcon->Command &= ~CtrDrvrCommandDebugHisOff;
@@ -3214,6 +3279,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
 	 return OK;
 
       case CtrDrvrSET_BRUTAL_PLL:
+	 if (mcon->UpLock) break;
 	 if (lav) {
 	    mcon->Command |=  CtrDrvrCommandUtcPllOff;
 	    mcon->Command &= ~CtrDrvrCommandUtcPllOn;
@@ -3232,6 +3298,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrSET_INPUT_DELAY:        /* Set input delay in 25ns ticks */
+	 if (mcon->UpLock) break;
 	 mmap->InputDelay = lav;
 	 mcon->InputDelay = lav;
 	 return OK;
@@ -3248,6 +3315,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrSET_REMOTE:             /* Counter Remote/Local status */
+	 if (mcon->UpLock) break;
 	 if (rcnt >= sizeof(CtrdrvrRemoteCommandBuf)) {
 	    remc = (CtrdrvrRemoteCommandBuf *) arg;
 	    if ((remc->Counter >= CtrDrvrCounter1) && (remc->Counter <= CtrDrvrCounter8)) {
@@ -3259,6 +3327,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrREMOTE:                 /* Remote control counter */
+	 if (mcon->UpLock) break;
 	 if (rcnt >= sizeof(CtrdrvrRemoteCommandBuf)) {
 	    remc = (CtrdrvrRemoteCommandBuf *) arg;
 	    if ((remc->Counter >= CtrDrvrCounter1) && (remc->Counter <= CtrDrvrCounter8)) {
@@ -3299,6 +3368,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrSET_OUT_MASK:           /* Counter output routing mask */
+	 if (mcon->UpLock) break;
 	 if (rcnt >= sizeof(CtrDrvrCounterMaskBuf)) {
 	    cmsb = (CtrDrvrCounterMaskBuf *) arg;
 	    if ((cmsb->Counter >= CtrDrvrCounter1) && (cmsb->Counter <= CtrDrvrCounter8)) {
@@ -3334,6 +3404,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrSET_CONFIG:             /* Set a counter configuration */
+	 if (mcon->UpLock) break;
 	 if (rcnt >= sizeof(CtrDrvrCounterConfigurationBuf)) {
 	    conf = (CtrDrvrCounterConfigurationBuf *) arg;
 	    if (mmap->Counters[conf->Counter].Control.LockConfig) {
@@ -3372,6 +3443,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrSET_PLL:                /* Set phase locked loop parameters */
+	 if (mcon->UpLock) break;
 	 if (rcnt >= sizeof(CtrDrvrPll)) {
 	    pll = (CtrDrvrPll *) arg;
 	    Int32Copy((unsigned int *) &(mmap->Pll),
@@ -3397,6 +3469,7 @@ unsigned int cntrl;      /* PLX9030 serial EEPROM control register */
       break;
 
       case CtrDrvrSET_PLL_ASYNC_PERIOD:   /* Set PLL asynchronous period */
+	 if (mcon->UpLock) break;
 	 if (rcnt >= sizeof(CtrDrvrPllAsyncPeriodNs)) {
 	    asyp = (CtrDrvrPllAsyncPeriodNs *) arg;
 	    *asyp = mcon->PllAsyncPeriodNs;

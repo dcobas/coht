@@ -365,12 +365,20 @@ int cnt, dir;
       dir = READ_FLAG;
       break;
 
-   case CtrDrvrIOCTL_64:
-   case CtrDrvrIOCTL_65:
-   case CtrDrvrIOCTL_66:
+   case CtrDrvrLOCK:
+      cnt = sizeof(uint32_t);
+      dir = READ_FLAG;
+      break;
+
+   case CtrDrvrUNLOCK:
+      cnt = sizeof(uint32_t);
+      dir = READ_FLAG;
+      break;
+
    case CtrDrvrIOCTL_67:
    case CtrDrvrIOCTL_68:
    case CtrDrvrIOCTL_69:
+   case CtrDrvrIOCTL_70:
       cnt = sizeof(uint32_t);
       dir = READ_FLAG;
       break;
