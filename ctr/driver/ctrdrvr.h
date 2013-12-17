@@ -511,12 +511,10 @@ typedef enum {
 #define CtrIoctlLOCK                           CIOWR(CtrDrvrLOCK                   ,uint32_t)
 #define CtrIoctlUNLOCK                         CIOWR(CtrDrvrUNLOCK                 ,uint32_t)
 
-#define CtrIoctlIOCTL_64                       CIOWR(CtrDrvrIOCTL_64               ,uint32_t)
-#define CtrIoctlIOCTL_65                       CIOWR(CtrDrvrIOCTL_65               ,uint32_t)
-#define CtrIoctlIOCTL_66                       CIOWR(CtrDrvrIOCTL_66               ,uint32_t)
 #define CtrIoctlIOCTL_67                       CIOWR(CtrDrvrIOCTL_67               ,uint32_t)
 #define CtrIoctlIOCTL_68                       CIOWR(CtrDrvrIOCTL_68               ,uint32_t)
 #define CtrIoctlIOCTL_69                       CIOWR(CtrDrvrIOCTL_69               ,uint32_t)
+#define CtrIoctlIOCTL_70                       CIOWR(CtrDrvrIOCTL_70               ,uint32_t)
 
 #ifdef CTR_VME
 #define CtrIoctlGET_OUTPUT_BYTE                CIOWR(CtrDrvrGET_OUTPUT_BYTE        ,uint32_t)
